@@ -1,74 +1,70 @@
-﻿using System;
-using System.Threading.Tasks;
-using Colossal.Serialization.Entities;
+﻿using Colossal.Serialization.Entities;
 using Colossal.UI.Binding;
 using Game;
 using Game.UI;
 using Unity.Mathematics;
 using AdvancedRoadTools.ExtendedRoadUpgrades;
-using Game.SceneFlow;
-using UnityEngine;
-using cohtml.Net;
 
 namespace AdvancedRoadTools.Core;
 
 public partial class ZoningControllerToolUISystem : UISystemBase
 {
-    private const string ModId = "Zoning_Controller";
-
-    public ZoningMode CurrentZoningMode => (ZoningMode)m_zoningMode.value;
-
-    public int CurrentZoningDepth => m_zoningDepth.value;
+    private const string ModId = "AdvancedRoadTools";
     
-    private ValueBinding<int> m_zoningMode;
-    private ValueBinding<int> m_zoningDepth;
-
-    private cohtml.Net.View m_UiView;
+    private ValueBinding<int> _zoningMode;
+    private ValueBinding<int> _zoningDepthLeft;
+    private ValueBinding<int> _zoningDepthRight;
+    
+    public int DepthLeft => _zoningDepthLeft.value;
+    public int DepthRight => _zoningDepthRight.value;
+    public ZoningMode ZoningMode => (ZoningMode)_zoningMode.value;
 
     protected override void OnCreate()
     {
         base.OnCreate();
         
-        AddBinding(m_zoningMode = new ValueBinding<int>(ModId, "ZoningMode", (int)ZoningMode.Both));
-        AddBinding(m_zoningDepth = new ValueBinding<int>(ModId, "ZoningDepth", 6));
+        AddBinding(_zoningMode = new ValueBinding<int>(ModId, "ZoningMode", (int)ZoningMode.Both));
+        AddBinding(_zoningDepthLeft = new ValueBinding<int>(ModId, "ZoningDepthLeft", 6));
+        AddBinding(_zoningDepthRight = new ValueBinding<int>(ModId, "ZoningDepthRight", 6));
         
         
-        AddBinding(new TriggerBinding<int>(ModId, "ChangeToolMode", ChangeZoningMode));
-        AddBinding(new TriggerBinding<int>(ModId, "ChangeToolDepth", ChangeZoningDepth));
-        AddBinding(new TriggerBinding(ModId, "depth-up-arrow", IncreaseDepth));
-        AddBinding(new TriggerBinding(ModId, "depth-down-arrow", DecreaseDepth));
+        AddBinding(new TriggerBinding<int>(ModId, "ChangeZoningMode", ChangeZoningMode));
+        AddBinding(new TriggerBinding(ModId, "depth-up-left-arrow", () => IncreaseDepth(_zoningDepthLeft.value, ZoningMode.Left)));
+        AddBinding(new TriggerBinding(ModId, "depth-down-left-arrow", () => DecreaseDepth(_zoningDepthLeft.value, ZoningMode.Left)));
+        AddBinding(new TriggerBinding(ModId, "depth-up-right-arrow", () => IncreaseDepth(_zoningDepthRight.value, ZoningMode.Right)));
+        AddBinding(new TriggerBinding(ModId, "depth-down-right-arrow", () => DecreaseDepth(_zoningDepthRight.value, ZoningMode.Right)));
     }
 
-    protected override void OnUpdate()
+    private void DecreaseDepth(int value, ZoningMode mode)
     {
-        base.OnUpdate();
-        m_UiView = GameManager.instance.userInterface.view.View;
-        
-        m_UiView.ExecuteScript("if (yyTreeController == null) var yyTreeController = {};");
-        
+        ChangeZoningDepth(value-1, mode);
     }
 
-    private void DecreaseDepth()
+    private void IncreaseDepth(int value, ZoningMode mode)
     {
-        var depth = m_zoningDepth.value;
-        depth = math.clamp(depth-1, 0, int.MaxValue);
-        
-        m_zoningDepth.Update(depth);
+        ChangeZoningDepth(value+1, mode);
     }
 
-    private void IncreaseDepth()
+    private void ChangeZoningDepth(int value, ZoningMode mode)
     {
-        var depth = m_zoningDepth.value;
-        depth = math.clamp(depth+1, 0, int.MaxValue);
-        
-        m_zoningDepth.Update(depth);
-    }
+        log.Info(value);
 
-    private void ChangeZoningDepth(int value)
-    {
-        if(value < 0)
-            log.Error("Zoning depth must be greater than 0");
-        m_zoningDepth.Update(value);
+        value = math.clamp(value, 0, AdvancedRoadToolsMod.m_Setting.MaxDepth);
+
+        if ((mode & ZoningMode.Left) == ZoningMode.Left)
+        {
+            if(value == 0)
+                _zoningMode.Update((int)((ZoningMode)_zoningMode.value ^ ZoningMode.Left));
+            else
+                _zoningDepthLeft.Update(value);
+        }
+        else if ((mode & ZoningMode.Right) == ZoningMode.Right)
+        {
+            if(value == 0)
+                _zoningMode.Update((int)((ZoningMode)_zoningMode.value ^ ZoningMode.Right));
+            else
+                _zoningDepthRight.Update(value);
+        }
     }
 
     protected override void OnGamePreload(Purpose purpose, GameMode mode)
@@ -80,23 +76,8 @@ public partial class ZoningControllerToolUISystem : UISystemBase
     private void ChangeZoningMode(int value)
     {
         var mode = (ZoningMode)value;
-        switch (mode)
-        {
-            case ZoningMode.None:
-                m_zoningMode.Update((int)ZoningMode.None);
-                m_zoningDepth.Update(0);
-                break;
-            case ZoningMode.Right:
-                m_zoningMode.Update((int)ZoningMode.None);
-                break;
-            case ZoningMode.Left:
-                m_zoningMode.Update((int)ZoningMode.None);
-                break;
-            case ZoningMode.Both:
-                m_zoningMode.Update((int)ZoningMode.None);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+        AdvancedRoadToolsMod.log.Info(mode);
+        
+        _zoningMode.Update(value);
     }
 }

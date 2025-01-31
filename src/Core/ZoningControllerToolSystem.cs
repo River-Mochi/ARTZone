@@ -1,9 +1,9 @@
-﻿using Game.Common;
+﻿using AdvancedRoadTools.Core.Logging;
+using Game.Common;
 using Game.Net;
 using Game.Prefabs;
 using Game.Tools;
 using Unity.Burst;
-using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -59,6 +59,7 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
 
     public override bool TrySetPrefab(PrefabBase prefab)
     {
+        Log.Info($"[{this.GetType().Name}] TrySetPrefab called]");
         return false;
     }
 

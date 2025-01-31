@@ -14,10 +14,8 @@ public class AdvancedRoadToolsMod : IMod
         .SetShowsErrorsInUI(false);
 
     internal static Setting m_Setting;
-    private UpdateRoadTilingSystem updateRoadTilingSystem;
-    private InitializeAdvancedDataSystem initializeAdvancedDataSystem;
-    private ZoningControllerToolUISystem RoadTilingUISystem;
-    private ZoningControllerToolSystem _zoningControllerToolSystem;
+
+    private Harmony _harmony;
     
     public void OnLoad(UpdateSystem updateSystem)
     {
@@ -32,19 +30,13 @@ public class AdvancedRoadToolsMod : IMod
 
         AssetDatabase.global.LoadSettings(nameof(Core), m_Setting, new Setting(this));
 
-
-        initializeAdvancedDataSystem = new InitializeAdvancedDataSystem();
         updateSystem.UpdateAt<InitializeAdvancedDataSystem>(SystemUpdatePhase.Modification4B);
-        
-        updateRoadTilingSystem = new UpdateRoadTilingSystem();
-        RoadTilingUISystem = new ZoningControllerToolUISystem();
-        _zoningControllerToolSystem = new ZoningControllerToolSystem();
-        
-        
         updateSystem.UpdateAfter<UpdateRoadTilingSystem>(SystemUpdatePhase.Modification4);
-        updateSystem.UpdateAt<ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
         updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
-        Harmony.CreateAndPatchAll(typeof(AdvancedRoadToolsMod).Assembly);
+        updateSystem.UpdateAt<ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
+        
+        _harmony = new Harmony("AdvancedRoadTools");
+        _harmony.PatchAll();
     }
 
 

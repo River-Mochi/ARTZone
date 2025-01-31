@@ -11,6 +11,7 @@ using Game;
 using Game.Common;
 using Game.Input;
 using Game.Net;
+using Unity.Mathematics;
 using Block = Game.Zones.Block;
 
 namespace AdvancedRoadTools.Core;
@@ -19,6 +20,7 @@ public partial class InitializeAdvancedDataSystem : GameSystemBase
 {
     public EntityQuery uninitializedRoadsQuery;
     private ModificationBarrier4B _modification4B;
+    private ZoningControllerToolUISystem zoneControllerToolUI;
 
     protected override void OnCreate()
     {
@@ -29,7 +31,8 @@ public partial class InitializeAdvancedDataSystem : GameSystemBase
 
 
         this.RequireAnyForUpdate(this.uninitializedRoadsQuery);
-        _modification4B = World.GetOrCreateSystemManaged<ModificationBarrier4B>();
+        _modification4B = World.GetOrCreateSystemManaged<ModificationBarrier4B>();;
+        zoneControllerToolUI = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
     }
 
 
@@ -42,7 +45,8 @@ public partial class InitializeAdvancedDataSystem : GameSystemBase
                 ecb = ecb,
                 EntityTypeHandle = GetEntityTypeHandle(),
                 BlockTypeHandle = GetComponentTypeHandle<Block>(true),
-                LastSystemVersion = LastSystemVersion
+                size = new(((zoneControllerToolUI.ZoningMode & ZoningMode.Left) != ZoningMode.Left) ? 0 : zoneControllerToolUI.DepthLeft,
+                    ((zoneControllerToolUI.ZoningMode & ZoningMode.Right) != ZoningMode.Right) ? 0 : zoneControllerToolUI.DepthRight),
             }
             .Schedule(uninitializedRoadsQuery, Dependency);
 
@@ -54,7 +58,7 @@ public partial class InitializeAdvancedDataSystem : GameSystemBase
     {
         public EntityTypeHandle EntityTypeHandle;
         [ReadOnly] public ComponentTypeHandle<Block> BlockTypeHandle;
-        public uint LastSystemVersion;
+        public int2 size;
 
         public EntityCommandBuffer ecb;
 
@@ -72,8 +76,8 @@ public partial class InitializeAdvancedDataSystem : GameSystemBase
                 ecb.AddComponent<AdvancedBlockData>(entities[i], new()
                 {
                     originalPosition = blocks[i].m_Position,
-                    offset = default,
-                    TillingMode = Setting.TillingModes.Both
+                    depthLeft = size.x,
+                    depthRight = size.y,
                 });
             }
         }

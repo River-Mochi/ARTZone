@@ -25,8 +25,8 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
             // Quay
             new ExtendedRoadUpgradeModel
             {
-                ObsoleteId = "Zoning Mode",
-                Id = "Zoning Mode",
+                ObsoleteId = "Zone Controller Tool",
+                Id = "Zone Controller Tool",
                 m_SetUpgradeFlags = new CompositionFlags
                 {
                     m_General = CompositionFlags.General.Edge
