@@ -1,0 +1,25 @@
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" width="64" height="64"
+     viewBox="0 0 64 64">
+    <defs>
+        <clipPath id="b">
+            <rect width="64" height="64"/>
+        </clipPath>
+    </defs>
+    <g id="a">
+        <path d="M733.426-302.733l29.61,25.369,27.033-16.2v-2.474l-8.621.632-48.021-9.373Z"
+              transform="translate(-729.729 335.842)" fill="#434343"/>
+        <path d="M735.865-304.107l34.087,22.391,13.869-8.215-28.775-25.8Z" transform="translate(-731.64 335.022)"
+              fill="#d4d4d4"/>
+        <path d="M1224.4-1129.661l29.871,25.1,10.9-6.448-30.016-25.114Z" transform="translate(-1220.736 1160.714)"
+              fill="#929191"/>
+        <path d="M1224.4-1129.661l29.871,25.1,7.66-4.456-26.773-27.106Z" transform="translate(-1208.684 1153.599)"
+              fill="#929191"/>
+        <path d="M1249.1-1108.867l11.313-6.694Z" transform="translate(-1203.615 1158.607)" fill="gray"/>
+        <path d="M1224.4-1129.661l29.871,25.1,3.22-1.742-29.986-24.958Z" transform="translate(-1220.736 1160.714)"
+              fill="#716e6e"/>
+        <path d="M1231.995-1134.992l29.876,25.051,7.153-3.857-29.987-25.279Z" transform="translate(-1208.684 1153.599)"
+              fill="#dddddd"/>
+        <path d="M1836.825-447.064l-30.108-25.156.095-1.066,30.013,25.138Z" transform="translate(-1783.689 491.713)"
+              fill="#d4d4d4"/>
+    </g>
+</svg>

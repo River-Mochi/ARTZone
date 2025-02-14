@@ -25,11 +25,10 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
             // Quay
             new ExtendedRoadUpgradeModel
             {
-                ObsoleteId = "Zone Controller Tool",
+                ObsoleteId = "ZoneControllerTool",
                 Id = "Zone Controller Tool",
                 m_SetUpgradeFlags = new CompositionFlags
                 {
-                    m_General = CompositionFlags.General.Edge
                 },
                 m_UnsetUpgradeFlags = new CompositionFlags
                 {
@@ -37,7 +36,8 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
 
                 // TODO: not sure how this works yet
                 m_SetState = new [] { NetPieceRequirements.Edge },
-                m_UnsetState = null
+                m_UnsetState = null,
+                IsUnderground = true
             },
         };
     }

@@ -173,17 +173,23 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
 
                 // Create and populate the new UIObject for our cloned Prefab
                 var clonedGrassUpgradePrefabUIObject = ScriptableObject.CreateInstance<UIObject>();
-                clonedGrassUpgradePrefabUIObject.m_Icon = $"{COUIBaseLocation}{upgradeMode.ObsoleteId}.svg";
+                //clonedGrassUpgradePrefabUIObject.m_Icon = $"/";
                 clonedGrassUpgradePrefabUIObject.name = grassUpgradePrefabUIObject.name.Replace("Grass", upgradeMode.Id);
                 clonedGrassUpgradePrefabUIObject.m_IsDebugObject = grassUpgradePrefabUIObject.m_IsDebugObject;
                 clonedGrassUpgradePrefabUIObject.m_Priority = grassUpgradePrefabUIObject.m_Priority;
                 clonedGrassUpgradePrefabUIObject.m_Group = grassUpgradePrefabUIObject.m_Group;
                 clonedGrassUpgradePrefabUIObject.active = grassUpgradePrefabUIObject.active;
+                
+                
 
                 Log.Debug($"{logHeader} [{upgradeMode.Id}] Created a custom UIObject for our cloned Prefab with name {clonedGrassUpgradePrefabUIObject.name} and icon {clonedGrassUpgradePrefabUIObject.m_Icon}.");
 
                 // Add the newly created UIObject component and then add the cloned Prefab to our PrefabSystem
                 clonedGrassUpgradePrefab.AddComponentFrom(clonedGrassUpgradePrefabUIObject);
+                var tool = world.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
+                
+                tool.SetPrefab(clonedGrassUpgradePrefab);
+                
                 if (!prefabSystem.AddPrefab(clonedGrassUpgradePrefab))
                 {
                     Log.Error($"{logHeader} [{upgradeMode.Id}] Failed adding the cloned Prefab to PrefabSystem, exiting.");
@@ -306,6 +312,16 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
                     Log.Error($"{logHeader} [{upgradeMode.Id}] Failed retrieving the cloned Grass Prefab's PlaceableNetData instance, exiting.");
                     return;
                 }
+
+                string s = string.Empty;
+
+                s+= $"\nRight:{clonedGrassUpgradePrefabData.m_SetUpgradeFlags.m_Right}";
+                s+= $"\nGeneral:{clonedGrassUpgradePrefabData.m_SetUpgradeFlags.m_General}";
+                s+= $"\nLeft:{clonedGrassUpgradePrefabData.m_SetUpgradeFlags.m_Left}";
+                
+                s+= $"\nPlacement:{clonedGrassUpgradePrefabData.m_PlacementFlags}";
+                
+                AdvancedRoadToolsMod.log.Info(s);
 
                 Log.Debug($"{logHeader} [{upgradeMode.Id}] Retrieved the cloned Grass Prefab's PlaceableNetData instance.");
 

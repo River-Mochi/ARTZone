@@ -1,91 +1,345 @@
-﻿using AdvancedRoadTools.Core.Logging;
+﻿using System;
+using System.Linq;
+using Colossal.Entities;
+using Colossal.Logging;
+using Colossal.Serialization.Entities;
+using Game;
 using Game.Common;
 using Game.Net;
 using Game.Prefabs;
 using Game.Tools;
+using Game.Zones;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 
 namespace AdvancedRoadTools.Core;
 
 [BurstCompile]
 public partial class ZoningControllerToolSystem : ToolBaseSystem
-{    
-    public EntityQuery edgesQuery;
-    private ModificationBarrier4B _modification4B;
-    
+{
+    private ToolOutputBarrier _toolOutputBarrier;
+    private ZoningControllerToolUISystem _zoningControllerToolUISystem;
+    private ILog log => AdvancedRoadToolsMod.log;
+
+    private const string LOG_HEADER = $"[{nameof(ZoningControllerToolSystem)}]";
+
+    public override string toolID => "Zone Controller Tool";
+
+    private EntityQuery allBlocksQuery;
+    private EntityQuery highlightedEntityQuery;
+    private EntityQuery tempAdvancedRoadQuery;
+
     [BurstCompile]
-    public void OnCreate(ref SystemState state)
+    protected override void OnCreate()
     {
-        
-        edgesQuery = new EntityQueryBuilder(Allocator.Temp)
-            .WithAll<Edge>()
-            .WithNone<Highlighted>()
+        log.Info("OnCreate");
+        base.OnCreate();
+        _toolOutputBarrier = World.GetOrCreateSystemManaged<ToolOutputBarrier>();
+        _zoningControllerToolUISystem = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
+
+        allBlocksQuery = new EntityQueryBuilder(Allocator.Temp)
+            .WithAll<Block, Owner>()
             .Build(this);
-        
-        this.RequireAnyForUpdate(this.edgesQuery);
-        _modification4B = World.GetOrCreateSystemManaged<ModificationBarrier4B>();
+
+        highlightedEntityQuery = new EntityQueryBuilder(Allocator.Temp)
+            .WithAll<Highlighted>()
+            .Build(this);
+
+        tempAdvancedRoadQuery = new EntityQueryBuilder(Allocator.Temp)
+            .WithAll<TempZoning>()
+            .Build(this);
+
+        ExtendedRoadUpgrades.UpgradesManager.Install();
     }
 
-    [BurstCompile]
-    public void OnUpdate(ref SystemState state)
+    /// <inheritdoc/>
+    protected override void OnStartRunning()
     {
-        if (!GetRaycastResult(out Entity entity, out var hit)) return;
-        
-        var ecb = _modification4B.CreateCommandBuffer();
-            
-        this.Dependency = new EdgeHighlightJob
+        log.Info("OnStartRunning");
+        base.OnStartRunning();
+        applyAction.enabled = true;
+        secondaryApplyAction.enabled = true;
+        requireZones = true;
+        requireNet = Layer.Road;
+        allowUnderground = true;
+
+        this.ToggleToolOptions(true);
+    }
+
+    ///cleans up actions or whatever else you want to happen when your tool becomes inactive.
+    protected override void OnStopRunning()
+    {
+        log.Info("OnStopRunning");
+        base.OnStartRunning();
+        applyAction.enabled = false;
+        secondaryApplyAction.enabled = false;
+        requireZones = false;
+        requireNet = Layer.None;
+        allowUnderground = false;
+        this.ToggleToolOptions(false);
+    }
+
+    private enum State
+    {
+        Default,
+        Applying,
+        Cancelling,
+    }
+
+    protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
+    {
+        base.OnGameLoadingComplete(purpose, mode);
+        log.Debug($"{nameof(ZoningControllerToolSystem)}.{nameof(OnGameLoadingComplete)} New Order:");
+        m_ToolSystem.tools.Remove(this);
+        m_ToolSystem.tools.Insert(0, this);
+
+        foreach (ToolBaseSystem toolBaseSystem in m_ToolSystem.tools)
         {
-            Entity = entity,
-            EdgeLookup = GetComponentLookup<Edge>(true),
-            ecb = ecb
-        }.Schedule(this.Dependency);
-            
-        this._modification4B.AddJobHandleForProducer(this.Dependency);
+            log.Debug($"{nameof(ZoningControllerToolSystem)}.{nameof(OnGameLoadingComplete)} {toolBaseSystem.toolID}");
+        }
     }
 
-    [BurstCompile]
-    public void OnDestroy(ref SystemState state)
+    private JobHandle Apply(JobHandle inputDeps)
     {
-
+        this.applyMode = ApplyMode.Apply;
+        return inputDeps;
     }
+
+    protected override JobHandle OnUpdate(JobHandle inputDeps)
+    {
+        inputDeps = Dependency;
+        
+        var ecb = _toolOutputBarrier.CreateCommandBuffer();
+        bool raycastFlag = GetRaycastResult(out Entity e, out RaycastHit hit);
+
+        var depths = new int2(_zoningControllerToolUISystem.DepthLeft,
+            _zoningControllerToolUISystem.DepthRight);
+
+        if (!highlightedEntityQuery.IsEmpty || raycastFlag)
+        {
+            var handleHighlightJob = new HandleHighlightJob
+            {
+                RaycastHit = hit,
+                AdvancedRoadLookup = GetComponentLookup<AdvancedRoad>(true),
+                HighlightedLookup = GetComponentLookup<Highlighted>(true),
+                EdgeLookup = GetComponentLookup<Edge>(true),
+                SubBlockLookup = GetBufferLookup<SubBlock>(true),
+                HighlightedEntities = highlightedEntityQuery.ToEntityArray(Allocator.TempJob),
+                ECB = ecb,
+                Depths = depths,
+            }.Schedule(inputDeps);
+            inputDeps = JobHandle.CombineDependencies(inputDeps, handleHighlightJob);
+        }
+
+        if (!tempAdvancedRoadQuery.IsEmpty || raycastFlag)
+        {
+            var handleTempJob = new HandleTempJob
+            {
+                RaycastHit = hit,
+                ECB = ecb,
+                AdvancedRoadLookup = GetComponentLookup<AdvancedRoad>(true),
+                TempZoningLookup = GetComponentLookup<TempZoning>(true),
+                TempAdvancedRoadEntities = tempAdvancedRoadQuery.ToEntityArray(Allocator.TempJob),
+                Depths = depths,
+            }.Schedule(inputDeps);
+            inputDeps = JobHandle.CombineDependencies(inputDeps, handleTempJob);
+        }
+
+        
+        //Left Click will set the Zoning depth to the current setting
+        if (applyAction.WasPressedThisFrame() && raycastFlag)
+        {
+            log.Debug($"{LOG_HEADER} ({nameof(OnUpdate)}) - Left Click on {toolID}");
+
+            var setAdvancedRoadJob = new SetAdvancedRoadJob()
+            {
+                TempZoningLookup = GetComponentLookup<TempZoning>(true),
+                RoadEntity = e,
+                ECB = ecb
+            }.Schedule(inputDeps);
+            inputDeps = JobHandle.CombineDependencies(inputDeps, setAdvancedRoadJob);
+        }
+
+        //Right click inverts the current zoning mode
+        if (secondaryApplyAction.WasPressedThisFrame())
+        {
+            _zoningControllerToolUISystem.InvertZoningMode();
+        }
+
+        _toolOutputBarrier.AddJobHandleForProducer(inputDeps);
+
+        return inputDeps;
+    }
+
+    private PrefabBase m_Prefab;
+
+    public void SetPrefab(PrefabBase prefab) => m_Prefab = prefab;
 
     public override PrefabBase GetPrefab()
     {
-        return null;
+        return m_Prefab;
     }
 
     public override bool TrySetPrefab(PrefabBase prefab)
     {
-        Log.Info($"[{this.GetType().Name}] TrySetPrefab called]");
-        return false;
+        bool isRightPrefab = prefab.name == toolID;
+
+        return isRightPrefab;
     }
 
     public override void InitializeRaycast()
     {
         base.InitializeRaycast();
 
-        this.m_ToolRaycastSystem.typeMask = TypeMask.Lanes | TypeMask.Net;
+        this.m_ToolRaycastSystem.typeMask = TypeMask.Net;
         this.m_ToolRaycastSystem.netLayerMask = Layer.Road;
-        this.m_ToolRaycastSystem.areaTypeMask = Game.Areas.AreaTypeMask.Surfaces;
     }
 
-    public override string toolID => "Zoning Controller";
-
-    public partial struct EdgeHighlightJob : IJob
+    /// <summary>
+    /// Updates the highlighted entities and sets them up to preview what the changes will be like
+    /// </summary>
+    public struct HandleTempJob : IJob
     {
-        public Entity Entity;
-        public ComponentLookup<Edge> EdgeLookup;
-        public EntityCommandBuffer ecb;
+        public RaycastHit RaycastHit;
+        public EntityCommandBuffer ECB;
+        public ComponentLookup<AdvancedRoad> AdvancedRoadLookup;
+        public ComponentLookup<TempZoning> TempZoningLookup;
+        public NativeArray<Entity> TempAdvancedRoadEntities;
+        public int2 Depths;
+        public bool SettingsChanged;
 
-        
         public void Execute()
         {
-            ecb.AddComponent<Highlighted>(EdgeLookup[Entity].m_End); 
+            var entity = RaycastHit.m_HitEntity;
+            var hasAdvancedRoad = AdvancedRoadLookup.TryGetComponent(entity, out var data);
+            var hasTempZoning = TempZoningLookup.TryGetComponent(entity, out var temp);
+
+            if (entity != Entity.Null)
+            {
+                if (!hasTempZoning || math.any(Depths != temp.Depths))
+                {
+                    if ((hasAdvancedRoad && math.any(data.Depths != Depths)) //IF has advance road an its different
+                        || (!hasAdvancedRoad &&
+                            math.any(Depths !=
+                                     new int2(6)))) //OR doesn't have advance road and its different from default
+                    {
+                        AdvancedRoadToolsMod.log.Debug(
+                            $"[{nameof(HandleTempJob)}] Setting temporary zoning of {entity} ({Depths})");
+                        ECB.AddComponent(entity, new TempZoning
+                        {
+                            Depths = Depths
+                        });
+                        ECB.AddComponent<Updated>(entity);
+                    }
+                }
+            }
+
+            foreach (var tempAdvancedRoadEntity in TempAdvancedRoadEntities.Where(tempAdvancedRoad =>
+                         tempAdvancedRoad != entity))
+            {
+                DeleteTemp(tempAdvancedRoadEntity);
+            }
+
+            TempAdvancedRoadEntities.Dispose();
+        }
+
+        private void DeleteTemp(Entity entity)
+        {
+            ECB.RemoveComponent<TempZoning>(entity);
+            ECB.AddComponent<Updated>(entity);
+
+            AdvancedRoadToolsMod.log.Debug($"[{nameof(HandleTempJob)}] Removed temporary zoning of {entity}");
         }
     }
-    
-    
+
+    /// <summary>
+    /// Sets the previewed zoning
+    /// </summary>
+    public struct SetAdvancedRoadJob : IJob
+    {
+        public Entity RoadEntity;
+        public ComponentLookup<TempZoning> TempZoningLookup;
+        public EntityCommandBuffer ECB;
+
+        public void Execute()
+        {
+            AdvancedRoadToolsMod.log.Debug($"[{nameof(SetAdvancedRoadJob)}.Execute()]");
+
+            if (!TempZoningLookup.TryGetComponent(RoadEntity, out var tempZoning)) return;
+            
+            var newDepth = tempZoning.Depths;
+            
+            ECB.RemoveComponent<TempZoning>(RoadEntity);
+            ECB.AddComponent<AdvancedRoad>(RoadEntity,
+                new AdvancedRoad { Depths = newDepth });
+        }
+    }
+
+    /// <summary>
+    /// Highlights the moused over road and unhighlights other entities
+    /// </summary>
+    public struct HandleHighlightJob : IJob
+    {
+        public RaycastHit RaycastHit;
+        public ComponentLookup<AdvancedRoad> AdvancedRoadLookup;
+        public ComponentLookup<Highlighted> HighlightedLookup;
+        public ComponentLookup<Edge> EdgeLookup;
+        public BufferLookup<SubBlock> SubBlockLookup;
+        public NativeArray<Entity> HighlightedEntities;
+        public EntityCommandBuffer ECB;
+        public int2 Depths;
+
+        public void Execute()
+        {
+            var entity = RaycastHit.m_HitEntity;
+
+            var hasAdvancedRoad = AdvancedRoadLookup.TryGetComponent(entity, out var data);
+            var hasSubBlock = SubBlockLookup.TryGetBuffer(entity, out var subBlock);
+
+            if (!HighlightedLookup.HasComponent(entity) && entity != Entity.Null) //IF is not highlighted
+            {
+                if ((hasAdvancedRoad && hasSubBlock && !subBlock.IsEmpty &&
+                     math.any(data.Depths != Depths)) //if advanced data depths is different from current depths
+                    || (!hasAdvancedRoad && hasSubBlock && !subBlock.IsEmpty  &&
+                        math.any(Depths !=
+                                 new int2(6)))) //if it doesn't have an advanced data and depths are game's defaults
+                {
+                    HighlightEntity(entity);
+                }
+            }
+
+            foreach (var highlightedEntity in HighlightedEntities.Where(
+                         highlightedEntity => highlightedEntity != entity))
+            {
+                UnhighlightEntity(highlightedEntity);
+            }
+
+            HighlightedEntities.Dispose();
+        }
+
+        private void HighlightEntity(Entity entity)
+        {
+            ECB.AddComponent<Highlighted>(entity);
+            ECB.AddComponent<BatchesUpdated>(entity);
+
+            if (!EdgeLookup.TryGetComponent(entity, out var edge)) return;
+
+            ECB.AddComponent<Updated>(edge.m_Start);
+            ECB.AddComponent<Updated>(edge.m_End);
+        }
+
+        private void UnhighlightEntity(Entity entity)
+        {
+            ECB.RemoveComponent<Highlighted>(entity);
+            ECB.AddComponent<BatchesUpdated>(entity);
+
+            if (!EdgeLookup.TryGetComponent(entity, out var edge)) return;
+
+            ECB.AddComponent<Updated>(edge.m_Start);
+            ECB.AddComponent<Updated>(edge.m_End);
+        }
+    }
 }

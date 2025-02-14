@@ -6,6 +6,7 @@ import mod from "../../mod.json";
 import {VanillaComponentResolver} from "../YenYang/VanillaComponentResolver";
 import styles from "./ZoningToolSections.module.scss";
 import { Icon } from "cs2/ui";
+import Thumbnail from "../../ZoneControllerTool.svg";
 
 export enum ZoningMode {
     None = 0,
@@ -69,8 +70,10 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
         const ZoningModeRightTooltipDescription = translate("ToolOptions.TOOLTIP_DESCRIPTION[AdvancedRoadTools.Zone_Controller.ZoningModeRightDescription]", "Change the zoning depth on the right side.");
 
         var result = Component();
-
-        if (netToolActive || zoningToolActive) {
+        
+        //Currently the mod doesn't work when placing roads, only with the Zoning TOol
+        //if (netToolActive || zoningToolActive) {
+        if (zoningToolActive) {
             result.props.children?.push(
                 <>
                     {(<VanillaComponentResolver.instance.Section title={ZoningModeTitle}>
@@ -92,40 +95,40 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
                             </>
                         </VanillaComponentResolver.instance.Section>
                     )}
-                    {((SelectedZoningMode & ZoningMode.Left) == ZoningMode.Left) && (
-                        <VanillaComponentResolver.instance.Section title={`Left ${ZoningDepthTitle}`}>
-                            <VanillaComponentResolver.instance.ToolButton
-                                tooltip={ZoningDepthDownTooltipDescription} 
-                                onSelect={() => handleClick(depthDownLeftID)} 
-                                src={arrowDownSrc} 
-                                focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED} 
-                                className={VanillaComponentResolver.instance.mouseToolOptionsTheme.startButton}></VanillaComponentResolver.instance.ToolButton>
-                            <div className={VanillaComponentResolver.instance.mouseToolOptionsTheme.numberField}>{ ZoningDepthLeft }</div>
-                            <VanillaComponentResolver.instance.ToolButton 
-                                tooltip={ZoningDepthUpTooltipDescription}
-                                onSelect={() => handleClick(depthUpLeftID)}
-                                src={arrowUpSrc} 
-                                focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED} 
-                                className={VanillaComponentResolver.instance.mouseToolOptionsTheme.endButton}></VanillaComponentResolver.instance.ToolButton>
-                        </VanillaComponentResolver.instance.Section>
-                    )}
-                    {((SelectedZoningMode & ZoningMode.Right) == ZoningMode.Right) && (
-                        <VanillaComponentResolver.instance.Section title={`Right ${ZoningDepthTitle}`}>
-                            <VanillaComponentResolver.instance.ToolButton
-                                tooltip={ZoningDepthDownTooltipDescription}
-                                onSelect={() => handleClick(depthDownRightID)}
-                                src={arrowDownSrc}
-                                focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
-                                className={VanillaComponentResolver.instance.mouseToolOptionsTheme.startButton}></VanillaComponentResolver.instance.ToolButton>
-                            <div className={VanillaComponentResolver.instance.mouseToolOptionsTheme.numberField}>{ ZoningDepthRight }</div>
-                            <VanillaComponentResolver.instance.ToolButton
-                                tooltip={ZoningDepthUpTooltipDescription}
-                                onSelect={() => handleClick(depthUpRightID)}
-                                src={arrowUpSrc}
-                                focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
-                                className={VanillaComponentResolver.instance.mouseToolOptionsTheme.endButton}></VanillaComponentResolver.instance.ToolButton>
-                        </VanillaComponentResolver.instance.Section>
-                    )}
+                    {/*{((SelectedZoningMode & ZoningMode.Left) == ZoningMode.Left) && (*/}
+                    {/*    <VanillaComponentResolver.instance.Section title={`Left ${ZoningDepthTitle}`}>*/}
+                    {/*        <VanillaComponentResolver.instance.ToolButton*/}
+                    {/*            tooltip={ZoningDepthDownTooltipDescription} */}
+                    {/*            onSelect={() => handleClick(depthDownLeftID)} */}
+                    {/*            src={arrowDownSrc} */}
+                    {/*            focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED} */}
+                    {/*            className={VanillaComponentResolver.instance.mouseToolOptionsTheme.startButton}></VanillaComponentResolver.instance.ToolButton>*/}
+                    {/*        <div className={VanillaComponentResolver.instance.mouseToolOptionsTheme.numberField}>{ ZoningDepthLeft }</div>*/}
+                    {/*        <VanillaComponentResolver.instance.ToolButton */}
+                    {/*            tooltip={ZoningDepthUpTooltipDescription}*/}
+                    {/*            onSelect={() => handleClick(depthUpLeftID)}*/}
+                    {/*            src={arrowUpSrc} */}
+                    {/*            focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED} */}
+                    {/*            className={VanillaComponentResolver.instance.mouseToolOptionsTheme.endButton}></VanillaComponentResolver.instance.ToolButton>*/}
+                    {/*    </VanillaComponentResolver.instance.Section>*/}
+                    {/*)}*/}
+                    {/*{((SelectedZoningMode & ZoningMode.Right) == ZoningMode.Right) && (*/}
+                    {/*    <VanillaComponentResolver.instance.Section title={`Right ${ZoningDepthTitle}`}>*/}
+                    {/*        <VanillaComponentResolver.instance.ToolButton*/}
+                    {/*            tooltip={ZoningDepthDownTooltipDescription}*/}
+                    {/*            onSelect={() => handleClick(depthDownRightID)}*/}
+                    {/*            src={arrowDownSrc}*/}
+                    {/*            focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}*/}
+                    {/*            className={VanillaComponentResolver.instance.mouseToolOptionsTheme.startButton}></VanillaComponentResolver.instance.ToolButton>*/}
+                    {/*        <div className={VanillaComponentResolver.instance.mouseToolOptionsTheme.numberField}>{ ZoningDepthRight }</div>*/}
+                    {/*        <VanillaComponentResolver.instance.ToolButton*/}
+                    {/*            tooltip={ZoningDepthUpTooltipDescription}*/}
+                    {/*            onSelect={() => handleClick(depthUpRightID)}*/}
+                    {/*            src={arrowUpSrc}*/}
+                    {/*            focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}*/}
+                    {/*            className={VanillaComponentResolver.instance.mouseToolOptionsTheme.endButton}></VanillaComponentResolver.instance.ToolButton>*/}
+                    {/*    </VanillaComponentResolver.instance.Section>*/}
+                    {/*)}*/}
                 </>
             )
         }

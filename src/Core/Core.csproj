@@ -21,8 +21,6 @@
         <Exec Command="npm run build" WorkingDirectory="$(ProjectDir)/UI" />
     </Target>
     <ItemGroup>
-        <Reference Include="cohtml.Net">
-        </Reference>
         <Reference Include="Game">
             <Private>false</Private>
         </Reference>
