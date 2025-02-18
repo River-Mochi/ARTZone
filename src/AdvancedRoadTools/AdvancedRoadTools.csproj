@@ -7,11 +7,15 @@
 
         <!--The file where mod information which is required for publishing mod on PDX mods are stored-->
         <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
-        <RootNamespace>AdvancedRoadTools.Core</RootNamespace>
-        <AssemblyName>AdvancedRoadTools.Core</AssemblyName>
+        <RootNamespace>AdvancedRoadTools</RootNamespace>
+        <AssemblyName>AdvancedRoadTools</AssemblyName>
         <LangVersion>default</LangVersion>
         <Company>LuxStice Modding</Company>
         <Product>AdvancedRoadTools</Product>
+        <IsPackable>false</IsPackable>
+        <PackageId>AdvancedRoadTools</PackageId>
+        <Authors>AdvancedRoadTools</Authors>
+        <AssemblyVersion>0.1</AssemblyVersion>
     </PropertyGroup>
 
     <!--Imports must be after PropertyGroup block-->

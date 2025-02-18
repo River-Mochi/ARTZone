@@ -23,11 +23,11 @@ public class Setting : ModSetting
     }
 
     [SettingsUISection(kSection, kToggleGroup)]
-    public bool RemoveZonedCells { get; set; }
-    
+    public bool RemoveZonedCells { get; set; } = true;
+
     [SettingsUISection(kSection, kToggleGroup)]
     [SettingsUIDisableByCondition(typeof(Setting), nameof(IfRemoveZonedCells))]
-    public bool RemoveOccupiedCells { get; set; }
+    public bool RemoveOccupiedCells { get; set; } = true;
 
     public override void SetDefaults()
     {
@@ -56,8 +56,8 @@ public class LocaleEN : IDictionarySource
 
             { m_Setting.GetOptionGroupLocaleID(Setting.kToggleGroup), "Zone Controller Tool" },
 
-            { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Remove Zoned Cells" },
-            { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Remove Occupied Cells" },
+            { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being removed" },
+            { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
 
         };
     }

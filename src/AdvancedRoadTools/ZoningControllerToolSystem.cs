@@ -142,6 +142,7 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
                 ECB = ecb,
                 AdvancedRoadLookup = GetComponentLookup<AdvancedRoad>(true),
                 TempZoningLookup = GetComponentLookup<TempZoning>(true),
+                SubBlockLookup = GetBufferLookup<SubBlock>(true),
                 TempAdvancedRoadEntities = tempAdvancedRoadQuery.ToEntityArray(Allocator.TempJob),
                 Depths = depths,
             }.Schedule(inputDeps);
@@ -208,6 +209,7 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
         public ComponentLookup<AdvancedRoad> AdvancedRoadLookup;
         public ComponentLookup<TempZoning> TempZoningLookup;
         public NativeArray<Entity> TempAdvancedRoadEntities;
+        public BufferLookup<SubBlock> SubBlockLookup;
         public int2 Depths;
         public bool SettingsChanged;
 
@@ -216,10 +218,11 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
             var entity = RaycastHit.m_HitEntity;
             var hasAdvancedRoad = AdvancedRoadLookup.TryGetComponent(entity, out var data);
             var hasTempZoning = TempZoningLookup.TryGetComponent(entity, out var temp);
+            var hasSubBlocks = SubBlockLookup.TryGetBuffer(entity, out var subBlocks);
 
             if (entity != Entity.Null)
             {
-                if (!hasTempZoning || math.any(Depths != temp.Depths))
+                if ((!hasTempZoning || math.any(Depths != temp.Depths)) && (hasSubBlocks && subBlocks.Length > 0))
                 {
                     if ((hasAdvancedRoad && math.any(data.Depths != Depths)) //IF has advance road an its different
                         || (!hasAdvancedRoad &&
