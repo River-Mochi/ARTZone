@@ -173,7 +173,7 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
 
                 // Create and populate the new UIObject for our cloned Prefab
                 var clonedGrassUpgradePrefabUIObject = ScriptableObject.CreateInstance<UIObject>();
-                //clonedGrassUpgradePrefabUIObject.m_Icon = $"/";
+                clonedGrassUpgradePrefabUIObject.m_Icon = $"coui://ui-mods/images/ZoneControllerTool.svg";
                 clonedGrassUpgradePrefabUIObject.name = grassUpgradePrefabUIObject.name.Replace("Grass", upgradeMode.Id);
                 clonedGrassUpgradePrefabUIObject.m_IsDebugObject = grassUpgradePrefabUIObject.m_IsDebugObject;
                 clonedGrassUpgradePrefabUIObject.m_Priority = grassUpgradePrefabUIObject.m_Priority;

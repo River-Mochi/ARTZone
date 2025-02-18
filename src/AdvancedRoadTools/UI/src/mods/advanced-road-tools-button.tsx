@@ -1,23 +1,36 @@
 ﻿import { FloatingButton } from "cs2/ui";
 import React, { CSSProperties } from 'react';
-import menuButtonStyles from "./advanced-road-tools-button.module.scss";
+import {useLocalization} from "cs2/l10n";
 import {trigger} from "cs2/api";
 import mod from "../../mod.json";
+import buttonIcon from "../../ZoneControllerTool.svg";
+import {VanillaComponentResolver} from "../YenYang/VanillaComponentResolver";
 
-class AdvancedRoadToolsButtonInternal extends React.Component {
-    ToggleZoneControllerTool = () => {
-        trigger(mod.id, "ToggleZoneControllerTool");
-    }
-
-    render() {
-
-        return (
-            <FloatingButton
-                onClick={this.ToggleZoneControllerTool}
-            >
-            </FloatingButton>
-        );
-    }
+function ToggleZoneControllerTool()
+{
+    trigger(mod.id, "ToggleZoneControllerTool");
 }
 
-export const AdvancedRoadToolsButton = AdvancedRoadToolsButtonInternal
+export function descriptionTooltip(tooltipTitle: string | null, tooltipDescription: string | null) : JSX.Element {
+    return (
+        <>
+            <div className={VanillaComponentResolver.instance.descriptionTooltipTheme.title}>{tooltipTitle}</div>
+            <div className={VanillaComponentResolver.instance.descriptionTooltipTheme.content}>{tooltipDescription}</div>
+        </>
+    );
+}
+function ZoningToolControllerButton(): JSX.Element {
+
+        const {translate} = useLocalization();
+        const buttonTooltip = translate("AdvancedRoadTools.Zone_Controller.ToolName", "ACT");
+    return (
+        
+        <FloatingButton
+            onClick={ToggleZoneControllerTool}
+            src={buttonIcon}
+            tooltipLabel={buttonTooltip}
+        ></FloatingButton>
+    )
+}
+
+export default ZoningToolControllerButton;

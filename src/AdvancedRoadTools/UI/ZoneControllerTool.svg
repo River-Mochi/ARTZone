@@ -1,25 +1,38 @@
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" width="64" height="64"
-     viewBox="0 0 64 64">
-    <defs>
-        <clipPath id="b">
-            <rect width="64" height="64"/>
-        </clipPath>
-    </defs>
-    <g id="a">
-        <path d="M733.426-302.733l29.61,25.369,27.033-16.2v-2.474l-8.621.632-48.021-9.373Z"
-              transform="translate(-729.729 335.842)" fill="#434343"/>
-        <path d="M735.865-304.107l34.087,22.391,13.869-8.215-28.775-25.8Z" transform="translate(-731.64 335.022)"
-              fill="#d4d4d4"/>
-        <path d="M1224.4-1129.661l29.871,25.1,10.9-6.448-30.016-25.114Z" transform="translate(-1220.736 1160.714)"
-              fill="#929191"/>
-        <path d="M1224.4-1129.661l29.871,25.1,7.66-4.456-26.773-27.106Z" transform="translate(-1208.684 1153.599)"
-              fill="#929191"/>
-        <path d="M1249.1-1108.867l11.313-6.694Z" transform="translate(-1203.615 1158.607)" fill="gray"/>
-        <path d="M1224.4-1129.661l29.871,25.1,3.22-1.742-29.986-24.958Z" transform="translate(-1220.736 1160.714)"
-              fill="#716e6e"/>
-        <path d="M1231.995-1134.992l29.876,25.051,7.153-3.857-29.987-25.279Z" transform="translate(-1208.684 1153.599)"
-              fill="#dddddd"/>
-        <path d="M1836.825-447.064l-30.108-25.156.095-1.066,30.013,25.138Z" transform="translate(-1783.689 491.713)"
-              fill="#d4d4d4"/>
-    </g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56.95 44.06">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #434343;
+      }
+
+      .cls-2 {
+        fill: #929191;
+      }
+
+      .cls-3 {
+        fill: gray;
+      }
+
+      .cls-4 {
+        fill: #d4d4d4;
+      }
+
+      .cls-5 {
+        fill: #716e6e;
+      }
+    </style>
+  </defs>
+  <g id="a">
+    <path class="cls-1" d="M0,18.93l29.95,25.13,27.01-15.97v-1.76l-26.8,15.48L0,16.65v2.28Z"/>
+    <path class="cls-4" d="M11.03,10.41l30.02,25.11,1.15-.64L12.13,9.65l-1.09.76Z"/>
+    <path class="cls-2" d="M3.04,14.9l30.05,25.21,7.96-4.59L11.03,10.41l-8,4.49Z"/>
+    <path class="cls-2" d="M12.13,9.65l30.08,25.24,7.55-4.39L19.68,5.27l-7.56,4.38Z"/>
+    <path class="cls-3" d="M42.1,35.56l11.31-6.69-11.31,6.69Z"/>
+    <path class="cls-5" d="M0,16.65l30.15,25.16,2.94-1.7L3.04,14.9,0,16.65Z"/>
+    <path class="cls-4" d="M49.75,30.47L19.68,5.27v-1.11l30.07,25.22,7.2-4.16v1.11l-7.2,4.13Z"/>
+  </g>
+  <polygon class="cls-4" points="19.68 4.16 26.89 0 56.95 25.22 56.13 25.7 42.17 13.98 41.36 13.3 26.87 1.14 20.48 4.83 19.68 4.16"/>
+  <polygon class="cls-4" points="34.97 16.99 35.78 17.67 42.17 13.98 41.36 13.3 34.97 16.99"/>
+  <line class="cls-4" x1="26.61" y1="21.81" x2="14.65" y2="7.81"/>
 </svg>

@@ -8,8 +8,10 @@ using Game.UI;
 using Unity.Mathematics;
 using AdvancedRoadTools.ExtendedRoadUpgrades;
 using Colossal.Logging;
+using Game.Net;
 using Game.Prefabs;
 using Game.Tools;
+using Game.Zones;
 using HarmonyLib;
 using Unity.Collections;
 using Unity.Entities;
@@ -24,6 +26,18 @@ public partial class ZoningControllerToolUISystem : UISystemBase
     private ValueBinding<int> _zoningMode;
     private ValueBinding<int> _zoningDepthLeft;
     private ValueBinding<int> _zoningDepthRight;
+
+    private ValueBinding<bool> _isValidTool
+    {
+        get
+        {
+            isValidTool.Update(IsValidTool());
+            return isValidTool;
+        }
+        set => isValidTool = value;
+    }
+
+    private ValueBinding<bool> isValidTool;
 
     public int DepthLeft => _zoningDepthLeft.value;
     public int DepthRight => _zoningDepthRight.value;
@@ -42,6 +56,7 @@ public partial class ZoningControllerToolUISystem : UISystemBase
         AddBinding(_zoningMode = new ValueBinding<int>(ModId, "ZoningMode", (int)ZoningMode.Both));
         AddBinding(_zoningDepthLeft = new ValueBinding<int>(ModId, "ZoningDepthLeft", 6));
         AddBinding(_zoningDepthRight = new ValueBinding<int>(ModId, "ZoningDepthRight", 6));
+        AddBinding(_isValidTool = new ValueBinding<bool>(ModId, "IsValidTool", false));
 
 
         AddBinding(new TriggerBinding<int>(ModId, "ChangeZoningMode", ChangeZoningMode));
@@ -66,9 +81,17 @@ public partial class ZoningControllerToolUISystem : UISystemBase
     private void ActivateTreeControllerTool()
     {
         if (m_ToolSystem.activeTool == m_ZoningControllerToolSystem) return;
-        
+
+        m_ToolSystem.ActivatePrefabTool(m_ZoningControllerToolSystem.GetPrefab());
         m_ToolSystem.selected = Entity.Null;
-        m_ToolSystem.activeTool = m_ZoningControllerToolSystem;
+    }
+
+    private bool IsValidTool()
+    {
+        var flag = true;
+
+        return m_ToolSystem.activeTool == m_ZoningControllerToolSystem ||
+               (m_ToolSystem.activeTool.GetPrefab().Has(typeof(Road)));
     }
 
     // private void DecreaseDepth(int value, ZoningMode mode)

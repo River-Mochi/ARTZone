@@ -5,8 +5,6 @@ import {useLocalization} from "cs2/l10n";
 import mod from "../../mod.json";
 import {VanillaComponentResolver} from "../YenYang/VanillaComponentResolver";
 import styles from "./ZoningToolSections.module.scss";
-import { Icon } from "cs2/ui";
-import Thumbnail from "../../ZoneControllerTool.svg";
 
 export enum ZoningMode {
     None = 0,
@@ -15,18 +13,9 @@ export enum ZoningMode {
     Both = 3
 }
 const uilStandard =                         "coui://uil/Standard/";
-const gameStandard =                           "Media/Tools/";
-const arrowDownSrc =                uilStandard +  "ArrowDownThickStroke.svg";
-const arrowUpSrc =                  uilStandard +  "ArrowUpThickStroke.svg";
 const allSrc =              uilStandard + "StarAll.svg";
 
 const ZoningMode$ = bindValue<number>(mod.id, 'ZoningMode');
-
-// This functions trigger an event on C# side and C# designates the method to implement.
-function handleClick(eventName: string)
-{
-    trigger(mod.id, eventName);
-}
 
 function changeZoningMode(zoningMode: ZoningMode) {
     trigger(mod.id, "ChangeZoningMode", zoningMode);
@@ -56,7 +45,7 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
         var result = Component();
         
         //Currently the mod doesn't work when placing roads, only with the Zoning TOol
-        if (netToolActive || zoningToolActive) {
+        if ((netToolActive) || zoningToolActive) {
         //if (zoningToolActive) {
             result.props.children?.push(
                 <>
