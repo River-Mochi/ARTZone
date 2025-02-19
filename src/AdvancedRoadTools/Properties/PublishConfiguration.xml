@@ -20,15 +20,16 @@ as of now the mod contains:
 		
 	</LongDescription>
 	<!--Thumbnail-->
-	<Thumbnail Value="/Thumbnail/ART Icon.png" />
+	<Thumbnail Value="Properties/Thumbnail.png" />
 	<!--Screenshot, can be set multiple times-->
-	<Screenshot Value="" />
+	<Screenshot Value="Properties/screenshot-02.png" />
+	<Screenshot Value="Properties/screenshot-03.png" />
 	<!--Tag, can be set multiple times-->
 	<Tag Value="Code Mod" />
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/advanced-road-tools.1728786/" />
 	<!--Version of the mod-->
-	<ModVersion Value="0.3" />
+	<ModVersion Value="0.3.1" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.2.*" />
 	<!--Dependency for the mod, can be set multiple times-->
@@ -43,10 +44,12 @@ as of now the mod contains:
 <!-- - Added localization for PT-PT and PT-BR (support the mod by localizing to your language on Crowdin!)-->
 - Fixed partially bug where some roads would be reset whenever a new road was drawn from it
 - Renamed the mod's settings to be more accurate
+0.3.1
+- Added icon and screenshot for the mod
 	</ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
 	<ExternalLink Type="github" Url="https://github.com/LuxStice/AdvancedRoadTools" />
 	<ExternalLink Type="crowdin" Url="https://crowdin.com/project/advancedroadtools" />
 	<ExternalLink Type="discord" Url="https://discord.com/channels/1024242828114673724/1339409937520136222" />
-	<ExternalLink Type="ko-fi" Url="https://ko-fi.com/luxstice" />
+	<ExternalLink Type="kofi" Url="https://ko-fi.com/luxstice" />
 </Publish>
