@@ -1,21 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Colossal.Serialization.Entities;
+﻿using Colossal.Serialization.Entities;
 using Colossal.UI.Binding;
 using Game;
 using Game.UI;
-using Unity.Mathematics;
-using AdvancedRoadTools.ExtendedRoadUpgrades;
 using Colossal.Logging;
-using Game.Net;
 using Game.Prefabs;
 using Game.Tools;
-using Game.Zones;
-using HarmonyLib;
-using Unity.Collections;
 using Unity.Entities;
-using UnityEngine;
 
 namespace AdvancedRoadTools.Core;
 
@@ -27,17 +17,7 @@ public partial class ZoningControllerToolUISystem : UISystemBase
     private ValueBinding<int> _zoningDepthLeft;
     private ValueBinding<int> _zoningDepthRight;
 
-    private ValueBinding<bool> _isValidTool
-    {
-        get
-        {
-            isValidTool.Update(IsValidTool());
-            return isValidTool;
-        }
-        set => isValidTool = value;
-    }
-
-    private ValueBinding<bool> isValidTool;
+    private ValueBinding<bool> _isRoadPrefab;
 
     public int DepthLeft => _zoningDepthLeft.value;
     public int DepthRight => _zoningDepthRight.value;
@@ -56,12 +36,13 @@ public partial class ZoningControllerToolUISystem : UISystemBase
         AddBinding(_zoningMode = new ValueBinding<int>(ModId, "ZoningMode", (int)ZoningMode.Both));
         AddBinding(_zoningDepthLeft = new ValueBinding<int>(ModId, "ZoningDepthLeft", 6));
         AddBinding(_zoningDepthRight = new ValueBinding<int>(ModId, "ZoningDepthRight", 6));
-        AddBinding(_isValidTool = new ValueBinding<bool>(ModId, "IsValidTool", false));
+        AddBinding(_isRoadPrefab = new ValueBinding<bool>(ModId, "IsRoadPrefab", false));
 
 
         AddBinding(new TriggerBinding<int>(ModId, "ChangeZoningMode", ChangeZoningMode));
         AddBinding(new TriggerBinding(ModId, "FlipBothMode", FlipBothMode));
         AddBinding(new TriggerBinding(ModId, "ToggleZoneControllerTool", ActivateTreeControllerTool));
+        
         // AddBinding(new TriggerBinding(ModId, "depth-up-left-arrow",
         //     () => IncreaseDepth(_zoningDepthLeft.value, ZoningMode.Left)));
         // AddBinding(new TriggerBinding(ModId, "depth-down-left-arrow",
@@ -72,7 +53,13 @@ public partial class ZoningControllerToolUISystem : UISystemBase
         //     () => DecreaseDepth(_zoningDepthRight.value, ZoningMode.Right)));
 
         m_ToolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
+            m_ToolSystem.EventPrefabChanged += EventPrefabChanged;
         m_ZoningControllerToolSystem = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
+    }
+
+    private void EventPrefabChanged(PrefabBase obj)
+    {
+        _isRoadPrefab.Update(obj is RoadPrefab);
     }
 
     /// <summary>
@@ -85,46 +72,6 @@ public partial class ZoningControllerToolUISystem : UISystemBase
         m_ToolSystem.ActivatePrefabTool(m_ZoningControllerToolSystem.GetPrefab());
         m_ToolSystem.selected = Entity.Null;
     }
-
-    private bool IsValidTool()
-    {
-        var flag = true;
-
-        return m_ToolSystem.activeTool == m_ZoningControllerToolSystem ||
-               (m_ToolSystem.activeTool.GetPrefab().Has(typeof(Road)));
-    }
-
-    // private void DecreaseDepth(int value, ZoningMode mode)
-    // {
-    //     ChangeZoningDepth(value - 1, mode);
-    // }
-    //
-    // private void IncreaseDepth(int value, ZoningMode mode)
-    // {
-    //     ChangeZoningDepth(value + 1, mode);
-    // }
-    //
-    // private void ChangeZoningDepth(int value, ZoningMode mode)
-    // {
-    //     log.Info(value);
-    //
-    //     value = math.clamp(value, 0, 6);
-    //
-    //     if ((mode & ZoningMode.Left) == ZoningMode.Left)
-    //     {
-    //         if (value == 0)
-    //             _zoningMode.Update((int)((ZoningMode)_zoningMode.value ^ ZoningMode.Left));
-    //         else
-    //             _zoningDepthLeft.Update(value);
-    //     }
-    //     else if ((mode & ZoningMode.Right) == ZoningMode.Right)
-    //     {
-    //         if (value == 0)
-    //             _zoningMode.Update((int)((ZoningMode)_zoningMode.value ^ ZoningMode.Right));
-    //         else
-    //             _zoningDepthRight.Update(value);
-    //     }
-    // }
 
     protected override void OnGamePreload(Purpose purpose, GameMode mode)
     {

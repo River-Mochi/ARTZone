@@ -12,11 +12,11 @@
 Advanced Road Tools (ART) is a mod that provides a variety of tools to control roads and their behaviour.
 
 as of now the mod contains:
-- **Zoning Controller Tool** - Control zoning on roads, with a previeable tool where you can just hover the road and see what you'll get! Right-Click inverts the current zoning configuration
+- **Zoning Controller Tool** - Control zoning on roads, with a previewable tool where you can just hover the road and see what you'll get! Right-Click inverts the current zoning configuration
 ---
 ### Planned Features
 - **Parallel Tool** - Create parallel roads and tracks out of any network. This tool will allow you to create parallel roads out of train tracks, highways and tram tracks without the need of tracing them. Simply click them and see the new parallel road appear.
-- **Advanced Grid Tool** - Create a grid by the amount of collumns and rows that you want. Simply set 2 control points to define a rectangle, and then, on a pop-up window, set how many rows and collumns you want and them cofirm it. voila!
+- **Advanced Grid Tool** - Create a grid by the amount of columns and rows that you want. Simply set 2 control points to define a rectangle, and then, on a pop-up window, set how many rows and collumns you want and them cofirm it. voila!
 		
 	</LongDescription>
 	<!--Thumbnail-->
@@ -29,24 +29,18 @@ as of now the mod contains:
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/advanced-road-tools.1728786/" />
 	<!--Version of the mod-->
-	<ModVersion Value="0.3.1" />
+	<ModVersion Value="0.3.2" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.2.*" />
 	<!--Dependency for the mod, can be set multiple times-->
 	<Dependency Id="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 <!--	<ChangeLog Value="Created roads are now affected by the zoning configuration" />-->
-	<ChangeLog>
-0.3
-- Added icon to the Zoning Controller Tool
-- Added icon on the top left to quickly access zoning tool
-- Added a * option to select/deselect all sides
-<!-- - Added localization for PT-PT and PT-BR (support the mod by localizing to your language on Crowdin!)-->
-- Fixed partially bug where some roads would be reset whenever a new road was drawn from it
-- Renamed the mod's settings to be more accurate
-0.3.1
-- Added icon and screenshot for the mod
-	</ChangeLog>
+<ChangeLog>
+# Fixes
+- Fixed incompatibility with ExtraDetailingTools. This was due to a mismatch in Harmony version. In 0.4 Harmony will be completely removed from ART
+- Removed Unlockable trait from Zone Controller Tool, you can now access it from any point in game. 
+</ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
 	<ExternalLink Type="github" Url="https://github.com/LuxStice/AdvancedRoadTools" />
 	<ExternalLink Type="crowdin" Url="https://crowdin.com/project/advancedroadtools" />

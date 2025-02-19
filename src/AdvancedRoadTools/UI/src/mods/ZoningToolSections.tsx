@@ -16,6 +16,7 @@ const uilStandard =                         "coui://uil/Standard/";
 const allSrc =              uilStandard + "StarAll.svg";
 
 const ZoningMode$ = bindValue<number>(mod.id, 'ZoningMode');
+const isRoadPrefab$ = bindValue<boolean>(mod.id, 'IsRoadPrefab');
 
 function changeZoningMode(zoningMode: ZoningMode) {
     trigger(mod.id, "ChangeZoningMode", zoningMode);
@@ -31,6 +32,7 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
 
         // These get the value of the bindings.
         const netToolActive = useValue(tool.activeTool$).id == tool.NET_TOOL;
+        const isRoadPrefab = useValue(isRoadPrefab$);
         const zoningToolActive = useValue(tool.activeTool$).id == "Zone Controller Tool";
         const SelectedZoningMode = useValue(ZoningMode$) as ZoningMode;
 
@@ -45,7 +47,7 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
         var result = Component();
         
         //Currently the mod doesn't work when placing roads, only with the Zoning TOol
-        if ((netToolActive) || zoningToolActive) {
+        if (isRoadPrefab || zoningToolActive) {
         //if (zoningToolActive) {
             result.props.children?.push(
                 <>

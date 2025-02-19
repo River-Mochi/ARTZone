@@ -84,11 +84,11 @@
     <ItemGroup>
         <None Include="$(ModPropsFile)" Link="Properties\Mod.props"/>
         <None Include="$(ModTargetsFile)" Link="Properties\Mod.targets"/>
-    </ItemGroup>
-
+    </ItemGroup>  
+    
     <ItemGroup>
-      <PackageReference Include="HarmonyX" Version="2.14.0" />
-    </ItemGroup>
+    <PackageReference Include="Lib.Harmony" Version="2.2.2" />
+</ItemGroup>
 
     <ItemGroup>
       <Folder Include="ExtendedRoadUpgrades\" />

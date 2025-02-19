@@ -168,6 +168,10 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
                 // keeping any unintended reference to the source object so I'd rather manually copy
                 // over only the thing I need instead of relying on automatic cloning.
                 clonedGrassUpgradePrefab.Remove<UIObject>();
+                clonedGrassUpgradePrefab.Remove<ServiceObject>();
+                clonedGrassUpgradePrefab.Remove<NetSubObjects>();
+                clonedGrassUpgradePrefab.Remove<Unlockable>();
+                clonedGrassUpgradePrefab.Remove<NetUpgrade>();
 
                 Log.Debug($"{logHeader} [{upgradeMode.Id}] Removed the original UIObject instance from the cloned Prefab.");
 

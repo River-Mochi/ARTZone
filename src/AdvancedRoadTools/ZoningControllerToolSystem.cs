@@ -65,8 +65,6 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
         requireZones = true;
         requireNet = Layer.Road;
         allowUnderground = true;
-
-        this.ToggleToolOptions(true);
     }
 
     ///cleans up actions or whatever else you want to happen when your tool becomes inactive.
@@ -79,14 +77,6 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
         requireZones = false;
         requireNet = Layer.None;
         allowUnderground = false;
-        this.ToggleToolOptions(false);
-    }
-
-    private enum State
-    {
-        Default,
-        Applying,
-        Cancelling,
     }
 
     protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
@@ -94,7 +84,7 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
         base.OnGameLoadingComplete(purpose, mode);
         log.Debug($"{nameof(ZoningControllerToolSystem)}.{nameof(OnGameLoadingComplete)} New Order:");
         m_ToolSystem.tools.Remove(this);
-        m_ToolSystem.tools.Insert(0, this);
+        m_ToolSystem.tools.Insert(10, this);
 
         foreach (ToolBaseSystem toolBaseSystem in m_ToolSystem.tools)
         {

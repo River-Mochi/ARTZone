@@ -57,7 +57,13 @@ public class LocaleEN : IDictionarySource
             { m_Setting.GetOptionGroupLocaleID(Setting.kToggleGroup), "Zone Controller Tool" },
 
             { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being removed" },
+            { m_Setting.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being overriden during preview and set phase of Zone Controller Tool." +
+                "\nSet this to true if you're having problem with losing your zoning configuration when using the tool." +
+                "\nDefault: true" },
             { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
+            { m_Setting.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being overriden during preview and set phase of Zone Controller Tool." +
+                "\nSet this to true if you're having problem with buildings becoming vacant and/or abandoned when using the tool." +
+                "\nDefault: true" },
 
         };
     }
