@@ -188,7 +188,20 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
         this.m_ToolRaycastSystem.typeMask = TypeMask.Net;
         this.m_ToolRaycastSystem.netLayerMask = Layer.Road;
     }
-
+    
+    public void SetToolEnabled(bool isEnabled)
+    {
+        if (isEnabled && m_ToolSystem.activeTool != this)
+        {
+            m_ToolSystem.selected = Entity.Null;
+            m_ToolSystem.activeTool = this;
+        } else if (!isEnabled && m_ToolSystem.activeTool == this)
+        {
+            m_ToolSystem.selected = Entity.Null;
+            m_ToolSystem.activeTool = m_DefaultToolSystem;
+        }
+    } 
+    
     /// <summary>
     /// Updates the highlighted entities and sets them up to preview what the changes will be like
     /// </summary>
