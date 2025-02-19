@@ -8,10 +8,9 @@
 	<!--Long description of the mod. Single line or multi line. Supports minimal markdown subset-->
 	<!--LongDescription Value="This is a long description" /-->
 	<LongDescription>
-# BETA - Expect missing graphics
 Advanced Road Tools (ART) is a mod that provides a variety of tools to control roads and their behaviour.
 
-as of now the mod contains:
+## Features
 - **Zoning Controller Tool** - Control zoning on roads, with a previewable tool where you can just hover the road and see what you'll get! Right-Click inverts the current zoning configuration
 ---
 ### Planned Features
@@ -26,20 +25,25 @@ as of now the mod contains:
 	<Screenshot Value="Properties/screenshot-03.png" />
 	<!--Tag, can be set multiple times-->
 	<Tag Value="Code Mod" />
+	<Tag Value="Zoning" />
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/advanced-road-tools.1728786/" />
 	<!--Version of the mod-->
-	<ModVersion Value="0.3.2" />
+	<ModVersion Value="1.0" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.2.*" />
 	<!--Dependency for the mod, can be set multiple times-->
-	<Dependency Id="" />
+	<Dependency Id="75426" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 <!--	<ChangeLog Value="Created roads are now affected by the zoning configuration" />-->
 <ChangeLog>
+# ! The mod now requires l18n Everywhere as a dependency !
+# New Features
+- Localization
+- Setting to configure the Invert Zoning action for Zone Controller Tool
 # Fixes
-- Fixed incompatibility with ExtraDetailingTools. This was due to a mismatch in Harmony version. In 0.4 Harmony will be completely removed from ART
-- Removed Unlockable trait from Zone Controller Tool, you can now access it from any point in game. 
+- Zone Controller tool now has a Title and Description
+- Zone Controller tool doesn't show as having a price per km used anymore
 </ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
 	<ExternalLink Type="github" Url="https://github.com/LuxStice/AdvancedRoadTools" />
