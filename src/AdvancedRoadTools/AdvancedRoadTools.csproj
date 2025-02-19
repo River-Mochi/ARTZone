@@ -3,7 +3,7 @@
     <PropertyGroup>
         <OutputType>Library</OutputType>
         <TargetFramework>net472</TargetFramework>
-        <Configurations>Debug;Release</Configurations>
+        <Configurations>Debug;Release;Build locale keys</Configurations>
 
         <!--The file where mod information which is required for publishing mod on PDX mods are stored-->
         <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
@@ -16,6 +16,7 @@
         <PackageId>AdvancedRoadTools</PackageId>
         <Authors>AdvancedRoadTools</Authors>
         <AssemblyVersion>0.1</AssemblyVersion>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <!--Imports must be after PropertyGroup block-->
