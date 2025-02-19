@@ -1,3 +1,3 @@
 files:
-  - source: /**/src/AdvancedRoadTools/lang/en-US.json
+  - source: /**/crowdin/template.json
     translation: /**/src/AdvancedRoadTools/lang/%locale%.json
