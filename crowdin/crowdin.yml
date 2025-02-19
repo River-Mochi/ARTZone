@@ -1,3 +1,0 @@
-files:
-  - source: /**/crowdin/template.json
-    translation: /**/src/AdvancedRoadTools/lang/%locale%.json
