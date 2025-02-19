@@ -53,7 +53,7 @@ public partial class ZoningControllerToolUISystem : UISystemBase
         _isRoadPrefab.Update(obj is RoadPrefab);
     }
 
-    private void ToggleTool() => m_ZoningControllerToolSystem.SetToolEnabled(m_ToolSystem.activeTool == m_ZoningControllerToolSystem);
+    private void ToggleTool() => m_ZoningControllerToolSystem.SetToolEnabled(m_ToolSystem.activeTool != m_ZoningControllerToolSystem);
 
 
     private void FlipBothMode()
