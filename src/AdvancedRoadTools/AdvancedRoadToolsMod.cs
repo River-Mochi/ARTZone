@@ -3,6 +3,7 @@ using Game;
 using Game.Modding;
 using Game.SceneFlow;
 using Colossal.IO.AssetDatabase;
+using Game.Input;
 using Game.Prefabs;
 using Unity.Entities;
 using UnityEngine;
@@ -14,7 +15,9 @@ public class AdvancedRoadToolsMod : IMod
     public static ILog log = LogManager.GetLogger($"{nameof(Core)}.{nameof(AdvancedRoadToolsMod)}")
         .SetShowsErrorsInUI(false);
 
-    internal static Setting m_Setting;
+    public static Setting m_Setting;
+    public const string kInvertZoningActionName = "InvertZoning";
+    public static ProxyAction m_InvertZoningAction;
     
     public void OnLoad(UpdateSystem updateSystem)
     {
@@ -28,6 +31,9 @@ public class AdvancedRoadToolsMod : IMod
         m_Setting = new Setting(this);
         m_Setting.RegisterInOptionsUI();
         GameManager.instance.localizationManager.AddSource("en-US", new LocaleEN(m_Setting));
+        m_Setting.RegisterKeyBindings();
+
+        m_InvertZoningAction = m_Setting.GetAction(kInvertZoningActionName);
 
         AssetDatabase.global.LoadSettings(nameof(Core), m_Setting, new Setting(this));
 

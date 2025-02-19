@@ -5,6 +5,7 @@ using Colossal.Logging;
 using Colossal.Serialization.Entities;
 using Game;
 using Game.Common;
+using Game.Input;
 using Game.Net;
 using Game.Prefabs;
 using Game.Tools;
@@ -23,6 +24,8 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
     private ToolOutputBarrier _toolOutputBarrier;
     private ZoningControllerToolUISystem _zoningControllerToolUISystem;
     private ILog log => AdvancedRoadToolsMod.log;
+    
+    private IProxyAction InvertZoningAction;
 
     private const string LOG_HEADER = $"[{nameof(ZoningControllerToolSystem)}]";
 
@@ -39,6 +42,8 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
         base.OnCreate();
         _toolOutputBarrier = World.GetOrCreateSystemManaged<ToolOutputBarrier>();
         _zoningControllerToolUISystem = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
+
+        InvertZoningAction = AdvancedRoadToolsMod.m_InvertZoningAction;
 
         allBlocksQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithAll<Block, Owner>()
@@ -58,10 +63,10 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
     /// <inheritdoc/>
     protected override void OnStartRunning()
     {
-        log.Info("OnStartRunning");
+        log.Debug("OnStartRunning");
         base.OnStartRunning();
         applyAction.enabled = true;
-        secondaryApplyAction.enabled = true;
+        InvertZoningAction.enabled = true;
         requireZones = true;
         requireNet = Layer.Road;
         allowUnderground = true;
@@ -70,10 +75,10 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
     ///cleans up actions or whatever else you want to happen when your tool becomes inactive.
     protected override void OnStopRunning()
     {
-        log.Info("OnStopRunning");
+        log.Debug("OnStopRunning");
         base.OnStartRunning();
         applyAction.enabled = false;
-        secondaryApplyAction.enabled = false;
+        InvertZoningAction.enabled = false;
         requireZones = false;
         requireNet = Layer.None;
         allowUnderground = false;
@@ -155,7 +160,7 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
         }
 
         //Right click inverts the current zoning mode
-        if (secondaryApplyAction.WasPressedThisFrame())
+        if (InvertZoningAction.WasPressedThisFrame())
         {
             _zoningControllerToolUISystem.InvertZoningMode();
         }

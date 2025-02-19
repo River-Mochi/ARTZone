@@ -12,11 +12,14 @@ namespace AdvancedRoadTools.Core;
 [FileLocation(nameof(Core))]
 [SettingsUIGroupOrder(kToggleGroup)]
 [SettingsUIShowGroupName(kToggleGroup)]
+[SettingsUIMouseAction(AdvancedRoadToolsMod.kInvertZoningActionName, ActionType.Button,
+    usages: new string[] { Usages.kToolUsage, "TestUsage" }, interactions: new string[] { "UIButton" })]
 public class Setting : ModSetting
 {
     public const string kSection = "Main";
 
     public const string kToggleGroup = "Zone Controller Tool";
+    public const string kInvertZoningAction = "InvertZoning";
 
     public Setting(IMod mod) : base(mod)
     {
@@ -28,10 +31,16 @@ public class Setting : ModSetting
     [SettingsUISection(kSection, kToggleGroup)]
     [SettingsUIDisableByCondition(typeof(Setting), nameof(IfRemoveZonedCells))]
     public bool RemoveOccupiedCells { get; set; } = true;
+    
+    [SettingsUIMouseBinding(BindingMouse.Right, kInvertZoningAction)]
+    [SettingsUISection(kSection, kToggleGroup)]
+    public ProxyBinding InvertZoning { get; set; }
 
     public override void SetDefaults()
     {
-        throw new System.NotImplementedException();
+        RemoveOccupiedCells = true;
+        RemoveZonedCells = true;
+        InvertZoning = new ProxyBinding{};
     }
 
     private bool IfRemoveZonedCells() => !RemoveZonedCells;
@@ -64,7 +73,8 @@ public class LocaleEN : IDictionarySource
             { m_Setting.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being overriden during preview and set phase of Zone Controller Tool." +
                 "\nSet this to true if you're having problem with buildings becoming vacant and/or abandoned when using the tool." +
                 "\nDefault: true" },
-
+            { m_Setting.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Invert Zoning Mouse Button" },
+            { m_Setting.GetOptionDescLocaleID(nameof(Setting.InvertZoning)), "Inverts the current zoning configuration with a mouse action." },
         };
     }
 
