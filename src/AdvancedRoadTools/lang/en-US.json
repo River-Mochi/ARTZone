@@ -11,5 +11,7 @@
   "Options.OPTION[AdvancedRoadTools.AdvancedRoadTools.Core.AdvancedRoadToolsMod.Setting.RemoveZonedCells]": "Prevent zoned cells from being removed",
   "Options.OPTION_DESCRIPTION[AdvancedRoadTools.AdvancedRoadTools.Core.AdvancedRoadToolsMod.Setting.RemoveZonedCells]": "Prevent zoned cells from being overridden during preview and set phase of Zone Controller Tool.\nSet this to true if you're having problem with losing your zoning configuration when using the tool.\nDefault: true",
   "Options.OPTION[AdvancedRoadTools.AdvancedRoadTools.Core.AdvancedRoadToolsMod.Setting.RemoveOccupiedCells]": "Prevent occupied cells from being removed",
-  "Options.OPTION_DESCRIPTION[AdvancedRoadTools.AdvancedRoadTools.Core.AdvancedRoadToolsMod.Setting.RemoveOccupiedCells]": "Prevent occupied cells from being overridden during preview and set phase of Zone Controller Tool.\nSet this to true if you're having problem with buildings becoming vacant and/or abandoned when using the tool.\nDefault: true"
+  "Options.OPTION_DESCRIPTION[AdvancedRoadTools.AdvancedRoadTools.Core.AdvancedRoadToolsMod.Setting.RemoveOccupiedCells]": "Prevent occupied cells from being overridden during preview and set phase of Zone Controller Tool.\nSet this to true if you're having problem with buildings becoming vacant and/or abandoned when using the tool.\nDefault: true",
+  "Options.OPTION[AdvancedRoadTools.AdvancedRoadTools.Core.AdvancedRoadToolsMod.Setting.InvertZoning]": "Invert Zoning Mouse Button",
+  "Options.OPTION_DESCRIPTION[AdvancedRoadTools.AdvancedRoadTools.Core.AdvancedRoadToolsMod.Setting.InvertZoning]": "Inverts the current zoning configuration with a mouse action."
 }
