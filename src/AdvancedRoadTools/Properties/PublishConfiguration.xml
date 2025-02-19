@@ -25,7 +25,6 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 	<Screenshot Value="Properties/screenshot-03.png" />
 	<!--Tag, can be set multiple times-->
 	<Tag Value="Code Mod" />
-	<Tag Value="Zoning" />
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/advanced-road-tools.1728786/" />
 	<!--Version of the mod-->
