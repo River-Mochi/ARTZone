@@ -88,11 +88,11 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
 
             if (installed)
             {
-                Log.Info($"{logHeader} Extended Upgrades is installed, skipping");
+                Log.Debug($"{logHeader} Extended Upgrades is installed, skipping");
                 return;
             }
 
-            Log.Info($"{logHeader} Installing Extended Upgrades");
+            Log.Debug($"{logHeader} Installing Extended Upgrades");
 
             // Getting World instance
             world = Traverse.Create(GameManager.instance).Field<World>("m_World").Value;
@@ -204,12 +204,12 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
 
                 // Attach to GameManager's loading event to perform the second phase of our patch
                 GameManager.instance.onGameLoadingComplete += GameManager_onGameLoadingComplete;
-                Log.Info($"{logHeader} Ready to listen to GameManager loading events.");
+                Log.Debug($"{logHeader} Ready to listen to GameManager loading events.");
 
                 // Mark the Install as already executed
                 installed = true;
 
-                Log.Info($"{logHeader} Completed.");
+                Log.Debug($"{logHeader} Completed.");
             }
         }
 
@@ -251,7 +251,7 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
 
             if (postInstalled)
             {
-                Log.Info($"{logHeader} Already executed before, skipping.");
+                Log.Debug($"{logHeader} Already executed before, skipping.");
                 return;
             }
 
@@ -262,7 +262,7 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
                 return;
             }
 
-            Log.Info($"{logHeader} Started.");
+            Log.Debug($"{logHeader} Started.");
 
             // Getting Prefabs list from PrefabSystem
             var prefabs = Traverse.Create(prefabSystem).Field<List<PrefabBase>>("m_Prefabs").Value;
@@ -325,7 +325,7 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
                 
                 s+= $"\nPlacement:{clonedGrassUpgradePrefabData.m_PlacementFlags}";
                 
-                AdvancedRoadToolsMod.log.Info(s);
+                AdvancedRoadToolsMod.log.Debug(s);
 
                 Log.Debug($"{logHeader} [{upgradeMode.Id}] Retrieved the cloned Grass Prefab's PlaceableNetData instance.");
 
@@ -344,13 +344,13 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
                 // Persist the updated flags by replacing the ComponentData with the one we just created
                 prefabSystem.AddComponentData(clonedGrassUpgradePrefab, clonedGrassUpgradePrefabData);
 
-                Log.Info($"{logHeader} [{upgradeMode.Id}] Successfully set flags for our cloned Prefab to {clonedGrassUpgradePrefabData.m_SetUpgradeFlags.ToJSONString()} and {clonedGrassUpgradePrefabData.m_UnsetUpgradeFlags.ToJSONString()}.");
+                Log.Debug($"{logHeader} [{upgradeMode.Id}] Successfully set flags for our cloned Prefab to {clonedGrassUpgradePrefabData.m_SetUpgradeFlags.ToJSONString()} and {clonedGrassUpgradePrefabData.m_UnsetUpgradeFlags.ToJSONString()}.");
             }
 
             // Mark the Prefix as already executed
             postInstalled = true;
 
-            Log.Info($"{logHeader} Extended Road Upgrades Completed.");
+            Log.Debug($"{logHeader} Extended Road Upgrades Completed.");
         }
     }
 }
