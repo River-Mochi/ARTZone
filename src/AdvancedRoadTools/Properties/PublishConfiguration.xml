@@ -20,7 +20,7 @@ as of now the mod contains:
 		
 	</LongDescription>
 	<!--Thumbnail-->
-	<Thumbnail Value="Properties/Thumbnail.png" />
+	<Thumbnail Value="/Thumbnail/ART Icon.png" />
 	<!--Screenshot, can be set multiple times-->
 	<Screenshot Value="" />
 	<!--Tag, can be set multiple times-->
@@ -28,16 +28,25 @@ as of now the mod contains:
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/advanced-road-tools.1728786/" />
 	<!--Version of the mod-->
-	<ModVersion Value="0.2" />
+	<ModVersion Value="0.3" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.2.*" />
 	<!--Dependency for the mod, can be set multiple times-->
 	<Dependency Id="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
-	<ChangeLog Value="Created roads are now affected by the zoning configuration" />
-	<!--ChangeLog>
-	</ChangeLog-->
+<!--	<ChangeLog Value="Created roads are now affected by the zoning configuration" />-->
+	<ChangeLog>
+0.3
+- Added icon to the Zoning Controller Tool
+- Added icon on the top left to quickly access zoning tool
+- Added a * option to select/deselect all sides
+<!-- - Added localization for PT-PT and PT-BR (support the mod by localizing to your language on Crowdin!)-->
+- Fixed partially bug where some roads would be reset whenever a new road was drawn from it
+- Renamed the mod's settings to be more accurate
+	</ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
 	<ExternalLink Type="github" Url="https://github.com/LuxStice/AdvancedRoadTools" />
+	<ExternalLink Type="crowdin" Url="https://crowdin.com/project/advancedroadtools" />
+	<ExternalLink Type="discord" Url="https://discord.com/channels/1024242828114673724/1339409937520136222" />
 	<ExternalLink Type="ko-fi" Url="https://ko-fi.com/luxstice" />
 </Publish>
