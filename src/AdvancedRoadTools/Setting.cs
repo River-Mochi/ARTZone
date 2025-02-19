@@ -63,7 +63,7 @@ public class LocaleEN : IDictionarySource
             { m_Setting.GetSettingsLocaleID(), "Advanced Road Tools" },
             { m_Setting.GetOptionTabLocaleID(Setting.kSection), "Main" },
 
-            { m_Setting.GetOptionGroupLocaleID(Setting.kToggleGroup), "Zone Controller Tool" },
+            { m_Setting.GetOptionGroupLocaleID(Setting.kToggleGroup), "Zone Controller Tool Options" },
 
             { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being removed" },
             { m_Setting.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being overriden during preview and set phase of Zone Controller Tool." +
