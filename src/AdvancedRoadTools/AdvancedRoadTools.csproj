@@ -3,7 +3,7 @@
     <PropertyGroup>
         <OutputType>Library</OutputType>
         <TargetFramework>net472</TargetFramework>
-        <Configurations>Debug;Release;Build locale keys</Configurations>
+        <Configurations>Debug;Release;Build locale keys;Publish</Configurations>
 
         <!--The file where mod information which is required for publishing mod on PDX mods are stored-->
         <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>

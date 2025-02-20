@@ -94,263 +94,77 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
 
             Log.Debug($"{logHeader} Installing Extended Upgrades");
 
-            // Getting World instance
             world = Traverse.Create(GameManager.instance).Field<World>("m_World").Value;
-            if (world == null)
+            if (world is null)
             {
                 Log.Error($"{logHeader} Failed retrieving World instance, exiting.");
                 return;
             }
 
-            Log.Debug($"{logHeader} Retrieved World instance.");
-
-            // Getting PrefabSystem instance from World
             prefabSystem = world.GetExistingSystemManaged<PrefabSystem>();
-            if (prefabSystem == null)
+            if (prefabSystem is null)
             {
                 Log.Error($"{logHeader} Failed retrieving PrefabSystem instance, exiting.");
                 return;
             }
 
-            Log.Debug($"{logHeader} Retrieved PrefabSystem instance.");
-
-            // Getting Prefabs list from PrefabSystem
             var prefabs = Traverse.Create(prefabSystem).Field<List<PrefabBase>>("m_Prefabs").Value;
-            if (prefabs == null || !prefabs.Any())
+            if (prefabs is null || !prefabs.Any())
             {
                 Log.Error($"{logHeader} Failed retrieving Prefabs list, exiting.");
                 return;
             }
 
-            Log.Debug($"{logHeader} Retrieved Prefabs list.");
-
-            // Getting the original Grass Prefab
-            var grassUpgradePrefab = prefabs.FirstOrDefault(p => p.name == "Grass");
-            if (grassUpgradePrefab == null)
+            var originalPrefab = prefabs.FirstOrDefault(p => p.name == "Wide Sidewalk");
+            if (originalPrefab is null)
             {
                 Log.Error($"{logHeader} Failed retrieving the original Grass Prefab instance, exiting.");
                 return;
             }
 
-            Log.Debug($"{logHeader} Retrieved the original Grass Prefab instance.");
-
-            // Getting the original Grass Prefab's UIObject
-            var grassUpgradePrefabUIObject = grassUpgradePrefab.GetComponent<UIObject>();
-            if (grassUpgradePrefabUIObject == null)
+            var originalUIObject = originalPrefab.GetComponent<UIObject>();
+            if (originalUIObject is null)
             {
                 Log.Error($"{logHeader} Failed retrieving the original Grass Prefab's UIObject instance, exiting.");
                 return;
             }
-
-            Log.Debug($"{logHeader} Retrieved the original Grass Prefab's UIObject instance.");
-
-            // We now have all the needed original objects to build our clones
+            
             foreach (var upgradeMode in ExtendedRoadUpgrades.Modes)
             {
-                if (prefabSystem.TryGetPrefab(new PrefabID("FencePrefab", upgradeMode.ObsoleteId), out PrefabBase prefabBase))
+                if (prefabSystem.TryGetPrefab(new PrefabID(nameof(FencePrefab), upgradeMode.ObsoleteId), out PrefabBase prefabBase))
                 {
                     Log.Debug($"{logHeader} [{upgradeMode.ObsoleteId}] Already exists.");
                     return;
                 }
 
-                // Instantiate our clone copying all the properties over
-                var clonedGrassUpgradePrefab = GameObject.Instantiate(grassUpgradePrefab);
+                var clonedUIButtonPrefab = Object.Instantiate(originalPrefab);
 
-                // Replace the name our they will be called "Grass (Clone)"
-                clonedGrassUpgradePrefab.name = upgradeMode.Id;
-
-                Log.Debug($"{logHeader} [{upgradeMode.Id}] Cloned the original Grass Prefab instance.");
-
-                // Update the UI component.
-                // To avoid impacting the Grass prefab we need to replace the UIObject with
-                // a fresh instance. Every property besides name and icon can be copied over.
-                // There is probably a better way of doing this, but I need to be sure that we're not
-                // keeping any unintended reference to the source object so I'd rather manually copy
-                // over only the thing I need instead of relying on automatic cloning.
-                clonedGrassUpgradePrefab.Remove<UIObject>();
-                clonedGrassUpgradePrefab.Remove<ServiceObject>();
-                clonedGrassUpgradePrefab.Remove<NetSubObjects>();
-                clonedGrassUpgradePrefab.Remove<Unlockable>();
-                clonedGrassUpgradePrefab.Remove<NetUpgrade>();
-
-                Log.Debug($"{logHeader} [{upgradeMode.Id}] Removed the original UIObject instance from the cloned Prefab.");
-
-                // Create and populate the new UIObject for our cloned Prefab
-                var clonedGrassUpgradePrefabUIObject = ScriptableObject.CreateInstance<UIObject>();
-                clonedGrassUpgradePrefabUIObject.m_Icon = $"coui://ui-mods/images/ZoneControllerTool.svg";
-                clonedGrassUpgradePrefabUIObject.name = grassUpgradePrefabUIObject.name.Replace("Grass", upgradeMode.Id);
-                clonedGrassUpgradePrefabUIObject.m_IsDebugObject = grassUpgradePrefabUIObject.m_IsDebugObject;
-                clonedGrassUpgradePrefabUIObject.m_Priority = grassUpgradePrefabUIObject.m_Priority;
-                clonedGrassUpgradePrefabUIObject.m_Group = grassUpgradePrefabUIObject.m_Group;
-                clonedGrassUpgradePrefabUIObject.active = grassUpgradePrefabUIObject.active;
+                clonedUIButtonPrefab.name = upgradeMode.Id;
                 
+                clonedUIButtonPrefab.Remove<UIObject>();
+                clonedUIButtonPrefab.Remove<Unlockable>();
                 
-
-                Log.Debug($"{logHeader} [{upgradeMode.Id}] Created a custom UIObject for our cloned Prefab with name {clonedGrassUpgradePrefabUIObject.name} and icon {clonedGrassUpgradePrefabUIObject.m_Icon}.");
-
-                // Add the newly created UIObject component and then add the cloned Prefab to our PrefabSystem
-                clonedGrassUpgradePrefab.AddComponentFrom(clonedGrassUpgradePrefabUIObject);
+                var uiObject = ScriptableObject.CreateInstance<UIObject>();
+                uiObject.m_Icon = $"coui://ui-mods/images/ZoneControllerTool.svg";
+                uiObject.name = originalUIObject.name.Replace("Grass", upgradeMode.Id);
+                uiObject.m_IsDebugObject = originalUIObject.m_IsDebugObject;
+                uiObject.m_Priority = originalUIObject.m_Priority-1;
+                uiObject.m_Group = originalUIObject.m_Group;
+                uiObject.active = originalUIObject.active;
+                
+                clonedUIButtonPrefab.AddComponentFrom(uiObject);
                 var tool = world.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
                 
-                tool.SetPrefab(clonedGrassUpgradePrefab);
+                tool.SetPrefab(clonedUIButtonPrefab);
                 
-                if (!prefabSystem.AddPrefab(clonedGrassUpgradePrefab))
+                if (!prefabSystem.AddPrefab(clonedUIButtonPrefab))
                 {
                     Log.Error($"{logHeader} [{upgradeMode.Id}] Failed adding the cloned Prefab to PrefabSystem, exiting.");
                     return;
                 }
-
-                Log.Info($"{logHeader} [{upgradeMode.Id}] Successfully created and added our cloned Prefab to PrefabSystem.");
-
-                // Attach to GameManager's loading event to perform the second phase of our patch
-                GameManager.instance.onGameLoadingComplete += GameManager_onGameLoadingComplete;
-                Log.Debug($"{logHeader} Ready to listen to GameManager loading events.");
-
-                // Mark the Install as already executed
                 installed = true;
 
-                Log.Debug($"{logHeader} Completed.");
             }
-        }
-
-        /// <summary>
-        ///     <para>
-        ///         This event handler performs the second phase of our custom modes patching.
-        ///     </para>
-        ///     <para>
-        ///         While in the first phase we create the <see cref="PrefabBase"/> without any <see cref="IComponentData"/>, in this one
-        ///         we add the <see cref="IComponentData"/> that we need to define the behavior of our custom upgrade modes.
-        ///     </para>
-        ///     <para>
-        ///         This behavior is defined by the <see cref="PlaceableNetData"/> <see cref="IComponentData"/>, which allows us to specify
-        ///         a collection of <see cref="PlaceableNetData.m_SetUpgradeFlags"/> and <see cref="PlaceableNetData.m_UnsetUpgradeFlags"/>.
-        ///     </para>
-        ///     <para>
-        ///         These two collection contains all the needed <see cref="CompositionFlags"/> that game will use to compose the final road.
-        ///     </para>
-        ///     <para>
-        ///         <list type="bullet">
-        ///             <ul>
-        ///                 <see cref="PlaceableNetData.m_SetUpgradeFlags"/> contains the flags that must be added to the target road piece
-        ///             </ul>
-        ///             <ul>
-        ///                 <see cref="PlaceableNetData.m_UnsetUpgradeFlags"/> contains the flags that must be removed from the target road piece
-        ///             </ul>
-        ///         </list>
-        ///     </para>
-        ///     <para>
-        ///         The goal of this method is then to simply iterate over our cloned <see cref="PrefabBase"/> Prefabs and add to each one of them
-        ///         the appropriate <see cref="PlaceableNetData"/>, based on the data set in our <see cref="ExtendedRoadUpgrades.Modes"/> collection.
-        ///     </para>
-        /// </summary>
-        /// <param name="purpose"></param>
-        /// <param name="mode"></param>
-        private static void GameManager_onGameLoadingComplete(Colossal.Serialization.Entities.Purpose purpose, Game.GameMode mode)
-        {
-            var logHeader = $"[{nameof(UpgradesManager)}.{nameof(GameManager_onGameLoadingComplete)}]";
-
-            if (postInstalled)
-            {
-                Log.Debug($"{logHeader} Already executed before, skipping.");
-                return;
-            }
-
-            // Execute in Game mode only
-            if (mode != Game.GameMode.Game && mode != Game.GameMode.Editor)
-            {
-                Log.Info($"{logHeader} Game mode is {mode}, skipping.");
-                return;
-            }
-
-            Log.Debug($"{logHeader} Started.");
-
-            // Getting Prefabs list from PrefabSystem
-            var prefabs = Traverse.Create(prefabSystem).Field<List<PrefabBase>>("m_Prefabs").Value;
-            if (prefabs == null || !prefabs.Any())
-            {
-                Log.Error($"{logHeader} Failed retrieving Prefabs list, exiting.");
-                return;
-            }
-
-            Log.Debug($"{logHeader} Retrieved Prefabs list.");
-
-            // Getting the original Grass Prefab
-            var grassUpgradePrefab = prefabs.FirstOrDefault(p => p.name == "Grass");
-            if (grassUpgradePrefab == null)
-            {
-                Log.Error($"{logHeader} Failed retrieving the original Grass Prefab instance, exiting.");
-                return;
-            }
-
-            Log.Debug($"{logHeader} Retrieved the original Grass Prefab instance.");
-
-            // Getting the original Grass Prefab's PlaceableNetData
-            var grassUpgradePrefabData = prefabSystem.GetComponentData<PlaceableNetData>(grassUpgradePrefab);
-            if (grassUpgradePrefabData.Equals(default(PlaceableNetData)))
-            {
-                // This type is not nullabe so we check equality with the default empty data
-                Log.Error($"{logHeader} Failed retrieving the original Grass Prefab's PlaceableNetData instance, exiting.");
-                return;
-            }
-
-            Log.Debug($"{logHeader} Retrieved the original Grass Prefab's PlaceableNetData instance.");
-
-            // We now have all the needed original objects to patch our clones
-            foreach (var upgradeMode in ExtendedRoadUpgrades.Modes)
-            {
-                // Getting the cloned Grass Prefab for the current upgrade mode
-                var clonedGrassUpgradePrefab = prefabs.FirstOrDefault(p => p.name == upgradeMode.Id);
-                if (clonedGrassUpgradePrefab == null)
-                {
-                    Log.Error($"{logHeader} [{upgradeMode.Id}] Failed retrieving the cloned Grass Prefab instance, exiting.");
-                    return;
-                }
-
-                Log.Debug($"{logHeader} [{upgradeMode.Id}] Retrieved the cloned Grass Prefab instance.");
-
-                // Getting the cloned Grass Prefab's PlaceableNetData for the current upgrade mode
-                var clonedGrassUpgradePrefabData = prefabSystem.GetComponentData<PlaceableNetData>(clonedGrassUpgradePrefab);
-                if (clonedGrassUpgradePrefabData.Equals(default(PlaceableNetData)))
-                {
-                    // This type is not nullabe so we check equality with the default empty data
-                    Log.Error($"{logHeader} [{upgradeMode.Id}] Failed retrieving the cloned Grass Prefab's PlaceableNetData instance, exiting.");
-                    return;
-                }
-
-                string s = string.Empty;
-
-                s+= $"\nRight:{clonedGrassUpgradePrefabData.m_SetUpgradeFlags.m_Right}";
-                s+= $"\nGeneral:{clonedGrassUpgradePrefabData.m_SetUpgradeFlags.m_General}";
-                s+= $"\nLeft:{clonedGrassUpgradePrefabData.m_SetUpgradeFlags.m_Left}";
-                
-                s+= $"\nPlacement:{clonedGrassUpgradePrefabData.m_PlacementFlags}";
-                
-                AdvancedRoadToolsMod.log.Debug(s);
-
-                Log.Debug($"{logHeader} [{upgradeMode.Id}] Retrieved the cloned Grass Prefab's PlaceableNetData instance.");
-
-                // Update the flags with the ones set in our upgrade mode
-                clonedGrassUpgradePrefabData.m_SetUpgradeFlags = upgradeMode.m_SetUpgradeFlags;
-
-                // TODO: this works even without the unset flags, keeping them there just in case
-                clonedGrassUpgradePrefabData.m_UnsetUpgradeFlags = upgradeMode.m_UnsetUpgradeFlags;
-
-                // This toggles underground mode for our custom upgrade modes
-                if (upgradeMode.IsUnderground)
-                {
-                    clonedGrassUpgradePrefabData.m_PlacementFlags |= Game.Net.PlacementFlags.UndergroundUpgrade;
-                }
-
-                // Persist the updated flags by replacing the ComponentData with the one we just created
-                prefabSystem.AddComponentData(clonedGrassUpgradePrefab, clonedGrassUpgradePrefabData);
-
-                Log.Debug($"{logHeader} [{upgradeMode.Id}] Successfully set flags for our cloned Prefab to {clonedGrassUpgradePrefabData.m_SetUpgradeFlags.ToJSONString()} and {clonedGrassUpgradePrefabData.m_UnsetUpgradeFlags.ToJSONString()}.");
-            }
-
-            // Mark the Prefix as already executed
-            postInstalled = true;
-
-            Log.Debug($"{logHeader} Extended Road Upgrades Completed.");
         }
     }
 }

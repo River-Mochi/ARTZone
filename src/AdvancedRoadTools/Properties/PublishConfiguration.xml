@@ -28,7 +28,7 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/advanced-road-tools.1728786/" />
 	<!--Version of the mod-->
-	<ModVersion Value="1.0" />
+	<ModVersion Value="1.0.1" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.2.*" />
 	<!--Dependency for the mod, can be set multiple times-->
@@ -36,13 +36,8 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 <!--	<ChangeLog Value="Created roads are now affected by the zoning configuration" />-->
 <ChangeLog>
-# ! The mod now requires l18n Everywhere as a dependency !
-# New Features
-- Localization
-- Setting to configure the Invert Zoning action for Zone Controller Tool
 # Fixes
-- Zone Controller tool now has a Title and Description
-- Zone Controller tool doesn't show as having a price per km used anymore
+- Fixed Zone Controller tool requiring money to be used!
 </ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
 	<ExternalLink Type="github" Url="https://github.com/LuxStice/AdvancedRoadTools" />
