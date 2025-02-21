@@ -13,7 +13,7 @@ namespace AdvancedRoadTools.Core;
 [SettingsUIGroupOrder(kToggleGroup)]
 [SettingsUIShowGroupName(kToggleGroup)]
 [SettingsUIMouseAction(AdvancedRoadToolsMod.kInvertZoningActionName, ActionType.Button,
-    usages: new string[] { Usages.kToolUsage, "TestUsage" }, interactions: new string[] { "UIButton" })]
+    usages: ["Zone Controller Tool"])]
 public class Setting : ModSetting
 {
     public const string kSection = "Main";
