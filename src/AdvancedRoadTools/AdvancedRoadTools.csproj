@@ -54,6 +54,9 @@
         <Reference Include="Unity.InputSystem">
             <Private>false</Private>
         </Reference>
+        <Reference Include="UnityEngine.AudioModule">
+            <Private>false</Private>
+        </Reference>
         <Reference Include="UnityEngine.CoreModule">
             <Private>false</Private>
         </Reference>
