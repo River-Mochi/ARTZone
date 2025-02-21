@@ -1,6 +1,5 @@
 using System;
 using Colossal.Serialization.Entities;
-using Colossal.UI.Binding;
 using Unity.Entities;
 using Unity.Mathematics;
 
