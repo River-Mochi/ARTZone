@@ -3,9 +3,7 @@
 // </copyright>
 
 // This code was originally part of Extended Road Upgrades by ST-Apps. It has been incorporated into this project with permission of ST-Apps.
-
-using AdvancedRoadTools.Core;
-using AdvancedRoadTools.Core.Logging;
+using AdvancedRoadTools.Tools;
 
 namespace AdvancedRoadTools.ExtendedRoadUpgrades
 {
@@ -88,44 +86,44 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
 
             if (installed)
             {
-                Log.Debug($"{logHeader} Extended Upgrades is installed, skipping");
+                log.Debug($"{logHeader} Extended Upgrades is installed, skipping");
                 return;
             }
 
-            Log.Debug($"{logHeader} Installing Extended Upgrades");
+            log.Debug($"{logHeader} Installing Extended Upgrades");
 
             world = Traverse.Create(GameManager.instance).Field<World>("m_World").Value;
             if (world is null)
             {
-                Log.Error($"{logHeader} Failed retrieving World instance, exiting.");
+                log.Error($"{logHeader} Failed retrieving World instance, exiting.");
                 return;
             }
 
             prefabSystem = world.GetExistingSystemManaged<PrefabSystem>();
             if (prefabSystem is null)
             {
-                Log.Error($"{logHeader} Failed retrieving PrefabSystem instance, exiting.");
+                log.Error($"{logHeader} Failed retrieving PrefabSystem instance, exiting.");
                 return;
             }
 
             var prefabs = Traverse.Create(prefabSystem).Field<List<PrefabBase>>("m_Prefabs").Value;
             if (prefabs is null || !prefabs.Any())
             {
-                Log.Error($"{logHeader} Failed retrieving Prefabs list, exiting.");
+                log.Error($"{logHeader} Failed retrieving Prefabs list, exiting.");
                 return;
             }
 
             var originalPrefab = prefabs.FirstOrDefault(p => p.name == "Wide Sidewalk");
             if (originalPrefab is null)
             {
-                Log.Error($"{logHeader} Failed retrieving the original Grass Prefab instance, exiting.");
+                log.Error($"{logHeader} Failed retrieving the original Grass Prefab instance, exiting.");
                 return;
             }
 
             var originalUIObject = originalPrefab.GetComponent<UIObject>();
             if (originalUIObject is null)
             {
-                Log.Error($"{logHeader} Failed retrieving the original Grass Prefab's UIObject instance, exiting.");
+                log.Error($"{logHeader} Failed retrieving the original Grass Prefab's UIObject instance, exiting.");
                 return;
             }
             
@@ -133,7 +131,7 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
             {
                 if (prefabSystem.TryGetPrefab(new PrefabID(nameof(FencePrefab), upgradeMode.ObsoleteId), out PrefabBase prefabBase))
                 {
-                    Log.Debug($"{logHeader} [{upgradeMode.ObsoleteId}] Already exists.");
+                    log.Debug($"{logHeader} [{upgradeMode.ObsoleteId}] Already exists.");
                     return;
                 }
 
@@ -159,7 +157,7 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
                 
                 if (!prefabSystem.AddPrefab(clonedUIButtonPrefab))
                 {
-                    Log.Error($"{logHeader} [{upgradeMode.Id}] Failed adding the cloned Prefab to PrefabSystem, exiting.");
+                    log.Error($"{logHeader} [{upgradeMode.Id}] Failed adding the cloned Prefab to PrefabSystem, exiting.");
                     return;
                 }
                 installed = true;

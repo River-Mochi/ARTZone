@@ -3,7 +3,7 @@ using Colossal.Serialization.Entities;
 using Unity.Entities;
 using Unity.Mathematics;
 
-namespace AdvancedRoadTools.Core;
+namespace AdvancedRoadTools.Components;
 
 public struct AdvancedRoad : IComponentData, IEquatable<AdvancedRoad>, ISerializable
 {

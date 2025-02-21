@@ -1,22 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using Colossal.Logging;
+using AdvancedRoadTools.Components;
+using AdvancedRoadTools.Logging;
 using Game;
 using Game.Common;
 using Game.Zones;
-using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
-using UnityEngine.PlayerLoop;
 
-namespace AdvancedRoadTools.Core;
+namespace AdvancedRoadTools;
 
 public partial class SyncBlockSystem : GameSystemBase
 {
     private EntityQuery UpdatedBlocksQuery;
-    public new ILog log => AdvancedRoadToolsMod.log;
 
     private ModificationBarrier4B _modificationBarrier;
 
@@ -36,8 +33,8 @@ public partial class SyncBlockSystem : GameSystemBase
     protected override void OnUpdate()
     {
         if (UpdatedBlocksQuery.IsEmpty) return;
-
-        AdvancedRoadToolsMod.log.Debug(
+        
+        LogART.Debug(
             $"[{nameof(SyncBlockSystem)}] Synchronizing Blocks and Valid Areas of {UpdatedBlocksQuery.CalculateEntityCount()} blocks.");
 
         var ecb = _modificationBarrier.CreateCommandBuffer();

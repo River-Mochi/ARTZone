@@ -1,5 +1,5 @@
 ﻿import { FloatingButton } from "cs2/ui";
-import React, { CSSProperties } from 'react';
+import React from 'react';
 import {useLocalization} from "cs2/l10n";
 import {trigger} from "cs2/api";
 import mod from "../../mod.json";
