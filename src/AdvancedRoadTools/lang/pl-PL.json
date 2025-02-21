@@ -1,0 +1,17 @@
+﻿{
+  "Assets.NAME[Zone Controller Tool]": "Kontroler Stref",
+  "Assets.DESCRIPTION[Zone Controller Tool]": "Narzędzie do kontrolowania zachowania stref drogi.\nWybierz występowanie stref, po obu stronach, na żadnej stronie, po lewej lub po prawej stronie, dla dróg.\nDomyślnie prawy przycisk myszy odwraca konfigurację stref.",
+  "ToolOptions.SECTION[AdvancedRoadTools.Zone_Controller.SectionTitle]": "Strefy",
+  "ToolOptions.TOOLTIP_DESCRIPTION[AdvancedRoadTools.Zone_Controller.ZoningModeBothDescription]": "Strefy po obu stronach.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[AdvancedRoadTools.Zone_Controller.ZoningModeLeftDescription]": "Strefy tylko po lewej stronie.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[AdvancedRoadTools.Zone_Controller.ZoningModeRightDescription]": "Strefy tylko po prawej stronie.",
+  "Options.SECTION[AdvancedRoadTools.AdvancedRoadTools.Core.AdvancedRoadToolsMod]": "Advanced Road Tools",
+  "Options.TAB[AdvancedRoadTools.AdvancedRoadTools.Core.AdvancedRoadToolsMod.Main]": "Główne",
+  "Options.GROUP[AdvancedRoadTools.AdvancedRoadTools.Core.AdvancedRoadToolsMod.Zone Controller Tool]": "Opcje Narzędzia Kontroli Stref",
+  "Options.OPTION[AdvancedRoadTools.AdvancedRoadTools.Core.AdvancedRoadToolsMod.Setting.RemoveZonedCells]": "Zapobiegaj usuwaniu już wyznaczonych stref",
+  "Options.OPTION_DESCRIPTION[AdvancedRoadTools.AdvancedRoadTools.Core.AdvancedRoadToolsMod.Setting.RemoveZonedCells]": "Zapobiegaj nadpisywaniu już wyznaczonych stref podczas wyświetlania i etapu ustawiania Narzędzia Kontroli Stref. Ustaw na prawda, jeżeli masz problem ze znikającą konfiguracją stref podczas korzystania z tego narzędzia. Domyślnie: prawda",
+  "Options.OPTION[AdvancedRoadTools.AdvancedRoadTools.Core.AdvancedRoadToolsMod.Setting.RemoveOccupiedCells]": "Zapobiegaj usuwaniu już zajętych stref",
+  "Options.OPTION_DESCRIPTION[AdvancedRoadTools.AdvancedRoadTools.Core.AdvancedRoadToolsMod.Setting.RemoveOccupiedCells]": "Zapobiegaj nadpisywaniu już zajętych stref podczas wyświetlania i etapu ustawiania Narzędzia Kontroli Stref. Ustaw na prawda, jeżeli masz problem z budynkami, które zostają opuszczone i lub porzucone podczas korzystania z tego narzędzia. Domyślnie: prawda",
+  "Options.OPTION[AdvancedRoadTools.AdvancedRoadTools.Core.AdvancedRoadToolsMod.Setting.InvertZoning]": "Odwróć działanie przycisku myszy",
+  "Options.OPTION_DESCRIPTION[AdvancedRoadTools.AdvancedRoadTools.Core.AdvancedRoadToolsMod.Setting.InvertZoning]": "Odwraca bieżącą konfigurację stref."
+}
