@@ -17,13 +17,9 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
     /// </summary>
     internal class ExtendedRoadUpgrades
     {
-        /// <summary>
-        ///     This variable contains all the available upgrade modes that we support.
-        /// </summary>
-        public static IEnumerable<ExtendedRoadUpgradeModel> Modes = new[]
-        {
-            // Quay
-            new ExtendedRoadUpgradeModel
+        public static IEnumerable<ExtendedRoadUpgradeModel> Modes =
+        [
+            new()
             {
                 ObsoleteId = "ZoneControllerTool",
                 Id = "Zone Controller Tool",
@@ -38,7 +34,7 @@ namespace AdvancedRoadTools.ExtendedRoadUpgrades
                 m_SetState = new [] { NetPieceRequirements.Edge },
                 m_UnsetState = null,
                 IsUnderground = true
-            },
-        };
+            }
+        ];
     }
 }
