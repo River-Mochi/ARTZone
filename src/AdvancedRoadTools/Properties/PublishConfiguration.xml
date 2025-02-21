@@ -8,15 +8,25 @@
 	<!--Long description of the mod. Single line or multi line. Supports minimal markdown subset-->
 	<!--LongDescription Value="This is a long description" /-->
 	<LongDescription>
+# Advanced Road Tools (ART)
+---		
 Advanced Road Tools (ART) is a mod that provides a variety of tools to control roads and their behaviour.
 
 ## Features
 - **Zoning Controller Tool** - Control zoning on roads, with a previewable tool where you can just hover the road and see what you'll get! Right-Click inverts the current zoning configuration
----
+
 ### Planned Features
 - **Parallel Tool** - Create parallel roads and tracks out of any network. This tool will allow you to create parallel roads out of train tracks, highways and tram tracks without the need of tracing them. Simply click them and see the new parallel road appear.
-- **Advanced Grid Tool** - Create a grid by the amount of columns and rows that you want. Simply set 2 control points to define a rectangle, and then, on a pop-up window, set how many rows and collumns you want and them cofirm it. voila!
+- **Advanced Grid Tool** - Create a grid by the amount of columns and rows that you want. Simply set 2 control points to define a rectangle, and then, on a pop-up window, set how many rows and columns you want and them confirm it. voila!
+- **Control Zoning Depth** - Set zoning depth from 0 to 12 (or even more). Have EVEN MORE control over how zoning is generated on your roads. create a 2 deep zoning road for those nice warehouses, or 3 deep zoning road for those compact row homes. Or even, in the future, 12 deep zoning for 12x12 gigantic factories or mansions!		
 		
+---
+## Translations*
+- English
+- Portuguese-Brazilian
+- Simplified Chinese (Thanks to RilkeXS)
+- Polish (Thanks to karmel68)
+* all translations that are NOT English require l18n to work!		
 	</LongDescription>
 	<!--Thumbnail-->
 	<Thumbnail Value="Properties/Thumbnail.png" />
@@ -28,16 +38,20 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/advanced-road-tools.1728786/" />
 	<!--Version of the mod-->
-	<ModVersion Value="1.0.1" />
+	<ModVersion Value="1.0.2" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.2.*" />
 	<!--Dependency for the mod, can be set multiple times-->
-	<Dependency Id="75426" />
+	<Dependency Id="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 <!--	<ChangeLog Value="Created roads are now affected by the zoning configuration" />-->
 <ChangeLog>
+# Translations
+- Added Polish translation (Thanks to karmel68)
+- Added Simplified Chinese translation (Thanks to RilkeXS)
+
 # Fixes
-- Fixed Zone Controller tool requiring money to be used!
+- Fixed keybind conflict with Tool/Secondary Action. The Invert Zoning doesn't get called on tools other than Zone Controller. 
 </ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
 	<ExternalLink Type="github" Url="https://github.com/LuxStice/AdvancedRoadTools" />
