@@ -4,6 +4,7 @@ using Colossal.Entities;
 using Colossal.Logging;
 using Colossal.Serialization.Entities;
 using Game;
+using Game.Audio;
 using Game.Common;
 using Game.Input;
 using Game.Net;
@@ -149,6 +150,16 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
         if (applyAction.WasPressedThisFrame() && raycastFlag)
         {
             log.Debug($"{LOG_HEADER} ({nameof(OnUpdate)}) - Left Click on {toolID}");
+            try
+            {
+                var m_SoundQuery = GetEntityQuery(ComponentType.ReadOnly<ToolUXSoundSettingsData>());
+                AudioManager m_AudioManager = AudioManager.instance;
+                m_AudioManager.PlayUISound(m_SoundQuery.GetSingleton<ToolUXSoundSettingsData>().m_NetBuildSound);
+            }
+            catch (Exception ex)
+            {
+                AdvancedRoadToolsMod.log.Error("Failed to play audio: " + ex.Message);
+            }
 
             var setAdvancedRoadJob = new SetAdvancedRoadJob()
             {
@@ -163,6 +174,16 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
         if (InvertZoningAction.WasPressedThisFrame())
         {
             _zoningControllerToolUISystem.InvertZoningMode();
+            try
+            {
+                var m_SoundQuery = GetEntityQuery(ComponentType.ReadOnly<ToolUXSoundSettingsData>());
+                AudioManager m_AudioManager = AudioManager.instance;
+                m_AudioManager.PlayUISound(m_SoundQuery.GetSingleton<ToolUXSoundSettingsData>().m_NetCancelSound);
+            }
+            catch (Exception ex)
+            {
+                AdvancedRoadToolsMod.log.Error("Failed to play audio: " + ex.Message);
+            }
         }
 
         _toolOutputBarrier.AddJobHandleForProducer(inputDeps);
