@@ -1,6 +1,6 @@
 ﻿import {ModuleRegistryExtend} from "cs2/modding";
-import {bindValue, trigger, useValue} from "cs2/api";
-import {game, tool} from "cs2/bindings";
+import {bindValue, trigger, useValue } from "cs2/api";
+import {tool} from "cs2/bindings";
 import {useLocalization} from "cs2/l10n";
 import mod from "../../mod.json";
 import {VanillaComponentResolver} from "../YenYang/VanillaComponentResolver";
@@ -45,6 +45,7 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
         const ZoningModeRightTooltipDescription = translate("ToolOptions.TOOLTIP_DESCRIPTION[AdvancedRoadTools.Zone_Controller.ZoningModeRightDescription]", "Zone only on the right side.");
 
         var result = Component();
+        
         
         //Currently the mod doesn't work when placing roads, only with the Zoning TOol
         if (isRoadPrefab || zoningToolActive) {
