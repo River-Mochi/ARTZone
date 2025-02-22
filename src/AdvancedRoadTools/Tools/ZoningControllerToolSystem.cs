@@ -26,8 +26,9 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
 
     private IProxyAction invertZoningAction;
 
-    public override string toolID => "Zone Controller Tool";
-    
+    public const string ToolID =  "Zone Controller Tool";
+    public override string toolID => ToolID;
+
     private ComponentLookup<AdvancedRoad> advancedRoadLookup;
     private BufferLookup<SubBlock> subBlockLookup;
     private int2 Depths => zoningControllerToolUISystem.Depths;
@@ -57,7 +58,12 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
         advancedRoadLookup = GetComponentLookup<AdvancedRoad>(true);
         subBlockLookup = GetBufferLookup<SubBlock>(true);
         
-        ExtendedRoadUpgrades.UpgradesManager.Install();
+        var definition = new ToolDefinition(typeof(ZoningControllerToolSystem), toolID, new ToolDefinition.UI
+        {
+            ImagePath = ToolDefinition.UI.PathPrefix + toolID + ToolDefinition.UI.ImageFormat,
+        });
+
+        ToolsHelper.RegisterTool(definition);
     }
 
     /// <inheritdoc/>

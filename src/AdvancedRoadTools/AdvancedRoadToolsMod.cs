@@ -46,6 +46,13 @@ public class AdvancedRoadToolsMod : IMod
         updateSystem.UpdateAt<SyncCreatedRoadsSystem>(SystemUpdatePhase.Modification4);
         updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
         updateSystem.UpdateAt<ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
+        
+        GameManager.instance.onGameLoadingComplete += CreateTools;
+    }
+
+    private void CreateTools(Purpose purpose, GameMode mode)
+    {
+        ToolsHelper.CreateToolsUI();
     }
 
     private void RegisterPrefab()
