@@ -2,6 +2,7 @@
 using AdvancedRoadTools.Tools;
 using Colossal.IO.AssetDatabase;
 using Colossal.Logging;
+using Colossal.Serialization.Entities;
 using Game;
 using Game.Input;
 using Game.Modding;

@@ -18,7 +18,7 @@ using Unity.Mathematics;
 namespace AdvancedRoadTools.Tools;
 
 [BurstCompile]
-public partial class ZoningControllerToolSystem : ToolBaseSystem
+public partial class ZoningControllerToolSystem : ToolBaseSystem, IARTTool
 {
     private ToolOutputBarrier toolOutputBarrier;
     private ZoningControllerToolUISystem zoningControllerToolUISystem;
@@ -32,14 +32,16 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
     private ComponentLookup<AdvancedRoad> advancedRoadLookup;
     private BufferLookup<SubBlock> subBlockLookup;
     private int2 Depths => zoningControllerToolUISystem.Depths;
+    private ZoningMode ZoningMode => zoningControllerToolUISystem.ZoningMode;
     private EntityQuery tempAdvancedRoadQuery;
     private EntityQuery soundbankQuery;
     private Entity lastEntity;
+    private PrefabBase toolPrefab;
 
     [BurstCompile]
     protected override void OnCreate()
     {
-        log.Debug($"{toolID}:{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
+        log.Debug($"{nameof(ZoningControllerToolSystem)}.{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
         base.OnCreate();
         toolOutputBarrier = World.GetOrCreateSystemManaged<ToolOutputBarrier>();
         zoningControllerToolUISystem = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
@@ -69,7 +71,7 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
     /// <inheritdoc/>
     protected override void OnStartRunning()
     {
-        log.Debug($"{toolID}:{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
+        log.Debug($"{nameof(ZoningControllerToolSystem)}.{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
         base.OnStartRunning();
         applyAction.enabled = true;
         invertZoningAction.enabled = true;
@@ -81,7 +83,7 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
     ///cleans up actions or whatever else you want to happen when your tool becomes inactive.
     protected override void OnStopRunning()
     {
-        log.Debug($"{toolID}:{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
+        log.Debug($"{nameof(ZoningControllerToolSystem)}.{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
         base.OnStartRunning();
         applyAction.enabled = false;
         invertZoningAction.enabled = false;
@@ -92,12 +94,12 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
 
     protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
     {
-        log.Debug($"{toolID}:{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
+        log.Debug($"{nameof(ZoningControllerToolSystem)}.{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
         base.OnGameLoadingComplete(purpose, mode);
+
         m_ToolSystem.tools.Remove(this);
         m_ToolSystem.tools.Insert(10, this);
     }
-
 
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
@@ -115,11 +117,12 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
             {
                 toolHighlightSystem.HighlightEntity(lastEntity, false);
             }
+
             if (e != Entity.Null)
             {
                 toolHighlightSystem.HighlightEntity(e, true);
+                AudioManager.instance.PlayUISound(soundbank.m_SelectEntitySound);
             }
-            AudioManager.instance.PlayUISound(soundbank.m_SelectEntitySound);
         }
 
         if (entityChanged)
@@ -138,8 +141,9 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
         }
 
         //Left Click will set the Zoning depth to the current setting
-        if (applyAction.WasPressedThisFrame() || raycastFlag)
+        if (applyAction.WasPressedThisFrame() && raycastFlag)
         {
+            log.Info($"{toolID}:Setting advanced road of {e}");
             var setAdvancedRoadJob = new SetAdvancedRoadJob
             {
                 TempZoningLookup = GetComponentLookup<TempZoning>(true),
@@ -147,15 +151,16 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
                 ECB = ecb
             }.Schedule(inputDeps);
             inputDeps = JobHandle.CombineDependencies(inputDeps, setAdvancedRoadJob);
-            
+
             AudioManager.instance.PlayUISound(soundbank.m_NetBuildSound);
         }
 
         //Right click inverts the current zoning mode
         if (invertZoningAction.WasPressedThisFrame())
         {
+            log.Debug($"{toolID}:Inverting zoning configuration from {ZoningMode} to {~ZoningMode}");
             zoningControllerToolUISystem.InvertZoningMode();
-            
+
             AudioManager.instance.PlayUISound(soundbank.m_NetCancelSound);
         }
 
@@ -165,15 +170,18 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
         return inputDeps;
     }
 
-
     private new bool GetRaycastResult(out Entity entity, out RaycastHit hit)
     {
-        base.GetRaycastResult(out entity, out hit);
+        if (!base.GetRaycastResult(out entity, out hit)) return false;
 
         var hasAdvancedRoad = advancedRoadLookup.TryGetComponent(entity, out var data);
         var hasSubBlock = subBlockLookup.TryGetBuffer(entity, out _);
 
-        if (!hasSubBlock) return false;
+        if (!hasSubBlock)
+        {
+            entity = Entity.Null;
+            return false;
+        }
 
         switch (hasAdvancedRoad)
         {
@@ -186,10 +194,9 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
                 return true;
         }
 
+        entity = Entity.Null;
         return false;
     }
-
-    private PrefabBase toolPrefab;
 
     public void SetPrefab(PrefabBase prefab) => toolPrefab = prefab;
 
@@ -307,71 +314,6 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
             ECB.RemoveComponent<TempZoning>(RoadEntity);
             ECB.AddComponent(RoadEntity,
                 new AdvancedRoad { Depths = newDepth });
-        }
-    }
-
-    /// <summary>
-    /// Highlights the moused over road and unhighlights other entities
-    /// </summary>
-    public struct HandleHighlightJob : IJob
-    {
-        public RaycastHit RaycastHit;
-        public ComponentLookup<AdvancedRoad> AdvancedRoadLookup;
-        public ComponentLookup<Highlighted> HighlightedLookup;
-        public ComponentLookup<Edge> EdgeLookup;
-        public BufferLookup<SubBlock> SubBlockLookup;
-        public NativeArray<Entity> HighlightedEntities;
-        public EntityCommandBuffer ECB;
-        public int2 Depths;
-
-        public void Execute()
-        {
-            var entity = RaycastHit.m_HitEntity;
-
-            var hasAdvancedRoad = AdvancedRoadLookup.TryGetComponent(entity, out var data);
-            var hasSubBlock = SubBlockLookup.TryGetBuffer(entity, out var subBlock);
-
-            if (!HighlightedLookup.HasComponent(entity) && entity != Entity.Null) //IF is not highlighted
-            {
-                if ((hasAdvancedRoad && hasSubBlock && !subBlock.IsEmpty &&
-                     math.any(data.Depths != Depths)) //if advanced data depths is different from current depths
-                    || (!hasAdvancedRoad && hasSubBlock && !subBlock.IsEmpty &&
-                        math.any(Depths !=
-                                 new int2(6)))) //if it doesn't have an advanced data and depths are game's defaults
-                {
-                    HighlightEntity(entity);
-                }
-            }
-
-            foreach (var highlightedEntity in HighlightedEntities.Where(
-                         highlightedEntity => highlightedEntity != entity))
-            {
-                UnhighlightEntity(highlightedEntity);
-            }
-
-            HighlightedEntities.Dispose();
-        }
-
-        private void HighlightEntity(Entity entity)
-        {
-            ECB.AddComponent<Highlighted>(entity);
-            ECB.AddComponent<BatchesUpdated>(entity);
-
-            if (!EdgeLookup.TryGetComponent(entity, out var edge)) return;
-
-            ECB.AddComponent<Updated>(edge.m_Start);
-            ECB.AddComponent<Updated>(edge.m_End);
-        }
-
-        private void UnhighlightEntity(Entity entity)
-        {
-            ECB.RemoveComponent<Highlighted>(entity);
-            ECB.AddComponent<BatchesUpdated>(entity);
-
-            if (!EdgeLookup.TryGetComponent(entity, out var edge)) return;
-
-            ECB.AddComponent<Updated>(edge.m_Start);
-            ECB.AddComponent<Updated>(edge.m_End);
         }
     }
 }

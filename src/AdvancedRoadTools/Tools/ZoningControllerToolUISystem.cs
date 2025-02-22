@@ -1,4 +1,5 @@
 ﻿using Colossal.UI.Binding;
+using Game;
 using Game.Prefabs;
 using Game.Tools;
 using Game.UI;
@@ -16,7 +17,8 @@ public partial class ZoningControllerToolUISystem : UISystemBase
 
     public int DepthLeft => zoningDepthLeft.value;
     public int DepthRight => zoningDepthRight.value;
-    private ZoningMode ZoningMode => (ZoningMode)zoningMode.value;
+    public ZoningMode ZoningMode => (ZoningMode)zoningMode.value;
+    public bool InvertedLastFrame;
 
     public int2 Depths
     {
@@ -53,6 +55,12 @@ public partial class ZoningControllerToolUISystem : UISystemBase
         mainToolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
             mainToolSystem.EventPrefabChanged += EventPrefabChanged;
         toolSystem = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
+    }
+
+    protected override void OnUpdate()
+    {
+        base.OnUpdate();
+        InvertedLastFrame = false;
     }
 
     private void EventPrefabChanged(PrefabBase obj)
@@ -98,6 +106,7 @@ public partial class ZoningControllerToolUISystem : UISystemBase
 
     public void InvertZoningMode()
     {
+        InvertedLastFrame = true;
         ChangeZoningMode(~ZoningMode);
     }
 }
