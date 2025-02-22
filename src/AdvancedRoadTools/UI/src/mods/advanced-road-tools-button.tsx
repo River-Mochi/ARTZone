@@ -3,7 +3,7 @@ import React from 'react';
 import {useLocalization} from "cs2/l10n";
 import {trigger} from "cs2/api";
 import mod from "../../mod.json";
-import buttonIcon from "../../ZoneControllerTool.svg";
+import buttonIcon from "../../images/Zone Controller Tool.svg";
 import {VanillaComponentResolver} from "../YenYang/VanillaComponentResolver";
 
 function ToggleZoneControllerTool()
