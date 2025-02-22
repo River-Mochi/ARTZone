@@ -1,7 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using AdvancedRoadTools.Components;
-using AdvancedRoadTools.Logging;
 using Colossal.Serialization.Entities;
 using Game;
 using Game.Audio;
@@ -26,35 +24,27 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
     private ZoningControllerToolUISystem zoningControllerToolUISystem;
     private ToolHighlightSystem toolHighlightSystem;
 
-    private IProxyAction InvertZoningAction;
-
-    private const string LOG_HEADER = $"[{nameof(ZoningControllerToolSystem)}]";
+    private IProxyAction invertZoningAction;
 
     public override string toolID => "Zone Controller Tool";
-
-    private EntityQuery allBlocksQuery;
-    private EntityQuery highlightedEntityQuery;
+    
+    private ComponentLookup<AdvancedRoad> advancedRoadLookup;
+    private BufferLookup<SubBlock> subBlockLookup;
+    private int2 Depths => zoningControllerToolUISystem.Depths;
     private EntityQuery tempAdvancedRoadQuery;
     private EntityQuery soundbankQuery;
+    private Entity lastEntity;
 
     [BurstCompile]
     protected override void OnCreate()
     {
-        LogART.Info("OnCreate");
+        log.Debug($"{toolID}:{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
         base.OnCreate();
         toolOutputBarrier = World.GetOrCreateSystemManaged<ToolOutputBarrier>();
         zoningControllerToolUISystem = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
         toolHighlightSystem = World.GetOrCreateSystemManaged<ToolHighlightSystem>();
 
-        InvertZoningAction = AdvancedRoadToolsMod.m_InvertZoningAction;
-
-        allBlocksQuery = new EntityQueryBuilder(Allocator.Temp)
-            .WithAll<Block, Owner>()
-            .Build(this);
-
-        highlightedEntityQuery = new EntityQueryBuilder(Allocator.Temp)
-            .WithAll<Highlighted>()
-            .Build(this);
+        invertZoningAction = AdvancedRoadToolsMod.m_InvertZoningAction;
 
         tempAdvancedRoadQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithAll<TempZoning>()
@@ -64,16 +54,19 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
             .WithAll<ToolUXSoundSettingsData>()
             .Build(this);
 
+        advancedRoadLookup = GetComponentLookup<AdvancedRoad>(true);
+        subBlockLookup = GetBufferLookup<SubBlock>(true);
+        
         ExtendedRoadUpgrades.UpgradesManager.Install();
     }
 
     /// <inheritdoc/>
     protected override void OnStartRunning()
     {
-        LogART.Debug("OnStartRunning");
+        log.Debug($"{toolID}:{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
         base.OnStartRunning();
         applyAction.enabled = true;
-        InvertZoningAction.enabled = true;
+        invertZoningAction.enabled = true;
         requireZones = true;
         requireNet = Layer.Road;
         allowUnderground = true;
@@ -82,10 +75,10 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
     ///cleans up actions or whatever else you want to happen when your tool becomes inactive.
     protected override void OnStopRunning()
     {
-        LogART.Debug("OnStopRunning");
+        log.Debug($"{toolID}:{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
         base.OnStartRunning();
         applyAction.enabled = false;
-        InvertZoningAction.enabled = false;
+        invertZoningAction.enabled = false;
         requireZones = false;
         requireNet = Layer.None;
         allowUnderground = false;
@@ -93,25 +86,12 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
 
     protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
     {
+        log.Debug($"{toolID}:{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
         base.OnGameLoadingComplete(purpose, mode);
-        LogART.Debug($"{nameof(ZoningControllerToolSystem)}.{nameof(OnGameLoadingComplete)} New Order:");
         m_ToolSystem.tools.Remove(this);
         m_ToolSystem.tools.Insert(10, this);
-
-        foreach (ToolBaseSystem toolBaseSystem in m_ToolSystem.tools)
-        {
-            LogART.Debug(
-                $"{nameof(ZoningControllerToolSystem)}.{nameof(OnGameLoadingComplete)} {toolBaseSystem.toolID}");
-        }
     }
 
-    private JobHandle Apply(JobHandle inputDeps)
-    {
-        this.applyMode = ApplyMode.Apply;
-        return inputDeps;
-    }
-
-    private Entity LastEntity;
 
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
@@ -119,22 +99,21 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
 
         var ecb = toolOutputBarrier.CreateCommandBuffer();
         bool raycastFlag = GetRaycastResult(out Entity e, out RaycastHit hit);
-        var entityChanged = LastEntity != e;
+        var entityChanged = lastEntity != e;
         var soundbank = soundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
         if (entityChanged)
         {
             //Highlight new entity and unhighlight old
-            if (LastEntity != Entity.Null)
+            if (lastEntity != Entity.Null)
             {
-                toolHighlightSystem.HighlightEntity(LastEntity, false);
-                AudioManager.instance.PlayUISound(soundbank.m_DeletetEntitySound);
+                toolHighlightSystem.HighlightEntity(lastEntity, false);
             }
             if (e != Entity.Null)
             {
                 toolHighlightSystem.HighlightEntity(e, true);
-                AudioManager.instance.PlayUISound(soundbank.m_SelectEntitySound);
             }
+            AudioManager.instance.PlayUISound(soundbank.m_SelectEntitySound);
         }
 
         if (entityChanged)
@@ -167,7 +146,7 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
         }
 
         //Right click inverts the current zoning mode
-        if (InvertZoningAction.WasPressedThisFrame())
+        if (invertZoningAction.WasPressedThisFrame())
         {
             zoningControllerToolUISystem.InvertZoningMode();
             
@@ -176,20 +155,17 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
 
         toolOutputBarrier.AddJobHandleForProducer(inputDeps);
 
-        LastEntity = e;
+        lastEntity = e;
         return inputDeps;
     }
 
-    private ComponentLookup<AdvancedRoad> advancedRoadLookup;
-    private BufferLookup<SubBlock> subBlockLookup;
-    private int2 Depths => zoningControllerToolUISystem.Depths;
 
     private new bool GetRaycastResult(out Entity entity, out RaycastHit hit)
     {
         base.GetRaycastResult(out entity, out hit);
 
         var hasAdvancedRoad = advancedRoadLookup.TryGetComponent(entity, out var data);
-        var hasSubBlock = subBlockLookup.TryGetBuffer(entity, out var subBlock);
+        var hasSubBlock = subBlockLookup.TryGetBuffer(entity, out _);
 
         if (!hasSubBlock) return false;
 
@@ -207,17 +183,18 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
         return false;
     }
 
-    private PrefabBase prefab;
+    private PrefabBase toolPrefab;
 
-    public void SetPrefab(PrefabBase prefab) => this.prefab = prefab;
+    public void SetPrefab(PrefabBase prefab) => toolPrefab = prefab;
 
     public override PrefabBase GetPrefab()
     {
-        return prefab;
+        return toolPrefab;
     }
 
     public override bool TrySetPrefab(PrefabBase prefab)
     {
+        log.Debug($"{toolID}:{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
         bool isRightPrefab = prefab.name == toolID;
 
         return isRightPrefab;
@@ -275,7 +252,7 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
                             math.any(Depths !=
                                      new int2(6)))) //OR doesn't have advance road and its different from default
                     {
-                        LogART.Debug(
+                        log.Debug(
                             $"[{nameof(HandleTempJob)}] Setting temporary zoning of {entity} ({Depths})");
                         ECB.AddComponent(entity, new TempZoning
                         {
@@ -300,7 +277,7 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
             ECB.RemoveComponent<TempZoning>(entity);
             ECB.AddComponent<Updated>(entity);
 
-            LogART.Debug($"[{nameof(HandleTempJob)}] Removed temporary zoning of {entity}");
+            log.Debug($"[{nameof(HandleTempJob)}] Removed temporary zoning of {entity}");
         }
     }
 
@@ -315,14 +292,14 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem
 
         public void Execute()
         {
-            LogART.Debug($"[{nameof(SetAdvancedRoadJob)}.Execute()]");
+            log.Debug($"[{nameof(SetAdvancedRoadJob)}.Execute()]");
 
             if (!TempZoningLookup.TryGetComponent(RoadEntity, out var tempZoning)) return;
 
             var newDepth = tempZoning.Depths;
 
             ECB.RemoveComponent<TempZoning>(RoadEntity);
-            ECB.AddComponent<AdvancedRoad>(RoadEntity,
+            ECB.AddComponent(RoadEntity,
                 new AdvancedRoad { Depths = newDepth });
         }
     }
