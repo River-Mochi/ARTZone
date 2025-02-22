@@ -78,7 +78,7 @@ public partial class ToolHighlightSystem : GameSystemBase
             {
                 case true:
                     ECB.RemoveComponent<Highlighted>(index, entity);
-                    ECB.RemoveComponent<BatchesUpdated>(index, entity);
+                    ECB.AddComponent<BatchesUpdated>(index, entity);
                     log.Debug($"Removed highlight from {entity}");
                     break;
                 case false:
