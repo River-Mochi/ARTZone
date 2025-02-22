@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AdvancedRoadTools.Tools;
 using Colossal;
 using Colossal.IO.AssetDatabase;
 using Game.Input;
@@ -73,8 +74,11 @@ public class LocaleEN : IDictionarySource
                 "\nDefault: true" },
             { m_Setting.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Invert Zoning Mouse Button" },
             { m_Setting.GetOptionDescLocaleID(nameof(Setting.InvertZoning)), "Inverts the current zoning configuration with a mouse action." },
-            { "Assets.NAME[Zone Controller Tool]","Zone Controller" },
-            {"Assets.DESCRIPTION[Zone Controller Tool]", "Tool to control how the zoning of a road behaves.\nChoose between zoning on both sides, only on the left or right, or no zoning for that road.\nBy default, right-click inverts the zoning configuration."}
+            { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]","Zone Controller" },
+            { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]", "Tool to control how the zoning of a road behaves.\nChoose between zoning on both sides, only on the left or right, or no zoning for that road.\nBy default, right-click inverts the zoning configuration."},
+            
+            { $"Assets.NAME[{AdvancedParallelToolSystem.ToolID}]","Parallel Tool" },
+            { $"Assets.DESCRIPTION[{AdvancedParallelToolSystem.ToolID}]", "WIP"}
         };
     }
 
