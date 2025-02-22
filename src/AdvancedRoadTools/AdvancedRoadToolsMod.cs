@@ -1,6 +1,7 @@
 ﻿using AdvancedRoadTools.Logging;
 using AdvancedRoadTools.Tools;
 using Colossal.IO.AssetDatabase;
+using Colossal.Logging;
 using Game;
 using Game.Input;
 using Game.Modding;
@@ -14,18 +15,19 @@ public class AdvancedRoadToolsMod : IMod
 {
     public const string ModID = "AdvancedRoadTools";
     
+    
     public static Setting m_Setting;
     public const string kInvertZoningActionName = "InvertZoning";
     public static ProxyAction m_InvertZoningAction;
     
     public void OnLoad(UpdateSystem updateSystem)
     {
-        LogART.Info(nameof(OnLoad));
+        log.Info(nameof(OnLoad));
 
         RegisterPrefab();
 
         if (GameManager.instance.modManager.TryGetExecutableAsset(this, out var asset))
-            LogART.Info($"Current mod asset at {asset.path}");
+            log.Info($"Current mod asset at {asset.path}");
 
         m_Setting = new Setting(this);
         m_Setting.RegisterInOptionsUI();
@@ -39,6 +41,7 @@ public class AdvancedRoadToolsMod : IMod
         
         updateSystem.UpdateAt<AdvancedParallelToolSystem>(SystemUpdatePhase.ToolUpdate);
         updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
+        updateSystem.UpdateAt<ToolHighlightSystem>(SystemUpdatePhase.ToolUpdate);
         
         updateSystem.UpdateAt<SyncCreatedRoadsSystem>(SystemUpdatePhase.Modification4);
         updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
@@ -59,7 +62,7 @@ public class AdvancedRoadToolsMod : IMod
 
     public void OnDispose()
     {
-        LogART.Info(nameof(OnDispose));
+        log.Info(nameof(OnDispose));
         if (m_Setting != null)
         {
             m_Setting.UnregisterInOptionsUI();

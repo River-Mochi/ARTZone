@@ -22,8 +22,11 @@ public partial class ToolHighlightSystem : GameSystemBase
     protected override void OnCreate()
     {
         toolOutputBarrier = World.GetOrCreateSystemManaged<ToolOutputBarrier>();
+        
         edgeLookup = GetComponentLookup<Edge>(true);
         highlightedLookup = GetComponentLookup<Highlighted>(true);
+
+        toToggleEntities = new NativeList<Entity>(Allocator.Persistent);
     }
 
     protected override void OnUpdate()
@@ -34,27 +37,28 @@ public partial class ToolHighlightSystem : GameSystemBase
         edgeLookup.Update(this);
         highlightedLookup.Update(this);
         
-        log.Debug($"({System.Reflection.MethodBase.GetCurrentMethod()?.Name}) Toggling {toToggleEntities} entities");
+        log.Debug($"({System.Reflection.MethodBase.GetCurrentMethod()?.Name}) Toggling {toToggleEntities.Length} entities");
 
         var setHighlightedJob = new SetHighlightJob
         {
             EntitiesToToggle = toToggleEntities.AsReadOnly(),
             HighlightedLookup = highlightedLookup,
-            ECB = ecb,
+            ECB = ecb.AsParallelWriter(),
             EdgeLookup = edgeLookup
         }.Schedule(toToggleEntities.Length, 32, Dependency);
         
         
         Dependency = JobHandle.CombineDependencies(Dependency, setHighlightedJob);
+        toolOutputBarrier.AddJobHandleForProducer(Dependency);
         Dependency.Complete();
-
-        toToggleEntities.Dispose();
+        
+        toToggleEntities.Clear();
     }
 
     public void HighlightEntity(Entity entity, bool value)
     {
         if (highlightedLookup.HasComponent(entity) == value) return;
-
+        
         toToggleEntities.Add(entity);
     }
 
@@ -63,31 +67,32 @@ public partial class ToolHighlightSystem : GameSystemBase
         public NativeArray<Entity>.ReadOnly EntitiesToToggle;
         [ReadOnly] public ComponentLookup<Highlighted> HighlightedLookup;
         [ReadOnly] public ComponentLookup<Edge> EdgeLookup;
-        public EntityCommandBuffer ECB;
+        public EntityCommandBuffer.ParallelWriter ECB;
 
         public void Execute(int index)
         {
             var entity = EntitiesToToggle[index];
-            if (entity == Entity.Null) throw new NullReferenceException($"Entity {entity} is null!");
+            if (entity == Entity.Null) log.Error($"Trying to set highlights on a null entity!");
 
-            var isHighlighted = HighlightedLookup.HasComponent(entity);
-
-            switch (isHighlighted)
+            switch (HighlightedLookup.HasComponent(entity))
             {
                 case true:
-                    ECB.RemoveComponent<Highlighted>(entity);
-                    ECB.RemoveComponent<BatchesUpdated>(entity);
+                    ECB.RemoveComponent<Highlighted>(index, entity);
+                    ECB.RemoveComponent<BatchesUpdated>(index, entity);
+                    log.Debug($"Removed highlight from {entity}");
                     break;
                 case false:
-                    ECB.AddComponent<Highlighted>(entity);
-                    ECB.AddComponent<BatchesUpdated>(entity);
+                    ECB.AddComponent<Highlighted>(index, entity);
+                    ECB.AddComponent<BatchesUpdated>(index, entity);
+                    log.Debug($"Added highlight to {entity}");
                     break;
             }
 
             if (EdgeLookup.TryGetComponent(entity, out var edge))
             {
-                ECB.AddComponent<Updated>(edge.m_Start);
-                ECB.AddComponent<Updated>(edge.m_End);
+                ECB.AddComponent<Updated>(index, edge.m_Start);
+                ECB.AddComponent<Updated>(index, edge.m_End);
+                log.Debug($"Updated edges of {entity}");
             }
         }
     }

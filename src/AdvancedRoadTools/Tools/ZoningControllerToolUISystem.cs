@@ -83,7 +83,7 @@ public partial class ZoningControllerToolUISystem : UISystemBase
     private void ChangeZoningMode(int value)
     {
         var mode = (ZoningMode)value;
-        //LogART.Info(mode);
+        //log.Info(mode);
 
         zoningMode.Update(value);
 

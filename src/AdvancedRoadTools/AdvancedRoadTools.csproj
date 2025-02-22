@@ -3,7 +3,7 @@
     <PropertyGroup>
         <OutputType>Library</OutputType>
         <TargetFramework>net472</TargetFramework>
-        <Configurations>Debug;Release;Build locale keys;Publish</Configurations>
+        <Configurations>Debug;Release;Build locale keys</Configurations>
 
         <!--The file where mod information which is required for publishing mod on PDX mods are stored-->
         <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
@@ -91,7 +91,6 @@
     </ItemGroup>
 
     <ItemGroup Label="L18n Everywhere compatiblity">
-        <Folder Include="Core\Logging\" />
         <Folder Include="lang\"/>
         <Content Include="lang\**">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -99,6 +98,5 @@
         <Content Update="crowdin\template.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
-        <Folder Include="ZoningController\" />
     </ItemGroup>
 </Project>

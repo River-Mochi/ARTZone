@@ -34,7 +34,7 @@ public partial class SyncBlockSystem : GameSystemBase
     {
         if (UpdatedBlocksQuery.IsEmpty) return;
         
-        LogART.Debug(
+        log.Debug(
             $"[{nameof(SyncBlockSystem)}] Synchronizing Blocks and Valid Areas of {UpdatedBlocksQuery.CalculateEntityCount()} blocks.");
 
         var ecb = _modificationBarrier.CreateCommandBuffer();
