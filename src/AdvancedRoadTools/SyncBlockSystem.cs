@@ -34,8 +34,8 @@ public partial class SyncBlockSystem : GameSystemBase
     {
         if (UpdatedBlocksQuery.IsEmpty) return;
         
-        log.Debug(
-            $"[{nameof(SyncBlockSystem)}] Synchronizing Blocks and Valid Areas of {UpdatedBlocksQuery.CalculateEntityCount()} blocks.");
+        //log.Debug(
+        //    $"[{nameof(SyncBlockSystem)}] Synchronizing Blocks and Valid Areas of {UpdatedBlocksQuery.CalculateEntityCount()} blocks.");
 
         var ecb = _modificationBarrier.CreateCommandBuffer();
 
@@ -117,7 +117,6 @@ public partial class SyncBlockSystem : GameSystemBase
                 {
                     int index = z * block.m_Size.x + x;
                     Cell cell = cells[index];
-
 
                     if ((cell.m_State & CellFlags.Occupied) != 0)
                         return true;

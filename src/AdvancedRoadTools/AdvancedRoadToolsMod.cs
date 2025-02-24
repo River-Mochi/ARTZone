@@ -23,7 +23,7 @@ public class AdvancedRoadToolsMod : IMod
     
     public void OnLoad(UpdateSystem updateSystem)
     {
-        log.Info(nameof(OnLoad));
+        log.Debug($"{nameof(AdvancedRoadToolsMod)}.{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
 
         RegisterPrefab();
 
@@ -44,16 +44,20 @@ public class AdvancedRoadToolsMod : IMod
         updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
         updateSystem.UpdateAt<ToolHighlightSystem>(SystemUpdatePhase.ToolUpdate);
         
+        updateSystem.UpdateAt<CreateParallelRoadsSystem>(SystemUpdatePhase.Modification4);
         updateSystem.UpdateAt<SyncCreatedRoadsSystem>(SystemUpdatePhase.Modification4);
-        updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
-        updateSystem.UpdateAt<ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
         
-        GameManager.instance.onGameLoadingComplete += CreateTools;
+        updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
+        
+        updateSystem.UpdateAt<ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
+        updateSystem.UpdateAt<AdvancedParallelToolUISystem>(SystemUpdatePhase.UIUpdate);
+        
+        GameManager.instance.onGamePreload += CreateTools;
     }
 
     private void CreateTools(Purpose purpose, GameMode mode)
     {
-        ToolsHelper.CreateToolsUI();
+        ToolsHelper.InstantiateTools();
     }
 
     private void RegisterPrefab()
@@ -70,7 +74,7 @@ public class AdvancedRoadToolsMod : IMod
 
     public void OnDispose()
     {
-        log.Info(nameof(OnDispose));
+        log.Debug($"{nameof(AdvancedRoadToolsMod)}.{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
         if (m_Setting != null)
         {
             m_Setting.UnregisterInOptionsUI();

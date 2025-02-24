@@ -16,83 +16,135 @@ public partial class ToolHighlightSystem : GameSystemBase
     private EntityCommandBuffer ecb;
     private ToolOutputBarrier toolOutputBarrier;
 
-    private NativeList<Entity> toToggleEntities;
-    public NativeArray<Entity>.ReadOnly ToToggleEntities => toToggleEntities.AsReadOnly();
+    private NativeList<Entity> toHighlightEntities;
+    private NativeList<Entity> toUnhighlightEntities;
+
+    private EntityQuery highlightedQuery;
 
     protected override void OnCreate()
     {
         toolOutputBarrier = World.GetOrCreateSystemManaged<ToolOutputBarrier>();
-        
+
         edgeLookup = GetComponentLookup<Edge>(true);
         highlightedLookup = GetComponentLookup<Highlighted>(true);
 
-        toToggleEntities = new NativeList<Entity>(Allocator.Persistent);
+        toHighlightEntities = new NativeList<Entity>(Allocator.Persistent);
+        toUnhighlightEntities = new NativeList<Entity>(Allocator.Persistent);
+        
+        highlightedQuery = GetEntityQuery(ComponentType.ReadOnly<Highlighted>());
     }
 
     protected override void OnUpdate()
     {
-        if(toToggleEntities.IsEmpty) return;
-        
         ecb = toolOutputBarrier.CreateCommandBuffer();
         edgeLookup.Update(this);
         highlightedLookup.Update(this);
-        
-        log.Debug($"({System.Reflection.MethodBase.GetCurrentMethod()?.Name}) Toggling {toToggleEntities.Length} entities");
 
-        var setHighlightedJob = new SetHighlightJob
+        if (!toHighlightEntities.IsEmpty)
         {
-            EntitiesToToggle = toToggleEntities.AsReadOnly(),
-            HighlightedLookup = highlightedLookup,
-            ECB = ecb.AsParallelWriter(),
-            EdgeLookup = edgeLookup
-        }.Schedule(toToggleEntities.Length, 32, Dependency);
+            var job = new HighlightJob
+            {
+                Entities = toHighlightEntities.AsReadOnly(),
+                HighlightedLookup = highlightedLookup,
+                EdgeLookup = edgeLookup,
+                ECB = ecb.AsParallelWriter()
+            }.Schedule(toHighlightEntities.Length, 32, Dependency);
+            
+            Dependency = JobHandle.CombineDependencies(Dependency, job);
+        }
         
-        
-        Dependency = JobHandle.CombineDependencies(Dependency, setHighlightedJob);
+        if (!toUnhighlightEntities.IsEmpty)
+        {
+            var job = new UnhighlightJob
+            {
+                Entities = toUnhighlightEntities.AsReadOnly(),
+                HighlightedLookup = highlightedLookup,
+                EdgeLookup = edgeLookup,
+                ECB = ecb.AsParallelWriter()
+            }.Schedule(toUnhighlightEntities.Length, 32, Dependency);
+            
+            Dependency = JobHandle.CombineDependencies(Dependency, job);
+        }
+
         toolOutputBarrier.AddJobHandleForProducer(Dependency);
         Dependency.Complete();
-        
-        toToggleEntities.Clear();
+
+        toHighlightEntities.Clear();
+        toUnhighlightEntities.Clear();
+    }
+
+    public void ToggleHighlight(Entity entity)
+    {
+        if (highlightedLookup.HasComponent(entity))
+            toUnhighlightEntities.Add(entity);
+        else
+            toHighlightEntities.Add(entity);
     }
 
     public void HighlightEntity(Entity entity, bool value)
     {
-        if (highlightedLookup.HasComponent(entity) == value) return;
-        
-        toToggleEntities.Add(entity);
+        if (value)
+        {
+            if (!toHighlightEntities.Contains(entity))
+                toHighlightEntities.Add(entity);
+        }
+        else
+        {
+            if (!toUnhighlightEntities.Contains(entity))
+                toUnhighlightEntities.Add(entity);
+        }
     }
 
-    private struct SetHighlightJob : IJobParallelFor
+    private struct HighlightJob : IJobParallelFor
     {
-        public NativeArray<Entity>.ReadOnly EntitiesToToggle;
-        [ReadOnly] public ComponentLookup<Highlighted> HighlightedLookup;
         [ReadOnly] public ComponentLookup<Edge> EdgeLookup;
+        public NativeArray<Entity>.ReadOnly Entities;
+        [ReadOnly] public ComponentLookup<Highlighted> HighlightedLookup;
         public EntityCommandBuffer.ParallelWriter ECB;
 
         public void Execute(int index)
         {
-            var entity = EntitiesToToggle[index];
+            var entity = Entities[index];
             if (entity == Entity.Null) log.Error($"Trying to set highlights on a null entity!");
 
-            switch (HighlightedLookup.HasComponent(entity))
+            if (!HighlightedLookup.HasComponent(entity))
             {
-                case true:
-                    ECB.RemoveComponent<Highlighted>(index, entity);
-                    ECB.AddComponent<BatchesUpdated>(index, entity);
-                    log.Debug($"Removed highlight from {entity}");
-                    break;
-                case false:
-                    ECB.AddComponent<Highlighted>(index, entity);
-                    ECB.AddComponent<BatchesUpdated>(index, entity);
-                    log.Debug($"Added highlight to {entity}");
-                    break;
+                ECB.AddComponent<Highlighted>(index, entity);
+                ECB.AddComponent<BatchesUpdated>(index, entity);
+                log.Debug($"\tHighlighted {entity}");
             }
-
+                
             if (EdgeLookup.TryGetComponent(entity, out var edge))
             {
                 ECB.AddComponent<Updated>(index, edge.m_Start);
                 ECB.AddComponent<Updated>(index, edge.m_End);
-                log.Debug($"Updated edges of {entity}");
+            }  
+        }
+    }
+
+    private struct UnhighlightJob : IJobParallelFor
+    {
+        [ReadOnly] public ComponentLookup<Edge> EdgeLookup;
+        public NativeArray<Entity>.ReadOnly Entities;
+        [ReadOnly] public ComponentLookup<Highlighted> HighlightedLookup;
+        public EntityCommandBuffer.ParallelWriter ECB;
+
+        public void Execute(int index)
+        {
+            var entity = Entities[index];
+            if (entity == Entity.Null) log.Error($"Trying to set highlights on a null entity!");
+
+            if (HighlightedLookup.HasComponent(entity))
+            {
+                ECB.RemoveComponent<Highlighted>(index, entity);
+                ECB.AddComponent<BatchesUpdated>(index, entity);
+                log.Debug($"\tUnhighlighted {entity}");
+            }
+                
+            if (EdgeLookup.TryGetComponent(entity, out var edge))
+            {
+                ECB.AddComponent<Updated>(index, edge.m_Start);
+                ECB.AddComponent<Updated>(index, edge.m_End);
             }
         }
     }
