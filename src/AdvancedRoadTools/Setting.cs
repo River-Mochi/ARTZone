@@ -28,7 +28,7 @@ public class Setting : ModSetting
     public bool RemoveZonedCells { get; set; } = true;
 
     [SettingsUISection(kSection, kToggleGroup)]
-    [SettingsUIDisableByCondition(typeof(Setting), nameof(IfRemoveZonedCells))]
+    //[SettingsUIDisableByCondition(typeof(Setting), nameof(IfRemoveZonedCells))]
     public bool RemoveOccupiedCells { get; set; } = true;
     
     [SettingsUIMouseBinding(BindingMouse.Right, kInvertZoningAction)]
