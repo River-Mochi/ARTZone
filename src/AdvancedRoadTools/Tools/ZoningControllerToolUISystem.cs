@@ -1,5 +1,4 @@
 ﻿using Colossal.UI.Binding;
-using Game;
 using Game.Prefabs;
 using Game.Tools;
 using Game.UI;
@@ -54,7 +53,13 @@ public partial class ZoningControllerToolUISystem : UISystemBase
         
         mainToolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
             mainToolSystem.EventPrefabChanged += EventPrefabChanged;
+            mainToolSystem.EventToolChanged += EventToolChanged;
         toolSystem = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
+    }
+
+    private void EventToolChanged(ToolBaseSystem obj)
+    {
+        isRoadPrefab.Update(obj.GetPrefab() is RoadPrefab);
     }
 
     protected override void OnUpdate()
@@ -68,7 +73,10 @@ public partial class ZoningControllerToolUISystem : UISystemBase
         isRoadPrefab.Update(obj is RoadPrefab);
     }
 
-    private void ToggleTool() => toolSystem.SetToolEnabled(mainToolSystem.activeTool != toolSystem);
+    private void ToggleTool()
+    {
+        toolSystem.SetToolEnabled(mainToolSystem.activeTool != toolSystem);
+    }
 
 
     private void FlipBothMode()
