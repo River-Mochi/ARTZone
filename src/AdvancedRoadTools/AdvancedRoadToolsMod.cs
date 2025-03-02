@@ -38,10 +38,13 @@ public class AdvancedRoadToolsMod : IMod
         AssetDatabase.global.LoadSettings(nameof(Core), m_Setting, new Setting(this));
 
         
+        updateSystem.UpdateAt<AdvancedParallelToolSystem>(SystemUpdatePhase.ToolUpdate);
         updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
+        updateSystem.UpdateAt<CreateParallelRoadsSystem>(SystemUpdatePhase.Modification4);
         updateSystem.UpdateAt<SyncCreatedRoadsSystem>(SystemUpdatePhase.Modification4);
         updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
         updateSystem.UpdateAt<ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
+        updateSystem.UpdateAt<AdvancedParallelToolUISystem>(SystemUpdatePhase.UIUpdate);
     }
 
     private void RegisterPrefab()
