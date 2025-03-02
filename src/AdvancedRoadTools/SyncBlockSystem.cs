@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using Colossal.Logging;
+using AdvancedRoadTools.Components;
+using AdvancedRoadTools.Logging;
 using Game;
 using Game.Common;
 using Game.Zones;
@@ -9,9 +9,8 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
-using UnityEngine.PlayerLoop;
 
-namespace AdvancedRoadTools.Core;
+namespace AdvancedRoadTools;
 
 public partial class SyncBlockSystem : GameSystemBase
 {
@@ -120,7 +119,6 @@ public partial class SyncBlockSystem : GameSystemBase
                 {
                     int index = z * block.m_Size.x + x;
                     Cell cell = cells[index];
-
 
                     if ((cell.m_State & CellFlags.Occupied) != 0)
                         return true;

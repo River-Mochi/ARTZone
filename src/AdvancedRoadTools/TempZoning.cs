@@ -1,7 +1,7 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
 
-namespace AdvancedRoadTools.Core;
+namespace AdvancedRoadTools;
 
 public struct TempZoning : IComponentData
 {

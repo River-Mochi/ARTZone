@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AdvancedRoadTools.Core;
+namespace AdvancedRoadTools;
 
 [Flags]
 public enum ZoningMode

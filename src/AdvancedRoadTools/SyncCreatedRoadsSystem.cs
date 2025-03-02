@@ -1,4 +1,6 @@
-﻿using Game;
+﻿using AdvancedRoadTools.Components;
+using AdvancedRoadTools.Tools;
+using Game;
 using Game.Common;
 using Game.Net;
 using Game.Tools;
@@ -8,7 +10,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 
-namespace AdvancedRoadTools.Core;
+namespace AdvancedRoadTools;
 
 public partial class SyncCreatedRoadsSystem : GameSystemBase
 {

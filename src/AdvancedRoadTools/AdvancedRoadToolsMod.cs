@@ -8,13 +8,13 @@ using Game.Prefabs;
 using Unity.Entities;
 using UnityEngine;
 
-namespace AdvancedRoadTools.Core;
+namespace AdvancedRoadTools;
 
 public class AdvancedRoadToolsMod : IMod
 {
-    public static ILog log = LogManager.GetLogger($"{nameof(Core)}.{nameof(AdvancedRoadToolsMod)}")
-        .SetShowsErrorsInUI(false);
-
+    public const string ModID = "AdvancedRoadTools";
+    
+    
     public static Setting m_Setting;
     public const string kInvertZoningActionName = "InvertZoning";
     public static ProxyAction m_InvertZoningAction;
@@ -35,7 +35,7 @@ public class AdvancedRoadToolsMod : IMod
 
         m_InvertZoningAction = m_Setting.GetAction(kInvertZoningActionName);
 
-        AssetDatabase.global.LoadSettings(nameof(Core), m_Setting, new Setting(this));
+        AssetDatabase.global.LoadSettings(nameof(AdvancedRoadTools), m_Setting, new Setting(this));
 
         
         updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
@@ -47,9 +47,8 @@ public class AdvancedRoadToolsMod : IMod
     private void RegisterPrefab()
     {
         //World world = World;
-       // PrefabSystem prefabSystem = world.GetOrCreateSystem<PrefabSystem>();
+        //PrefabSystem prefabSystem = world.GetOrCreateSystem<PrefabSystem>();
         var prefab = ScriptableObject.CreateInstance<ServicePrefab>();
-        
         var uiObject = ScriptableObject.CreateInstance<UIObject>();
         
         
