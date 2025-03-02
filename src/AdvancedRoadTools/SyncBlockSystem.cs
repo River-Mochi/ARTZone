@@ -36,9 +36,9 @@ public partial class SyncBlockSystem : GameSystemBase
     protected override void OnUpdate()
     {
         if (UpdatedBlocksQuery.IsEmpty) return;
-
-        AdvancedRoadToolsMod.log.Debug(
-            $"[{nameof(SyncBlockSystem)}] Synchronizing Blocks and Valid Areas of {UpdatedBlocksQuery.CalculateEntityCount()} blocks.");
+        
+        //log.Debug(
+        //    $"[{nameof(SyncBlockSystem)}] Synchronizing Blocks and Valid Areas of {UpdatedBlocksQuery.CalculateEntityCount()} blocks.");
 
         var ecb = _modificationBarrier.CreateCommandBuffer();
 

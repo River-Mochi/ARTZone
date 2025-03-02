@@ -21,7 +21,7 @@ public class AdvancedRoadToolsMod : IMod
     
     public void OnLoad(UpdateSystem updateSystem)
     {
-        log.Info(nameof(OnLoad));
+        log.Debug($"{nameof(AdvancedRoadToolsMod)}.{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
 
         RegisterPrefab();
 
@@ -59,7 +59,7 @@ public class AdvancedRoadToolsMod : IMod
 
     public void OnDispose()
     {
-        log.Info(nameof(OnDispose));
+        log.Debug($"{nameof(AdvancedRoadToolsMod)}.{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
         if (m_Setting != null)
         {
             m_Setting.UnregisterInOptionsUI();
