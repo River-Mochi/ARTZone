@@ -1,11 +1,13 @@
-﻿using Colossal.Logging;
-using Game;
-using Game.Modding;
-using Game.SceneFlow;
+﻿using AdvancedRoadTools.Logging;
+using AdvancedRoadTools.Tools;
 using Colossal.IO.AssetDatabase;
+using Colossal.Logging;
+using Colossal.Serialization.Entities;
+using Game;
 using Game.Input;
+using Game.Modding;
 using Game.Prefabs;
-using Unity.Entities;
+using Game.SceneFlow;
 using UnityEngine;
 
 namespace AdvancedRoadTools;
@@ -39,9 +41,20 @@ public class AdvancedRoadToolsMod : IMod
 
         
         updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
+        updateSystem.UpdateAt<ToolHighlightSystem>(SystemUpdatePhase.ToolUpdate);
+        
         updateSystem.UpdateAt<SyncCreatedRoadsSystem>(SystemUpdatePhase.Modification4);
+        
         updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
+        
         updateSystem.UpdateAt<ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
+        
+        GameManager.instance.onGamePreload += CreateTools;
+    }
+
+    private void CreateTools(Purpose purpose, GameMode mode)
+    {
+        ToolsHelper.InstantiateTools();
     }
 
     private void RegisterPrefab()
