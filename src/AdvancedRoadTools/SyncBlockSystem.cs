@@ -4,7 +4,6 @@ using AdvancedRoadTools.Logging;
 using Game;
 using Game.Common;
 using Game.Zones;
-using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -15,7 +14,6 @@ namespace AdvancedRoadTools;
 public partial class SyncBlockSystem : GameSystemBase
 {
     private EntityQuery UpdatedBlocksQuery;
-    public new ILog log => AdvancedRoadToolsMod.log;
 
     private ModificationBarrier4B _modificationBarrier;
 
