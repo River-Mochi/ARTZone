@@ -5,6 +5,9 @@ import {useLocalization} from "cs2/l10n";
 import mod from "../../mod.json";
 import {VanillaComponentResolver} from "../YenYang/VanillaComponentResolver";
 import styles from "./ZoningToolSections.module.scss";
+import all_icon from "../../images/Toolbar/all/ico-all.svg";
+import left_icon from "../../images/Toolbar/left/ico-left.svg";
+import right_icon from "../../images/Toolbar/right/ico-right.svg";
 
 export enum ZoningMode {
     None = 0,
@@ -58,23 +61,23 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
                                     selected={((SelectedZoningMode & ZoningMode.Both) == ZoningMode.Both)}
                                     tooltip={ZoningModeBothTooltipDescription}
                                     onSelect={flipBothMode}
-                                    src={allSrc}
+                                    src={all_icon}
                                     focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
                                     className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}></label></VanillaComponentResolver.instance.ToolButton>
                                 <VanillaComponentResolver.instance.ToolButton
                                     selected={((SelectedZoningMode & ZoningMode.Left) == ZoningMode.Left)}
                                     tooltip={ ZoningModeLeftTooltipDescription}
                                     onSelect={() => changeZoningMode(SelectedZoningMode ^ ZoningMode.Left)}
-                                    //src={}                                                
+                                    src={left_icon}                                                
                                     focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
-                                    className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}>L</label></VanillaComponentResolver.instance.ToolButton>
+                                    className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}></label></VanillaComponentResolver.instance.ToolButton>
                                 <VanillaComponentResolver.instance.ToolButton
                                     selected={((SelectedZoningMode & ZoningMode.Right) == ZoningMode.Right)}
                                     tooltip={ZoningModeRightTooltipDescription}
                                     onSelect={() => changeZoningMode(SelectedZoningMode ^ ZoningMode.Right)}
-                                    //src={}
+                                    src={right_icon}
                                     focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
-                                    className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}>R</label></VanillaComponentResolver.instance.ToolButton>
+                                    className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}></label></VanillaComponentResolver.instance.ToolButton>
                             </>
                         </VanillaComponentResolver.instance.Section>
                     )}

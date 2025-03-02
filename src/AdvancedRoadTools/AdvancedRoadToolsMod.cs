@@ -1,27 +1,29 @@
-﻿using Colossal.Logging;
-using Game;
-using Game.Modding;
-using Game.SceneFlow;
+﻿using AdvancedRoadTools.Logging;
+using AdvancedRoadTools.Tools;
 using Colossal.IO.AssetDatabase;
+using Colossal.Logging;
+using Colossal.Serialization.Entities;
+using Game;
 using Game.Input;
+using Game.Modding;
 using Game.Prefabs;
-using Unity.Entities;
+using Game.SceneFlow;
 using UnityEngine;
 
-namespace AdvancedRoadTools.Core;
+namespace AdvancedRoadTools;
 
 public class AdvancedRoadToolsMod : IMod
 {
-    public static ILog log = LogManager.GetLogger($"{nameof(Core)}.{nameof(AdvancedRoadToolsMod)}")
-        .SetShowsErrorsInUI(false);
-
+    public const string ModID = "AdvancedRoadTools";
+    
+    
     public static Setting m_Setting;
     public const string kInvertZoningActionName = "InvertZoning";
     public static ProxyAction m_InvertZoningAction;
     
     public void OnLoad(UpdateSystem updateSystem)
     {
-        log.Info(nameof(OnLoad));
+        log.Debug($"{nameof(AdvancedRoadToolsMod)}.{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
 
         RegisterPrefab();
 
@@ -35,21 +37,31 @@ public class AdvancedRoadToolsMod : IMod
 
         m_InvertZoningAction = m_Setting.GetAction(kInvertZoningActionName);
 
-        AssetDatabase.global.LoadSettings(nameof(Core), m_Setting, new Setting(this));
+        AssetDatabase.global.LoadSettings(nameof(AdvancedRoadTools), m_Setting, new Setting(this));
 
         
         updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
+        updateSystem.UpdateAt<ToolHighlightSystem>(SystemUpdatePhase.ToolUpdate);
+        
         updateSystem.UpdateAt<SyncCreatedRoadsSystem>(SystemUpdatePhase.Modification4);
+        
         updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
+        
         updateSystem.UpdateAt<ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
+        
+        GameManager.instance.onGamePreload += CreateTools;
+    }
+
+    private void CreateTools(Purpose purpose, GameMode mode)
+    {
+        ToolsHelper.InstantiateTools();
     }
 
     private void RegisterPrefab()
     {
         //World world = World;
-       // PrefabSystem prefabSystem = world.GetOrCreateSystem<PrefabSystem>();
+        //PrefabSystem prefabSystem = world.GetOrCreateSystem<PrefabSystem>();
         var prefab = ScriptableObject.CreateInstance<ServicePrefab>();
-        
         var uiObject = ScriptableObject.CreateInstance<UIObject>();
         
         
@@ -59,7 +71,7 @@ public class AdvancedRoadToolsMod : IMod
 
     public void OnDispose()
     {
-        log.Info(nameof(OnDispose));
+        log.Debug($"{nameof(AdvancedRoadToolsMod)}.{System.Reflection.MethodBase.GetCurrentMethod()?.Name}");
         if (m_Setting != null)
         {
             m_Setting.UnregisterInOptionsUI();
