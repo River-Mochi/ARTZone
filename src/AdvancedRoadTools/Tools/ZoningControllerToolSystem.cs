@@ -324,7 +324,6 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem, IARTTool
                 {
                     Depths = Depths
                 });
-                ECB.AddComponent<Updated>(index, entity);
             }
             else
             {
@@ -332,8 +331,8 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem, IARTTool
                 {
                     Depths = Depths
                 });
-                ECB.AddComponent<Updated>(index, entity);
             }
+            ECB.AddComponent<Updated>(index, entity);
         }
     }
 
