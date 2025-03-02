@@ -77,7 +77,7 @@ public class LocaleEN : IDictionarySource
             { "Assets.NAME[Zone Controller Tool]","Zone Controller" },
             {"Assets.DESCRIPTION[Zone Controller Tool]", "Tool to control how the zoning of a road behaves.\nChoose between zoning on both sides, only on the left or right, or no zoning for that road.\nBy default, right-click inverts the zoning configuration."}
             { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]","Zone Controller" },
-            { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]", "Tool to control how the zoning of a road behaves.\nChoose between zoning on both sides, only on the left or right, or no zoning for that road.\nBy default, right-click inverts the zoning configuration."},
+            { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]", "Tool to control how the zoning of a road behaves.\nChoose between zoning on both sides, only on the left or right, or no zoning for that road.\nBy default, right-click inverts the zoning configuration."}
         };
     }
 
