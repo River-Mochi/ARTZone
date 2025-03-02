@@ -66,7 +66,7 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem, IARTTool
 
         var definition = new ToolDefinition(typeof(ZoningControllerToolSystem), toolID, 59, new ToolDefinition.UI
         {
-            ImagePath = ToolDefinition.UI.PathPrefix + toolID + ToolDefinition.UI.ImageFormat,
+            ImagePath = ToolDefinition.UI.PathPrefix + "ToolsIcon.png",
         })
         {
             PlacementFlags = PlacementFlags.UndergroundUpgrade
@@ -157,7 +157,7 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem, IARTTool
                 }
                 break;
             case Mode.Select when hasHit:
-                if (!selectedEntities.Contains(e) && ShouldHighlight(e))
+                if (!selectedEntities.Contains(e))
                 {
                     selectedEntities.Add(e);
                     toolHighlightSystem.HighlightEntity(e, true);
@@ -200,16 +200,6 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem, IARTTool
         if (invertZoningAction.WasPressedThisFrame())
         {
             zoningControllerToolUISystem.InvertZoningMode();
-
-            for (int i = 0; i < selectedEntities.Length; i++)
-            {
-                var entity = selectedEntities[i];
-                if (ShouldHighlight(entity)) continue;
-
-                toolHighlightSystem.HighlightEntity(entity, false);
-                selectedEntities.RemoveAt(i);
-                i--;
-            }
         }
 
         var syncTempJob = new SyncTempJob
