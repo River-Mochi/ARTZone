@@ -8,20 +8,17 @@ namespace AdvancedRoadTools.Tools;
 
 public partial class ZoningControllerToolUISystem : UISystemBase
 {
-    private ValueBinding<int> zoningMode;
-    private ValueBinding<int> zoningDepthLeft;
-    private ValueBinding<int> zoningDepthRight;
+    private ValueBinding<int> toolZoningMode;
+    private ValueBinding<int> roadZoningMode;
 
     private ValueBinding<bool> isRoadPrefab;
+    
+    public ZoningMode ToolZoningMode => (ZoningMode)toolZoningMode.value;
+    public ZoningMode RoadZoningMode => (ZoningMode)roadZoningMode.value;
 
-    public int DepthLeft => zoningDepthLeft.value;
-    public int DepthRight => zoningDepthRight.value;
-    public ZoningMode ZoningMode => (ZoningMode)zoningMode.value;
-    public bool InvertedLastFrame;
-
-    public int2 Depths
+    public int2 ToolDepths
     {
-        get => new(zoningDepthLeft.value, zoningDepthRight.value);
+        get => new(((ZoningMode)toolZoningMode.value & ZoningMode.Left) == ZoningMode.Left ? 6 : 0, ((ZoningMode)toolZoningMode.value & ZoningMode.Right) == ZoningMode.Right ? 6 : 0);
         set
         {
             var newZoningMode = ZoningMode.Both;
@@ -30,7 +27,21 @@ public partial class ZoningControllerToolUISystem : UISystemBase
             if (value.y == 0)
                 newZoningMode ^= ZoningMode.Right;
             
-            ChangeZoningMode(newZoningMode);
+            ChangeToolZoningMode((int)newZoningMode);
+        }
+    }
+    public int2 RoadDepths
+    {
+        get => new(((ZoningMode)roadZoningMode.value & ZoningMode.Left) == ZoningMode.Left ? 6 : 0, ((ZoningMode)roadZoningMode.value & ZoningMode.Right) == ZoningMode.Right ? 6 : 0);
+        set
+        {
+            var newZoningMode = ZoningMode.Both;
+            if (value.x == 0)
+                newZoningMode ^= ZoningMode.Left;
+            if (value.y == 0)
+                newZoningMode ^= ZoningMode.Right;
+            
+            ChangeRoadZoningMode((int)newZoningMode);
         }
     }
 
@@ -41,14 +52,15 @@ public partial class ZoningControllerToolUISystem : UISystemBase
     {
         base.OnCreate();
 
-        AddBinding(zoningMode = new ValueBinding<int>(AdvancedRoadToolsMod.ModID, "ZoningMode", (int)ZoningMode.Both));
-        AddBinding(zoningDepthLeft = new ValueBinding<int>(AdvancedRoadToolsMod.ModID, "ZoningDepthLeft", 6));
-        AddBinding(zoningDepthRight = new ValueBinding<int>(AdvancedRoadToolsMod.ModID, "ZoningDepthRight", 6));
+        AddBinding(toolZoningMode = new ValueBinding<int>(AdvancedRoadToolsMod.ModID, "ToolZoningMode", (int)ZoningMode.Both));
+        AddBinding(roadZoningMode = new ValueBinding<int>(AdvancedRoadToolsMod.ModID, "RoadZoningMode", (int)ZoningMode.Both));
         AddBinding(isRoadPrefab = new ValueBinding<bool>(AdvancedRoadToolsMod.ModID, "IsRoadPrefab", false));
 
 
-        AddBinding(new TriggerBinding<int>(AdvancedRoadToolsMod.ModID, "ChangeZoningMode", ChangeZoningMode));
-        AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "FlipBothMode", FlipBothMode));
+        AddBinding(new TriggerBinding<int>(AdvancedRoadToolsMod.ModID, "ChangeRoadZoningMode", ChangeRoadZoningMode));
+        AddBinding(new TriggerBinding<int>(AdvancedRoadToolsMod.ModID, "ChangeToolZoningMode", ChangeToolZoningMode));
+        AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "FlipToolBothMode", FlipToolBothMode));
+        AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "FlipRoadBothMode", FlipRoadBothMode));
         AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "ToggleZoneControllerTool", ToggleTool));
         
         mainToolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
@@ -65,7 +77,6 @@ public partial class ZoningControllerToolUISystem : UISystemBase
     protected override void OnUpdate()
     {
         base.OnUpdate();
-        InvertedLastFrame = false;
     }
 
     private void EventPrefabChanged(PrefabBase obj)
@@ -79,42 +90,47 @@ public partial class ZoningControllerToolUISystem : UISystemBase
     }
 
 
-    private void FlipBothMode()
+    private void FlipToolBothMode()
     {
-        if (ZoningMode == ZoningMode.Both)
+        if (ToolZoningMode == ZoningMode.Both)
         {
-            zoningMode.Update((int)ZoningMode.None);
-            zoningDepthLeft.Update(0);
-            zoningDepthRight.Update(0);
+            toolZoningMode.Update((int)ZoningMode.None);
         }
         else
         {
-            zoningMode.Update((int)ZoningMode.Both);
-            zoningDepthLeft.Update(6);
-            zoningDepthRight.Update(6);
+            toolZoningMode.Update((int)ZoningMode.Both);
+        }
+
+    }
+    private void FlipRoadBothMode()
+    {
+        if (RoadZoningMode == ZoningMode.Both)
+        {
+            roadZoningMode.Update((int)ZoningMode.None);
+        }
+        else
+        {
+            roadZoningMode.Update((int)ZoningMode.Both);
         }
 
     }
 
-    private void ChangeZoningMode(int value)
+    private void ChangeToolZoningMode(int value)
     {
         var mode = (ZoningMode)value;
-        //log.Info(mode);
 
-        zoningMode.Update(value);
-
-        zoningDepthLeft.Update((mode & ZoningMode.Left) == 0 ? 0 : 6);
-        zoningDepthRight.Update((mode & ZoningMode.Right) == 0 ? 0 : 6);
+        toolZoningMode.Update(value);
     }
-
-    public void ChangeZoningMode(ZoningMode mode)
+    
+    private void ChangeRoadZoningMode(int value)
     {
-        ChangeZoningMode((int)mode);
+        var mode = (ZoningMode)value;
+
+        roadZoningMode.Update(value);
     }
 
     public void InvertZoningMode()
     {
-        InvertedLastFrame = true;
-        ChangeZoningMode(~ZoningMode);
+        ChangeToolZoningMode((int)~ToolZoningMode);
     }
 }

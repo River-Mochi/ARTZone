@@ -53,14 +53,15 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 <!--	<ChangeLog Value="Created roads are now affected by the zoning configuration" />-->
 <ChangeLog>
 ### New
-- 
+#### Zone Controller
+- Zone controller now has exclusive configurations for creating and modifying roads. [#10](https://github.com/LuxStice/AdvancedRoadTools/issues/10)
 
 ### Translations
 - 
 - 
 
 ### Fixes
--
+- Zone Controller would remove the configuration of the root road [#13](https://github.com/LuxStice/AdvancedRoadTools/issues/13)
 </ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
 	<ExternalLink Type="github" Url="https://github.com/LuxStice/AdvancedRoadTools" />

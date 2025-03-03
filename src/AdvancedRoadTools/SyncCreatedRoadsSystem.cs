@@ -35,7 +35,7 @@ public partial class SyncCreatedRoadsSystem : GameSystemBase
     {
         var ECB = _modificationBarrier.CreateCommandBuffer();
 
-        var depths = new int2(_UISystem.DepthLeft, _UISystem.DepthRight);
+        var depths = _UISystem.RoadDepths;
         
         if (!NewCreatedRoadsQuery.IsEmpty && math.any(depths != new int2(6)))
         {
