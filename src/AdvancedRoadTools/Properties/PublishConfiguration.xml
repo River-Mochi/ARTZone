@@ -26,6 +26,11 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 - Portuguese-Brazilian
 - Simplified Chinese (Thanks to RilkeXS)
 - Polish (Thanks to karmel68)
+- French (Edou24)
+- Dutch (Jesyx)
+		
+## Thank Yous
+- Kelvin for the artwork!
 		
 ! All translations that are NOT English require l18n to work!		
 	</LongDescription>
@@ -39,7 +44,7 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/advanced-road-tools.1728786/" />
 	<!--Version of the mod-->
-	<ModVersion Value="1.0.2" />
+	<ModVersion Value="1.0.3.1" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.2.*" />
 	<!--Dependency for the mod, can be set multiple times-->
@@ -47,15 +52,8 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 <!--	<ChangeLog Value="Created roads are now affected by the zoning configuration" />-->
 <ChangeLog>
-# New
-- Zone Controller Tool now plays a sound when changing zoning and when inverting zoning
-	
-# Translations
-- Added Polish translation (Thanks to karmel68)
-- Added Simplified Chinese translation (Thanks to RilkeXS)
-
-# Fixes
-- Fixed keybind conflict with Tool/Secondary Action. The Invert Zoning doesn't get called on tools other than Zone Controller. 
+# Fixes (shamefully)
+- Forgot to replace the Mod's logo for the one that Kelvin did!
 </ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
 	<ExternalLink Type="github" Url="https://github.com/LuxStice/AdvancedRoadTools" />
