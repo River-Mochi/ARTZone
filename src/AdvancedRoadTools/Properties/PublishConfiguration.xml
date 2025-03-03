@@ -44,7 +44,7 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/advanced-road-tools.1728786/" />
 	<!--Version of the mod-->
-	<ModVersion Value="1.0.3.1" />
+	<ModVersion Value="1.0.3.2" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.2.*" />
 	<!--Dependency for the mod, can be set multiple times-->
@@ -53,7 +53,7 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 <!--	<ChangeLog Value="Created roads are now affected by the zoning configuration" />-->
 <ChangeLog>
 # Fixes (shamefully)
-- Forgot to replace the Mod's logo for the one that Kelvin did!
+- New tool helper duplicated tools when entering a new map in the same session
 </ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
 	<ExternalLink Type="github" Url="https://github.com/LuxStice/AdvancedRoadTools" />

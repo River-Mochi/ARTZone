@@ -55,6 +55,7 @@ public class AdvancedRoadToolsMod : IMod
     private void CreateTools(Purpose purpose, GameMode mode)
     {
         ToolsHelper.InstantiateTools();
+        GameManager.instance.onGamePreload -= CreateTools;
     }
 
     private void RegisterPrefab()
