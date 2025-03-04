@@ -18,15 +18,23 @@ export enum ZoningMode {
 const uilStandard =                         "coui://uil/Standard/";
 const allSrc =              uilStandard + "StarAll.svg";
 
-const ZoningMode$ = bindValue<number>(mod.id, 'ZoningMode');
+const RoadZoningMode$ = bindValue<number>(mod.id, 'RoadZoningMode');
+const ToolZoningMode$ = bindValue<number>(mod.id, 'ToolZoningMode');
 const isRoadPrefab$ = bindValue<boolean>(mod.id, 'IsRoadPrefab');
 
-function changeZoningMode(zoningMode: ZoningMode) {
-    trigger(mod.id, "ChangeZoningMode", zoningMode);
+function changeToolZoningMode(zoningMode: ZoningMode) {
+    trigger(mod.id, "ChangeToolZoningMode", zoningMode);
 }
 
-function flipBothMode(){
-    trigger(mod.id, "FlipBothMode");
+function changeRoadZoningMode(zoningMode: ZoningMode) {
+    trigger(mod.id, "ChangeRoadZoningMode", zoningMode);
+}
+
+function flipRoadBothMode(){
+    trigger(mod.id, "FlipRoadBothMode");
+}
+function flipToolBothMode(){
+    trigger(mod.id, "FlipToolBothMode");
 }
 
 export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
@@ -37,7 +45,8 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
         const netToolActive = useValue(tool.activeTool$).id == tool.NET_TOOL;
         const isRoadPrefab = useValue(isRoadPrefab$);
         const zoningToolActive = useValue(tool.activeTool$).id == "Zone Controller Tool";
-        const SelectedZoningMode = useValue(ZoningMode$) as ZoningMode;
+        const SelectedToolZoningMode = useValue(ToolZoningMode$) as ZoningMode;
+        const SelectedRoadZoningMode = useValue(RoadZoningMode$) as ZoningMode;
 
         // translation handling. Translates using locale keys that are defined in C# or fallback string here.
         const {translate} = useLocalization();
@@ -51,70 +60,67 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
         
         
         //Currently the mod doesn't work when placing roads, only with the Zoning TOol
-        if (isRoadPrefab || zoningToolActive) {
-        //if (zoningToolActive) {
+        if (isRoadPrefab) {
             result.props.children?.push(
                 <>
                     {(<VanillaComponentResolver.instance.Section title={ZoningModeTitle}>
                             <>
                                 <VanillaComponentResolver.instance.ToolButton
-                                    selected={((SelectedZoningMode & ZoningMode.Both) == ZoningMode.Both)}
+                                    selected={((SelectedRoadZoningMode & ZoningMode.Both) == ZoningMode.Both)}
                                     tooltip={ZoningModeBothTooltipDescription}
-                                    onSelect={flipBothMode}
+                                    onSelect={flipRoadBothMode}
                                     src={all_icon}
                                     focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
                                     className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}></label></VanillaComponentResolver.instance.ToolButton>
                                 <VanillaComponentResolver.instance.ToolButton
-                                    selected={((SelectedZoningMode & ZoningMode.Left) == ZoningMode.Left)}
+                                    selected={((SelectedRoadZoningMode & ZoningMode.Left) == ZoningMode.Left)}
                                     tooltip={ ZoningModeLeftTooltipDescription}
-                                    onSelect={() => changeZoningMode(SelectedZoningMode ^ ZoningMode.Left)}
+                                    onSelect={() => changeRoadZoningMode(SelectedRoadZoningMode ^ ZoningMode.Left)}
                                     src={left_icon}                                                
                                     focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
                                     className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}></label></VanillaComponentResolver.instance.ToolButton>
                                 <VanillaComponentResolver.instance.ToolButton
-                                    selected={((SelectedZoningMode & ZoningMode.Right) == ZoningMode.Right)}
+                                    selected={((SelectedRoadZoningMode & ZoningMode.Right) == ZoningMode.Right)}
                                     tooltip={ZoningModeRightTooltipDescription}
-                                    onSelect={() => changeZoningMode(SelectedZoningMode ^ ZoningMode.Right)}
+                                    onSelect={() => changeRoadZoningMode(SelectedRoadZoningMode ^ ZoningMode.Right)}
                                     src={right_icon}
                                     focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
                                     className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}></label></VanillaComponentResolver.instance.ToolButton>
                             </>
                         </VanillaComponentResolver.instance.Section>
                     )}
-                    {/*{((SelectedZoningMode & ZoningMode.Left) == ZoningMode.Left) && (*/}
-                    {/*    <VanillaComponentResolver.instance.Section title={`Left ${ZoningDepthTitle}`}>*/}
-                    {/*        <VanillaComponentResolver.instance.ToolButton*/}
-                    {/*            tooltip={ZoningDepthDownTooltipDescription} */}
-                    {/*            onSelect={() => handleClick(depthDownLeftID)} */}
-                    {/*            src={arrowDownSrc} */}
-                    {/*            focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED} */}
-                    {/*            className={VanillaComponentResolver.instance.mouseToolOptionsTheme.startButton}></VanillaComponentResolver.instance.ToolButton>*/}
-                    {/*        <div className={VanillaComponentResolver.instance.mouseToolOptionsTheme.numberField}>{ ZoningDepthLeft }</div>*/}
-                    {/*        <VanillaComponentResolver.instance.ToolButton */}
-                    {/*            tooltip={ZoningDepthUpTooltipDescription}*/}
-                    {/*            onSelect={() => handleClick(depthUpLeftID)}*/}
-                    {/*            src={arrowUpSrc} */}
-                    {/*            focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED} */}
-                    {/*            className={VanillaComponentResolver.instance.mouseToolOptionsTheme.endButton}></VanillaComponentResolver.instance.ToolButton>*/}
-                    {/*    </VanillaComponentResolver.instance.Section>*/}
-                    {/*)}*/}
-                    {/*{((SelectedZoningMode & ZoningMode.Right) == ZoningMode.Right) && (*/}
-                    {/*    <VanillaComponentResolver.instance.Section title={`Right ${ZoningDepthTitle}`}>*/}
-                    {/*        <VanillaComponentResolver.instance.ToolButton*/}
-                    {/*            tooltip={ZoningDepthDownTooltipDescription}*/}
-                    {/*            onSelect={() => handleClick(depthDownRightID)}*/}
-                    {/*            src={arrowDownSrc}*/}
-                    {/*            focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}*/}
-                    {/*            className={VanillaComponentResolver.instance.mouseToolOptionsTheme.startButton}></VanillaComponentResolver.instance.ToolButton>*/}
-                    {/*        <div className={VanillaComponentResolver.instance.mouseToolOptionsTheme.numberField}>{ ZoningDepthRight }</div>*/}
-                    {/*        <VanillaComponentResolver.instance.ToolButton*/}
-                    {/*            tooltip={ZoningDepthUpTooltipDescription}*/}
-                    {/*            onSelect={() => handleClick(depthUpRightID)}*/}
-                    {/*            src={arrowUpSrc}*/}
-                    {/*            focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}*/}
-                    {/*            className={VanillaComponentResolver.instance.mouseToolOptionsTheme.endButton}></VanillaComponentResolver.instance.ToolButton>*/}
-                    {/*    </VanillaComponentResolver.instance.Section>*/}
-                    {/*)}*/}
+                </>
+            )
+        }
+        else if(zoningToolActive){
+            result.props.children?.push(
+                <>
+                    {(<VanillaComponentResolver.instance.Section title={ZoningModeTitle}>
+                            <>
+                                <VanillaComponentResolver.instance.ToolButton
+                                    selected={((SelectedToolZoningMode & ZoningMode.Both) == ZoningMode.Both)}
+                                    tooltip={ZoningModeBothTooltipDescription}
+                                    onSelect={flipToolBothMode}
+                                    src={all_icon}
+                                    focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
+                                    className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}></label></VanillaComponentResolver.instance.ToolButton>
+                                <VanillaComponentResolver.instance.ToolButton
+                                    selected={((SelectedToolZoningMode & ZoningMode.Left) == ZoningMode.Left)}
+                                    tooltip={ ZoningModeLeftTooltipDescription}
+                                    onSelect={() => changeToolZoningMode(SelectedToolZoningMode ^ ZoningMode.Left)}
+                                    src={left_icon}
+                                    focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
+                                    className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}></label></VanillaComponentResolver.instance.ToolButton>
+                                <VanillaComponentResolver.instance.ToolButton
+                                    selected={((SelectedToolZoningMode & ZoningMode.Right) == ZoningMode.Right)}
+                                    tooltip={ZoningModeRightTooltipDescription}
+                                    onSelect={() => changeToolZoningMode(SelectedToolZoningMode ^ ZoningMode.Right)}
+                                    src={right_icon}
+                                    focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
+                                    className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}></label></VanillaComponentResolver.instance.ToolButton>
+                            </>
+                        </VanillaComponentResolver.instance.Section>
+                    )}
                 </>
             )
         }

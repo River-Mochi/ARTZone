@@ -32,8 +32,8 @@ public partial class ZoningControllerToolSystem : ToolBaseSystem, IARTTool
 
     private ComponentLookup<AdvancedRoad> advancedRoadLookup;
     private BufferLookup<SubBlock> subBlockLookup;
-    private int2 Depths => zoningControllerToolUISystem.Depths;
-    private ZoningMode ZoningMode => zoningControllerToolUISystem.ZoningMode;
+    private int2 Depths => zoningControllerToolUISystem.ToolDepths;
+    private ZoningMode ZoningMode => zoningControllerToolUISystem.ToolZoningMode;
     private EntityQuery tempZoningQuery;
     private EntityQuery soundbankQuery;
     private PrefabBase toolPrefab;
