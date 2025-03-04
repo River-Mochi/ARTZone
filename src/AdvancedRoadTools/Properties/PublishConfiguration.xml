@@ -28,6 +28,7 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 - Polish (Thanks to karmel68)
 - French (Edou24)
 - Dutch (Jesyx)
+- Korean (acelion19, hellflone and comsasa)
 		
 ## Thank Yous
 - Kelvin for the artwork!
@@ -44,7 +45,7 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/advanced-road-tools.1728786/" />
 	<!--Version of the mod-->
-	<ModVersion Value="1.0.3.2" />
+	<ModVersion Value="1.0.4" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.2.*" />
 	<!--Dependency for the mod, can be set multiple times-->
@@ -52,8 +53,15 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 <!--	<ChangeLog Value="Created roads are now affected by the zoning configuration" />-->
 <ChangeLog>
-# Fixes (shamefully)
-- New tool helper duplicated tools when entering a new map in the same session
+### New
+#### Zone Controller
+- Zone controller now has exclusive configurations for creating and modifying roads. [#10](https://github.com/LuxStice/AdvancedRoadTools/issues/10)
+
+### Translations
+- Added Korean locale (Thank you acelion19, hellflone and comsasa)
+
+### Fixes
+- Zone Controller would remove the configuration of the root road [#13](https://github.com/LuxStice/AdvancedRoadTools/issues/13)
 </ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
 	<ExternalLink Type="github" Url="https://github.com/LuxStice/AdvancedRoadTools" />

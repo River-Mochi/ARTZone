@@ -52,11 +52,9 @@ public partial class SyncBlockSystem : GameSystemBase
             AdvancedRoadLookup = GetComponentLookup<AdvancedRoad>(true),
             TempZoningLookup = GetComponentLookup<TempZoning>(true),
         }.Schedule(UpdatedBlocksQuery.CalculateEntityCount(), 32, this.Dependency);
+        updatedBlocks.Dispose(syncBlockJob);
+        
         this.Dependency = JobHandle.CombineDependencies(this.Dependency, syncBlockJob);
-
-        Dependency.Complete();
-
-        updatedBlocks.Dispose();
 
         _modificationBarrier.AddJobHandleForProducer(this.Dependency);
     }

@@ -14,7 +14,7 @@ namespace AdvancedRoadTools;
 
 public partial class SyncCreatedRoadsSystem : GameSystemBase
 {
-    private EntityQuery createdRoadsQuery;
+    private EntityQuery NewCreatedRoadsQuery;
     private ModificationBarrier4 _modificationBarrier;
     private ZoningControllerToolUISystem _UISystem;
 
@@ -22,9 +22,9 @@ public partial class SyncCreatedRoadsSystem : GameSystemBase
     {
         base.OnCreate();
 
-        createdRoadsQuery = new EntityQueryBuilder(Allocator.Temp)
-            .WithAll<Updated, Temp, Road, SubBlock>()
-            .WithNone<Applied>()
+        NewCreatedRoadsQuery = new EntityQueryBuilder(Allocator.Temp)
+            .WithAll<Road, Temp, SubBlock, Updated>()
+            .WithAll<Created>()
             .Build(this);
 
         _modificationBarrier = World.GetOrCreateSystemManaged<ModificationBarrier4>();
@@ -33,56 +33,45 @@ public partial class SyncCreatedRoadsSystem : GameSystemBase
 
     protected override void OnUpdate()
     {
-        if (createdRoadsQuery.IsEmpty) return;
-
         var ECB = _modificationBarrier.CreateCommandBuffer();
 
-        var createdRoads = createdRoadsQuery.ToEntityArray(Allocator.TempJob);
-
-        var syncCreatedRoadsJob = new SyncCreatedRoadsJob
+        var depths = _UISystem.RoadDepths;
+        
+        if (!NewCreatedRoadsQuery.IsEmpty && math.any(depths != new int2(6)))
         {
-            CreatedRoads = createdRoads.AsReadOnly(),
-            ECB = ECB.AsParallelWriter(),
-            Depths = new int2(_UISystem.DepthLeft, _UISystem.DepthRight),
-            TempLookup = GetComponentLookup<Temp>(true),
-            AdvancedRoadLookup = GetComponentLookup<AdvancedRoad>(true)
-        }.Schedule(createdRoads.Length, 32, this.Dependency);
-        this.Dependency = JobHandle.CombineDependencies(this.Dependency, syncCreatedRoadsJob);
+            var entities = NewCreatedRoadsQuery.ToEntityArray(Allocator.TempJob);
+            var job = new AddAdvancedRoadToCreatedRoadsJob
+            {
+                Entities = entities.AsReadOnly(),
+                ECB = ECB.AsParallelWriter(),
+                Depths = depths,
+                TempLookup = GetComponentLookup<Temp>(true)
+            }.Schedule(entities.Length, 32, this.Dependency);
+            entities.Dispose(job);
+            this.Dependency = JobHandle.CombineDependencies(this.Dependency, job);
+        }
 
         _modificationBarrier.AddJobHandleForProducer(this.Dependency);
     }
 
-    public partial struct SyncCreatedRoadsJob : IJobParallelFor
+    public struct AddAdvancedRoadToCreatedRoadsJob : IJobParallelFor
     {
-        public NativeArray<Entity>.ReadOnly CreatedRoads;
+        public NativeArray<Entity>.ReadOnly Entities;
         public EntityCommandBuffer.ParallelWriter ECB;
-        public int2 Depths;
-
         [ReadOnly] public ComponentLookup<Temp> TempLookup;
-        [ReadOnly] public ComponentLookup<AdvancedRoad> AdvancedRoadLookup;
-
+        public int2 Depths;
         public void Execute(int index)
         {
-            var createdRoadEntity = CreatedRoads[index];
+            var entity = Entities[index];
+            var temp = TempLookup[entity];
 
-            if (TempLookup.TryGetComponent(createdRoadEntity, out var temp) && temp.m_Original != Entity.Null)
+            if ((temp.m_Flags & TempFlags.Create) == TempFlags.Create)
             {
-                if (AdvancedRoadLookup.TryGetComponent(temp.m_Original, out var advancedRoad))
+                ECB.AddComponent(index, entity, new AdvancedRoad
                 {
-                    Depths = advancedRoad.Depths;
-                }
-                else
-                {
-                    Depths = new int2(6);
-                }
+                    Depths = Depths
+                });
             }
-
-            if (math.all(Depths == new int2(6))) return;
-
-            ECB.AddComponent(index, createdRoadEntity, new AdvancedRoad
-            {
-                Depths = Depths
-            });
         }
     }
 }
