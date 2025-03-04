@@ -89,14 +89,9 @@
         <None Include="$(ModPropsFile)" Link="Properties\Mod.props"/>
         <None Include="$(ModTargetsFile)" Link="Properties\Mod.targets"/>
     </ItemGroup>
-
+    
     <ItemGroup Label="L18n Everywhere compatiblity">
         <Folder Include="lang\"/>
-        <Content Include="lang\**">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-        <Content Update="crowdin\template.json">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
+        <Content Include="lang\**"/>
     </ItemGroup>
 </Project>
