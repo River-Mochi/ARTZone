@@ -44,6 +44,7 @@ public class AdvancedRoadToolsMod : IMod
         updateSystem.UpdateAt<ToolHighlightSystem>(SystemUpdatePhase.ToolUpdate);
         
         updateSystem.UpdateAt<SyncCreatedRoadsSystem>(SystemUpdatePhase.Modification4);
+        updateSystem.UpdateAt<SyncUpgradedRoadsSystem>(SystemUpdatePhase.Modification4);
         
         updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
         
