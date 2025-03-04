@@ -28,6 +28,7 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 - Polish (Thanks to karmel68)
 - French (Edou24)
 - Dutch (Jesyx)
+- Korean (acelion19, hellflone and comsasa)
 		
 ## Thank Yous
 - Kelvin for the artwork!
@@ -57,8 +58,7 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 - Zone controller now has exclusive configurations for creating and modifying roads. [#10](https://github.com/LuxStice/AdvancedRoadTools/issues/10)
 
 ### Translations
-- 
-- 
+- Added Korean locale (Thank you acelion19, hellflone and comsasa)
 
 ### Fixes
 - Zone Controller would remove the configuration of the root road [#13](https://github.com/LuxStice/AdvancedRoadTools/issues/13)
