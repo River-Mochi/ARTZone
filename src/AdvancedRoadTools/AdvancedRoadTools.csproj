@@ -101,9 +101,5 @@
         <Content Include="lang\**">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
-        <Content Update="crowdin\template.json">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-        <Folder Include="Localization\" />
     </ItemGroup>
 </Project>
