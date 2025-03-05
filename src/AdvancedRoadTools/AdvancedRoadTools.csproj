@@ -28,6 +28,9 @@
     </Target>
     
     <ItemGroup Label="Required assemblies">
+        <Reference Include="Colossal.PSI.Common">
+            <Private>false</Private>
+        </Reference>
         <Reference Include="Game">
             <Private>false</Private>
         </Reference>
@@ -50,6 +53,9 @@
             <Private>false</Private>
         </Reference>
         <Reference Include="Colossal.Localization">
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Newtonsoft.Json">
             <Private>false</Private>
         </Reference>
         <Reference Include="Unity.InputSystem">
@@ -98,5 +104,6 @@
         <Content Update="crowdin\template.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
+        <Folder Include="Localization\" />
     </ItemGroup>
 </Project>

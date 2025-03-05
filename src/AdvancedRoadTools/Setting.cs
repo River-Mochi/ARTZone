@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using AdvancedRoadTools.Tools;
 using Colossal;
 using Colossal.IO.AssetDatabase;
@@ -45,39 +46,67 @@ public class Setting : ModSetting
     private bool IfRemoveZonedCells() => !RemoveZonedCells;
 }
 
-public class LocaleEN : IDictionarySource
+public class Locale : IDictionarySource
 {
-    private readonly Setting m_Setting;
+    public readonly string LocaleID;
+    private readonly Setting setting;
+    public Dictionary<string, string> Entries;
 
-    public LocaleEN(Setting setting)
+    public Locale(string localeID, Setting setting)
     {
-        m_Setting = setting;
+        LocaleID = localeID;
+        this.setting = setting;
     }
+
+    public override string ToString() => $"[ART.Locale] {LocaleID}; Entries: {(Entries is null ? "null" : $"{Entries.Count}")}";
 
     public IEnumerable<KeyValuePair<string, string>> ReadEntries(IList<IDictionaryEntryError> errors,
         Dictionary<string, int> indexCounts)
     {
-        return new Dictionary<string, string>
+        if (Entries is not null && Entries.Count > 0)
         {
-            { m_Setting.GetSettingsLocaleID(), "Advanced Road Tools" },
-            { m_Setting.GetOptionTabLocaleID(Setting.kSection), "Main" },
+            return Entries.ToDictionary(pair => pair.Key, pair => pair.Value);
+        }
+        else 
+            return new Dictionary<string, string>
+            {
+                { setting.GetSettingsLocaleID(), "Advanced Road Tools" },
+                { setting.GetOptionTabLocaleID(Setting.kSection), "Main" },
 
-            { m_Setting.GetOptionGroupLocaleID(Setting.kToggleGroup), "Zone Controller Tool Options" },
+                { setting.GetOptionGroupLocaleID(Setting.kToggleGroup), "Zone Controller Tool Options" },
 
-            { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being removed" },
-            { m_Setting.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being overriden during preview and set phase of Zone Controller Tool." +
-                "\nSet this to true if you're having problem with losing your zoning configuration when using the tool." +
-                "\nDefault: true" },
-            { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
-            { m_Setting.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being overriden during preview and set phase of Zone Controller Tool." +
-                "\nSet this to true if you're having problem with buildings becoming vacant and/or abandoned when using the tool." +
-                "\nDefault: true" },
-            { m_Setting.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Invert Zoning Mouse Button" },
-            { m_Setting.GetOptionDescLocaleID(nameof(Setting.InvertZoning)), "Inverts the current zoning configuration with a mouse action." },
-            
-            { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]","Zone Controller" },
-            { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]", "Tool to control how the zoning of a road behaves.\nChoose between zoning on both sides, only on the left or right, or no zoning for that road.\nBy default, right-click inverts the zoning configuration."}
-        };
+                {
+                    setting.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)),
+                    "Prevent zoned cells from being removed"
+                },
+                {
+                    setting.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
+                    "Prevent zoned cells from being overriden during preview and set phase of Zone Controller Tool." +
+                    "\nSet this to true if you're having problem with losing your zoning configuration when using the tool." +
+                    "\nDefault: true"
+                },
+                {
+                    setting.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)),
+                    "Prevent occupied cells from being removed"
+                },
+                {
+                    setting.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
+                    "Prevent occupied cells from being overriden during preview and set phase of Zone Controller Tool." +
+                    "\nSet this to true if you're having problem with buildings becoming vacant and/or abandoned when using the tool." +
+                    "\nDefault: true"
+                },
+                { setting.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Invert Zoning Mouse Button" },
+                {
+                    setting.GetOptionDescLocaleID(nameof(Setting.InvertZoning)),
+                    "Inverts the current zoning configuration with a mouse action."
+                },
+
+                { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Zone Controller" },
+                {
+                    $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
+                    "Tool to control how the zoning of a road behaves.\nChoose between zoning on both sides, only on the left or right, or no zoning for that road.\nBy default, right-click inverts the zoning configuration."
+                }
+            };
     }
 
     public void Unload()
