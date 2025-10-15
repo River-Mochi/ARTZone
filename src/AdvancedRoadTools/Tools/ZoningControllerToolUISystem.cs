@@ -131,6 +131,11 @@ public partial class ZoningControllerToolUISystem : UISystemBase
 
     public void InvertZoningMode()
     {
-        ChangeToolZoningMode((int)~ToolZoningMode);
+        // Flip only the Left/Right bits, keep scope inside the Both mask
+        var flipped = ZoningMode.Both ^ ToolZoningMode;
+        ChangeToolZoningMode((int)flipped);
     }
+
+
+
 }
