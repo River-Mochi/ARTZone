@@ -12,7 +12,7 @@ public partial class ZoningControllerToolUISystem : UISystemBase
     private ValueBinding<int> roadZoningMode;
 
     private ValueBinding<bool> isRoadPrefab;
-    
+
     public ZoningMode ToolZoningMode => (ZoningMode)toolZoningMode.value;
     public ZoningMode RoadZoningMode => (ZoningMode)roadZoningMode.value;
 
@@ -26,7 +26,7 @@ public partial class ZoningControllerToolUISystem : UISystemBase
                 newZoningMode ^= ZoningMode.Left;
             if (value.y == 0)
                 newZoningMode ^= ZoningMode.Right;
-            
+
             ChangeToolZoningMode((int)newZoningMode);
         }
     }
@@ -40,7 +40,7 @@ public partial class ZoningControllerToolUISystem : UISystemBase
                 newZoningMode ^= ZoningMode.Left;
             if (value.y == 0)
                 newZoningMode ^= ZoningMode.Right;
-            
+
             ChangeRoadZoningMode((int)newZoningMode);
         }
     }
@@ -62,10 +62,10 @@ public partial class ZoningControllerToolUISystem : UISystemBase
         AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "FlipToolBothMode", FlipToolBothMode));
         AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "FlipRoadBothMode", FlipRoadBothMode));
         AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "ToggleZoneControllerTool", ToggleTool));
-        
+
         mainToolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
-            mainToolSystem.EventPrefabChanged += EventPrefabChanged;
-            mainToolSystem.EventToolChanged += EventToolChanged;
+        mainToolSystem.EventPrefabChanged += EventPrefabChanged;
+        mainToolSystem.EventToolChanged += EventToolChanged;
         toolSystem = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
     }
 
@@ -121,7 +121,7 @@ public partial class ZoningControllerToolUISystem : UISystemBase
 
         toolZoningMode.Update(value);
     }
-    
+
     private void ChangeRoadZoningMode(int value)
     {
         var mode = (ZoningMode)value;
