@@ -1,5 +1,5 @@
-﻿// Tools/ToolDefinition.cs
-// Definition of a tool button + metadata. Uses SVG icon.
+﻿// File: src/AdvancedRoadTools/Tools/ToolDefinition.cs
+// Tool metadata. Palette icon uses PNG emitted by webpack.
 
 namespace AdvancedRoadTools.Tools
 {
@@ -23,7 +23,7 @@ namespace AdvancedRoadTools.Tools
         {
             get;
         }
-        // Optional callback a system can use to reflect enabled/disabled state in UI.
+
         public Action<bool> SetState
         {
             get; set;
@@ -34,15 +34,14 @@ namespace AdvancedRoadTools.Tools
             Type = systemType;
             ToolID = id;
             Priority = priority;
-            this.ui = ui ?? new UI();   // default SVG icon
+            this.ui = ui ?? new UI(); // default icon
             SetState = _ => { };
         }
 
         public sealed class UI
         {
-            // COUI root is the UI package id from UI/mod.json ("AdvancedRoadTools").
-            // Webpack emits: images/ZoneControllerTool.svg
-            public const string IconPath = "coui://AdvancedRoadTools/images/ZoneControllerTool.svg";
+            // Webpack emits: images/ToolsIcon.png  (copied from UI/images/Tool_Icon/ToolsIcon.png)
+            public const string IconPath = "coui://AdvancedRoadTools/images/ToolsIcon.png";
 
             public string ImagePath
             {
@@ -53,10 +52,9 @@ namespace AdvancedRoadTools.Tools
             {
                 ImagePath = IconPath;
             }
-
-            public UI(string imagePath)
+            public UI(string path)
             {
-                ImagePath = imagePath;
+                ImagePath = path;
             }
         }
     }

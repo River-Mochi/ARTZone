@@ -1,8 +1,12 @@
-﻿// Tools/ToolsHelper.cs
+﻿// File: src/AdvancedRoadTools/Tools/ToolsHelper.cs
+// Creates the prefab + UI for the tool and restores PlacementFlags per your SDK:
+// IsUpgrade | UpgradeOnly | UndergroundUpgrade
+
 using System;
 using System.Collections.Generic;
 using Colossal.Serialization.Entities;  // Purpose
 using Game;             // GameMode
+using Game.Net;         // << needed for Game.Net.PlacementFlags
 using Game.Prefabs;
 using Game.SceneFlow;
 using Game.Tools;
@@ -12,9 +16,6 @@ using Object = UnityEngine.Object;
 
 namespace AdvancedRoadTools.Tools
 {
-    /// <summary>
-    /// Public-API-only tool instantiation helper (no Harmony, no reflection).
-    /// </summary>
     public static class ToolsHelper
     {
         public static List<ToolDefinition> ToolDefinitions { get; private set; } = new List<ToolDefinition>();
@@ -102,6 +103,7 @@ namespace AdvancedRoadTools.Tools
 
             AdvancedRoadToolsMod.s_Log.Info($"Creating tools UI. {ToolDefinitions.Count} registered tools");
 
+            // Template only for base components; we will overwrite flags below
             if (!TryResolveTemplatePrefab("Wide Sidewalk", out s_TemplatePrefab, out s_TemplateUI))
             {
                 AdvancedRoadToolsMod.s_Log.Error("Could not resolve template prefab/UI (\"Wide Sidewalk\"). Tools will not be created.");
@@ -120,7 +122,8 @@ namespace AdvancedRoadTools.Tools
                     toolPrefab.Remove<NetSubObjects>();
 
                     UIObject ui = ScriptableObject.CreateInstance<UIObject>();
-                    ui.m_Icon = definition.ui.ImagePath;                     // e.g. "UI/images/Tool_Icon/ToolsIcon.png"
+                    // PNG palette icon emitted by webpack at: coui://AdvancedRoadTools/images/ToolsIcon.png
+                    ui.m_Icon = definition.ui.ImagePath;
                     ui.name = definition.ToolID;
                     ui.m_IsDebugObject = s_TemplateUI.m_IsDebugObject;
                     ui.m_Priority = definition.Priority;
@@ -198,7 +201,14 @@ namespace AdvancedRoadTools.Tools
                         continue;
                     }
 
-                    // Phase-1: keep template's flags as-is (no PlacementFlags dependency)
+                    // Critical for “upgrade-style” palette tools:
+                    // - IsUpgrade: this prefab is an upgrade
+                    // - UpgradeOnly: only allow upgrading existing nets (no fresh placement)
+                    // - UndergroundUpgrade: allow when road is underground
+                    placeable.m_PlacementFlags |= PlacementFlags.IsUpgrade;
+                    placeable.m_PlacementFlags |= PlacementFlags.UpgradeOnly;
+                    placeable.m_PlacementFlags |= PlacementFlags.UndergroundUpgrade;
+
                     s_PrefabSystem.AddComponentData(prefab, placeable);
                 }
                 catch (Exception e)
@@ -213,13 +223,7 @@ namespace AdvancedRoadTools.Tools
             prefab = null!;
             ui = null!;
 
-            string[] typeCandidates = new[]
-            {
-                nameof(RoadPrefab),
-                nameof(NetPrefab),
-                "ContentPrefab",
-                nameof(PrefabBase)
-            };
+            string[] typeCandidates = { nameof(RoadPrefab), nameof(NetPrefab), "ContentPrefab", nameof(PrefabBase) };
 
             foreach (string? typeName in typeCandidates)
             {

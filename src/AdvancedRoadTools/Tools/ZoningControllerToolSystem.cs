@@ -1,5 +1,5 @@
-﻿// Tools/ZoningControllerToolSystem.cs
-// Zone Controller Tool (phase 1). No Harmony, no PlacementFlags; uses template flags.
+﻿// File: src/AdvancedRoadTools/Tools/ZoningControllerToolSystem.cs
+// Input fix: keep invert action as ProxyAction (no Enable/Disable), use WasPressedThisFrame().
 
 namespace AdvancedRoadTools.Tools
 {
@@ -25,7 +25,8 @@ namespace AdvancedRoadTools.Tools
         private ZoningControllerToolUISystem m_ZoningControllerToolUISystem = null!;
         private ToolHighlightSystem m_ToolHighlightSystem = null!;
 
-        private IProxyAction m_InvertZoningAction = null!;
+        // Keep as ProxyAction and just poll it; don’t try to enable/disable.
+        private ProxyAction m_InvertZoningAction = default!;
 
         public const string ToolID = "Zone Controller Tool";
         public override string toolID => ToolID;
@@ -50,6 +51,7 @@ namespace AdvancedRoadTools.Tools
             m_ZoningControllerToolUISystem = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
             m_ToolHighlightSystem = World.GetOrCreateSystemManaged<ToolHighlightSystem>();
 
+            // Get the action that Settings registered
             m_InvertZoningAction = AdvancedRoadToolsMod.m_InvertZoningAction;
 
             m_TempZoningQuery = new EntityQueryBuilder(Allocator.Temp)
@@ -65,15 +67,13 @@ namespace AdvancedRoadTools.Tools
 
             m_SelectedEntities = new NativeList<Entity>(Allocator.Persistent);
 
-            var definition = new ToolDefinition(
+            ToolDefinition definition = new ToolDefinition(
                  typeof(ZoningControllerToolSystem),
                  toolID,
                  59,
-                 new ToolDefinition.UI()  // COUI path for ToolsIcon.png
+                 new ToolDefinition.UI() // COUI path for ToolsIcon.png
             );
-
             ToolsHelper.RegisterTool(definition);
-
         }
 
         protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
@@ -81,7 +81,7 @@ namespace AdvancedRoadTools.Tools
             AdvancedRoadToolsMod.s_Log.Debug($"{nameof(ZoningControllerToolSystem)}.{nameof(OnGameLoadingComplete)}");
             base.OnGameLoadingComplete(purpose, mode);
 
-            // Put the tool near the front of the list (matches your earlier behavior)
+            // Put the tool near the front of the palette
             m_ToolSystem.tools.Remove(this);
             m_ToolSystem.tools.Insert(5, this);
         }
@@ -90,8 +90,9 @@ namespace AdvancedRoadTools.Tools
         {
             AdvancedRoadToolsMod.s_Log.Debug($"{nameof(ZoningControllerToolSystem)}.{nameof(OnStartRunning)}");
             base.OnStartRunning();
+            // Don’t toggle m_InvertZoningAction; just poll it each frame.
             applyAction.enabled = true;
-            m_InvertZoningAction.enabled = true;
+
             requireZones = true;
             requireNet = Layer.Road;
             allowUnderground = true;
@@ -102,7 +103,7 @@ namespace AdvancedRoadTools.Tools
             AdvancedRoadToolsMod.s_Log.Debug($"{nameof(ZoningControllerToolSystem)}.{nameof(OnStopRunning)}");
             base.OnStopRunning();
             applyAction.enabled = false;
-            m_InvertZoningAction.enabled = false;
+
             requireZones = false;
             requireNet = Layer.None;
             allowUnderground = false;
@@ -189,6 +190,7 @@ namespace AdvancedRoadTools.Tools
                     break;
             }
 
+            // RMB invert (or whatever the user bound in Options)
             if (m_InvertZoningAction.WasPressedThisFrame())
             {
                 m_ZoningControllerToolUISystem.InvertZoningMode();

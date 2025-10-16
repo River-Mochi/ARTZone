@@ -22,7 +22,7 @@ namespace AdvancedRoadTools
         // Initialize with null! to satisfy CS8618; set for real in OnLoad.
         public static Setting m_Setting = null!;
         public const string kInvertZoningActionName = "InvertZoning";
-        public static ProxyAction m_InvertZoningAction = null!;
+        public static ProxyAction m_InvertZoningAction = default!;
 
         // One shared logger for the entire mod:
         public static readonly ILog s_Log =
