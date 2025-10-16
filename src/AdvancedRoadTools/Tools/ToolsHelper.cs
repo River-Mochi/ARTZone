@@ -178,42 +178,21 @@ namespace AdvancedRoadTools.Tools
         {
             if (s_PrefabSystem == null)
             {
+                // Make sure s_World is initialized
+                if (s_World == null)
+                    s_World = World.DefaultGameObjectInjectionWorld;
+
+                if (s_World == null)
+                {
+                    AdvancedRoadToolsMod.s_Log.Error("SetupToolsOnGameLoaded: World is null.");
+                    return;
+                }
+
                 s_PrefabSystem = s_World.GetExistingSystemManaged<PrefabSystem>();
                 if (s_PrefabSystem == null)
                 {
                     AdvancedRoadToolsMod.s_Log.Error("SetupToolsOnGameLoaded: PrefabSystem unavailable.");
                     return;
-                }
-            }
-
-            AdvancedRoadToolsMod.s_Log.Info($"Setting up tools. {s_ToolsLookup.Count} registered tools");
-
-            foreach (KeyValuePair<ToolDefinition, (PrefabBase prefab, UIObject ui)> kvp in s_ToolsLookup)
-            {
-                ToolDefinition def = kvp.Key;
-                PrefabBase prefab = kvp.Value.prefab;
-
-                try
-                {
-                    if (!TryGetPlaceableNetDataFromTemplate(out PlaceableNetData placeable))
-                    {
-                        AdvancedRoadToolsMod.s_Log.Error($"\tCould not obtain PlaceableNetData for {def.ToolID}.");
-                        continue;
-                    }
-
-                    // Critical for “upgrade-style” palette tools:
-                    // - IsUpgrade: this prefab is an upgrade
-                    // - UpgradeOnly: only allow upgrading existing nets (no fresh placement)
-                    // - UndergroundUpgrade: allow when road is underground
-                    placeable.m_PlacementFlags |= PlacementFlags.IsUpgrade;
-                    placeable.m_PlacementFlags |= PlacementFlags.UpgradeOnly;
-                    placeable.m_PlacementFlags |= PlacementFlags.UndergroundUpgrade;
-
-                    s_PrefabSystem.AddComponentData(prefab, placeable);
-                }
-                catch (Exception e)
-                {
-                    AdvancedRoadToolsMod.s_Log.Error($"\tCould not setup tool {def.ToolID}: {e}");
                 }
             }
         }
