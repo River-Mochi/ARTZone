@@ -120,7 +120,7 @@ namespace AdvancedRoadTools.Tools
                     toolPrefab.Remove<NetSubObjects>();
 
                     UIObject ui = ScriptableObject.CreateInstance<UIObject>();
-                    ui.m_Icon = definition.ui.ImagePath;                     // e.g. "UI/images/Tool Icon/ToolsIcon.png"
+                    ui.m_Icon = definition.ui.ImagePath;                     // e.g. "UI/images/Tool_Icon/ToolsIcon.png"
                     ui.name = definition.ToolID;
                     ui.m_IsDebugObject = s_TemplateUI.m_IsDebugObject;
                     ui.m_Priority = definition.Priority;

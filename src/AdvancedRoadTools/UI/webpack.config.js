@@ -25,6 +25,7 @@ const banner = `
 module.exports = {
   mode: "production",
   stats: "none",
+  performance: { hints: false },
   entry: {
     [MOD.id]: "./src/index.tsx",
   },

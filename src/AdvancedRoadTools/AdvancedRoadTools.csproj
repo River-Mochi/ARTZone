@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <!-- src/AdvancedRoadTools/AdvancedRoadTools.csproj -->
+  <!-- File: src/AdvancedRoadTools/AdvancedRoadTools.csproj -->
 
   <PropertyGroup>
     <Configurations>Debug;Release</Configurations>
@@ -11,6 +11,11 @@
     <Product>Advanced Road Tools</Product>
 
     <Nullable>enable</Nullable>
+
+    <!-- Node/NPM runner + soft-fail switch for UI build -->
+    <NpmCmd>npm</NpmCmd>
+    <!-- set to true if you want the whole build to fail when npm fails -->
+    <FailUIBuild>false</FailUIBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -26,26 +31,6 @@
   <!-- CS2 toolchain (sets net48, refs, analyzers, etc.) -->
   <Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.props" />
   <Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.targets" />
-
-  <!-- Ensure UI deps are installed (only if UI/ exists and node_modules doesn't) -->
-  <Target Name="NpmInstall" BeforeTargets="Build"
-          Condition="Exists('$(ProjectDir)\UI\package.json') AND !Exists('$(ProjectDir)\UI\node_modules')">
-    <Exec Command="npm ci" WorkingDirectory="$(ProjectDir)\UI" />
-  </Target>
-
-  <!-- Build UI after C# -->
-  <Target Name="BuildUI" AfterTargets="AfterBuild" Condition="Exists('$(ProjectDir)\UI\package.json')">
-    <Exec Command="npm run build" WorkingDirectory="$(ProjectDir)\UI" />
-  </Target>
-
-  <!-- Copy UI folder (except node_modules) into the deploy folder that Mod.targets creates -->
-  <Target Name="DeployUI" AfterTargets="DeployWIP" Condition="Exists('$(ProjectDir)\UI\mod.json')">
-    <ItemGroup>
-      <UiFiles Include="UI\**\*.*" Exclude="UI\node_modules\**\*.*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(UiFiles)"
-          DestinationFiles="@(UiFiles->'$(DeployDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
-  </Target>
 
   <ItemGroup>
     <Reference Include="Game"><Private>false</Private></Reference>
@@ -67,21 +52,53 @@
     </Reference>
   </ItemGroup>
 
-  <!-- Link the shared toolchain files in Properties/ for visibility -->
+  <!-- Surface the common toolchain files in Properties/ -->
   <ItemGroup>
     <None Include="$(ModPropsFile)" Link="Properties\Mod.props" />
     <None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
   </ItemGroup>
 
-  <!-- Make UI files visible in VS (optional) -->
+  <!-- Copy UI assets so COUI can find them via coui://AdvancedRoadTools/... -->
   <ItemGroup>
-    <None Include="UI\mod.json">
-      <Visible>true</Visible>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
+    <Content Include="UI\mod.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\images\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- If your UI build outputs JS/CSS into UI\dist, copy that too -->
+    <Content Include="UI\dist\**\*.*" Condition="Exists('UI\dist')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
-  <!-- keep lang/** copied -->
+  <!-- Ensure UI deps are installed once -->
+  <Target Name="NpmInstall" BeforeTargets="Build"
+          Condition="Exists('$(ProjectDir)\UI\package.json') AND !Exists('$(ProjectDir)\UI\node_modules')">
+    <Message Text="ART UI: npm ci (first-time install)..." Importance="high" />
+    <Exec Command="$(NpmCmd) ci" WorkingDirectory="$(ProjectDir)\UI" IgnoreExitCode="true">
+      <Output TaskParameter="ExitCode" PropertyName="NpmCiExit" />
+    </Exec>
+    <Error Condition="'$(FailUIBuild)'=='true' AND '$(NpmCiExit)' != '0'"
+           Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). See Output window for details." />
+    <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmCiExit)' != '0'"
+             Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). Continuing C# build." />
+  </Target>
+
+  <!-- Build UI bundle (soft-fail by default so icons still ship) -->
+  <Target Name="BuildUI" AfterTargets="AfterBuild"
+          Condition="Exists('$(ProjectDir)\UI\package.json')">
+    <Message Text="ART UI: npm run build..." Importance="high" />
+    <Exec Command="$(NpmCmd) run build" WorkingDirectory="$(ProjectDir)\UI" IgnoreExitCode="true">
+      <Output TaskParameter="ExitCode" PropertyName="NpmBuildExit" />
+    </Exec>
+    <Error Condition="'$(FailUIBuild)'=='true' AND '$(NpmBuildExit)' != '0'"
+           Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit))." />
+    <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmBuildExit)' != '0'"
+             Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit)). Continuing C# build." />
+  </Target>
+
+  <!-- Keep lang/** copied (localization files) -->
   <ItemGroup>
     <Folder Include="lang\" />
     <Content Include="lang\**">

@@ -66,13 +66,14 @@ namespace AdvancedRoadTools.Tools
             m_SelectedEntities = new NativeList<Entity>(Allocator.Persistent);
 
             var definition = new ToolDefinition(
-                typeof(ZoningControllerToolSystem),
-                toolID,
-                priority: 59,
-                ui: new ToolDefinition.UI(ToolDefinition.UI.IconPath)
+                 typeof(ZoningControllerToolSystem),
+                 toolID,
+                 59,
+                 new ToolDefinition.UI(ToolDefinition.UI.IconPath)  // <- use emitted COUI path for ToolsIcon.png
             );
 
             ToolsHelper.RegisterTool(definition);
+
         }
 
         protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
@@ -120,9 +121,9 @@ namespace AdvancedRoadTools.Tools
             m_AdvancedRoadLookup.Update(this);
             m_SubBlockLookup.Update(this);
 
-            var ecb = m_ToolOutputBarrier.CreateCommandBuffer();
+            EntityCommandBuffer ecb = m_ToolOutputBarrier.CreateCommandBuffer();
             bool hasHit = GetRaycastResult(out Entity hitEntity, out RaycastHit hit);
-            var soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
+            ToolUXSoundSettingsData soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
             if (cancelAction.WasPressedThisFrame())
                 m_Mode = Mode.Cancel;
@@ -166,7 +167,7 @@ namespace AdvancedRoadTools.Tools
                     break;
 
                 case Mode.Apply:
-                    var setJob = new SetAdvancedRoadJob
+                    JobHandle setJob = new SetAdvancedRoadJob
                     {
                         TempZoningLookup = GetComponentLookup<TempZoning>(true),
                         Entities = m_SelectedEntities.AsArray().AsReadOnly(),
@@ -174,14 +175,14 @@ namespace AdvancedRoadTools.Tools
                     }.Schedule(inputDeps);
                     inputDeps = JobHandle.CombineDependencies(inputDeps, setJob);
 
-                    foreach (var se in m_SelectedEntities)
+                    foreach (Entity se in m_SelectedEntities)
                         m_ToolHighlightSystem.HighlightEntity(se, false);
                     m_SelectedEntities.Clear();
                     AudioManager.instance.PlayUISound(soundbank.m_NetBuildSound);
                     break;
 
                 case Mode.Cancel:
-                    foreach (var se in m_SelectedEntities)
+                    foreach (Entity se in m_SelectedEntities)
                         m_ToolHighlightSystem.HighlightEntity(se, false);
                     AudioManager.instance.PlayUISound(soundbank.m_NetCancelSound);
                     m_SelectedEntities.Clear();
@@ -193,7 +194,7 @@ namespace AdvancedRoadTools.Tools
                 m_ZoningControllerToolUISystem.InvertZoningMode();
             }
 
-            var syncTempJob = new SyncTempJob
+            JobHandle syncTempJob = new SyncTempJob
             {
                 ECB = m_ToolOutputBarrier.CreateCommandBuffer().AsParallelWriter(),
                 TempZoningLookup = GetComponentLookup<TempZoning>(true),
@@ -201,10 +202,10 @@ namespace AdvancedRoadTools.Tools
                 Depths = Depths
             }.Schedule(m_SelectedEntities.Length, 32, inputDeps);
 
-            var tempZoningEntities = m_TempZoningQuery.ToEntityArray(Allocator.TempJob);
+            NativeArray<Entity> tempZoningEntities = m_TempZoningQuery.ToEntityArray(Allocator.TempJob);
             inputDeps = JobHandle.CombineDependencies(inputDeps, syncTempJob);
 
-            var cleanupTempJob = new CleanupTempJob
+            JobHandle cleanupTempJob = new CleanupTempJob
             {
                 ECB = m_ToolOutputBarrier.CreateCommandBuffer().AsParallelWriter(),
                 SelectedEntities = m_SelectedEntities.AsArray().AsReadOnly(),
@@ -222,8 +223,8 @@ namespace AdvancedRoadTools.Tools
             if (!base.GetRaycastResult(out entity, out hit))
                 return false;
 
-            var hasAdvancedRoad = m_AdvancedRoadLookup.TryGetComponent(entity, out var data);
-            var hasSubBlock = m_SubBlockLookup.TryGetBuffer(entity, out _);
+            bool hasAdvancedRoad = m_AdvancedRoadLookup.TryGetComponent(entity, out AdvancedRoad data);
+            bool hasSubBlock = m_SubBlockLookup.TryGetBuffer(entity, out _);
 
             if (!hasSubBlock)
             {
@@ -280,9 +281,9 @@ namespace AdvancedRoadTools.Tools
 
             public void Execute(int index)
             {
-                var entity = SelectedEntities[index];
+                Entity entity = SelectedEntities[index];
 
-                if (TempZoningLookup.TryGetComponent(entity, out var data) && math.any(data.Depths != Depths))
+                if (TempZoningLookup.TryGetComponent(entity, out TempZoning data) && math.any(data.Depths != Depths))
                 {
                     ECB.SetComponent(index, entity, new TempZoning { Depths = Depths });
                 }
@@ -302,7 +303,7 @@ namespace AdvancedRoadTools.Tools
 
             public void Execute(int index)
             {
-                var entity = Entities[index];
+                Entity entity = Entities[index];
                 if (SelectedEntities.Contains(entity))
                     return;
 
@@ -319,9 +320,9 @@ namespace AdvancedRoadTools.Tools
 
             public void Execute()
             {
-                foreach (var entity in Entities)
+                foreach (Entity entity in Entities)
                 {
-                    if (!TempZoningLookup.TryGetComponent(entity, out var temp))
+                    if (!TempZoningLookup.TryGetComponent(entity, out TempZoning temp))
                         continue;
 
                     ECB.RemoveComponent<TempZoning>(entity);
