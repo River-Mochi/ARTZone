@@ -13,7 +13,7 @@ namespace AdvancedRoadTools
     using Game.Settings;
 
     // NOTE: you said you want this exact location
-    [FileLocation("ModsSettings/AdvancedRoadTools/ART")]
+    [FileLocation("ModsSettings/AdvancedRoadTools/AdvancedRoadTools")]
     [SettingsUIGroupOrder(kToggleGroup)]
     [SettingsUIShowGroupName(kToggleGroup)]
     [SettingsUIMouseAction(AdvancedRoadToolsMod.kInvertZoningActionName, ActionType.Button,
@@ -42,9 +42,9 @@ namespace AdvancedRoadTools
 
         public override void SetDefaults()
         {
+            // UI toggles
             RemoveOccupiedCells = true;
             RemoveZonedCells = true;
-            InvertZoning = new ProxyBinding { };
         }
 
         private bool IfRemoveZonedCells() => !RemoveZonedCells;

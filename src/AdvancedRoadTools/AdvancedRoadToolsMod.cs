@@ -37,10 +37,11 @@ namespace AdvancedRoadTools
 
             AddSources(); // robust locale loader (lang/*.json next to DLL)
 
+            // Load saved settings (or defaults) first
+            AssetDatabase.global.LoadSettings(ModID, m_Setting, new Setting(this));
+
             // keybinds: actions come from Settings
             m_InvertZoningAction = m_Setting.GetAction(kInvertZoningActionName);
-
-            AssetDatabase.global.LoadSettings(nameof(AdvancedRoadTools), m_Setting, new Setting(this));
 
             // Phase-1: zoning-only systems
             updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
