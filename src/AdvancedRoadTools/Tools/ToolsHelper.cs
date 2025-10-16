@@ -1,12 +1,14 @@
 ﻿// File: src/AdvancedRoadTools/Tools/ToolsHelper.cs
-// Creates the prefab + UI for the tool and restores PlacementFlags per your SDK:
-// IsUpgrade | UpgradeOnly | UndergroundUpgrade
+// Purpose: Public-API-only tool instantiation helper (no Harmony, no reflection).
+// Notes:
+//  - Resolves a *vanilla road prefab* (from a candidate list) to copy UI group + PlaceableNetData.
+//  - Ensures the tool appears under Road Services and behaves like a net upgrade.
+//  - Does NOT depend on “Wide Sidewalk”.
 
 using System;
 using System.Collections.Generic;
-using Colossal.Serialization.Entities;  // Purpose
-using Game;             // GameMode
-using Game.Net;         // << needed for Game.Net.PlacementFlags
+using Colossal.Serialization.Entities; // Purpose
+using Game;                           // GameMode
 using Game.Prefabs;
 using Game.SceneFlow;
 using Game.Tools;
@@ -103,10 +105,10 @@ namespace AdvancedRoadTools.Tools
 
             AdvancedRoadToolsMod.s_Log.Info($"Creating tools UI. {ToolDefinitions.Count} registered tools");
 
-            // Template only for base components; we will overwrite flags below
-            if (!TryResolveTemplatePrefab("Wide Sidewalk", out s_TemplatePrefab, out s_TemplateUI))
+            // >>> NEW: resolve a safe vanilla road template (no dependency on a specific asset name)
+            if (!TryResolveTemplatePrefab(out s_TemplatePrefab, out s_TemplateUI))
             {
-                AdvancedRoadToolsMod.s_Log.Error("Could not resolve template prefab/UI (\"Wide Sidewalk\"). Tools will not be created.");
+                AdvancedRoadToolsMod.s_Log.Error("Could not resolve template prefab/UI. Tools will not be created.");
                 return;
             }
 
@@ -117,13 +119,14 @@ namespace AdvancedRoadTools.Tools
                     PrefabBase toolPrefab = Object.Instantiate(s_TemplatePrefab);
                     toolPrefab.name = definition.ToolID;
 
+                    // Strip template-only bits; we only keep what we explicitly re-add.
                     toolPrefab.Remove<UIObject>();
                     toolPrefab.Remove<Unlockable>();
                     toolPrefab.Remove<NetSubObjects>();
 
+                    // UI tile: keep the template's group so we appear in Road Services; use our own icon & priority.
                     UIObject ui = ScriptableObject.CreateInstance<UIObject>();
-                    // PNG palette icon emitted by webpack at: coui://AdvancedRoadTools/images/ToolsIcon.png
-                    ui.m_Icon = definition.ui.ImagePath;
+                    ui.m_Icon = definition.ui.ImagePath;   // e.g. "coui://AdvancedRoadTools/images/ToolsIcon.png"
                     ui.name = definition.ToolID;
                     ui.m_IsDebugObject = s_TemplateUI.m_IsDebugObject;
                     ui.m_Priority = definition.Priority;
@@ -131,6 +134,7 @@ namespace AdvancedRoadTools.Tools
                     ui.active = s_TemplateUI.active;
                     toolPrefab.AddComponentFrom(ui);
 
+                    // Treat this like a net upgrade so placement UX matches expectations.
                     NetUpgrade upgrade = ScriptableObject.CreateInstance<NetUpgrade>();
                     toolPrefab.AddComponentFrom(upgrade);
 
@@ -178,16 +182,6 @@ namespace AdvancedRoadTools.Tools
         {
             if (s_PrefabSystem == null)
             {
-                // Make sure s_World is initialized
-                if (s_World == null)
-                    s_World = World.DefaultGameObjectInjectionWorld;
-
-                if (s_World == null)
-                {
-                    AdvancedRoadToolsMod.s_Log.Error("SetupToolsOnGameLoaded: World is null.");
-                    return;
-                }
-
                 s_PrefabSystem = s_World.GetExistingSystemManaged<PrefabSystem>();
                 if (s_PrefabSystem == null)
                 {
@@ -195,30 +189,90 @@ namespace AdvancedRoadTools.Tools
                     return;
                 }
             }
+
+            AdvancedRoadToolsMod.s_Log.Info($"Setting up tools. {s_ToolsLookup.Count} registered tools");
+
+            foreach (KeyValuePair<ToolDefinition, (PrefabBase prefab, UIObject ui)> kvp in s_ToolsLookup)
+            {
+                ToolDefinition def = kvp.Key;
+                PrefabBase prefab = kvp.Value.prefab;
+
+                try
+                {
+                    if (!TryGetPlaceableNetDataFromTemplate(out PlaceableNetData placeable))
+                    {
+                        AdvancedRoadToolsMod.s_Log.Error($"\tCould not obtain PlaceableNetData for {def.ToolID}.");
+                        continue;
+                    }
+
+                    // Behave like an upgrade; keep other fields inherited from the template.
+                    placeable.m_PlacementFlags |= Game.Net.PlacementFlags.IsUpgrade;
+                    placeable.m_PlacementFlags |= Game.Net.PlacementFlags.UndergroundUpgrade;
+
+                    s_PrefabSystem.AddComponentData(prefab, placeable);
+                }
+                catch (Exception e)
+                {
+                    AdvancedRoadToolsMod.s_Log.Error($"\tCould not setup tool {def.ToolID}: {e}");
+                }
+            }
         }
 
-        private static bool TryResolveTemplatePrefab(string name, out PrefabBase prefab, out UIObject ui)
+        // --- Template resolution (NEW): try many common vanilla roads; we only need a prefab with a UIObject ---
+        private static bool TryResolveTemplatePrefab(out PrefabBase prefab, out UIObject ui)
         {
             prefab = null!;
             ui = null!;
 
-            string[] typeCandidates = { nameof(RoadPrefab), nameof(NetPrefab), "ContentPrefab", nameof(PrefabBase) };
-
-            foreach (string? typeName in typeCandidates)
+            string[] nameCandidates =
             {
-                if (s_PrefabSystem.TryGetPrefab(new PrefabID(typeName, name), out PrefabBase? p) && p != null)
+                "Small Road",
+                "Two-Lane Road",
+                "2 Lane Road",
+                "Asphalt Road",
+                "Basic Road",
+                "Gravel Road",
+                "Medium Road",
+                "Large Road",
+                "Avenue",
+                "Highway",
+                "Pedestrian Street",
+                "Pedestrian Street Small",
+                "Pedestrian Street Medium",
+                "Pedestrian Street Large",
+                // keep the former one as last fallback
+                "Wide Sidewalk",
+            };
+
+            string[] typeCandidates =
+            {
+                nameof(RoadPrefab),
+                nameof(NetPrefab),
+                "ContentPrefab",
+                nameof(PrefabBase)
+            };
+
+            foreach (string roadName in nameCandidates)
+            {
+                foreach (string typeName in typeCandidates)
                 {
-                    UIObject uio = p.GetComponent<UIObject>();
-                    if (uio != null)
+                    if (s_PrefabSystem.TryGetPrefab(new PrefabID(typeName, roadName), out PrefabBase? p) && p != null)
                     {
-                        prefab = p!;
-                        ui = uio!;
-                        return true;
+                        UIObject uio = p.GetComponent<UIObject>();
+                        if (uio != null)
+                        {
+                            AdvancedRoadToolsMod.s_Log.Info($"Template resolved: {roadName} ({typeName})");
+                            prefab = p!;
+                            ui = uio!;
+                            return true;
+                        }
                     }
                 }
             }
 
-            AdvancedRoadToolsMod.s_Log.Error($"Template prefab \"{name}\" not found via PrefabSystem.TryGetPrefab(..).");
+            AdvancedRoadToolsMod.s_Log.Error(
+                "No suitable road template found via PrefabSystem.TryGetPrefab(..). " +
+                "Tool button cannot be created in the Road Services palette.");
             return false;
         }
 
