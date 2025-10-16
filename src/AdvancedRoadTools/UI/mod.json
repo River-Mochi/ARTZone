@@ -1,6 +1,6 @@
 {
   "id": "AdvancedRoadTools",
-  "author": "LuxStice",
+  "author": "rivermochi",
   "version": "1.0.0",
-  "dependencies": []
+  "dependencies": ["i18n_everywhere"]
 }

@@ -1,162 +1,263 @@
-﻿using System;
+﻿// Tools/ToolsHelper.cs
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using Colossal.Serialization.Entities;
-using Game;
-using Game.Net;
+using Colossal.Serialization.Entities;  // Purpose
+using Game;             // GameMode
 using Game.Prefabs;
 using Game.SceneFlow;
 using Game.Tools;
-using HarmonyLib;
 using Unity.Entities;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace AdvancedRoadTools.Tools;
-
-public static class ToolsHelper
+namespace AdvancedRoadTools.Tools
 {
-    public static List<ToolDefinition> ToolDefinitions { get; set; } = new();
-
-    private static Dictionary<ToolDefinition, Tuple<PrefabBase, UIObject>> toolsLookup = new();
-    public static bool Initialized { get; private set; }
-
-    public static bool HasTool(ToolDefinition tool) => ToolDefinitions.Contains(tool);
-    public static bool HasTool(string toolId) => ToolDefinitions.Exists(t => t.ToolID == toolId);
-
-    private static World world;
-    private static PrefabSystem prefabSystem;
-    private static PrefabBase originalPrefab;
-    private static List<PrefabBase> prefabs => Traverse.Create(prefabSystem).Field<List<PrefabBase>>("m_Prefabs").Value;
-
-    private static UIObject originalUiObject;
-
-
-    public static void RegisterTool(ToolDefinition toolDefinition)
+    /// <summary>
+    /// Public-API-only tool instantiation helper (no Harmony, no reflection).
+    /// </summary>
+    public static class ToolsHelper
     {
-        if (HasTool(toolDefinition))
+        public static List<ToolDefinition> ToolDefinitions { get; private set; } = new List<ToolDefinition>();
+
+        private static readonly Dictionary<ToolDefinition, (PrefabBase prefab, UIObject ui)> s_ToolsLookup =
+            new Dictionary<ToolDefinition, (PrefabBase, UIObject)>();
+
+        private static bool s_Initialized;
+        private static bool s_Instantiated;
+        private static bool s_SetupSubscribed;
+
+        private static World s_World = null!;
+        private static PrefabSystem s_PrefabSystem = null!;
+
+        private static PrefabBase s_TemplatePrefab = null!;
+        private static UIObject s_TemplateUI = null!;
+
+        public static bool HasTool(ToolDefinition tool) => ToolDefinitions.Contains(tool);
+        public static bool HasTool(string toolId) => ToolDefinitions.Exists(t => t.ToolID == toolId);
+
+        public static void RegisterTool(ToolDefinition toolDefinition)
         {
-            log.Error($"Tool \"{toolDefinition.ToolID}\" already registered");
-            return;
+            if (HasTool(toolDefinition))
+            {
+                AdvancedRoadToolsMod.s_Log.Error($"Tool \"{toolDefinition.ToolID}\" already registered");
+                return;
+            }
+
+            AdvancedRoadToolsMod.s_Log.Info($"Registering tool \"{toolDefinition.ToolID}\" with system \"{toolDefinition.Type.Name}\"");
+            ToolDefinitions.Add(toolDefinition);
         }
 
-        log.Info($"Registering tool \"{toolDefinition.ToolID}\" with system \"{toolDefinition.Type.Name}\"");
-        ToolDefinitions.Add(toolDefinition);
-    }
-
-    public static void Initialize(bool force = false)
-    {
-        if (Initialized && !force)
+        public static void Initialize(bool force = false)
         {
-            log.Info($"Trying to initialize ToolsHelper but it is already running.");
-            return;
+            if (s_Initialized && !force)
+            {
+                AdvancedRoadToolsMod.s_Log.Info("ToolsHelper.Initialize skipped (already initialized).");
+                return;
+            }
+
+            ToolDefinitions = new List<ToolDefinition>(8);
+            s_ToolsLookup.Clear();
+            s_Initialized = true;
+            s_Instantiated = false;
+            s_SetupSubscribed = false;
+
+            s_World = World.DefaultGameObjectInjectionWorld;
+            if (s_World == null)
+            {
+                AdvancedRoadToolsMod.s_Log.Error("DefaultGameObjectInjectionWorld is null; will retry when InstantiateTools() runs.");
+                return;
+            }
+
+            s_PrefabSystem = s_World.GetExistingSystemManaged<PrefabSystem>();
+            if (s_PrefabSystem == null)
+            {
+                AdvancedRoadToolsMod.s_Log.Error("PrefabSystem not available yet; will retry when InstantiateTools() runs.");
+                return;
+            }
         }
 
-        ToolDefinitions = new(8);
-        toolsLookup = new(8);
-        Initialized = true;
-    }
-
-    public static void InstantiateTools()
-    {
-        if (Initialized) return;
-
-        log.Info($"Creating tools UI. {ToolDefinitions.Count} registered tools");
-
-        world = Traverse.Create(GameManager.instance).Field<World>("m_World").Value;
-        prefabSystem = world.GetExistingSystemManaged<PrefabSystem>();
-
-        originalPrefab = prefabs.FirstOrDefault(p => p.name == "Wide Sidewalk");
-        if (originalPrefab is null)
+        public static void InstantiateTools()
         {
-            log.Error($"Could not find Wide Sidewalk Prefab");
-            return;
+            if (s_Instantiated)
+            {
+                AdvancedRoadToolsMod.s_Log.Info("InstantiateTools skipped (already instantiated).");
+                return;
+            }
+
+            if (s_World == null)
+                s_World = World.DefaultGameObjectInjectionWorld;
+
+            if (s_World == null)
+            {
+                AdvancedRoadToolsMod.s_Log.Error("InstantiateTools: DefaultGameObjectInjectionWorld is still null.");
+                return;
+            }
+
+            s_PrefabSystem ??= s_World.GetExistingSystemManaged<PrefabSystem>();
+            if (s_PrefabSystem == null)
+            {
+                AdvancedRoadToolsMod.s_Log.Error("InstantiateTools: PrefabSystem is still not available.");
+                return;
+            }
+
+            AdvancedRoadToolsMod.s_Log.Info($"Creating tools UI. {ToolDefinitions.Count} registered tools");
+
+            if (!TryResolveTemplatePrefab("Wide Sidewalk", out s_TemplatePrefab, out s_TemplateUI))
+            {
+                AdvancedRoadToolsMod.s_Log.Error("Could not resolve template prefab/UI (\"Wide Sidewalk\"). Tools will not be created.");
+                return;
+            }
+
+            foreach (ToolDefinition definition in ToolDefinitions)
+            {
+                try
+                {
+                    PrefabBase toolPrefab = Object.Instantiate(s_TemplatePrefab);
+                    toolPrefab.name = definition.ToolID;
+
+                    toolPrefab.Remove<UIObject>();
+                    toolPrefab.Remove<Unlockable>();
+                    toolPrefab.Remove<NetSubObjects>();
+
+                    UIObject ui = ScriptableObject.CreateInstance<UIObject>();
+                    ui.m_Icon = definition.ui.ImagePath;                     // e.g. "UI/images/Tool Icon/ToolsIcon.png"
+                    ui.name = definition.ToolID;
+                    ui.m_IsDebugObject = s_TemplateUI.m_IsDebugObject;
+                    ui.m_Priority = definition.Priority;
+                    ui.m_Group = s_TemplateUI.m_Group;
+                    ui.active = s_TemplateUI.active;
+                    toolPrefab.AddComponentFrom(ui);
+
+                    NetUpgrade upgrade = ScriptableObject.CreateInstance<NetUpgrade>();
+                    toolPrefab.AddComponentFrom(upgrade);
+
+                    ToolBaseSystem? system = s_World.GetOrCreateSystemManaged(definition.Type) as ToolBaseSystem;
+                    if (system == null)
+                    {
+                        AdvancedRoadToolsMod.s_Log.Error($"Failed to get or create tool system: {definition.Type}");
+                        Object.DestroyImmediate(toolPrefab);
+                        continue;
+                    }
+
+                    if (!system.TrySetPrefab(toolPrefab))
+                    {
+                        AdvancedRoadToolsMod.s_Log.Error($"Failed to set up tool prefab for type \"{definition.Type}\"");
+                        Object.DestroyImmediate(toolPrefab);
+                        continue;
+                    }
+
+                    if (!s_PrefabSystem.AddPrefab(toolPrefab))
+                    {
+                        AdvancedRoadToolsMod.s_Log.Error($"Tool \"{definition.ToolID}\" could not be added to {nameof(PrefabSystem)}");
+                        Object.DestroyImmediate(toolPrefab);
+                        continue;
+                    }
+
+                    s_ToolsLookup[definition] = (toolPrefab, ui);
+                    AdvancedRoadToolsMod.s_Log.Info($"\tTool \"{definition.ToolID}\" was successfully created");
+                }
+                catch (Exception e)
+                {
+                    AdvancedRoadToolsMod.s_Log.Error($"\tTool \"{definition.ToolID}\" could not be created: {e}");
+                }
+            }
+
+            if (!s_SetupSubscribed && GameManager.instance != null)
+            {
+                GameManager.instance.onGameLoadingComplete += SetupToolsOnGameLoaded;
+                s_SetupSubscribed = true;
+            }
+
+            s_Instantiated = true;
         }
 
-        originalUiObject = originalPrefab?.GetComponent<UIObject>();
-        if (originalUiObject is null)
+        private static void SetupToolsOnGameLoaded(Purpose purpose, GameMode mode)
         {
-            log.Error($"Could not find Wide Sidewalk UI Object");
-            return;
+            if (s_PrefabSystem == null)
+            {
+                s_PrefabSystem = s_World.GetExistingSystemManaged<PrefabSystem>();
+                if (s_PrefabSystem == null)
+                {
+                    AdvancedRoadToolsMod.s_Log.Error("SetupToolsOnGameLoaded: PrefabSystem unavailable.");
+                    return;
+                }
+            }
+
+            AdvancedRoadToolsMod.s_Log.Info($"Setting up tools. {s_ToolsLookup.Count} registered tools");
+
+            foreach (KeyValuePair<ToolDefinition, (PrefabBase prefab, UIObject ui)> kvp in s_ToolsLookup)
+            {
+                ToolDefinition def = kvp.Key;
+                PrefabBase prefab = kvp.Value.prefab;
+
+                try
+                {
+                    if (!TryGetPlaceableNetDataFromTemplate(out PlaceableNetData placeable))
+                    {
+                        AdvancedRoadToolsMod.s_Log.Error($"\tCould not obtain PlaceableNetData for {def.ToolID}.");
+                        continue;
+                    }
+
+                    // Phase-1: keep template's flags as-is (no PlacementFlags dependency)
+                    s_PrefabSystem.AddComponentData(prefab, placeable);
+                }
+                catch (Exception e)
+                {
+                    AdvancedRoadToolsMod.s_Log.Error($"\tCould not setup tool {def.ToolID}: {e}");
+                }
+            }
         }
 
-        // Getting the original Grass Prefab's PlaceableNetData
-        var originalUpgradePrefabData = prefabSystem.GetComponentData<PlaceableNetData>(originalPrefab);
-
-        foreach (var definition in ToolDefinitions)
+        private static bool TryResolveTemplatePrefab(string name, out PrefabBase prefab, out UIObject ui)
         {
+            prefab = null!;
+            ui = null!;
+
+            string[] typeCandidates = new[]
+            {
+                nameof(RoadPrefab),
+                nameof(NetPrefab),
+                "ContentPrefab",
+                nameof(PrefabBase)
+            };
+
+            foreach (string? typeName in typeCandidates)
+            {
+                if (s_PrefabSystem.TryGetPrefab(new PrefabID(typeName, name), out PrefabBase? p) && p != null)
+                {
+                    UIObject uio = p.GetComponent<UIObject>();
+                    if (uio != null)
+                    {
+                        prefab = p!;
+                        ui = uio!;
+                        return true;
+                    }
+                }
+            }
+
+            AdvancedRoadToolsMod.s_Log.Error($"Template prefab \"{name}\" not found via PrefabSystem.TryGetPrefab(..).");
+            return false;
+        }
+
+        private static bool TryGetPlaceableNetDataFromTemplate(out PlaceableNetData data)
+        {
+            data = default;
+
+            if (s_TemplatePrefab == null)
+            {
+                AdvancedRoadToolsMod.s_Log.Error("PlaceableNetData: template prefab is null.");
+                return false;
+            }
+
             try
             {
-                var toolPrefab = Object.Instantiate(originalPrefab);
-
-                toolPrefab.name = definition.ToolID;
-
-                toolPrefab.Remove<UIObject>();
-                toolPrefab.Remove<Unlockable>();
-                toolPrefab.Remove<NetSubObjects>();
-
-                var uiObject = ScriptableObject.CreateInstance<UIObject>();
-                uiObject.m_Icon = definition.ui.ImagePath;
-                uiObject.name = definition.ToolID;
-                uiObject.m_IsDebugObject = originalUiObject.m_IsDebugObject;
-                uiObject.m_Priority = definition.Priority;
-                uiObject.m_Group = originalUiObject.m_Group;
-                uiObject.active = originalUiObject.active;
-                toolPrefab.AddComponentFrom(uiObject);
-
-                var netUpgrade = ScriptableObject.CreateInstance<NetUpgrade>();
-                toolPrefab.AddComponentFrom(netUpgrade);
-
-                var tool = world.GetOrCreateSystemManaged(definition.Type) as ToolBaseSystem;
-
-                if (!tool.TrySetPrefab(toolPrefab))
-                {
-                    log.Error($"Failed to set up tool prefab for type \"{definition.Type}\"");
-                    continue;
-                }
-
-                if (!prefabSystem.AddPrefab(toolPrefab))
-                {
-                    log.Error($"Tool \"{definition.ToolID}\" could not be added to \"{nameof(PrefabSystem)}\"");
-                    continue;
-                }
-
-                toolsLookup.Add(definition, new Tuple<PrefabBase, UIObject>(toolPrefab, uiObject));
-                log.Info($"\tTool \"{definition.ToolID}\" was successfully created");
+                data = s_PrefabSystem.GetComponentData<PlaceableNetData>(s_TemplatePrefab);
+                return true;
             }
             catch (Exception e)
             {
-                log.Error($"\tTool \"{definition.ToolID}\" could not be created: {e}");
-            }
-
-            GameManager.instance.onGameLoadingComplete += SetupUpTools;
-        }
-    }
-
-    private static void SetupUpTools(Purpose purpose, GameMode mode)
-    {
-        log.Info($"Setting up tools. {toolsLookup.Count} registered tools");
-        
-        foreach (var kvp in toolsLookup)
-        {
-            var toolDefinition = kvp.Key;
-            var prefab = kvp.Value.Item1;
-            var uiObject = kvp.Value.Item2;
-            try
-            {
-                var placeableNetData = prefabSystem.GetComponentData<PlaceableNetData>(originalPrefab);
-                placeableNetData.m_SetUpgradeFlags = toolDefinition.SetFlags;
-                placeableNetData.m_UnsetUpgradeFlags = toolDefinition.UnsetFlags;
-                placeableNetData.m_PlacementFlags = toolDefinition.PlacementFlags;
-                
-                if(toolDefinition.Underground)
-                    placeableNetData.m_PlacementFlags |= PlacementFlags.UndergroundUpgrade;
-
-                prefabSystem.AddComponentData(prefab, placeableNetData);
-            }
-            catch (Exception e)
-            {
-                log.Error($"\tCould not setup tool {toolDefinition.ToolID}: {e}");
+                AdvancedRoadToolsMod.s_Log.Error($"Failed to read PlaceableNetData from template: {e}");
+                return false;
             }
         }
     }

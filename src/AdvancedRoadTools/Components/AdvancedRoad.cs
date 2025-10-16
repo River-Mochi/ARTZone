@@ -1,38 +1,37 @@
-using System;
-using Colossal.Serialization.Entities;
-using Unity.Entities;
-using Unity.Mathematics;
-
-namespace AdvancedRoadTools.Components;
-
-public struct AdvancedRoad : IComponentData, IEquatable<AdvancedRoad>, ISerializable
+// Components/AdvancedRoad.cs
+namespace AdvancedRoadTools.Components
 {
-    public int2 Depths
+    using System;
+    using Colossal.Serialization.Entities;
+    using Unity.Entities;
+    using Unity.Mathematics;
+    public struct AdvancedRoad : IComponentData, IEquatable<AdvancedRoad>, ISerializable
     {
-        get => new (depthLeft, depthRight);
-        set
+        public int depthLeft;
+        public int depthRight;
+
+        public int2 Depths
         {
-            depthLeft = value.x;
-            depthRight = value.y;
+            get => new int2(depthLeft, depthRight);
+            set
+            {
+                depthLeft = value.x;
+                depthRight = value.y;
+            }
         }
-    }
-    public int depthLeft;
-    public int depthRight;
 
-    public bool Equals(AdvancedRoad other)
-    {
-        return other.depthLeft == depthLeft && other.depthRight == depthRight;
-    }
+        public bool Equals(AdvancedRoad other) => other.depthLeft == depthLeft && other.depthRight == depthRight;
 
-    public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
-    {
-        writer.Write(depthLeft);
-        writer.Write(depthRight);
-    }
+        public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
+        {
+            writer.Write(depthLeft);
+            writer.Write(depthRight);
+        }
 
-    public void Deserialize<TReader>(TReader reader) where TReader : IReader
-    {
-        reader.Read(out depthLeft);
-        reader.Read(out depthRight);
+        public void Deserialize<TReader>(TReader reader) where TReader : IReader
+        {
+            reader.Read(out depthLeft);
+            reader.Read(out depthRight);
+        }
     }
 }

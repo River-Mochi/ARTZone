@@ -1,48 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using Game.Net;
-using Game.Prefabs;
+﻿// Tools/ToolDefinition.cs
+// Definition of a tool button + metadata (no PlacementFlags dependency)
 
-namespace AdvancedRoadTools.Tools;
-
-public struct ToolDefinition(Type toolSystemType, string toolId, int priority = 60, ToolDefinition.UI ui = default) : IEquatable<ToolDefinition>
+namespace AdvancedRoadTools.Tools
 {
-    public Type Type = toolSystemType;
-    public string ToolID = toolId;
-    public int Priority = priority;
-    public bool Underground = false;
-    public UI ui = ui;
-    public PlacementFlags PlacementFlags;
-    public CompositionFlags SetFlags;
-    public CompositionFlags UnsetFlags;
-    public IEnumerable<NetPieceRequirements> SetState;
-    public IEnumerable<NetPieceRequirements> UnsetState;
+    using System;
 
-    public ToolDefinition(Type toolSystemType,string toolId, UI ui) : this(toolSystemType, toolId, 60, ui)
+    public sealed class ToolDefinition
     {
-        
-    }
+        public Type Type
+        {
+            get;
+        }
+        public string ToolID
+        {
+            get;
+        }
+        public int Priority
+        {
+            get;
+        }
 
-    public struct UI(string imagePath)
-    {
-        public const string PathPrefix = "coui://ui-mods/images/";
-        public const string ImageFormat = ".svg";
-        public string ImagePath = imagePath;
-    }
+        public UI ui
+        {
+            get;
+        }
 
+        // Optional callback a system can use to reflect enabled/disabled state in UI.
+        public Action<bool> SetState
+        {
+            get; set;
+        }
 
-    public bool Equals(ToolDefinition other)
-    {
-        return ToolID == other.ToolID;
-    }
+        public ToolDefinition(Type systemType, string id, int priority, UI ui)
+        {
+            this.Type = systemType;
+            this.ToolID = id;
+            this.Priority = priority;
+            this.ui = ui ?? new UI(UI.IconPath);
+            this.SetState = _ => { };
+        }
 
-    public override bool Equals(object obj)
-    {
-        return obj is ToolDefinition other && Equals(other);
-    }
+        public sealed class UI
+        {
+            // This resolves against your UI package id from UI/mod.json
+            public const string IconPath = "coui://AdvancedRoadTools/images/Tool Icon/ToolsIcon.png";
 
-    public override int GetHashCode()
-    {
-        return (ToolID != null ? ToolID.GetHashCode() : 0);
+            public string ImagePath
+            {
+                get; set;
+            }
+
+            public UI(string imagePath)
+            {
+                ImagePath = imagePath;
+            }
+        }
     }
 }

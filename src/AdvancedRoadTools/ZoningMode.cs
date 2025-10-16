@@ -1,12 +1,16 @@
-﻿using System;
+﻿// Tools/ZoningMode.cs
+// Bitmask for left/right/both zoning toggles.
 
-namespace AdvancedRoadTools;
-
-[Flags]
-public enum ZoningMode
+namespace AdvancedRoadTools
 {
-    None = 0,
-    Right = 1,
-    Left = 2,
-    Both = Right | Left
+    using System;
+
+    [Flags]
+    public enum ZoningMode
+    {
+        None = 0,
+        Right = 1,
+        Left = 2,
+        Both = Right | Left
+    }
 }

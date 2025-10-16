@@ -1,141 +1,130 @@
-﻿using Colossal.UI.Binding;
-using Game.Prefabs;
-using Game.Tools;
-using Game.UI;
-using Unity.Mathematics;
+﻿// Tools/ZoningControllerToolUISystem.cs
 
-namespace AdvancedRoadTools.Tools;
-
-public partial class ZoningControllerToolUISystem : UISystemBase
+namespace AdvancedRoadTools.Tools
 {
-    private ValueBinding<int> toolZoningMode;
-    private ValueBinding<int> roadZoningMode;
+    using Colossal.UI.Binding;
+    using Game.Prefabs;
+    using Game.Tools;
+    using Game.UI;
+    using Unity.Mathematics;
 
-    private ValueBinding<bool> isRoadPrefab;
-
-    public ZoningMode ToolZoningMode => (ZoningMode)toolZoningMode.value;
-    public ZoningMode RoadZoningMode => (ZoningMode)roadZoningMode.value;
-
-    public int2 ToolDepths
+    public partial class ZoningControllerToolUISystem : UISystemBase
     {
-        get => new(((ZoningMode)toolZoningMode.value & ZoningMode.Left) == ZoningMode.Left ? 6 : 0, ((ZoningMode)toolZoningMode.value & ZoningMode.Right) == ZoningMode.Right ? 6 : 0);
-        set
+        private ValueBinding<int> m_ToolZoningMode = null!;
+        private ValueBinding<int> m_RoadZoningMode = null!;
+        private ValueBinding<bool> m_IsRoadPrefab = null!;
+
+        public ZoningMode ToolZoningMode => (ZoningMode)m_ToolZoningMode.value;
+        public ZoningMode RoadZoningMode => (ZoningMode)m_RoadZoningMode.value;
+
+        public int2 ToolDepths
         {
-            var newZoningMode = ZoningMode.Both;
-            if (value.x == 0)
-                newZoningMode ^= ZoningMode.Left;
-            if (value.y == 0)
-                newZoningMode ^= ZoningMode.Right;
-
-            ChangeToolZoningMode((int)newZoningMode);
-        }
-    }
-    public int2 RoadDepths
-    {
-        get => new(((ZoningMode)roadZoningMode.value & ZoningMode.Left) == ZoningMode.Left ? 6 : 0, ((ZoningMode)roadZoningMode.value & ZoningMode.Right) == ZoningMode.Right ? 6 : 0);
-        set
-        {
-            var newZoningMode = ZoningMode.Both;
-            if (value.x == 0)
-                newZoningMode ^= ZoningMode.Left;
-            if (value.y == 0)
-                newZoningMode ^= ZoningMode.Right;
-
-            ChangeRoadZoningMode((int)newZoningMode);
-        }
-    }
-
-    private ToolSystem mainToolSystem;
-    private ZoningControllerToolSystem toolSystem;
-
-    protected override void OnCreate()
-    {
-        base.OnCreate();
-
-        AddBinding(toolZoningMode = new ValueBinding<int>(AdvancedRoadToolsMod.ModID, "ToolZoningMode", (int)ZoningMode.Both));
-        AddBinding(roadZoningMode = new ValueBinding<int>(AdvancedRoadToolsMod.ModID, "RoadZoningMode", (int)ZoningMode.Both));
-        AddBinding(isRoadPrefab = new ValueBinding<bool>(AdvancedRoadToolsMod.ModID, "IsRoadPrefab", false));
-
-
-        AddBinding(new TriggerBinding<int>(AdvancedRoadToolsMod.ModID, "ChangeRoadZoningMode", ChangeRoadZoningMode));
-        AddBinding(new TriggerBinding<int>(AdvancedRoadToolsMod.ModID, "ChangeToolZoningMode", ChangeToolZoningMode));
-        AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "FlipToolBothMode", FlipToolBothMode));
-        AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "FlipRoadBothMode", FlipRoadBothMode));
-        AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "ToggleZoneControllerTool", ToggleTool));
-
-        mainToolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
-        mainToolSystem.EventPrefabChanged += EventPrefabChanged;
-        mainToolSystem.EventToolChanged += EventToolChanged;
-        toolSystem = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
-    }
-
-    private void EventToolChanged(ToolBaseSystem obj)
-    {
-        isRoadPrefab.Update(obj.GetPrefab() is RoadPrefab);
-    }
-
-    protected override void OnUpdate()
-    {
-        base.OnUpdate();
-    }
-
-    private void EventPrefabChanged(PrefabBase obj)
-    {
-        isRoadPrefab.Update(obj is RoadPrefab);
-    }
-
-    private void ToggleTool()
-    {
-        toolSystem.SetToolEnabled(mainToolSystem.activeTool != toolSystem);
-    }
-
-
-    private void FlipToolBothMode()
-    {
-        if (ToolZoningMode == ZoningMode.Both)
-        {
-            toolZoningMode.Update((int)ZoningMode.None);
-        }
-        else
-        {
-            toolZoningMode.Update((int)ZoningMode.Both);
+            get
+            {
+                int left = ((ZoningMode)m_ToolZoningMode.value & ZoningMode.Left) == ZoningMode.Left ? 6 : 0;
+                int right = ((ZoningMode)m_ToolZoningMode.value & ZoningMode.Right) == ZoningMode.Right ? 6 : 0;
+                return new int2(left, right);
+            }
+            set
+            {
+                ZoningMode newZoningMode = ZoningMode.Both;
+                if (value.x == 0)
+                    newZoningMode ^= ZoningMode.Left;
+                if (value.y == 0)
+                    newZoningMode ^= ZoningMode.Right;
+                ChangeToolZoningMode((int)newZoningMode);
+            }
         }
 
-    }
-    private void FlipRoadBothMode()
-    {
-        if (RoadZoningMode == ZoningMode.Both)
+        public int2 RoadDepths
         {
-            roadZoningMode.Update((int)ZoningMode.None);
+            get
+            {
+                int left = ((ZoningMode)m_RoadZoningMode.value & ZoningMode.Left) == ZoningMode.Left ? 6 : 0;
+                int right = ((ZoningMode)m_RoadZoningMode.value & ZoningMode.Right) == ZoningMode.Right ? 6 : 0;
+                return new int2(left, right);
+            }
+            set
+            {
+                ZoningMode newZoningMode = ZoningMode.Both;
+                if (value.x == 0)
+                    newZoningMode ^= ZoningMode.Left;
+                if (value.y == 0)
+                    newZoningMode ^= ZoningMode.Right;
+                ChangeRoadZoningMode((int)newZoningMode);
+            }
         }
-        else
+
+        private ToolSystem m_MainToolSystem = null!;
+        private ZoningControllerToolSystem m_ToolSystem = null!;
+
+        protected override void OnCreate()
         {
-            roadZoningMode.Update((int)ZoningMode.Both);
+            base.OnCreate();
+
+            AddBinding(m_ToolZoningMode = new ValueBinding<int>(AdvancedRoadToolsMod.ModID, "ToolZoningMode", (int)ZoningMode.Both));
+            AddBinding(m_RoadZoningMode = new ValueBinding<int>(AdvancedRoadToolsMod.ModID, "RoadZoningMode", (int)ZoningMode.Both));
+            AddBinding(m_IsRoadPrefab = new ValueBinding<bool>(AdvancedRoadToolsMod.ModID, "IsRoadPrefab", false));
+
+            AddBinding(new TriggerBinding<int>(AdvancedRoadToolsMod.ModID, "ChangeRoadZoningMode", ChangeRoadZoningMode));
+            AddBinding(new TriggerBinding<int>(AdvancedRoadToolsMod.ModID, "ChangeToolZoningMode", ChangeToolZoningMode));
+            AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "FlipToolBothMode", FlipToolBothMode));
+            AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "FlipRoadBothMode", FlipRoadBothMode));
+            AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "ToggleZoneControllerTool", ToggleTool));
+
+            m_MainToolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
+            m_MainToolSystem.EventPrefabChanged += EventPrefabChanged;
+            m_MainToolSystem.EventToolChanged += EventToolChanged;
+
+            m_ToolSystem = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
         }
 
+        private void EventToolChanged(ToolBaseSystem tool)
+        {
+            m_IsRoadPrefab.Update(tool.GetPrefab() is RoadPrefab);
+        }
+
+        private void EventPrefabChanged(PrefabBase prefab)
+        {
+            m_IsRoadPrefab.Update(prefab is RoadPrefab);
+        }
+
+        private void ToggleTool()
+        {
+            m_ToolSystem.SetToolEnabled(m_MainToolSystem.activeTool != m_ToolSystem);
+        }
+
+        private void FlipToolBothMode()
+        {
+            if (ToolZoningMode == ZoningMode.Both)
+                m_ToolZoningMode.Update((int)ZoningMode.None);
+            else
+                m_ToolZoningMode.Update((int)ZoningMode.Both);
+        }
+
+        private void FlipRoadBothMode()
+        {
+            if (RoadZoningMode == ZoningMode.Both)
+                m_RoadZoningMode.Update((int)ZoningMode.None);
+            else
+                m_RoadZoningMode.Update((int)ZoningMode.Both);
+        }
+
+        private void ChangeToolZoningMode(int value)
+        {
+            m_ToolZoningMode.Update(value);
+        }
+
+        private void ChangeRoadZoningMode(int value)
+        {
+            m_RoadZoningMode.Update(value);
+        }
+
+        public void InvertZoningMode()
+        {
+            // Flip only Left/Right bits, keep within Both mask
+            ZoningMode flipped = ZoningMode.Both ^ ToolZoningMode;
+            ChangeToolZoningMode((int)flipped);
+        }
     }
-
-    private void ChangeToolZoningMode(int value)
-    {
-        var mode = (ZoningMode)value;
-
-        toolZoningMode.Update(value);
-    }
-
-    private void ChangeRoadZoningMode(int value)
-    {
-        var mode = (ZoningMode)value;
-
-        roadZoningMode.Update(value);
-    }
-
-    public void InvertZoningMode()
-    {
-        // Flip only the Left/Right bits, keep scope inside the Both mask
-        var flipped = ZoningMode.Both ^ ToolZoningMode;
-        ChangeToolZoningMode((int)flipped);
-    }
-
-
-
 }

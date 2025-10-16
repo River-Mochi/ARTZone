@@ -1,151 +1,75 @@
-﻿using System;
-using Game;
-using Game.Common;
-using Game.Net;
-using Game.Tools;
-using Unity.Collections;
-using Unity.Entities;
-using Unity.Jobs;
+﻿// Tools/ToolHighlightSystem.cs
 
-namespace AdvancedRoadTools.Tools;
-
-public partial class ToolHighlightSystem : GameSystemBase
+namespace AdvancedRoadTools
 {
-    private ComponentLookup<Edge> edgeLookup;
-    private ComponentLookup<Highlighted> highlightedLookup;
-    private EntityCommandBuffer ecb;
-    private ToolOutputBarrier toolOutputBarrier;
+    using System.Collections.Generic;
+    using Game;
+    using Game.Common;
+    using Unity.Entities;
 
-    private NativeList<Entity> toHighlightEntities;
-    private NativeList<Entity> toUnhighlightEntities;
-
-    private EntityQuery highlightedQuery;
-
-    protected override void OnCreate()
+    /// <summary>
+    /// Minimal, local highlighter that satisfies our tool’s needs.
+    /// It intentionally no-ops visual effects for now; we just track a set
+    /// and poke Updated so other systems can react.
+    /// </summary>
+    public sealed partial class ToolHighlightSystem : GameSystemBase
     {
-        toolOutputBarrier = World.GetOrCreateSystemManaged<ToolOutputBarrier>();
+        private HashSet<Entity> m_Highlighted = null!;
 
-        edgeLookup = GetComponentLookup<Edge>(true);
-        highlightedLookup = GetComponentLookup<Highlighted>(true);
-
-        toHighlightEntities = new NativeList<Entity>(Allocator.Persistent);
-        toUnhighlightEntities = new NativeList<Entity>(Allocator.Persistent);
-        
-        highlightedQuery = GetEntityQuery(ComponentType.ReadOnly<Highlighted>());
-    }
-
-    protected override void OnUpdate()
-    {
-        ecb = toolOutputBarrier.CreateCommandBuffer();
-        edgeLookup.Update(this);
-        highlightedLookup.Update(this);
-
-        if (!toHighlightEntities.IsEmpty)
+        protected override void OnCreate()
         {
-            var job = new HighlightJob
+            base.OnCreate();
+            m_Highlighted = new HashSet<Entity>();
+        }
+
+        protected override void OnUpdate()
+        {
+            // No per-frame work needed for now.
+        }
+
+        /// <summary>
+        /// Toggle highlight bookkeeping for an entity.
+        /// </summary>
+        public void HighlightEntity(Entity entity, bool enable)
+        {
+            if (!EntityManager.Exists(entity))
+                return;
+
+            if (enable)
             {
-                Entities = toHighlightEntities.AsReadOnly(),
-                HighlightedLookup = highlightedLookup,
-                EdgeLookup = edgeLookup,
-                ECB = ecb.AsParallelWriter()
-            }.Schedule(toHighlightEntities.Length, 32, Dependency);
-            
-            Dependency = JobHandle.CombineDependencies(Dependency, job);
-        }
-        
-        if (!toUnhighlightEntities.IsEmpty)
-        {
-            var job = new UnhighlightJob
-            {
-                Entities = toUnhighlightEntities.AsReadOnly(),
-                HighlightedLookup = highlightedLookup,
-                EdgeLookup = edgeLookup,
-                ECB = ecb.AsParallelWriter()
-            }.Schedule(toUnhighlightEntities.Length, 32, Dependency);
-            
-            Dependency = JobHandle.CombineDependencies(Dependency, job);
-        }
-
-        toolOutputBarrier.AddJobHandleForProducer(Dependency);
-        Dependency.Complete();
-
-        toHighlightEntities.Clear();
-        toUnhighlightEntities.Clear();
-    }
-
-    public void ToggleHighlight(Entity entity)
-    {
-        if (highlightedLookup.HasComponent(entity))
-            toUnhighlightEntities.Add(entity);
-        else
-            toHighlightEntities.Add(entity);
-    }
-
-    public void HighlightEntity(Entity entity, bool value)
-    {
-        if (value)
-        {
-            if (!toHighlightEntities.Contains(entity))
-                toHighlightEntities.Add(entity);
-        }
-        else
-        {
-            if (!toUnhighlightEntities.Contains(entity))
-                toUnhighlightEntities.Add(entity);
-        }
-    }
-
-    private struct HighlightJob : IJobParallelFor
-    {
-        [ReadOnly] public ComponentLookup<Edge> EdgeLookup;
-        public NativeArray<Entity>.ReadOnly Entities;
-        [ReadOnly] public ComponentLookup<Highlighted> HighlightedLookup;
-        public EntityCommandBuffer.ParallelWriter ECB;
-
-        public void Execute(int index)
-        {
-            var entity = Entities[index];
-            if (entity == Entity.Null) log.Error($"Trying to set highlights on a null entity!");
-
-            if (!HighlightedLookup.HasComponent(entity))
-            {
-                ECB.AddComponent<Highlighted>(index, entity);
-                ECB.AddComponent<BatchesUpdated>(index, entity);
-                log.Debug($"\tHighlighted {entity}");
+                if (m_Highlighted.Add(entity))
+                {
+                    // Nudge dependent visuals/systems.
+                    EntityManager.AddComponent<Updated>(entity);
+                }
             }
-                
-            if (EdgeLookup.TryGetComponent(entity, out var edge))
+            else
             {
-                ECB.AddComponent<Updated>(index, edge.m_Start);
-                ECB.AddComponent<Updated>(index, edge.m_End);
-            }  
+                if (m_Highlighted.Remove(entity))
+                {
+                    // Nudge dependent visuals/systems.
+                    EntityManager.AddComponent<Updated>(entity);
+                }
+            }
         }
-    }
 
-    private struct UnhighlightJob : IJobParallelFor
-    {
-        [ReadOnly] public ComponentLookup<Edge> EdgeLookup;
-        public NativeArray<Entity>.ReadOnly Entities;
-        [ReadOnly] public ComponentLookup<Highlighted> HighlightedLookup;
-        public EntityCommandBuffer.ParallelWriter ECB;
-
-        public void Execute(int index)
+        /// <summary>
+        /// Clear all tracked highlights (used on cancel/tool swap).
+        /// </summary>
+        public void ClearAll()
         {
-            var entity = Entities[index];
-            if (entity == Entity.Null) log.Error($"Trying to set highlights on a null entity!");
+            if (m_Highlighted.Count == 0)
+                return;
 
-            if (HighlightedLookup.HasComponent(entity))
+            foreach (Entity e in m_Highlighted)
             {
-                ECB.RemoveComponent<Highlighted>(index, entity);
-                ECB.AddComponent<BatchesUpdated>(index, entity);
-                log.Debug($"\tUnhighlighted {entity}");
+                if (EntityManager.Exists(e))
+                {
+                    EntityManager.AddComponent<Updated>(e);
+                }
             }
-                
-            if (EdgeLookup.TryGetComponent(entity, out var edge))
-            {
-                ECB.AddComponent<Updated>(index, edge.m_Start);
-                ECB.AddComponent<Updated>(index, edge.m_End);
-            }
+
+            m_Highlighted.Clear();
         }
     }
 }

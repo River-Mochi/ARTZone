@@ -1,3 +1,0 @@
-_repo_dirs_tracked.txt
-_repo_files_tracked.txt
-_repo_files_untracked.txt
