@@ -1,51 +1,58 @@
 ﻿// File: src/AdvancedRoadTools/LocaleEN.cs
-// C# locale for Options panel + tool strings
+// English strings for Options UI and tool asset names.
+
+#nullable enable
 
 namespace AdvancedRoadTools
 {
     using System.Collections.Generic;
-    using System.Linq;
-    using AdvancedRoadTools.Tools;
     using Colossal;
-    using Game.Settings;
 
     public sealed class LocaleEN : IDictionarySource
     {
-        private readonly Setting _setting;
-
-        public LocaleEN(Setting setting) => _setting = setting;
+        private readonly Setting setting;
+        public LocaleEN(Setting setting)
+        {
+            this.setting = setting;
+        }
 
         public IEnumerable<KeyValuePair<string, string>> ReadEntries(
             IList<IDictionaryEntryError> errors,
             Dictionary<string, int> indexCounts)
         {
-            var d = new Dictionary<string, string>
+            return new Dictionary<string, string>
             {
-                { _setting.GetSettingsLocaleID(), "Advanced Road Tools" },
-                { _setting.GetOptionTabLocaleID(Setting.kSection), "Main" },
-                { _setting.GetOptionGroupLocaleID(Setting.kToggleGroup), "ZONE CONTROLLER TOOL OPTIONS" },
+                // Mod + Tab
+                { setting.GetSettingsLocaleID(), "Advanced Road Tools" },
+                { setting.GetOptionTabLocaleID(Setting.kSection), "Main" },
 
-                { _setting.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being removed" },
-                { _setting.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)), "Protect existing zone cells during preview and apply. Default: On" },
+                // Group headers in order
+                { setting.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Zone Controller Tool Options" },
+                { setting.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Key binding" },
 
-                { _setting.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
-                { _setting.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)), "Protect occupied cells to avoid unintended vacancy/abandonment. Default: On" },
+                // Toggles
+                { setting.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)),    "Prevent zoned cells from being removed" },
+                { setting.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),     "Prevent zoned cells from being overridden during preview and apply phases of the tool." },
 
-                { _setting.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Invert Zoning Mouse Button" },
-                { _setting.GetOptionDescLocaleID(nameof(Setting.InvertZoning)), "Click to invert the current zoning configuration. Default: RMB. Use ❌ to unassign or 🔄 to reset." },
+                { setting.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
+                { setting.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Prevent occupied cells from being overridden during preview and apply phases of the tool." },
 
-                // Tool palette strings (safe to keep on C# side)
-                { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Zone Controller" },
-                { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]", "Control road zoning: both sides, left, right, or none. Right-click toggles by default." },
+                // Binding row
+                { setting.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Invert Zoning Mouse Button" },
+                { setting.GetOptionDescLocaleID(nameof(Setting.InvertZoning)),  "Bind a mouse button to invert zoning while the tool is active." },
+
+                // Action title (shown in binding UI)
+                { setting.GetBindingKeyLocaleID(AdvancedRoadToolsMod.kInvertZoningActionName), "Invert Zoning" },
+
+                // Tool asset strings (palette name/tooltip)
+                { $"Assets.NAME[{Tools.ZoningControllerToolSystem.ToolID}]", "Zone Controller" },
+                { $"Assets.DESCRIPTION[{Tools.ZoningControllerToolSystem.ToolID}]",
+                  "Control how zoning behaves along a road.\nChoose both sides, left, right, or none.\nRight-click (by default) inverts the current zoning configuration." },
             };
-
-            return d.ToDictionary(p => p.Key, p => p.Value);
         }
 
         public void Unload()
         {
         }
-
-        public override string ToString() => "LocaleEN (AdvancedRoadTools)";
     }
 }

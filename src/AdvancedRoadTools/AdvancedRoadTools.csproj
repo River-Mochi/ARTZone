@@ -14,7 +14,6 @@
 
     <!-- Node/NPM runner + soft-fail switch for UI build -->
     <NpmCmd>npm</NpmCmd>
-    <!-- set to true if you want the whole build to fail when npm fails -->
     <FailUIBuild>false</FailUIBuild>
   </PropertyGroup>
 
@@ -26,6 +25,8 @@
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <DefineConstants>TRACE</DefineConstants>
+    <!-- In Release, fail the build if npm fails -->
+    <FailUIBuild>true</FailUIBuild>
   </PropertyGroup>
 
   <!-- CS2 toolchain (sets net48, refs, analyzers, etc.) -->
@@ -66,17 +67,18 @@
     <Content Include="UI\images\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <!-- If your UI build outputs JS/CSS into UI\dist, copy that too -->
+    <!-- Copy the built bundle if present -->
     <Content Include="UI\dist\**\*.*" Condition="Exists('UI\dist')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
-  <!-- Ensure UI deps are installed once -->
-  <Target Name="NpmInstall" BeforeTargets="Build"
-          Condition="Exists('$(ProjectDir)\UI\package.json') AND !Exists('$(ProjectDir)\UI\node_modules')">
+  <!-- Release-only: ensure npm deps are installed once -->
+  <Target Name="NpmInstallRelease"
+          BeforeTargets="Build"
+          Condition="'$(Configuration)'=='Release' AND Exists('$(ProjectDir)UI\package.json') AND !Exists('$(ProjectDir)UI\node_modules')">
     <Message Text="ART UI: npm ci (first-time install)..." Importance="high" />
-    <Exec Command="$(NpmCmd) ci" WorkingDirectory="$(ProjectDir)\UI" IgnoreExitCode="true">
+    <Exec Command="$(NpmCmd) ci" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true">
       <Output TaskParameter="ExitCode" PropertyName="NpmCiExit" />
     </Exec>
     <Error Condition="'$(FailUIBuild)'=='true' AND '$(NpmCiExit)' != '0'"
@@ -85,11 +87,12 @@
              Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). Continuing C# build." />
   </Target>
 
-  <!-- Build UI bundle (soft-fail by default so icons still ship) -->
-  <Target Name="BuildUI" AfterTargets="AfterBuild"
-          Condition="Exists('$(ProjectDir)\UI\package.json')">
-    <Message Text="ART UI: npm run build..." Importance="high" />
-    <Exec Command="$(NpmCmd) run build" WorkingDirectory="$(ProjectDir)\UI" IgnoreExitCode="true">
+  <!-- Release-only: build the UI BEFORE files are copied to output -->
+  <Target Name="BuildUIRelease"
+          BeforeTargets="CopyFilesToOutputDirectory"
+          Condition="'$(Configuration)'=='Release' AND Exists('$(ProjectDir)UI\package.json')">
+    <Message Text="ART UI: npm run build (Release)..." Importance="high" />
+    <Exec Command="$(NpmCmd) run build" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true">
       <Output TaskParameter="ExitCode" PropertyName="NpmBuildExit" />
     </Exec>
     <Error Condition="'$(FailUIBuild)'=='true' AND '$(NpmBuildExit)' != '0'"

@@ -1,10 +1,11 @@
 ﻿// AdvancedRoadToolsMod.cs
-// Purpose: Mod entry point (Colossal-aligned). Registers settings, key bindings, locales; gets ProxyAction.
+// Purpose: Mod entrypoint; settings + locales; keybinding hookup (polling); legacy m_Setting field kept.
 
 #nullable enable
 
 namespace AdvancedRoadTools
 {
+    using AdvancedRoadTools.Tools;
     using Colossal;
     using Colossal.IO.AssetDatabase;
     using Colossal.Logging;
@@ -13,26 +14,27 @@ namespace AdvancedRoadTools
     using Game.Input;
     using Game.Modding;
     using Game.SceneFlow;
-    using AdvancedRoadTools.Tools;
 
     public sealed class AdvancedRoadToolsMod : IMod
     {
         public const string ModID = "AdvancedRoadTools";
 
-        // Action name must match Setting.cs attribute
+        // Action name used by Setting.cs attributes
         public const string kInvertZoningActionName = "InvertZoning";
 
-        // Expose settings + action to the rest of the mod
+        // === Settings (keep legacy field for older code, plus a modern property) ===
+        public static Setting m_Setting = null!;           // legacy alias for existing files
         public static Setting? s_Settings
         {
             get; private set;
         }
+
+        // Runtime input action (polled in tool)
         public static ProxyAction? m_InvertZoningAction
         {
             get; private set;
         }
 
-        // Simple logger (quiet in UI)
         public static readonly ILog s_Log =
             LogManager.GetLogger("AdvancedRoadTools").SetShowsErrorsInUI(false);
 
@@ -40,36 +42,30 @@ namespace AdvancedRoadTools
         {
             s_Log.Info("[ART] OnLoad");
 
-            // Show where we’re loading from (helpful while deving)
-            if (GameManager.instance?.modManager != null &&
-                GameManager.instance.modManager.TryGetExecutableAsset(this, out var asset))
-            {
-                s_Log.Info("[ART] Asset path: " + asset.path);
-            }
-
             // Settings instance
-            var settings = new Setting(this);
+            Setting settings = new Setting(this);
             s_Settings = settings;
+            m_Setting = settings; // keep legacy callers working
 
             // Load saved values (or defaults)
             AssetDatabase.global.LoadSettings(ModID, settings, new Setting(this));
 
-            // Locales (yours lives in LocaleEN.cs); add BEFORE registering Options if labels/descs are localized
+            // Locales (engine manages lifetime)
             TryAddLocale("en-US", new LocaleEN(settings));
 
             // Show settings in Options UI
             settings.RegisterInOptionsUI();
 
-            // REQUIRED with the attribute-based template: ensure actions exist before GetAction()
+            // REQUIRED with attribute-based bindings
             try
             {
                 settings.RegisterKeyBindings();
 
-                // Acquire the runtime action handle (ProxyAction). This is what we poll each frame.
+                // Acquire the runtime handle and enable it for gameplay
                 m_InvertZoningAction = settings.GetAction(kInvertZoningActionName);
                 if (m_InvertZoningAction != null)
                 {
-                    m_InvertZoningAction.shouldBeEnabled = true; // enable runtime polling
+                    m_InvertZoningAction.shouldBeEnabled = true; // enable via default activator
                 }
             }
             catch (System.Exception ex)
@@ -85,34 +81,43 @@ namespace AdvancedRoadTools
             updateSystem.UpdateAt<ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
 
             // Optional: log active locale flips
-            var lm = GameManager.instance?.localizationManager;
+            Colossal.Localization.LocalizationManager? lm = GameManager.instance?.localizationManager;
             if (lm != null)
             {
                 lm.onActiveDictionaryChanged -= OnLocaleChanged;
                 lm.onActiveDictionaryChanged += OnLocaleChanged;
             }
 
-            // Create tool prefabs once preloading starts
-            GameManager.instance.onGamePreload += CreateTools;
+            // Create tool prefabs once preloading starts (guard instance for CS8602)
+            GameManager? gm = GameManager.instance;
+            if (gm != null)
+            {
+                gm.onGamePreload -= CreateTools; // ensure no double subscription
+                gm.onGamePreload += CreateTools;
+            }
+            else
+            {
+                s_Log.Warn("[ART] GameManager.instance is null during OnLoad; skipping onGamePreload hook.");
+            }
         }
 
         public void OnDispose()
         {
             s_Log.Info("[ART] OnDispose");
 
-            // Unhook only what we hook. Do NOT remove locales; the game manages them.
-            if (GameManager.instance != null)
+            // Unhook only what we hooked; do NOT remove locales
+            GameManager gm = GameManager.instance;
+            if (gm != null)
             {
-                GameManager.instance.onGamePreload -= CreateTools;
-                var lm = GameManager.instance.localizationManager;
+                gm.onGamePreload -= CreateTools;
+                Colossal.Localization.LocalizationManager lm = gm.localizationManager;
                 if (lm != null)
-                {
                     lm.onActiveDictionaryChanged -= OnLocaleChanged;
-                }
             }
 
             if (m_InvertZoningAction != null)
             {
+                // No event subscriptions to remove (we're polling)
                 m_InvertZoningAction.shouldBeEnabled = false;
                 m_InvertZoningAction = null;
             }
@@ -121,12 +126,13 @@ namespace AdvancedRoadTools
             {
                 s_Settings.UnregisterInOptionsUI();
                 s_Settings = null;
+                m_Setting = null!; // legacy alias cleared
             }
         }
 
         private static void TryAddLocale(string localeId, IDictionarySource source)
         {
-            var lm = GameManager.instance?.localizationManager;
+            Colossal.Localization.LocalizationManager? lm = GameManager.instance?.localizationManager;
             if (lm == null)
             {
                 s_Log.Warn("[ART] No LocalizationManager; cannot add locale " + localeId);
@@ -137,8 +143,8 @@ namespace AdvancedRoadTools
 
         private static void OnLocaleChanged()
         {
-            var lm = GameManager.instance?.localizationManager;
-            var id = lm?.activeLocaleId ?? "(unknown)";
+            Colossal.Localization.LocalizationManager? lm = GameManager.instance?.localizationManager;
+            string id = lm?.activeLocaleId ?? "(unknown)";
             s_Log.Info("[ART] Active locale = " + id);
         }
 
@@ -150,7 +156,9 @@ namespace AdvancedRoadTools
             }
             finally
             {
-                GameManager.instance.onGamePreload -= CreateTools;
+                GameManager gm = GameManager.instance;
+                if (gm != null)
+                    gm.onGamePreload -= CreateTools;
             }
         }
     }

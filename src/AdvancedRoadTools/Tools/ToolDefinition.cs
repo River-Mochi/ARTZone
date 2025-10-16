@@ -1,5 +1,5 @@
 ﻿// File: src/AdvancedRoadTools/Tools/ToolDefinition.cs
-// Tool metadata. Palette icon uses PNG emitted by webpack.
+// Tool metadata. Palette icon comes from COUI (copied by .csproj from UI/images/**).
 
 namespace AdvancedRoadTools.Tools
 {
@@ -24,7 +24,7 @@ namespace AdvancedRoadTools.Tools
             get;
         }
 
-        public Action<bool> SetState
+        public System.Action<bool> SetState
         {
             get; set;
         }
@@ -34,28 +34,34 @@ namespace AdvancedRoadTools.Tools
             Type = systemType;
             ToolID = id;
             Priority = priority;
-            this.ui = ui ?? new UI(); // default icon
+            this.ui = ui ?? new UI();
             SetState = _ => { };
         }
 
         public sealed class UI
         {
-            // Webpack emits: images/ToolsIcon.png  (copied from UI/images/Tool_Icon/ToolsIcon.png)
-            public const string IconPath = "coui://AdvancedRoadTools/images/ToolsIcon.png";
+            // Correct COUI path (single slash after mod id).
+            public const string DefaultIconCouiPath = "coui://AdvancedRoadTools/UI/images/Tool_Icon/ToolsIcon.png";
 
-            public string ImagePath
+            public string? ImagePath
             {
                 get; set;
             }
+            public string? SpriteName
+            {
+                get; set;
+            } // Optional if you map sprites in UI/mod.json
 
             public UI()
             {
-                ImagePath = IconPath;
+                ImagePath = DefaultIconCouiPath;
             }
-            public UI(string path)
+            public UI(string iconCouiPath)
             {
-                ImagePath = path;
+                ImagePath = iconCouiPath;
             }
+
+            public static UI FromSprite(string spriteName) => new UI { ImagePath = null, SpriteName = spriteName };
         }
     }
 }
