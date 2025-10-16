@@ -1,5 +1,5 @@
-﻿// Setting.cs
-// Mod settings + fallback locale
+﻿// File: src/AdvancedRoadTools/Setting.cs
+// Mod settings + fallback locale (RMB keybind uses the keybinding widget to get Unassign/Reset)
 
 namespace AdvancedRoadTools
 {
@@ -11,13 +11,15 @@ namespace AdvancedRoadTools
     using Game.Input;
     using Game.Modding;
     using Game.Settings;
+    using Game.UI.Widgets;
 
-    // NOTE: you said you want this exact location
+    // NOTE: per your preference
     [FileLocation("ModsSettings/AdvancedRoadTools/AdvancedRoadTools")]
     [SettingsUIGroupOrder(kToggleGroup)]
     [SettingsUIShowGroupName(kToggleGroup)]
+    // Registers the action in Options for the tool area (don’t remove)
     [SettingsUIMouseAction(AdvancedRoadToolsMod.kInvertZoningActionName, ActionType.Button,
-        usages: new string[] { "Zone Controller Tool" })] // C# 9 (no collection expressions)
+        usages: new string[] { "Zone Controller Tool" })]
     public class Setting : ModSetting
     {
         public const string kSection = "Main";
@@ -30,21 +32,26 @@ namespace AdvancedRoadTools
         public bool RemoveZonedCells { get; set; } = true;
 
         [SettingsUISection(kSection, kToggleGroup)]
-        // [SettingsUIDisableByCondition(typeof(Setting), nameof(IfRemoveZonedCells))]
         public bool RemoveOccupiedCells { get; set; } = true;
 
-        [SettingsUIMouseBinding(BindingMouse.Right, kInvertZoningAction)]
+        // IMPORTANT:
+        // Use the *keybinding widget* so the ❌ Unassign and 🔄 Reset buttons appear.
+        // Keep the action name aligned with your Mod.cs registration.
+        // Default = RMB (“<Mouse>/rightButton”)
         [SettingsUISection(kSection, kToggleGroup)]
-        public ProxyBinding InvertZoning
-        {
-            get; set;
-        }
+        [SettingsUIKeyBinding(
+            actionName: kInvertZoningAction,
+            defaultBinding: "<Mouse>/rightButton",
+            allowUnassign: true,           // shows the ❌
+            showReset: true                // shows the 🔄
+        )]
+        public InputBinding InvertZoning { get; set; } = InputBinding.From("<Mouse>/rightButton");
 
         public override void SetDefaults()
         {
-            // UI toggles
             RemoveOccupiedCells = true;
             RemoveZonedCells = true;
+            InvertZoning = InputBinding.From("<Mouse>/rightButton");
         }
 
         private bool IfRemoveZonedCells() => !RemoveZonedCells;
@@ -55,7 +62,6 @@ namespace AdvancedRoadTools
         public readonly string LocaleID;
         private readonly Setting setting;
 
-        // Initialize to avoid nullable warnings and simplify usage
         public Dictionary<string, string> Entries = new Dictionary<string, string>();
 
         public Locale(string localeID, Setting setting)
@@ -72,42 +78,35 @@ namespace AdvancedRoadTools
             Dictionary<string, int> indexCounts)
         {
             if (Entries != null && Entries.Count > 0)
-            {
-                // clone to be safe
                 return Entries.ToDictionary(pair => pair.Key, pair => pair.Value);
-            }
 
-            // Fallback built-in English strings
+            // Fallback English
             return new Dictionary<string, string>
             {
                 { setting.GetSettingsLocaleID(), "Advanced Road Tools" },
                 { setting.GetOptionTabLocaleID(Setting.kSection), "Main" },
 
-                { setting.GetOptionGroupLocaleID(Setting.kToggleGroup), "Zone Controller Tool Options" },
+                { setting.GetOptionGroupLocaleID(Setting.kToggleGroup), "ZONE CONTROLLER TOOL OPTIONS" },
 
                 { setting.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being removed" },
                 {
                     setting.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
-                    "Prevent zoned cells from being overriden during preview and set phase of Zone Controller Tool." +
-                    "\nSet this to true if you're having problem with losing your zoning configuration when using the tool." +
-                    "\nDefault: true"
+                    "Prevent zoned cells from being overridden during preview and set phases.\nDefault: true"
                 },
 
                 { setting.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
                 {
                     setting.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
-                    "Prevent occupied cells from being overriden during preview and set phase of Zone Controller Tool." +
-                    "\nSet this to true if you're having problem with buildings becoming vacant and/or abandoned when using the tool." +
-                    "\nDefault: true"
+                    "Prevent occupied cells from being overridden during preview and set phases.\nDefault: true"
                 },
 
                 { setting.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Invert Zoning Mouse Button" },
-                { setting.GetOptionDescLocaleID(nameof(Setting.InvertZoning)), "Inverts the current zoning configuration with a mouse action." },
+                { setting.GetOptionDescLocaleID(nameof(Setting.InvertZoning)), "Click to invert the current zoning configuration (default: RMB). Use ❌ to unassign or 🔄 to reset." },
 
                 { "Assets.NAME[" + ZoningControllerToolSystem.ToolID + "]", "Zone Controller" },
                 {
                     "Assets.DESCRIPTION[" + ZoningControllerToolSystem.ToolID + "]",
-                    "Tool to control how the zoning of a road behaves.\nChoose between zoning on both sides, only on the left or right, or no zoning for that road.\nBy default, right-click inverts the zoning configuration."
+                    "Control road zoning: both sides, left, right, or none. Default right-click inverts the zoning configuration."
                 }
             };
         }
