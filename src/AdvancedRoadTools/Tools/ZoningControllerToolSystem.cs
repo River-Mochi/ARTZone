@@ -69,7 +69,7 @@ namespace AdvancedRoadTools.Tools
                  typeof(ZoningControllerToolSystem),
                  toolID,
                  59,
-                 new ToolDefinition.UI(ToolDefinition.UI.IconPath)  // <- use emitted COUI path for ToolsIcon.png
+                 new ToolDefinition.UI()  // COUI path for ToolsIcon.png
             );
 
             ToolsHelper.RegisterTool(definition);

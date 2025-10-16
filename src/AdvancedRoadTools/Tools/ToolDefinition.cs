@@ -19,8 +19,6 @@ namespace AdvancedRoadTools.Tools
         {
             get;
         }
-
-        // NOTE: ToolsHelper reads definition.ui.ImagePath for UIObject.m_Icon
         public UI ui
         {
             get;
@@ -37,29 +35,25 @@ namespace AdvancedRoadTools.Tools
             Type = systemType;
             ToolID = id;
             Priority = priority;
-            // If no UI is provided, use the default icon path.
-            this.ui = ui ?? new UI();
+            this.ui = ui ?? new UI();   // default icon
             SetState = _ => { };
         }
 
         public sealed class UI
         {
-            // COUI root is the UI package id from UI/mod.json ("AdvancedRoadTools").
-            // Webpack emits: images/ToolsIcon.png  (from images/Tool_Icon/ToolsIcon.png)
-            public const string IconPath = "coui://AdvancedRoadTools/images/ToolsIcon.png";
+            // Webpack places the file at Mods/<id>/images/ToolsIcon.png and it is served under:
+            // coui://ui-mods/<id>/images/ToolsIcon.png
+            public const string IconPath = "coui://ui-mods/AdvancedRoadTools/images/ToolsIcon.png";
 
-            // This is what ToolsHelper assigns to UIObject.m_Icon.
             public string ImagePath
             {
                 get; set;
             }
 
-            // Default to the emitted icon path.
             public UI()
             {
                 ImagePath = IconPath;
             }
-
             public UI(string imagePath)
             {
                 ImagePath = imagePath;
