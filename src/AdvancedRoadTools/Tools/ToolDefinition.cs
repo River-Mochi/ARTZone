@@ -34,14 +34,14 @@ namespace AdvancedRoadTools.Tools
             Type = systemType;
             ToolID = id;
             Priority = priority;
-            this.ui = ui ?? new UI();   // default to our SVG icon
+            this.ui = ui ?? new UI();   // default SVG icon
             SetState = _ => { };
         }
 
         public sealed class UI
         {
-            // Webpack copies your file as: /images/ZoneControllerTool.svg
-            // COUI path resolves against UI/mod.json id: "AdvancedRoadTools"
+            // COUI root is the UI package id from UI/mod.json ("AdvancedRoadTools").
+            // Webpack emits: images/ZoneControllerTool.svg
             public const string IconPath = "coui://AdvancedRoadTools/images/ZoneControllerTool.svg";
 
             public string ImagePath
