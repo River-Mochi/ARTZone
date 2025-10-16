@@ -1,5 +1,5 @@
 ﻿// Tools/ToolDefinition.cs
-// Definition of a tool button + metadata. C# icon path matches webpack output.
+// Definition of a tool button + metadata. Uses SVG icon.
 
 namespace AdvancedRoadTools.Tools
 {
@@ -23,7 +23,6 @@ namespace AdvancedRoadTools.Tools
         {
             get;
         }
-
         // Optional callback a system can use to reflect enabled/disabled state in UI.
         public Action<bool> SetState
         {
@@ -35,15 +34,15 @@ namespace AdvancedRoadTools.Tools
             Type = systemType;
             ToolID = id;
             Priority = priority;
-            this.ui = ui ?? new UI();   // default icon
+            this.ui = ui ?? new UI();   // default to our SVG icon
             SetState = _ => { };
         }
 
         public sealed class UI
         {
-            // Webpack places the file at Mods/<id>/images/ToolsIcon.png and it is served under:
-            // coui://ui-mods/<id>/images/ToolsIcon.png
-            public const string IconPath = "coui://ui-mods/AdvancedRoadTools/images/ToolsIcon.png";
+            // Webpack copies your file as: /images/ZoneControllerTool.svg
+            // COUI path resolves against UI/mod.json id: "AdvancedRoadTools"
+            public const string IconPath = "coui://AdvancedRoadTools/images/ZoneControllerTool.svg";
 
             public string ImagePath
             {
@@ -54,6 +53,7 @@ namespace AdvancedRoadTools.Tools
             {
                 ImagePath = IconPath;
             }
+
             public UI(string imagePath)
             {
                 ImagePath = imagePath;

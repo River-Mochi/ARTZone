@@ -5,13 +5,8 @@ import React from "react";
 import { useLocalization } from "cs2/l10n";
 import { trigger } from "cs2/api";
 import mod from "../../mod.json";
-
-// Button image (this renders on the floating button)
-import buttonIcon from "../../images/Tool_Icon/ToolsIcon.png";
-
-// If you later use the SVG in this file, import it like this:
-// import zoneIcon from "../../images/Toolbar/ZoneControllerTool.svg";
-
+// Use the SVG button icon:
+import buttonIcon from "../../images/ZoneControllerTool.svg";
 import { VanillaComponentResolver } from "../YenYang/VanillaComponentResolver";
 
 function ToggleZoneControllerTool() {
