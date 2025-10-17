@@ -1,8 +1,7 @@
 ﻿// File: src/AdvancedRoadTools/LocaleEN.cs
-// English strings for Options UI and tool asset names.
+// Built-in English strings for Options UI + tool palette text.
 
 #nullable enable
-
 namespace AdvancedRoadTools
 {
     using System.Collections.Generic;
@@ -22,32 +21,27 @@ namespace AdvancedRoadTools
         {
             return new Dictionary<string, string>
             {
-                // Mod + Tab
                 { setting.GetSettingsLocaleID(), "Advanced Road Tools" },
                 { setting.GetOptionTabLocaleID(Setting.kSection), "Main" },
 
-                // Group headers in order
-                { setting.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Zone Controller Tool Options" },
-                { setting.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Key binding" },
+                { setting.GetOptionGroupLocaleID(Setting.kToggleGroup), "Zone Controller Tool Options" },
+                { setting.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Key bindings" },
 
-                // Toggles
-                { setting.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)),    "Prevent zoned cells from being removed" },
-                { setting.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),     "Prevent zoned cells from being overridden during preview and apply phases of the tool." },
+                { setting.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being removed" },
+                { setting.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being overridden during preview and apply phases." },
 
                 { setting.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
-                { setting.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Prevent occupied cells from being overridden during preview and apply phases of the tool." },
+                { setting.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being overridden during preview and apply phases." },
 
-                // Binding row
                 { setting.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Invert Zoning Mouse Button" },
-                { setting.GetOptionDescLocaleID(nameof(Setting.InvertZoning)),  "Bind a mouse button to invert zoning while the tool is active." },
+                { setting.GetOptionDescLocaleID(nameof(Setting.InvertZoning)), "Bind a mouse button to invert zoning while the tool is active." },
 
-                // Action title (shown in binding UI)
                 { setting.GetBindingKeyLocaleID(AdvancedRoadToolsMod.kInvertZoningActionName), "Invert Zoning" },
 
-                // Tool asset strings (palette name/tooltip)
+                // Palette/asset text
                 { $"Assets.NAME[{Tools.ZoningControllerToolSystem.ToolID}]", "Zone Controller" },
                 { $"Assets.DESCRIPTION[{Tools.ZoningControllerToolSystem.ToolID}]",
-                  "Control how zoning behaves along a road.\nChoose both sides, left, right, or none.\nRight-click (by default) inverts the current zoning configuration." },
+                  "Control how zoning behaves along a road.\nChoose zoning on both sides, only left or right, or none.\nRight-click (by default) inverts the configuration." },
             };
         }
 

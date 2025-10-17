@@ -1,8 +1,7 @@
 ﻿// File: src/AdvancedRoadTools/Setting.cs
-// Mod settings + keybinding (mouse). Groups ordered: Toggles first, Keybinding second.
+// Options UI + keybinding definition (mouse). Toggles shown first, keybinding below.
 
 #nullable enable
-
 namespace AdvancedRoadTools
 {
     using Colossal.IO.AssetDatabase;
@@ -11,29 +10,31 @@ namespace AdvancedRoadTools
     using Game.Settings;
 
     [FileLocation("ModsSettings/AdvancedRoadTools/AdvancedRoadTools")]
+    // Show toggles group first, then the keybinding group
     [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup)]
     [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup)]
 
-    // Define the action used by the binding row (button action on the mouse device)
-    [SettingsUIMouseAction(AdvancedRoadToolsMod.kInvertZoningActionName, ActionType.Button,
-        usages: new string[] { "Zone Controller Tool" })]
+    // Define the input action once. (Mouse action; Button type)
+    [SettingsUIMouseAction(AdvancedRoadToolsMod.kInvertZoningActionName,
+                           ActionType.Button,
+                           usages: new[] { "Zone Controller Tool" })]
     public sealed class Setting : ModSetting
     {
         public const string kSection = "Main";
         public const string kToggleGroup = "Zone Controller Tool";
-        public const string kKeybindingGroup = "Keybinding";
+        public const string kKeybindingGroup = "Key bindings";
 
         public Setting(IMod mod) : base(mod) { }
 
-        // ----- Toggles (shown first) -----
+        // === Toggles (top group) ===
         [SettingsUISection(kSection, kToggleGroup)]
         public bool RemoveZonedCells { get; set; } = true;
 
         [SettingsUISection(kSection, kToggleGroup)]
         public bool RemoveOccupiedCells { get; set; } = true;
 
-        // ----- Mouse binding (shown second) -----
-        // Default = RMB; UI lets user bind ANY mouse button (including LMB/MMB/Forward/Back).
+        // === Keybinding (bottom group) ===
+        // Default to RMB; user can unassign or rebind to other mouse buttons.
         [SettingsUIMouseBinding(BindingMouse.Right, AdvancedRoadToolsMod.kInvertZoningActionName)]
         [SettingsUISection(kSection, kKeybindingGroup)]
         public ProxyBinding InvertZoning
@@ -43,9 +44,8 @@ namespace AdvancedRoadTools
 
         public override void SetDefaults()
         {
-            RemoveOccupiedCells = true;
             RemoveZonedCells = true;
-            // Binding default handled by attribute; nothing to do here.
+            RemoveOccupiedCells = true;
         }
     }
 }

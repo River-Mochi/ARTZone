@@ -1,67 +1,60 @@
 ﻿// File: src/AdvancedRoadTools/Tools/ToolDefinition.cs
-// Tool metadata. Palette icon comes from COUI (copied by .csproj from UI/images/**).
+// Purpose: Small POD describing a tool + its UI icon path and palette priority.
+
+using System;
+using System.Collections.Generic;
+using Game.Net;
+using Game.Prefabs;
 
 namespace AdvancedRoadTools.Tools
 {
-    using System;
-
-    public sealed class ToolDefinition
+    public struct ToolDefinition : IEquatable<ToolDefinition>
     {
-        public Type Type
-        {
-            get;
-        }
-        public string ToolID
-        {
-            get;
-        }
-        public int Priority
-        {
-            get;
-        }
-        public UI ui
-        {
-            get;
-        }
+        public Type Type;
+        public string ToolID;
+        public int Priority;
+        public bool Underground;
+        public UI ui;
+        public PlacementFlags PlacementFlags;
+        public CompositionFlags SetFlags;
+        public CompositionFlags UnsetFlags;
+        public IEnumerable<NetPieceRequirements> SetState;
+        public IEnumerable<NetPieceRequirements> UnsetState;
 
-        public System.Action<bool> SetState
+        public ToolDefinition(Type toolSystemType, string toolId, int priority = 60, UI ui = default)
         {
-            get; set;
-        }
-
-        public ToolDefinition(Type systemType, string id, int priority, UI ui)
-        {
-            Type = systemType;
-            ToolID = id;
+            Type = toolSystemType;
+            ToolID = toolId;
             Priority = priority;
-            this.ui = ui ?? new UI();
-            SetState = _ => { };
+            Underground = false;
+            this.ui = ui;
+            PlacementFlags = default;
+            SetFlags = default;
+            UnsetFlags = default;
+            SetState = null;
+            UnsetState = null;
         }
 
-        public sealed class UI
+        public ToolDefinition(Type toolSystemType, string toolId, UI ui)
+            : this(toolSystemType, toolId, 60, ui) { }
+
+        public struct UI
         {
-            // Correct COUI path (single slash after mod id).
-            public const string DefaultIconCouiPath = "coui://AdvancedRoadTools/UI/images/Tool_Icon/ToolsIcon.png";
+            // We pack images with webpack so they end up under our mod’s COUI path.
+            // Keep the folder names exactly as in your project tree.
+            public const string PathPrefix = "coui://AdvancedRoadTools/UI/images/Tool_Icon/";
+            public const string ImageFormat = ".png";
 
-            public string? ImagePath
-            {
-                get; set;
-            }
-            public string? SpriteName
-            {
-                get; set;
-            } // Optional if you map sprites in UI/mod.json
+            public string ImagePath;
 
-            public UI()
+            public UI(string imagePath)
             {
-                ImagePath = DefaultIconCouiPath;
+                ImagePath = imagePath;
             }
-            public UI(string iconCouiPath)
-            {
-                ImagePath = iconCouiPath;
-            }
-
-            public static UI FromSprite(string spriteName) => new UI { ImagePath = null, SpriteName = spriteName };
         }
+
+        public bool Equals(ToolDefinition other) => ToolID == other.ToolID;
+        public override bool Equals(object obj) => obj is ToolDefinition other && Equals(other);
+        public override int GetHashCode() => ToolID != null ? ToolID.GetHashCode() : 0;
     }
 }

@@ -1,14 +1,14 @@
 ﻿// File: src/AdvancedRoadTools/Tools/ToolsHelper.cs
 // Purpose: Public-API-only tool instantiation helper (no Harmony, no reflection).
-// Notes:
-//  - Resolves a *vanilla road prefab* (from a candidate list) to copy UI group + PlaceableNetData.
-//  - Ensures the tool appears under Road Services and behaves like a net upgrade.
-//  - Does NOT depend on “Wide Sidewalk”.
+// - Resolves Road Services template (Sound Barrier; fallback Wide Sidewalk) to copy UI group.
+// - Places our tile right AFTER the template by priority+1 so it appears in the same tab.
+// - Behaves like a net upgrade (PlacementFlags merged on setup).
 
 using System;
 using System.Collections.Generic;
-using Colossal.Serialization.Entities; // Purpose
-using Game;                           // GameMode
+using Colossal.Serialization.Entities;  // Purpose
+using Game;                            // GameMode
+using Game.Net;                        // PlacementFlags
 using Game.Prefabs;
 using Game.SceneFlow;
 using Game.Tools;
@@ -105,7 +105,7 @@ namespace AdvancedRoadTools.Tools
 
             AdvancedRoadToolsMod.s_Log.Info($"Creating tools UI. {ToolDefinitions.Count} registered tools");
 
-            // >>> NEW: resolve a safe vanilla road template (no dependency on a specific asset name)
+            // Road Services template: Sound Barrier (preferred) -> Wide Sidewalk (fallback)
             if (!TryResolveTemplatePrefab(out s_TemplatePrefab, out s_TemplateUI))
             {
                 AdvancedRoadToolsMod.s_Log.Error("Could not resolve template prefab/UI. Tools will not be created.");
@@ -124,17 +124,19 @@ namespace AdvancedRoadTools.Tools
                     toolPrefab.Remove<Unlockable>();
                     toolPrefab.Remove<NetSubObjects>();
 
-                    // UI tile: keep the template's group so we appear in Road Services; use our own icon & priority.
+                    // UI tile: inherit the template GROUP and place our icon right AFTER it in the palette.
                     UIObject ui = ScriptableObject.CreateInstance<UIObject>();
-                    ui.m_Icon = definition.ui.ImagePath;   // e.g. "coui://AdvancedRoadTools/images/ToolsIcon.png"
+                    ui.m_Icon = string.IsNullOrEmpty(definition.ui.ImagePath)
+                        ? ToolDefinition.UI.PathPrefix + "ToolsIcon.png"
+                        : definition.ui.ImagePath;
                     ui.name = definition.ToolID;
                     ui.m_IsDebugObject = s_TemplateUI.m_IsDebugObject;
-                    ui.m_Priority = definition.Priority;
                     ui.m_Group = s_TemplateUI.m_Group;
                     ui.active = s_TemplateUI.active;
+                    ui.m_Priority = s_TemplateUI.m_Priority + 1; // after Sound Barrier/Wide Sidewalk
                     toolPrefab.AddComponentFrom(ui);
 
-                    // Treat this like a net upgrade so placement UX matches expectations.
+                    // Behave like a net upgrade so placement UX matches expectations.
                     NetUpgrade upgrade = ScriptableObject.CreateInstance<NetUpgrade>();
                     toolPrefab.AddComponentFrom(upgrade);
 
@@ -199,15 +201,17 @@ namespace AdvancedRoadTools.Tools
 
                 try
                 {
-                    if (!TryGetPlaceableNetDataFromTemplate(out PlaceableNetData placeable))
-                    {
-                        AdvancedRoadToolsMod.s_Log.Error($"\tCould not obtain PlaceableNetData for {def.ToolID}.");
-                        continue;
-                    }
+                    // Start from the template’s placeable data, then merge our flags.
+                    PlaceableNetData placeable = s_PrefabSystem.GetComponentData<PlaceableNetData>(s_TemplatePrefab);
 
-                    // Behave like an upgrade; keep other fields inherited from the template.
-                    placeable.m_PlacementFlags |= Game.Net.PlacementFlags.IsUpgrade;
-                    placeable.m_PlacementFlags |= Game.Net.PlacementFlags.UndergroundUpgrade;
+                    placeable.m_SetUpgradeFlags = def.SetFlags;
+                    placeable.m_UnsetUpgradeFlags = def.UnsetFlags;
+
+                    // Merge placement flags + ensure upgrade behavior.
+                    placeable.m_PlacementFlags |= def.PlacementFlags;
+                    placeable.m_PlacementFlags |= PlacementFlags.IsUpgrade;
+                    if (def.Underground)
+                        placeable.m_PlacementFlags |= PlacementFlags.UndergroundUpgrade;
 
                     s_PrefabSystem.AddComponentData(prefab, placeable);
                 }
@@ -218,30 +222,22 @@ namespace AdvancedRoadTools.Tools
             }
         }
 
-        // --- Template resolution (NEW): try many common vanilla roads; we only need a prefab with a UIObject ---
+        // --- Template resolution: Road Services entries (wrench tab) ---
         private static bool TryResolveTemplatePrefab(out PrefabBase prefab, out UIObject ui)
         {
             prefab = null!;
             ui = null!;
 
+            // Prefer an item that lives in Road Services in every locale; these English
+            // names still resolve under the neutral PrefabID even if the UI text is localized.
             string[] nameCandidates =
             {
-                "Small Road",
-                "Two-Lane Road",
-                "2 Lane Road",
-                "Asphalt Road",
-                "Basic Road",
-                "Gravel Road",
-                "Medium Road",
-                "Large Road",
-                "Avenue",
-                "Highway",
-                "Pedestrian Street",
-                "Pedestrian Street Small",
-                "Pedestrian Street Medium",
-                "Pedestrian Street Large",
-                // keep the former one as last fallback
-                "Wide Sidewalk",
+                "Sound Barrier", // preferred anchor
+                "Wide Sidewalk", // original ART fallback
+                // extra backups in the same tab (if the two above are not present)
+                "Retaining Wall",
+                "Quay",
+                "Tunnel",
             };
 
             string[] typeCandidates =
@@ -252,16 +248,16 @@ namespace AdvancedRoadTools.Tools
                 nameof(PrefabBase)
             };
 
-            foreach (string roadName in nameCandidates)
+            foreach (string name in nameCandidates)
             {
                 foreach (string typeName in typeCandidates)
                 {
-                    if (s_PrefabSystem.TryGetPrefab(new PrefabID(typeName, roadName), out PrefabBase? p) && p != null)
+                    if (s_PrefabSystem.TryGetPrefab(new PrefabID(typeName, name), out PrefabBase? p) && p != null)
                     {
                         UIObject uio = p.GetComponent<UIObject>();
                         if (uio != null)
                         {
-                            AdvancedRoadToolsMod.s_Log.Info($"Template resolved: {roadName} ({typeName})");
+                            AdvancedRoadToolsMod.s_Log.Info($"Template resolved: {name} ({typeName})");
                             prefab = p!;
                             ui = uio!;
                             return true;
@@ -271,31 +267,9 @@ namespace AdvancedRoadTools.Tools
             }
 
             AdvancedRoadToolsMod.s_Log.Error(
-                "No suitable road template found via PrefabSystem.TryGetPrefab(..). " +
+                "No suitable Road Services template found (Sound Barrier / Wide Sidewalk). " +
                 "Tool button cannot be created in the Road Services palette.");
             return false;
-        }
-
-        private static bool TryGetPlaceableNetDataFromTemplate(out PlaceableNetData data)
-        {
-            data = default;
-
-            if (s_TemplatePrefab == null)
-            {
-                AdvancedRoadToolsMod.s_Log.Error("PlaceableNetData: template prefab is null.");
-                return false;
-            }
-
-            try
-            {
-                data = s_PrefabSystem.GetComponentData<PlaceableNetData>(s_TemplatePrefab);
-                return true;
-            }
-            catch (Exception e)
-            {
-                AdvancedRoadToolsMod.s_Log.Error($"Failed to read PlaceableNetData from template: {e}");
-                return false;
-            }
         }
     }
 }
