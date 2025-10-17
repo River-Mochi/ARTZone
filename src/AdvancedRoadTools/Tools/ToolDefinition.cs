@@ -15,9 +15,12 @@ namespace AdvancedRoadTools.Tools
         public int Priority;
         public bool Underground;
         public UI ui;
+
         public PlacementFlags PlacementFlags;
         public CompositionFlags SetFlags;
         public CompositionFlags UnsetFlags;
+
+        // Initialize to empty sequences to satisfy <Nullable>enable</Nullable>
         public IEnumerable<NetPieceRequirements> SetState;
         public IEnumerable<NetPieceRequirements> UnsetState;
 
@@ -28,11 +31,14 @@ namespace AdvancedRoadTools.Tools
             Priority = priority;
             Underground = false;
             this.ui = ui;
+
             PlacementFlags = default;
             SetFlags = default;
             UnsetFlags = default;
-            SetState = null;
-            UnsetState = null;
+
+            // Avoid nulls under nullable context
+            SetState = Array.Empty<NetPieceRequirements>();
+            UnsetState = Array.Empty<NetPieceRequirements>();
         }
 
         public ToolDefinition(Type toolSystemType, string toolId, UI ui)
@@ -40,8 +46,6 @@ namespace AdvancedRoadTools.Tools
 
         public struct UI
         {
-            // We pack images with webpack so they end up under our mod’s COUI path.
-            // Keep the folder names exactly as in your project tree.
             public const string PathPrefix = "coui://AdvancedRoadTools/UI/images/Tool_Icon/";
             public const string ImageFormat = ".png";
 

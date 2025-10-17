@@ -9,10 +9,10 @@ namespace AdvancedRoadTools
 
     public sealed class LocaleEN : IDictionarySource
     {
-        private readonly Setting setting;
-        public LocaleEN(Setting setting)
+        private readonly Setting m_Setting;
+        public LocaleEN(Setting m_Setting)
         {
-            this.setting = setting;
+            this.m_Setting = m_Setting;
         }
 
         public IEnumerable<KeyValuePair<string, string>> ReadEntries(
@@ -21,22 +21,22 @@ namespace AdvancedRoadTools
         {
             return new Dictionary<string, string>
             {
-                { setting.GetSettingsLocaleID(), "Advanced Road Tools" },
-                { setting.GetOptionTabLocaleID(Setting.kSection), "Main" },
+                { m_Setting.GetSettingsLocaleID(), "Advanced Road Tools" },
+                { m_Setting.GetOptionTabLocaleID(Setting.kSection), "Main" },
 
-                { setting.GetOptionGroupLocaleID(Setting.kToggleGroup), "Zone Controller Tool Options" },
-                { setting.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Key bindings" },
+                { m_Setting.GetOptionGroupLocaleID(Setting.kToggleGroup), "Zone Controller Tool Options" },
+                { m_Setting.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Key bindings" },
 
-                { setting.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being removed" },
-                { setting.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being overridden during preview and apply phases." },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being removed" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being overridden during preview and apply phases." },
 
-                { setting.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
-                { setting.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being overridden during preview and apply phases." },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being overridden during preview and apply phases." },
 
-                { setting.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Invert Zoning Mouse Button" },
-                { setting.GetOptionDescLocaleID(nameof(Setting.InvertZoning)), "Bind a mouse button to invert zoning while the tool is active." },
+                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Invert Zoning Mouse Button" },
+                { m_Setting.GetOptionDescLocaleID(nameof(Setting.InvertZoning)), "Bind a mouse button to invert zoning while the tool is active." },
 
-                { setting.GetBindingKeyLocaleID(AdvancedRoadToolsMod.kInvertZoningActionName), "Invert Zoning" },
+                { m_Setting.GetBindingKeyLocaleID(AdvancedRoadToolsMod.kInvertZoningActionName), "Invert Zoning" },
 
                 // Palette/asset text
                 { $"Assets.NAME[{Tools.ZoningControllerToolSystem.ToolID}]", "Zone Controller" },

@@ -15,31 +15,31 @@ namespace AdvancedRoadTools
 {
     public partial class SyncCreatedRoadsSystem : GameSystemBase
     {
-        private EntityQuery NewCreatedRoadsQuery;
-        private ModificationBarrier4 _modificationBarrier = null!;   // set in OnCreate
-        private ZoningControllerToolUISystem _UISystem = null!;      // set in OnCreate
+        private EntityQuery m_NewCreatedRoadsQuery;
+        private ModificationBarrier4 m_ModificationBarrier = null!;   // set in OnCreate
+        private ZoningControllerToolUISystem m_UISystem = null!;      // set in OnCreate
 
         protected override void OnCreate()
         {
             base.OnCreate();
 
-            NewCreatedRoadsQuery = new EntityQueryBuilder(Allocator.Temp)
+            m_NewCreatedRoadsQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<Road, Temp, SubBlock, Updated>()
                 .WithAll<Created>()
                 .Build(this);
 
-            _modificationBarrier = World.GetOrCreateSystemManaged<ModificationBarrier4>();
-            _UISystem = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
+            m_ModificationBarrier = World.GetOrCreateSystemManaged<ModificationBarrier4>();
+            m_UISystem = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
         }
 
         protected override void OnUpdate()
         {
-            EntityCommandBuffer ECB = _modificationBarrier.CreateCommandBuffer();
-            int2 depths = _UISystem.RoadDepths;
+            EntityCommandBuffer ECB = m_ModificationBarrier.CreateCommandBuffer();
+            int2 depths = m_UISystem.RoadDepths;
 
-            if (!NewCreatedRoadsQuery.IsEmpty && math.any(depths != new int2(6)))
+            if (!m_NewCreatedRoadsQuery.IsEmpty && math.any(depths != new int2(6)))
             {
-                NativeArray<Entity> entities = NewCreatedRoadsQuery.ToEntityArray(Allocator.TempJob);
+                NativeArray<Entity> entities = m_NewCreatedRoadsQuery.ToEntityArray(Allocator.TempJob);
                 JobHandle job = new AddAdvancedRoadToCreatedRoadsJob
                 {
                     Entities = entities.AsReadOnly(),
@@ -51,7 +51,7 @@ namespace AdvancedRoadTools
                 this.Dependency = JobHandle.CombineDependencies(this.Dependency, job);
             }
 
-            _modificationBarrier.AddJobHandleForProducer(this.Dependency);
+            m_ModificationBarrier.AddJobHandleForProducer(this.Dependency);
         }
 
         public struct AddAdvancedRoadToCreatedRoadsJob : IJobParallelFor

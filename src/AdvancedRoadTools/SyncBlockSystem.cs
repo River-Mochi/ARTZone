@@ -15,30 +15,30 @@ namespace AdvancedRoadTools
 
     public partial class SyncBlockSystem : GameSystemBase
     {
-        private EntityQuery UpdatedBlocksQuery;
+        private EntityQuery m_UpdatedBlocksQuery;
 
         // Initialize with null! — assigned in OnCreate, avoids CS8618.
-        private ModificationBarrier4B _modificationBarrier = null!;
+        private ModificationBarrier4B m_ModificationBarrier = null!;
 
         protected override void OnCreate()
         {
             base.OnCreate();
 
-            UpdatedBlocksQuery = new EntityQueryBuilder(Allocator.Temp)
+            m_UpdatedBlocksQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAllRW<Block, ValidArea>()
                 .WithAll<Owner, Updated>()
                 .Build(this);
 
-            _modificationBarrier = World.GetOrCreateSystemManaged<ModificationBarrier4B>();
+            m_ModificationBarrier = World.GetOrCreateSystemManaged<ModificationBarrier4B>();
         }
 
         protected override void OnUpdate()
         {
-            if (UpdatedBlocksQuery.IsEmpty)
+            if (m_UpdatedBlocksQuery.IsEmpty)
                 return;
 
-            EntityCommandBuffer ecb = _modificationBarrier.CreateCommandBuffer();
-            NativeArray<Entity> updatedBlocks = UpdatedBlocksQuery.ToEntityArray(Allocator.TempJob);
+            EntityCommandBuffer ecb = m_ModificationBarrier.CreateCommandBuffer();
+            NativeArray<Entity> updatedBlocks = m_UpdatedBlocksQuery.ToEntityArray(Allocator.TempJob);
 
             JobHandle syncBlockJob = new SyncBlockJob
             {
@@ -50,11 +50,11 @@ namespace AdvancedRoadTools
                 CellLookup = GetBufferLookup<Cell>(true),
                 AdvancedRoadLookup = GetComponentLookup<AdvancedRoad>(true),
                 TempZoningLookup = GetComponentLookup<TempZoning>(true),
-            }.Schedule(UpdatedBlocksQuery.CalculateEntityCount(), 32, this.Dependency);
+            }.Schedule(m_UpdatedBlocksQuery.CalculateEntityCount(), 32, this.Dependency);
 
             updatedBlocks.Dispose(syncBlockJob);
             this.Dependency = JobHandle.CombineDependencies(this.Dependency, syncBlockJob);
-            _modificationBarrier.AddJobHandleForProducer(this.Dependency);
+            m_ModificationBarrier.AddJobHandleForProducer(this.Dependency);
         }
 
         public struct SyncBlockJob : IJobParallelFor

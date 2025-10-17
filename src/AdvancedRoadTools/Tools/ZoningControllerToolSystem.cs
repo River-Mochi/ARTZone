@@ -1,15 +1,38 @@
 ﻿// File: src/AdvancedRoadTools/Tools/ZoningControllerToolSystem.cs
-// Purpose: Original mouse behavior (press/hold/release), Underground placement flags, list insert.
-// Notes: depends on ZoningControllerToolUISystem bindings for depths & mode.
+// Purpose:
+//   This is the runtime tool "system" (a DOTS system derived from ToolBaseSystem).
+//   Decides what happens when you click, what gets highlighted, and when changes become permanent.
+//   Handles:
+//     - input (mouse LMB/RMB via ToolBaseSystem's apply/cancel actions),
+//     - entity preview/highlight,
+//     - applying zone-side changes (via jobs),
+//     - reacting to the "invert" keybind (toggles left/right/both in the UI).
+//
+// Palette tile vs internal tool order:
+//   • The icon in the Road Services TAB is NOT controlled here. That's in ToolsHelper.cs
+//     where we clone a UIObject from "Sound Barrier" (or Wide Sidewalk) and use priority + 1.
+//   • The line m_ToolSystem.tools.Insert(5, this) below only sets the INTERNAL order of tools
+//     inside ToolSystem.tools mainly for tool cycling.
+// Mouse behavior (matches Original):
+//   • Press/hold LMB (applyAction): SELECT highlight; release LMB over a valid hit = APPLY.
+//   • Release LMB away from a valid hit = CANCEL (clears preview).
+//   • RMB (cancelAction) = CANCEL.
+//   • Invert keybind toggles left/right/both in the UI system.
+//
+// Notes about keybinding handle:
+//   • We do NOT assign to ProxyAction.enabled here.
+//     It's already enabled via shouldBeEnabled in AdvancedRoadToolsMod.OnLoad(), so here it's only polled.
+
+#nullable enable
 
 using System;
 using AdvancedRoadTools.Components;
-using Colossal.Serialization.Entities;   // Purpose, OnGameLoadingComplete signature
+using Colossal.Serialization.Entities; // Purpose enum used by game hooks
 using Game;
 using Game.Audio;
 using Game.Common;
 using Game.Input;
-using Game.Net;
+using Game.Net;         // PlacementFlags
 using Game.Prefabs;
 using Game.Tools;
 using Game.Zones;
@@ -22,88 +45,32 @@ namespace AdvancedRoadTools.Tools
 {
     public partial class ZoningControllerToolSystem : ToolBaseSystem
     {
-        private ToolOutputBarrier m_ToolOutputBarrier;
-        private ZoningControllerToolUISystem m_ZoningControllerToolUISystem;
-        private ToolHighlightSystem m_ToolHighlightSystem;
-
-        // Runtime keybind provided by Mod.cs
-        private ProxyAction m_InvertZoningAction;
-
+        // === Identity ===
         public const string ToolID = "Zone Controller Tool";
         public override string toolID => ToolID;
 
+        // === Systems we talk to (created in OnCreate) ===
+        private ToolOutputBarrier m_ToolOutputBarrier = null!;
+        private ZoningControllerToolUISystem m_ZoningControllerToolUISystem = null!;
+        private ToolHighlightSystem m_ToolHighlightSystem = null!;
+
+        // Runtime keybind handle (provided by AdvancedRoadToolsMod). We only POLL this.
+        private ProxyAction? m_InvertZoningAction;
+
+        // === DOTS lookups/queries ===
         private ComponentLookup<AdvancedRoad> m_AdvancedRoadLookup;
         private BufferLookup<SubBlock> m_SubBlockLookup;
 
         private EntityQuery m_TempZoningQuery;
         private EntityQuery m_SoundbankQuery;
-        private PrefabBase m_ToolPrefab;
 
+        // The prefab "selected" for this tool (assigned by ToolsHelper via TrySetPrefab).
+        private PrefabBase m_ToolPrefab = null!;
+
+        // The set of currently selected/highlighted entities while user is interacting.
         private NativeList<Entity> m_SelectedEntities;
 
-        private int2 Depths =>
-            m_ZoningControllerToolUISystem != null ? m_ZoningControllerToolUISystem.ToolDepths : new int2(6);
-
-        protected override void OnCreate()
-        {
-            base.OnCreate();
-
-            m_ToolOutputBarrier = World.GetOrCreateSystemManaged<ToolOutputBarrier>();
-            m_ZoningControllerToolUISystem = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
-            m_ToolHighlightSystem = World.GetOrCreateSystemManaged<ToolHighlightSystem>();
-
-            m_InvertZoningAction = AdvancedRoadToolsMod.m_InvertZoningAction;
-
-            m_TempZoningQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<TempZoning>().Build(this);
-            m_SoundbankQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<ToolUXSoundSettingsData>().Build(this);
-
-            m_AdvancedRoadLookup = GetComponentLookup<AdvancedRoad>(true);
-            m_SubBlockLookup = GetBufferLookup<SubBlock>(true);
-
-            m_SelectedEntities = new NativeList<Entity>(Allocator.Persistent);
-
-            ToolDefinition def = new ToolDefinition(typeof(ZoningControllerToolSystem), toolID, 59,
-                new ToolDefinition.UI(ToolDefinition.UI.PathPrefix + "ToolsIcon.png"))
-            {
-                PlacementFlags = PlacementFlags.UndergroundUpgrade
-            };
-
-            ToolsHelper.RegisterTool(def);
-        }
-
-        // Keep the “Original” ordering hint (index 5). Safe to change to 1 if you prefer.
-        protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
-        {
-            base.OnGameLoadingComplete(purpose, mode);
-            if (m_ToolSystem?.tools != null)
-            {
-                m_ToolSystem.tools.Remove(this);
-                m_ToolSystem.tools.Insert(5, this);
-            }
-        }
-
-        protected override void OnStartRunning()
-        {
-            base.OnStartRunning();
-            applyAction.enabled = true;
-            if (m_InvertZoningAction != null)
-                m_InvertZoningAction.enabled = true;
-            requireZones = true;
-            requireNet = Layer.Road;
-            allowUnderground = true;
-        }
-
-        protected override void OnStopRunning()
-        {
-            base.OnStopRunning();
-            applyAction.enabled = false;
-            if (m_InvertZoningAction != null)
-                m_InvertZoningAction.enabled = false;
-            requireZones = false;
-            requireNet = Layer.None;
-            allowUnderground = false;
-        }
-
+        // === Small state machine ===
         private enum Mode
         {
             None, Select, Apply, Cancel, Preview
@@ -111,18 +78,130 @@ namespace AdvancedRoadTools.Tools
         private Mode m_Mode;
         private Entity m_PreviewEntity;
 
+        // Read current "Depths" (left/right zoning depths) from the UI binding/system.
+        private int2 Depths => m_ZoningControllerToolUISystem.ToolDepths;
+
+        protected override void OnCreate()
+        {
+            base.OnCreate();
+
+            // Grab systems we depend on
+            m_ToolOutputBarrier = World.GetOrCreateSystemManaged<ToolOutputBarrier>();
+            m_ZoningControllerToolUISystem = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
+            m_ToolHighlightSystem = World.GetOrCreateSystemManaged<ToolHighlightSystem>();
+
+            // Keybind handle (may be null if keybind couldn't be created; null-check before using)
+            m_InvertZoningAction = AdvancedRoadToolsMod.m_InvertZoningAction;
+
+            // Queries used in update loop
+            m_TempZoningQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<TempZoning>()
+                .Build(this);
+
+            m_SoundbankQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<ToolUXSoundSettingsData>()
+                .Build(this);
+
+            // Lookup caches
+            m_AdvancedRoadLookup = GetComponentLookup<AdvancedRoad>(true);
+            m_SubBlockLookup = GetBufferLookup<SubBlock>(true);
+
+            // Working selection list
+            m_SelectedEntities = new NativeList<Entity>(Allocator.Persistent);
+
+            // Register this tool so ToolsHelper will create the palette tile inside existing game "Road Services" tab.
+            // (ToolsHelper copies UI group from "Sound Barrier" or "Wide Sidewalk" and sets priority+1).
+            ToolDefinition def = new ToolDefinition(
+                typeof(ZoningControllerToolSystem),
+                toolID,
+                59, // palette priority if template priority is unavailable (ToolsHelper still prefers templatePriority+1)
+                new ToolDefinition.UI(ToolDefinition.UI.PathPrefix + "ToolsIcon.png"))
+            {
+                // behave like underground upgrade too (merged with template flags in ToolsHelper.Setup)
+                PlacementFlags = PlacementFlags.UndergroundUpgrade
+            };
+
+            ToolsHelper.RegisterTool(def);
+        }
+
+        protected override void OnDestroy()
+        {
+            if (m_SelectedEntities.IsCreated)
+                m_SelectedEntities.Dispose();
+            base.OnDestroy();
+        }
+
+        // === ToolSystem internal order tweak ===
+        // Keeping 5 for parity with Original. This influences internal tool list order (e.g., tool cycling),
+        protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
+        {
+            base.OnGameLoadingComplete(purpose, mode);
+
+            if (m_ToolSystem != null && m_ToolSystem.tools != null)
+            {
+                m_ToolSystem.tools.Remove(this);
+                m_ToolSystem.tools.Insert(5, this); // Original value; "nice spot" in internal order.
+            }
+        }
+
+        // === Life-cycle: when our tool starts running ===
+        protected override void OnStartRunning()
+        {
+            base.OnStartRunning();
+
+            // ToolBaseSystem provides "applyAction" (LMB) and "cancelAction" (RMB)
+            applyAction.enabled = true;
+
+            // DO NOT write m_InvertZoningAction.enabled (that causes CS0200); we just poll it in OnUpdate.
+
+            // Tool raycasts/zoning filters
+            requireZones = true;
+            requireNet = Layer.Road;
+            allowUnderground = true;
+        }
+
+        // === Life-cycle: when our tool stops running ===
+        protected override void OnStopRunning()
+        {
+            base.OnStartRunning();
+
+            applyAction.enabled = false;
+
+            requireZones = false;
+            requireNet = Layer.None;
+            allowUnderground = false;
+        }
+
+        // === Per-frame update (Original) ===
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            inputDeps = Dependency;
+            // Update lookups
             m_AdvancedRoadLookup.Update(this);
             m_SubBlockLookup.Update(this);
 
-            EntityCommandBuffer ecb = m_ToolOutputBarrier.CreateCommandBuffer();
-            bool hasHit = GetRaycastResult(out Entity e, out RaycastHit hit);
-            ToolUXSoundSettingsData soundbank = m_SoundbankQuery.CalculateEntityCount() > 0
-                ? m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>()
-                : default;
+            inputDeps = Dependency;
 
+            // Raycast to find a net entity under cursor (safe guarded)
+            bool hasHit;
+            Entity hitEntity;
+            RaycastHit hit;
+            try
+            {
+                hasHit = GetRaycastResult(out hitEntity, out hit);
+            }
+            catch
+            {
+                hasHit = false;
+                hitEntity = Entity.Null;
+            }
+
+            // Soundbank (UI click sounds)
+            bool haveSoundbank = m_SoundbankQuery.CalculateEntityCount() > 0;
+            ToolUXSoundSettingsData soundbank = default;
+            if (haveSoundbank)
+                soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
+
+            // --- Mouse state machine (Original logic) ---
             if (cancelAction.WasPressedThisFrame())
                 m_Mode = Mode.Cancel;
             else if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
@@ -134,82 +213,89 @@ namespace AdvancedRoadTools.Tools
             else
                 m_Mode = Mode.Preview;
 
+            EntityCommandBuffer ecb = m_ToolOutputBarrier.CreateCommandBuffer();
+
             switch (m_Mode)
             {
                 case Mode.Preview:
-                    if (m_PreviewEntity != e)
+                    if (m_PreviewEntity != hitEntity)
                     {
                         if (m_PreviewEntity != Entity.Null)
-                        {
                             m_ToolHighlightSystem.HighlightEntity(m_PreviewEntity, false);
-                            m_SelectedEntities.Clear();
-                            m_PreviewEntity = Entity.Null;
-                        }
+
+                        m_SelectedEntities.Clear();
+                        m_PreviewEntity = Entity.Null;
 
                         if (hasHit)
                         {
-                            m_ToolHighlightSystem.HighlightEntity(e, true);
-                            m_SelectedEntities.Add(e);
-                            m_PreviewEntity = e;
+                            m_ToolHighlightSystem.HighlightEntity(hitEntity, true);
+                            m_SelectedEntities.Add(hitEntity);
+                            m_PreviewEntity = hitEntity;
                         }
                     }
                     break;
 
                 case Mode.Select when hasHit:
-                    if (!m_SelectedEntities.Contains(e))
+                    if (!m_SelectedEntities.Contains(hitEntity))
                     {
-                        m_SelectedEntities.Add(e);
-                        m_ToolHighlightSystem.HighlightEntity(e, true);
-                        if (soundbank.m_SelectEntitySound != null)
+                        m_SelectedEntities.Add(hitEntity);
+                        m_ToolHighlightSystem.HighlightEntity(hitEntity, true);
+                        if (haveSoundbank)
                             AudioManager.instance.PlayUISound(soundbank.m_SelectEntitySound);
                     }
                     break;
 
                 case Mode.Apply:
-                    JobHandle setJob = new SetAdvancedRoadJob
                     {
-                        TempZoningLookup = GetComponentLookup<TempZoning>(true),
-                        Entities = m_SelectedEntities.AsArray().AsReadOnly(),
-                        ECB = ecb
-                    }.Schedule(inputDeps);
+                        // Commit previewed temp zoning to AdvancedRoad component
+                        JobHandle setJob = new SetAdvancedRoadJob
+                        {
+                            TempZoningLookup = GetComponentLookup<TempZoning>(true),
+                            Entities = m_SelectedEntities.AsArray().AsReadOnly(),
+                            ECB = ecb
+                        }.Schedule(inputDeps);
 
-                    inputDeps = JobHandle.CombineDependencies(inputDeps, setJob);
+                        inputDeps = JobHandle.CombineDependencies(inputDeps, setJob);
 
-                    foreach (Entity se in m_SelectedEntities)
-                        m_ToolHighlightSystem.HighlightEntity(se, false);
-                    m_SelectedEntities.Clear();
+                        for (int i = 0; i < m_SelectedEntities.Length; i++)
+                            m_ToolHighlightSystem.HighlightEntity(m_SelectedEntities[i], false);
+                        m_SelectedEntities.Clear();
 
-                    if (soundbank.m_NetBuildSound != null)
-                        AudioManager.instance.PlayUISound(soundbank.m_NetBuildSound);
-                    break;
+                        if (haveSoundbank)
+                            AudioManager.instance.PlayUISound(soundbank.m_NetBuildSound);
+                        break;
+                    }
 
                 case Mode.Cancel:
-                    foreach (Entity se in m_SelectedEntities)
-                        m_ToolHighlightSystem.HighlightEntity(se, false);
-
-                    if (soundbank.m_NetCancelSound != null)
-                        AudioManager.instance.PlayUISound(soundbank.m_NetCancelSound);
-
+                    for (int i = 0; i < m_SelectedEntities.Length; i++)
+                        m_ToolHighlightSystem.HighlightEntity(m_SelectedEntities[i], false);
                     m_SelectedEntities.Clear();
+                    if (haveSoundbank)
+                        AudioManager.instance.PlayUISound(soundbank.m_NetCancelSound);
                     break;
             }
 
-            if (m_InvertZoningAction != null && m_InvertZoningAction.WasPressedThisFrame())
+            // Invert keybind: poll only, call UI system toggle if pressed
+            ProxyAction? invert = m_InvertZoningAction;
+            if (invert != null && invert.WasPressedThisFrame())
             {
                 m_ZoningControllerToolUISystem.InvertZoningMode();
             }
 
+            // --- Sync temp zoning to preview, then cleanup for non-selected ---
+            ComponentLookup<TempZoning> tempLookup = GetComponentLookup<TempZoning>(true);
+
             JobHandle syncTempJob = new SyncTempJob
             {
                 ECB = m_ToolOutputBarrier.CreateCommandBuffer().AsParallelWriter(),
-                TempZoningLookup = GetComponentLookup<TempZoning>(true),
+                TempZoningLookup = tempLookup,
                 SelectedEntities = m_SelectedEntities.AsArray().AsReadOnly(),
                 Depths = Depths
             }.Schedule(m_SelectedEntities.Length, 32, inputDeps);
 
-            NativeArray<Entity> tempZoningEntities = m_TempZoningQuery.ToEntityArray(Allocator.TempJob);
-
             inputDeps = JobHandle.CombineDependencies(inputDeps, syncTempJob);
+
+            NativeArray<Entity> tempZoningEntities = m_TempZoningQuery.ToEntityArray(Allocator.TempJob);
 
             JobHandle cleanupTempJob = new CleanupTempJob
             {
@@ -217,20 +303,15 @@ namespace AdvancedRoadTools.Tools
                 SelectedEntities = m_SelectedEntities.AsArray().AsReadOnly(),
                 Entities = tempZoningEntities.AsReadOnly()
             }.Schedule(tempZoningEntities.Length, 32, inputDeps);
+
             inputDeps = JobHandle.CombineDependencies(inputDeps, cleanupTempJob);
+            tempZoningEntities.Dispose(inputDeps);
 
             m_ToolOutputBarrier.AddJobHandleForProducer(inputDeps);
             return inputDeps;
         }
 
-        private bool ShouldHighlight(Entity entity)
-        {
-            if (m_AdvancedRoadLookup.TryGetComponent(entity, out AdvancedRoad data))
-                return math.any(Depths != data.Depths);
-            else
-                return math.any(Depths != new int2(6));
-        }
-
+        // Accept only entities that actually have zone sub-blocks, and where depths differ from target
         private new bool GetRaycastResult(out Entity entity, out RaycastHit hit)
         {
             if (!base.GetRaycastResult(out entity, out hit))
@@ -245,10 +326,14 @@ namespace AdvancedRoadTools.Tools
                 return false;
             }
 
-            switch (hasAdvancedRoad)
+            if (hasAdvancedRoad)
             {
-                case true when math.any(Depths != data.Depths):
-                case false when math.any(Depths != new int2(6)):
+                if (math.any(Depths != data.Depths))
+                    return true;
+            }
+            else
+            {
+                if (math.any(Depths != new int2(6)))
                     return true;
             }
 
@@ -256,12 +341,14 @@ namespace AdvancedRoadTools.Tools
             return false;
         }
 
+        // Prefab hook from ToolsHelper
         public override PrefabBase GetPrefab() => m_ToolPrefab;
 
         public override bool TrySetPrefab(PrefabBase prefab)
         {
             if (prefab == null || prefab.name != toolID)
                 return false;
+
             m_ToolPrefab = prefab;
             return true;
         }
@@ -273,15 +360,19 @@ namespace AdvancedRoadTools.Tools
             m_ToolRaycastSystem.netLayerMask = Layer.Road;
         }
 
+        // Called from UI button ("ToggleZoneControllerTool") to switch the active tool
         public void SetToolEnabled(bool isEnabled)
         {
+            if (m_ToolSystem == null)
+                return;
+
             if (isEnabled && m_ToolSystem.activeTool != this)
                 m_ToolSystem.ActivatePrefabTool(GetPrefab());
             else if (!isEnabled && m_ToolSystem.activeTool == this)
                 m_ToolSystem.ActivatePrefabTool(null);
         }
 
-        // ===== Jobs (unchanged logic from Original) =====
+        // ===== Jobs (same as Original) =====
 
         public struct SyncTempJob : IJobParallelFor
         {
@@ -292,14 +383,14 @@ namespace AdvancedRoadTools.Tools
 
             public void Execute(int index)
             {
-                Entity entity = SelectedEntities[index];
+                Entity e = SelectedEntities[index];
 
-                if (TempZoningLookup.TryGetComponent(entity, out TempZoning data) && math.any(data.Depths != Depths))
-                    ECB.SetComponent(index, entity, new TempZoning { Depths = Depths });
+                if (TempZoningLookup.TryGetComponent(e, out TempZoning data) && math.any(data.Depths != Depths))
+                    ECB.SetComponent(index, e, new TempZoning { Depths = Depths });
                 else
-                    ECB.AddComponent(index, entity, new TempZoning { Depths = Depths });
+                    ECB.AddComponent(index, e, new TempZoning { Depths = Depths });
 
-                ECB.AddComponent<Updated>(index, entity);
+                ECB.AddComponent<Updated>(index, e);
             }
         }
 
@@ -311,12 +402,12 @@ namespace AdvancedRoadTools.Tools
 
             public void Execute(int index)
             {
-                Entity entity = Entities[index];
-                if (SelectedEntities.Contains(entity))
+                Entity e = Entities[index];
+                if (SelectedEntities.Contains(e))
                     return;
 
-                ECB.RemoveComponent<TempZoning>(index, entity);
-                ECB.AddComponent<Updated>(index, entity);
+                ECB.RemoveComponent<TempZoning>(index, e);
+                ECB.AddComponent<Updated>(index, e);
             }
         }
 
@@ -328,13 +419,13 @@ namespace AdvancedRoadTools.Tools
 
             public void Execute()
             {
-                foreach (Entity entity in Entities)
+                foreach (Entity e in Entities)
                 {
-                    if (!TempZoningLookup.TryGetComponent(entity, out TempZoning tempZoning))
-                        return;
+                    if (!TempZoningLookup.TryGetComponent(e, out TempZoning temp))
+                        continue;
 
-                    ECB.RemoveComponent<TempZoning>(entity);
-                    ECB.AddComponent(entity, new AdvancedRoad { Depths = tempZoning.Depths });
+                    ECB.RemoveComponent<TempZoning>(e);
+                    ECB.AddComponent(e, new AdvancedRoad { Depths = temp.Depths });
                 }
             }
         }
