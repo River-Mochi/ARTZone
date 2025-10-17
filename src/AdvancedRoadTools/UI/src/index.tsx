@@ -1,7 +1,7 @@
 // File: src/AdvancedRoadTools/UI/src/index.tsx
-// Purpose: Wire our React pieces into the game UI registry.
-// - Floating button goes to GameTopRight (per your request).
-// - Mouse tool options are extended with the Zoning Side section.
+// Purpose: Wire the React pieces into the game UI registry.
+//  • Appends our floating button at GameTopRight.
+//  • Extends the MouseToolOptions panel to render our "Zoning Side" buttons.
 
 import { ModRegistrar } from "cs2/modding";
 import { VanillaComponentResolver } from "./YenYang/VanillaComponentResolver";
@@ -11,10 +11,10 @@ import ZoningToolControllerButton from "./mods/advanced-road-tools-button";
 const register: ModRegistrar = (moduleRegistry) => {
     VanillaComponentResolver.setRegistry(moduleRegistry);
 
-    // Was GameTopLeft in the original; you asked for top-right instead.
+    // Your request: put the button on the top right instead of top left.
     moduleRegistry.append("GameTopRight", ZoningToolControllerButton);
 
-    // Extend vanilla mouse tool options with our "Zoning Side" section.
+    // Adds the "Zoning Side" section with three buttons (All/Left/Right).
     moduleRegistry.extend(
         "game-ui/game/components/tool-options/mouse-tool-options/mouse-tool-options.tsx",
         "MouseToolOptions",

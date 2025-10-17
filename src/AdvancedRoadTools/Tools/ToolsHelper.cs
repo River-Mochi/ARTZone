@@ -222,54 +222,65 @@ namespace AdvancedRoadTools.Tools
             }
         }
 
-        // --- Template resolution: Road Services entries (wrench tab) ---
+        // --- Template resolution: probe *only* Road Services tiles verified with dnSpy ---
         private static bool TryResolveTemplatePrefab(out PrefabBase prefab, out UIObject ui)
         {
             prefab = null!;
             ui = null!;
 
-            // Prefer an item that lives in Road Services in every locale; these English
-            // names still resolve under the neutral PrefabID even if the UI text is localized.
+            // *Road Services* palette tiles we want to anchor to.
+            // these match dnSpy’s NetPieceRequirements,
+            // but the PrefabSystem.TryGetPrefab must probe by **string name**.
+            // Order = preference for where our tile should appear “after”.
             string[] nameCandidates =
             {
-                "Sound Barrier", // preferred anchor
-                "Wide Sidewalk", // original ART fallback
-                // extra backups in the same tab (if the two above are not present)
-                "Retaining Wall",
-                "Quay",
-                "Tunnel",
-            };
+        "Sound Barrier",   // prefer appearing right after this
+        "Wide Sidewalk",   // exact
+        "Wide Sidewalks",  // plural variant found on some installs
+        "Traffic Lights",  // in the same Road Services group
+        "Crosswalk"
+    };
 
+            // Try common prefab type keys. The game registers nets under several type ids.
             string[] typeCandidates =
             {
-                nameof(RoadPrefab),
-                nameof(NetPrefab),
-                "ContentPrefab",
-                nameof(PrefabBase)
-            };
+        nameof(RoadPrefab),
+        nameof(NetPrefab),
+        "ContentPrefab",
+        nameof(PrefabBase)
+    };
 
             foreach (string name in nameCandidates)
             {
                 foreach (string typeName in typeCandidates)
                 {
+                    AdvancedRoadToolsMod.s_Log.Info($"[ART] Probe prefab: \"{name}\" ({typeName})");
                     if (s_PrefabSystem.TryGetPrefab(new PrefabID(typeName, name), out PrefabBase? p) && p != null)
                     {
                         UIObject uio = p.GetComponent<UIObject>();
                         if (uio != null)
                         {
-                            AdvancedRoadToolsMod.s_Log.Info($"Template resolved: {name} ({typeName})");
+                            AdvancedRoadToolsMod.s_Log.Info(
+                                $"[ART] Template resolved: {name} ({typeName}), group={uio.m_Group?.name ?? "(null)"} priority={uio.m_Priority}"
+                            );
                             prefab = p!;
                             ui = uio!;
                             return true;
+                        }
+                        else
+                        {
+                            AdvancedRoadToolsMod.s_Log.Warn($"[ART] Prefab \"{name}\" found but has no UIObject; trying next.");
                         }
                     }
                 }
             }
 
             AdvancedRoadToolsMod.s_Log.Error(
-                "No suitable Road Services template found (Sound Barrier / Wide Sidewalk). " +
-                "Tool button cannot be created in the Road Services palette.");
+                "[ART] No Road Services template resolved (Sound Barrier / Wide Sidewalk / Traffic Lights / Crosswalk). " +
+                "Tool button cannot be created in the Road Services palette."
+            );
             return false;
         }
+
     }
 }
