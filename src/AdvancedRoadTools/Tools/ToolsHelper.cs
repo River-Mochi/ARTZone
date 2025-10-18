@@ -1,14 +1,13 @@
 ﻿// File: src/AdvancedRoadTools/Tools/ToolsHelper.cs
-// Purpose: Public-API-only tool instantiation helper (no Harmony, no reflection).
-// - Resolves Road Services template (Sound Barrier; fallback Wide Sidewalk) to copy UI group.
-// - Places our tile right AFTER the template by priority+1 so it appears in the same tab.
-// - Behaves like a net upgrade (PlacementFlags merged on setup).
+// Minimal + Original behavior (no Harmony/Traverse):
+// - Extra probe logging when ART_DIAGNOSTICS is defined.
 
+#nullable enable
 using System;
 using System.Collections.Generic;
-using Colossal.Serialization.Entities;  // Purpose
-using Game;                            // GameMode
-using Game.Net;                        // PlacementFlags
+using Colossal.Serialization.Entities;
+using Game;
+using Game.Net;
 using Game.Prefabs;
 using Game.SceneFlow;
 using Game.Tools;
@@ -20,21 +19,8 @@ namespace AdvancedRoadTools.Tools
 {
     public static class ToolsHelper
     {
-        public static List<ToolDefinition> ToolDefinitions { get; private set; } = new List<ToolDefinition>();
-
-        private static readonly Dictionary<ToolDefinition, (PrefabBase prefab, UIObject ui)> s_ToolsLookup =
-            new Dictionary<ToolDefinition, (PrefabBase, UIObject)>();
-
-        private static bool s_Initialized;
-        private static bool s_Instantiated;
-        private static bool s_SetupSubscribed;
-
-        private static World s_World = null!;
-        private static PrefabSystem s_PrefabSystem = null!;
-
-        private static PrefabBase s_TemplatePrefab = null!;
-        private static UIObject s_TemplateUI = null!;
-
+        // ---- Public surface (same as Original) --------------------------------
+        public static List<ToolDefinition> ToolDefinitions { get; private set; } = new(8);
         public static bool HasTool(ToolDefinition tool) => ToolDefinitions.Contains(tool);
         public static bool HasTool(string toolId) => ToolDefinitions.Exists(t => t.ToolID == toolId);
 
@@ -50,105 +36,106 @@ namespace AdvancedRoadTools.Tools
             ToolDefinitions.Add(toolDefinition);
         }
 
+        // ---- Internals ---------------------------------------------------------
+        private static readonly Dictionary<ToolDefinition, (PrefabBase Prefab, UIObject UI)> s_ToolsLookup = new(8);
+
+        public static bool Initialized
+        {
+            get; private set;
+        }
+        private static bool s_Instantiated;
+
+        private static World? s_World;
+        private static PrefabSystem? s_PrefabSystem;
+
+        private static PrefabBase? s_AnchorPrefab;  // e.g., "Wide Sidewalk" or "Sound Barrier" etc.
+        private static UIObject? s_AnchorUI;
+
+        // Idempotent: does NOT clear ToolDefinitions unless you *really* want to force-reset.
         public static void Initialize(bool force = false)
         {
-            if (s_Initialized && !force)
+            if (!Initialized || force)
             {
-                AdvancedRoadToolsMod.s_Log.Info("ToolsHelper.Initialize skipped (already initialized).");
-                return;
-            }
+                if (force)
+                {
+                    ToolDefinitions = new(8);
+                    s_ToolsLookup.Clear();
+                }
 
-            ToolDefinitions = new List<ToolDefinition>(8);
-            s_ToolsLookup.Clear();
-            s_Initialized = true;
-            s_Instantiated = false;
-            s_SetupSubscribed = false;
-
-            s_World = World.DefaultGameObjectInjectionWorld;
-            if (s_World == null)
-            {
-                AdvancedRoadToolsMod.s_Log.Error("DefaultGameObjectInjectionWorld is null; will retry when InstantiateTools() runs.");
-                return;
-            }
-
-            s_PrefabSystem = s_World.GetExistingSystemManaged<PrefabSystem>();
-            if (s_PrefabSystem == null)
-            {
-                AdvancedRoadToolsMod.s_Log.Error("PrefabSystem not available yet; will retry when InstantiateTools() runs.");
-                return;
+                s_World = World.DefaultGameObjectInjectionWorld;
+                s_PrefabSystem = s_World?.GetExistingSystemManaged<PrefabSystem>();
+                Initialized = true;
             }
         }
 
         public static void InstantiateTools()
         {
+            if (!Initialized)
+                Initialize();
+
             if (s_Instantiated)
             {
                 AdvancedRoadToolsMod.s_Log.Info("InstantiateTools skipped (already instantiated).");
                 return;
             }
 
-            if (s_World == null)
-                s_World = World.DefaultGameObjectInjectionWorld;
-
-            if (s_World == null)
+            s_World ??= World.DefaultGameObjectInjectionWorld;
+            if (s_World is null)
             {
-                AdvancedRoadToolsMod.s_Log.Error("InstantiateTools: DefaultGameObjectInjectionWorld is still null.");
+                AdvancedRoadToolsMod.s_Log.Error("InstantiateTools: DefaultGameObjectInjectionWorld is null.");
                 return;
             }
 
             s_PrefabSystem ??= s_World.GetExistingSystemManaged<PrefabSystem>();
-            if (s_PrefabSystem == null)
+            if (s_PrefabSystem is null)
             {
-                AdvancedRoadToolsMod.s_Log.Error("InstantiateTools: PrefabSystem is still not available.");
+                AdvancedRoadToolsMod.s_Log.Error("InstantiateTools: PrefabSystem not available.");
                 return;
             }
 
             AdvancedRoadToolsMod.s_Log.Info($"Creating tools UI. {ToolDefinitions.Count} registered tools");
-
-            // Road Services template: Sound Barrier (preferred) -> Wide Sidewalk (fallback)
-            if (!TryResolveTemplatePrefab(out s_TemplatePrefab, out s_TemplateUI))
+            if (ToolDefinitions.Count == 0)
             {
-                AdvancedRoadToolsMod.s_Log.Error("Could not resolve template prefab/UI. Tools will not be created.");
+                AdvancedRoadToolsMod.s_Log.Error("[ART] No tools are registered. Ensure ToolsHelper.RegisterTool(...) ran before InstantiateTools().");
                 return;
             }
 
-            foreach (ToolDefinition definition in ToolDefinitions)
+            if (!TryResolveAnchor(out s_AnchorPrefab!, out s_AnchorUI!))
+            {
+                AdvancedRoadToolsMod.s_Log.Error("Could not find Road Services anchor (Wide Sidewalk / Sound Barrier / Traffic Lights / Crosswalk). Tools will not be created.");
+                return;
+            }
+
+            foreach (var definition in ToolDefinitions)
             {
                 try
                 {
-                    PrefabBase toolPrefab = Object.Instantiate(s_TemplatePrefab);
+                    // Clone the anchor prefab.
+                    var toolPrefab = Object.Instantiate(s_AnchorPrefab!);
                     toolPrefab.name = definition.ToolID;
 
-                    // Strip template-only bits; we only keep what we explicitly re-add.
+                    // Strip anchor-only components.
                     toolPrefab.Remove<UIObject>();
                     toolPrefab.Remove<Unlockable>();
                     toolPrefab.Remove<NetSubObjects>();
 
-                    // UI tile: inherit the template GROUP and place our icon right AFTER it in the palette.
-                    UIObject ui = ScriptableObject.CreateInstance<UIObject>();
-                    ui.m_Icon = string.IsNullOrEmpty(definition.ui.ImagePath)
-                        ? ToolDefinition.UI.PathPrefix + "ToolsIcon.png"
-                        : definition.ui.ImagePath;
-                    ui.name = definition.ToolID;
-                    ui.m_IsDebugObject = s_TemplateUI.m_IsDebugObject;
-                    ui.m_Group = s_TemplateUI.m_Group;
-                    ui.active = s_TemplateUI.active;
-                    ui.m_Priority = s_TemplateUI.m_Priority + 1; // after Sound Barrier/Wide Sidewalk
-                    toolPrefab.AddComponentFrom(ui);
+                    // Create our UI tile in the same group as the anchor.
+                    var uiObject = ScriptableObject.CreateInstance<UIObject>();
+                    uiObject.m_Icon = definition.ui.ImagePath; // e.g. coui://AdvancedRoadTools/images/ZoneControllerTool.svg
+                    uiObject.name = definition.ToolID;
+                    uiObject.m_IsDebugObject = s_AnchorUI!.m_IsDebugObject;
+                    uiObject.m_Priority = definition.Priority; // Original behavior uses the definition's priority
+                    uiObject.m_Group = s_AnchorUI!.m_Group;
+                    uiObject.active = s_AnchorUI!.active;
+                    toolPrefab.AddComponentFrom(uiObject);
 
-                    // Behave like a net upgrade so placement UX matches expectations.
-                    NetUpgrade upgrade = ScriptableObject.CreateInstance<NetUpgrade>();
-                    toolPrefab.AddComponentFrom(upgrade);
+                    // Behave like a net upgrade (same as Original).
+                    var netUpgrade = ScriptableObject.CreateInstance<NetUpgrade>();
+                    toolPrefab.AddComponentFrom(netUpgrade);
 
-                    ToolBaseSystem? system = s_World.GetOrCreateSystemManaged(definition.Type) as ToolBaseSystem;
-                    if (system == null)
-                    {
-                        AdvancedRoadToolsMod.s_Log.Error($"Failed to get or create tool system: {definition.Type}");
-                        Object.DestroyImmediate(toolPrefab);
-                        continue;
-                    }
-
-                    if (!system.TrySetPrefab(toolPrefab))
+                    // Wire the prefab to the tool system.
+                    if (s_World.GetOrCreateSystemManaged(definition.Type) is not ToolBaseSystem toolSystem
+                        || !toolSystem.TrySetPrefab(toolPrefab))
                     {
                         AdvancedRoadToolsMod.s_Log.Error($"Failed to set up tool prefab for type \"{definition.Type}\"");
                         Object.DestroyImmediate(toolPrefab);
@@ -162,7 +149,7 @@ namespace AdvancedRoadTools.Tools
                         continue;
                     }
 
-                    s_ToolsLookup[definition] = (toolPrefab, ui);
+                    s_ToolsLookup[definition] = (toolPrefab, uiObject);
                     AdvancedRoadToolsMod.s_Log.Info($"\tTool \"{definition.ToolID}\" was successfully created");
                 }
                 catch (Exception e)
@@ -171,45 +158,34 @@ namespace AdvancedRoadTools.Tools
                 }
             }
 
-            if (!s_SetupSubscribed && GameManager.instance != null)
-            {
+            if (GameManager.instance != null)
                 GameManager.instance.onGameLoadingComplete += SetupToolsOnGameLoaded;
-                s_SetupSubscribed = true;
-            }
 
             s_Instantiated = true;
         }
 
         private static void SetupToolsOnGameLoaded(Purpose purpose, GameMode mode)
         {
-            if (s_PrefabSystem == null)
+            if (s_PrefabSystem is null || s_AnchorPrefab is null)
             {
-                s_PrefabSystem = s_World.GetExistingSystemManaged<PrefabSystem>();
-                if (s_PrefabSystem == null)
-                {
-                    AdvancedRoadToolsMod.s_Log.Error("SetupToolsOnGameLoaded: PrefabSystem unavailable.");
-                    return;
-                }
+                AdvancedRoadToolsMod.s_Log.Error("SetupToolsOnGameLoaded: missing PrefabSystem or anchor prefab.");
+                return;
             }
 
             AdvancedRoadToolsMod.s_Log.Info($"Setting up tools. {s_ToolsLookup.Count} registered tools");
 
-            foreach (KeyValuePair<ToolDefinition, (PrefabBase prefab, UIObject ui)> kvp in s_ToolsLookup)
+            foreach (var (def, pair) in s_ToolsLookup)
             {
-                ToolDefinition def = kvp.Key;
-                PrefabBase prefab = kvp.Value.prefab;
+                var prefab = pair.Prefab;
 
                 try
                 {
-                    // Start from the template’s placeable data, then merge our flags.
-                    PlaceableNetData placeable = s_PrefabSystem.GetComponentData<PlaceableNetData>(s_TemplatePrefab);
-
+                    // Copy anchor flags (Original approach), then apply tool-specific flags.
+                    var placeable = s_PrefabSystem.GetComponentData<PlaceableNetData>(s_AnchorPrefab);
                     placeable.m_SetUpgradeFlags = def.SetFlags;
                     placeable.m_UnsetUpgradeFlags = def.UnsetFlags;
+                    placeable.m_PlacementFlags = def.PlacementFlags;
 
-                    // Merge placement flags + ensure upgrade behavior.
-                    placeable.m_PlacementFlags |= def.PlacementFlags;
-                    placeable.m_PlacementFlags |= PlacementFlags.IsUpgrade;
                     if (def.Underground)
                         placeable.m_PlacementFlags |= PlacementFlags.UndergroundUpgrade;
 
@@ -222,65 +198,70 @@ namespace AdvancedRoadTools.Tools
             }
         }
 
-        // --- Template resolution: probe *only* Road Services tiles verified with dnSpy ---
-        private static bool TryResolveTemplatePrefab(out PrefabBase prefab, out UIObject ui)
+        // ---- Anchor resolution (no reflection, public names only) --------------
+        private static bool TryResolveAnchor(out PrefabBase prefab, out UIObject ui)
         {
             prefab = null!;
             ui = null!;
 
-            // *Road Services* palette tiles we want to anchor to.
-            // these match dnSpy’s NetPieceRequirements,
-            // but the PrefabSystem.TryGetPrefab must probe by **string name**.
-            // Order = preference for where our tile should appear “after”.
-            string[] nameCandidates =
-            {
-        "Sound Barrier",   // prefer appearing right after this
-        "Wide Sidewalk",   // exact
-        "Wide Sidewalks",  // plural variant found on some installs
-        "Traffic Lights",  // in the same Road Services group
-        "Crosswalk"
-    };
+            if (s_PrefabSystem is null)
+                return false;
 
-            // Try common prefab type keys. The game registers nets under several type ids.
-            string[] typeCandidates =
+            // Candidates: prefer these in order. We probe both spaced and compact spellings.
+            // (Based on your dnSpy list and in-game labels.)
+            var baseNames = new[]
             {
-        nameof(RoadPrefab),
-        nameof(NetPrefab),
-        "ContentPrefab",
-        nameof(PrefabBase)
-    };
+                "Wide Sidewalk",
+                "Sound Barrier",
+                "Traffic Lights",
+                "Crosswalk",
+            };
 
-            foreach (string name in nameCandidates)
+            var nameCandidates = new List<string>(baseNames.Length * 2);
+            foreach (var n in baseNames)
             {
-                foreach (string typeName in typeCandidates)
+                nameCandidates.Add(n);                 // spaced (as shown in UI)
+                nameCandidates.Add(n.Replace(" ", "")); // compact
+            }
+
+            var typeCandidates = new[]
+            {
+                "RoadPrefab",
+                "NetPrefab",
+                "ContentPrefab",
+                nameof(PrefabBase),
+            };
+
+            foreach (var key in nameCandidates)
+            {
+                foreach (var typeName in typeCandidates)
                 {
-                    AdvancedRoadToolsMod.s_Log.Info($"[ART] Probe prefab: \"{name}\" ({typeName})");
-                    if (s_PrefabSystem.TryGetPrefab(new PrefabID(typeName, name), out PrefabBase? p) && p != null)
+#if ART_DIAGNOSTICS
+                    AdvancedRoadToolsMod.s_Log.Info($"[ART] Probe anchor: \"{key}\" ({typeName})");
+#endif
+                    var id = new PrefabID(typeName, key);
+                    if (s_PrefabSystem.TryGetPrefab(id, out PrefabBase? p) && p is not null)
                     {
-                        UIObject uio = p.GetComponent<UIObject>();
-                        if (uio != null)
+                        if (p.GetComponent<UIObject>() is UIObject u)
                         {
-                            AdvancedRoadToolsMod.s_Log.Info(
-                                $"[ART] Template resolved: {name} ({typeName}), group={uio.m_Group?.name ?? "(null)"} priority={uio.m_Priority}"
-                            );
-                            prefab = p!;
-                            ui = uio!;
+#if ART_DIAGNOSTICS
+                            AdvancedRoadToolsMod.s_Log.Info($"[ART] Anchor resolved: {key} ({typeName}), group={u.m_Group?.name ?? "(null)"} prio={u.m_Priority}");
+#endif
+                            prefab = p;
+                            ui = u;
                             return true;
                         }
+#if ART_DIAGNOSTICS
                         else
                         {
-                            AdvancedRoadToolsMod.s_Log.Warn($"[ART] Prefab \"{name}\" found but has no UIObject; trying next.");
+                            AdvancedRoadToolsMod.s_Log.Warn($"[ART] Prefab \"{key}\" found but has no UIObject; trying next.");
                         }
+#endif
                     }
                 }
             }
 
-            AdvancedRoadToolsMod.s_Log.Error(
-                "[ART] No Road Services template resolved (Sound Barrier / Wide Sidewalk / Traffic Lights / Crosswalk). " +
-                "Tool button cannot be created in the Road Services palette."
-            );
             return false;
         }
-
     }
 }

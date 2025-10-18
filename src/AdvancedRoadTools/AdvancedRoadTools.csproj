@@ -17,9 +17,10 @@
     <FailUIBuild>false</FailUIBuild>
   </PropertyGroup>
 
+
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+      <DefineConstants>TRACE;DEBUG;ART_DIAGNOSTICS</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

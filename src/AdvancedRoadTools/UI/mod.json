@@ -1,5 +1,6 @@
 {
   "id": "AdvancedRoadTools",
+  "author": "RiverMochi",
   "version": "1.0.0",
-  "dependencies": ["i18n_everywhere"]
+  "dependencies": []
 }
