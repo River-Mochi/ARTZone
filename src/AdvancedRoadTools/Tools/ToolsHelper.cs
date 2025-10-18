@@ -51,7 +51,7 @@ namespace AdvancedRoadTools.Tools
         private static PrefabBase? s_AnchorPrefab;  // e.g., "Wide Sidewalk" or "Sound Barrier" etc.
         private static UIObject? s_AnchorUI;
 
-        // Idempotent: does NOT clear ToolDefinitions unless you *really* want to force-reset.
+        // does NOT clear ToolDefinitions unless force-reset wanted.
         public static void Initialize(bool force = false)
         {
             if (!Initialized || force)
@@ -119,7 +119,7 @@ namespace AdvancedRoadTools.Tools
                     toolPrefab.Remove<Unlockable>();
                     toolPrefab.Remove<NetSubObjects>();
 
-                    // Create our UI tile in the same group as the anchor.
+                    // Create UI tile in the same group as the anchor.
                     var uiObject = ScriptableObject.CreateInstance<UIObject>();
                     uiObject.m_Icon = definition.ui.ImagePath; // e.g. coui://AdvancedRoadTools/images/ZoneControllerTool.svg
                     uiObject.name = definition.ToolID;
@@ -207,8 +207,8 @@ namespace AdvancedRoadTools.Tools
             if (s_PrefabSystem is null)
                 return false;
 
-            // Candidates: prefer these in order. We probe both spaced and compact spellings.
-            // (Based on your dnSpy list and in-game labels.)
+            // Candidates: prefer these in order. probe both spaced and compact spellings.
+            // (Based on dnSpy list and in-game labels.)
             var baseNames = new[]
             {
                 "Wide Sidewalk",
