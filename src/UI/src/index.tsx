@@ -6,7 +6,7 @@
 import { ModRegistrar } from "cs2/modding";
 import { VanillaComponentResolver } from "./YenYang/VanillaComponentResolver";
 import { ZoningToolController } from "./mods/ZoningToolSections";
-import ZoningToolControllerButton from "./mods/advanced-road-tools-button";
+import ZoningToolControllerButton from "./mods/ZoneGameTopButton";
 
 const register: ModRegistrar = (moduleRegistry) => {
     VanillaComponentResolver.setRegistry(moduleRegistry);
