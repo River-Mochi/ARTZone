@@ -1,5 +1,3 @@
-.\_files_rel_pruned.txt
-.\_folders_rel_pruned.txt
 .\AdvancedRoadTools.sln
 .\global.json
 .\LICENSE
