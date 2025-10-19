@@ -33,7 +33,7 @@ namespace AdvancedRoadTools
         }
 
         public static readonly ILog s_Log =
-            LogManager.GetLogger("AdvancedRoadTools").SetShowsErrorsInUI(false);
+            LogManager.GetLogger("ART-Zone").SetShowsErrorsInUI(false);
 
         public void OnLoad(UpdateSystem updateSystem)
         {
