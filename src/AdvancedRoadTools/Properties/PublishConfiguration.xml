@@ -9,7 +9,7 @@
 	<!--LongDescription Value="This is a long description" /-->
 	<LongDescription>
 # Advanced Road Tools (ART)
----		
+---
 Advanced Road Tools (ART) is a mod that provides a variety of tools to control roads and their behaviour.
 
 ## Features
@@ -18,8 +18,8 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 ### Planned Features
 - **Parallel Tool** - Create parallel roads and tracks out of any network. This tool will allow you to create parallel roads out of train tracks, highways and tram tracks without the need of tracing them. Simply click them and see the new parallel road appear.
 - **Advanced Grid Tool** - Create a grid by the amount of columns and rows that you want. Simply set 2 control points to define a rectangle, and then, on a pop-up window, set how many rows and columns you want and them confirm it. voila!
-- **Control Zoning Depth** - Set zoning depth from 0 to 12 (or even more). Have EVEN MORE control over how zoning is generated on your roads. create a 2 deep zoning road for those nice warehouses, or 3 deep zoning road for those compact row homes. Or even, in the future, 12 deep zoning for 12x12 gigantic factories or mansions!		
-		
+- **Control Zoning Depth** - Set zoning depth from 0 to 12 (or even more). Have EVEN MORE control over how zoning is generated on your roads. create a 2 deep zoning road for those nice warehouses, or 3 deep zoning road for those compact row homes. Or even, in the future, 12 deep zoning for 12x12 gigantic factories or mansions!
+
 ---
 ## Translations
 - English
@@ -32,9 +32,9 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 - Traditional Chinese (Thank you Kelvin)
 - Portuguese-Portugal (Thank you Ti4go)
 - German (Thank you TH.CB)
-		
+
 ## Thank Yous
-- Kelvin for the artwork!	
+- Kelvin for the artwork!
 	</LongDescription>
 	<!--Thumbnail-->
 	<Thumbnail Value="Properties/Thumbnail.png" />
@@ -55,16 +55,11 @@ Advanced Road Tools (ART) is a mod that provides a variety of tools to control r
 <!--	<ChangeLog Value="Created roads are now affected by the zoning configuration" />-->
 <ChangeLog>
 ### Translations
-- Added Traditional chinese (Thank you Kelvin) 
-- Added Portuguese-Portugal (Thank you Ti4go)
-- Added German (Thank you TH.CB)
 
 ### Fixes
 - Implemented my own localization system to avoid l18n dependency
 </ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
-	<ExternalLink Type="github" Url="https://github.com/LuxStice/AdvancedRoadTools" />
-	<ExternalLink Type="crowdin" Url="https://crowdin.com/project/advancedroadtools" />
-	<ExternalLink Type="discord" Url="https://discord.com/channels/1024242828114673724/1339409937520136222" />
-	<ExternalLink Type="kofi" Url="https://ko-fi.com/luxstice" />
+	<ExternalLink Type="github" Url="https://github.com/River-Mochi/ART-Zone" />
+	<ExternalLink Type="discord" Url="https://discord.gg/HTav7ARPs2" />
 </Publish>
