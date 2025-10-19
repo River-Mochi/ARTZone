@@ -1,4 +1,4 @@
-// ARTZoneMod.cs
+// src/ARTZoneMod.cs
 // Purpose: Mod entrypoint; settings + locales; keybinding hookup (polling)
 
 namespace ARTZone
@@ -81,7 +81,6 @@ namespace ARTZone
             // IMPORTANT: bootstrap AFTER vanilla prefabs/UI are around.
             // This polls for a Road Services anchor, then creates our palette prefab.
             updateSystem.UpdateAt<ToolBootstrapSystem>(SystemUpdatePhase.UIUpdate);
-            updateSystem.UpdateAt<RoadRmbInvertSystem>(SystemUpdatePhase.UIUpdate);
 
 
             // Optional: log active locale flips

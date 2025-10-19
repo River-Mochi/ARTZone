@@ -1,4 +1,4 @@
-﻿// src/ARTZone/UI/src/mods/ZoningToolSections.tsx
+﻿// src/UI/src/mods/ZoningToolSections.tsx
 import { ModuleRegistryExtend } from "cs2/modding";
 import { bindValue, trigger, useValue } from "cs2/api";
 import { tool } from "cs2/bindings";

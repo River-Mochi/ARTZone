@@ -1,4 +1,4 @@
-// File: src/ARTZone/Tools/ToolBootstrapSystem.cs
+// File: src/Tools/ToolBootstrapSystem.cs
 // Purpose: Retry ToolsHelper.InstantiateTools() until our tool prefab exists,
 //          then disable. Uses DOTS World.Time (no UnityEngine).
 

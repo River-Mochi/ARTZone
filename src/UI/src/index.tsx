@@ -1,4 +1,4 @@
-// File: src/ARTZone/UI/src/index.tsx
+// File: src/UI/src/index.tsx
 // Purpose: Wire the React pieces into the game UI registry.
 //  • Appends our floating button at GameTopRight.
 //  • Extends the MouseToolOptions panel to render our "Zoning Side" buttons.

@@ -1,12 +1,12 @@
-// File: src/ARTZone/Tools/RoadRmbInvertSystem.cs
+// File: src/Tools/RoadRmbInvertSystem.cs
 // Purpose: While the vanilla Net Tool is active (placing roads), let RMB invert the road zoning mode.
 
 namespace ARTZone.Tools
 {
     using Game;                 // GameSystemBase
-    using Game.Tools;           // ToolSystem, ToolBaseSystem
-    using Game.Prefabs;         // RoadPrefab
     using Game.Input;           // ProxyAction
+    using Game.Prefabs;         // RoadPrefab
+    using Game.Tools;           // ToolSystem, ToolBaseSystem
     using Unity.Entities;       // World
 
     public sealed partial class RoadRmbInvertSystem : GameSystemBase
@@ -29,12 +29,12 @@ namespace ARTZone.Tools
                 return;
 
             var active = m_MainToolSystem.activeTool as ToolBaseSystem;
-            var prefab = active?.GetPrefab();
+            PrefabBase? prefab = active?.GetPrefab();
 
             // Only when the vanilla road placement is in control (i.e., a RoadPrefab is active)
             if (prefab is RoadPrefab)
             {
-                var current = m_UISystem.RoadZoningMode; // public getter already exists
+                ZoningMode current = m_UISystem.RoadZoningMode; // public getter already exists
                 var inverted = (ZoningMode)((int)current ^ (int)ZoningMode.Both); // flip Left/Right bits
                 m_UISystem.SetRoadZoningMode(inverted);
             }

@@ -1,4 +1,4 @@
-// src/ARTZone/UI/src/YenYang/VanillaComponentResolver.tsx
+// src/UI/src/YenYang/VanillaComponentResolver.tsx
 import { BalloonDirection, Color, FocusKey, Theme, UniqueFocusKey } from "cs2/bindings";
 import { InputAction } from "cs2/input";
 import { ModuleRegistry } from "cs2/modding";

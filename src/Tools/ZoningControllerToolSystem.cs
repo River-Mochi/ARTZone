@@ -1,4 +1,4 @@
-// File: src/ARTZone/Tools/ZoningControllerToolSystem.cs
+// File: src/Tools/ZoningControllerToolSystem.cs
 // Purpose:
 //   This is the runtime tool "system" (a DOTS system derived from ToolBaseSystem).
 //   Decides what happens when you click, what gets highlighted, and when changes become permanent.

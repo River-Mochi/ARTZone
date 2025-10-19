@@ -1,4 +1,4 @@
-// src/ARTZone/UI/webpack.config.js
+// src/UI/webpack.config.js
 
 const path = require("path");
 const MOD = require("./mod.json");

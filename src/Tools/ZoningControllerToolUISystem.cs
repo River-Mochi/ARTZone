@@ -1,4 +1,4 @@
-// File: src/ARTZone/Tools/ZoningControllerToolUISystem.cs
+// File: src/Tools/ZoningControllerToolUISystem.cs
 // Purpose:
 //  Renders the “Zoning Side” section in-game with three buttons. Reads values from ZoningControllerToolUISystem bindings
 //   and calls its triggers when clicked.

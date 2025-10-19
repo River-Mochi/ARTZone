@@ -1,4 +1,4 @@
-// File: src/ARTZone/Tools/ToolsHelper.cs
+// File: src/Tools/ToolsHelper.cs
 // Original behavior, no Harmony. Broader anchor probe + DEBUG-only reflective fallback.
 //
 // - Don’t wipe ToolDefinitions after registration.

@@ -1,5 +1,5 @@
-// File: src/ARTZone/Settings/Setting.cs
-// Options UI + keybinding definition (mouse). Toggles shown first, keybinding below.
+// File: src/Settings/Setting.cs
+// Options UI: Actions (toggles+keybind) + About (links)
 
 namespace ARTZone
 {
@@ -8,47 +8,46 @@ namespace ARTZone
     using Game.Input;
     using Game.Modding;
     using Game.Settings;
-    using UnityEngine;              // Application.OpenURL
+    using UnityEngine; // Application.OpenURL
 
-    [FileLocation("ModsSettings/ART-Zone/ART-Zone")]
-    // Show toggles group first, keybinding group, then URL buttons
-    [SettingsUITabOrder(ActionsTab, AboutTab)]
-    [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup, InfoGroup)]
-    [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup)]   // InfoGroup  header omitted on purpose.
-
-
-    // Define the input action once. (Mouse action; Button type)
-    [SettingsUIMouseAction(ARTZoneMod.kInvertZoningActionName,
-                           ActionType.Button,
-                           usages: new[] { "Zone Controller Tool" })]
+    [FileLocation("ModsSettings/ART-Zone/ART-Zone")]    // save Options settings here
+    // Show tabs in this order:
+    [SettingsUITabOrder(kActionsTab, kAboutTab)]
+    // Show groups (section groups) in this order where they appear:
+    [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup, kAboutLinksGroup)]
+    // Show group headers for these:
+    [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup, kAboutLinksGroup)]
+    // Define our mouse action once
+    [SettingsUIMouseAction(ARTZoneMod.kInvertZoningActionName, ActionType.Button, usages: new[] { "Zone Controller Tool" })]
     public sealed class Setting : ModSetting
     {
-        // ---- Tabs ----
+        // Tabs
         public const string kActionsTab = "Actions";
         public const string kAboutTab = "About";
 
-        // Tab Sections ----
+        // Section id used on the Actions tab
         public const string kSection = "Main";
 
+        // Group names
         public const string kToggleGroup = "Zone Controller Tool";
         public const string kKeybindingGroup = "Key bindings";
+        public const string kAboutLinksGroup = "Links";
 
         public Setting(IMod mod) : base(mod) { }
 
-
-        // === External links ===
-        private const string UrlParadoxMods = "TBD";
+        // === External links (About tab) ===
+        private const string UrlParadoxMods = "https://mods.paradoxplaza.com/"; // TODO: set your mod page
         private const string UrlDiscord = "https://discord.gg/HTav7ARPs2";
 
-        // === Toggles (top group) ===
+        // === Toggles (Actions tab) ===
         [SettingsUISection(kSection, kToggleGroup)]
         public bool RemoveZonedCells { get; set; } = true;
 
         [SettingsUISection(kSection, kToggleGroup)]
         public bool RemoveOccupiedCells { get; set; } = true;
 
-        // === Keybinding (bottom group) ===
-        // Default to RMB; user can unassign or rebind to other mouse buttons.
+        // === Keybinding (Actions tab) ===
+        // Default: RMB (user can change in Options)
         [SettingsUIMouseBinding(BindingMouse.Right, ARTZoneMod.kInvertZoningActionName)]
         [SettingsUISection(kSection, kKeybindingGroup)]
         public ProxyBinding InvertZoning
@@ -56,11 +55,10 @@ namespace ARTZone
             get; set;
         }
 
-
-        // ---- About tab links: order below determines button order ----
-        [SettingsUIButtonGroup("SocialLinks")]
+        // === About tab buttons ===
+        [SettingsUISection(kAboutTab, kAboutLinksGroup)]
+        [SettingsUIButtonGroup("Social")]
         [SettingsUIButton]
-        [SettingsUISection(AboutTab, InfoGroup)]
         public bool OpenParadoxModsButton
         {
             set
@@ -69,13 +67,13 @@ namespace ARTZone
                 {
                     Application.OpenURL(UrlParadoxMods);
                 }
-                catch (Exception ex) { Mod.log.Warn($"Failed to open Paradox Mods: {ex.Message}"); }
+                catch (Exception ex) { ARTZoneMod.s_Log.Warn($"Open Paradox Mods failed: {ex.Message}"); }
             }
         }
 
-        [SettingsUIButtonGroup("SocialLinks")]
+        [SettingsUISection(kAboutTab, kAboutLinksGroup)]
+        [SettingsUIButtonGroup("Social")]
         [SettingsUIButton]
-        [SettingsUISection(AboutTab, InfoGroup)]
         public bool OpenDiscordButton
         {
             set
@@ -84,7 +82,7 @@ namespace ARTZone
                 {
                     Application.OpenURL(UrlDiscord);
                 }
-                catch (Exception ex) { Mod.log.Warn($"Failed to open Discord: {ex.Message}"); }
+                catch (Exception ex) { ARTZoneMod.s_Log.Warn($"Open Discord failed: {ex.Message}"); }
             }
         }
 

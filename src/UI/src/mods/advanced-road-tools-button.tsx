@@ -1,6 +1,6 @@
-﻿// File: src/ARTZone/UI/src/mods/advanced-road-tools-button.tsx
+﻿// File: src/UI/src/mods/advanced-road-tools-button.tsx
 // Purpose: Floating HUD button to toggle the Zone Controller Tool.
-// File: src/ARTZone/UI/src/mods/advanced-road-tools-button.tsx
+// File: src/UI/src/mods/advanced-road-tools-button.tsx
 import { FloatingButton } from "cs2/ui";
 import React from "react";
 import { useLocalization } from "cs2/l10n";

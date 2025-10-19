@@ -1,4 +1,4 @@
-// src/ARTZone/UI/tools/css-presence.js
+// src/UI/tools/css-presence.js
 const { RawSource } = require("webpack").sources;
 
 exports.CSSPresencePlugin = class CSSPresencePlugin {
