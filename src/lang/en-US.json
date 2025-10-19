@@ -1,18 +1,10 @@
 ﻿// lang/en-US.json
 {
   "Assets.NAME[Zone Controller Tool]": "Zone Controller",
-  "Assets.DESCRIPTION[Zone Controller Tool]": "Tool to control how the zoning of a road behaves.\nChoose between zoning on both sides, only on the left or right, or no zoning for that road.\nBy default, right-click inverts the zoning configuration.",
-  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "Zoning Side",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "Zone on both sides.",
+  "Assets.DESCRIPTION[Zone Controller Tool]": "Tool to control behavior of zoning next to a road.\nChooses: zoning on both sides of a road, only on the left or right, or no zoning.\nBy default, right-click flips the zoning choice.",
+
+  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "[ART] Zoning Side",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "Zone both sides.",
   "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "Zone only on the left side.",
   "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "Zone only on the right side.",
-  "Options.SECTION[ARTZone.ARTZone.ARTZoneMod]": "Advanced Road Tools",
-  "Options.TAB[ARTZone.ARTZone.ARTZoneMod.Main]": "Main",
-  "Options.GROUP[ARTZone.ARTZone.ARTZoneMod.Zone Controller Tool]": "Zone Controller Tool Options",
-  "Options.OPTION[ARTZone.ARTZone.ARTZoneMod.Setting.RemoveZonedCells]": "Prevent zoned cells from being removed",
-  "Options.OPTION_DESCRIPTION[ARTZone.ARTZone.ARTZoneMod.Setting.RemoveZonedCells]": "Prevent zoned cells from being overridden during preview and set phase of Zone Controller Tool.\nSet this to true if you're having problem with losing your zoning configuration when using the tool.\nDefault: true",
-  "Options.OPTION[ARTZone.ARTZone.ARTZoneMod.Setting.RemoveOccupiedCells]": "Prevent occupied cells from being removed",
-  "Options.OPTION_DESCRIPTION[ARTZone.ARTZone.ARTZoneMod.Setting.RemoveOccupiedCells]": "Prevent occupied cells from being overridden during preview and set phase of Zone Controller Tool.\nSet this to true if you're having problem with buildings becoming vacant and/or abandoned when using the tool.\nDefault: true",
-  "Options.OPTION[ARTZone.ARTZone.ARTZoneMod.Setting.InvertZoning]": "Invert Zoning Mouse Button",
-  "Options.OPTION_DESCRIPTION[ARTZone.ARTZone.ARTZoneMod.Setting.InvertZoning]": "Inverts the current zoning configuration with a mouse action."
 }

@@ -36,7 +36,7 @@ export function descriptionTooltip(
 
 function ZoningToolControllerButton(): JSX.Element {
     const { translate } = useLocalization();
-    const buttonTooltip = translate("ARTZone.Zone_Controller.ToolName", "ACT");
+    const buttonTooltip = translate("Assets.NAME[Zone Controller Tool]", "Zone Controller");
     return (
         <FloatingButton
             onClick={ToggleZoneControllerTool}
