@@ -52,7 +52,7 @@ namespace ARTZone.Tools
 
         private ProxyAction? m_InvertZoningAction;
 
-        private ComponentLookup<AdvancedRoad> m_AdvancedRoadLookup;
+        private ComponentLookup<RoadZoning> m_RoadZoningLookup;
         private BufferLookup<SubBlock> m_SubBlockLookup;
 
         private EntityQuery m_TempZoningQuery;
@@ -89,7 +89,7 @@ namespace ARTZone.Tools
                 .WithAll<ToolUXSoundSettingsData>()
                 .Build(this);
 
-            m_AdvancedRoadLookup = GetComponentLookup<AdvancedRoad>(true);
+            m_RoadZoningLookup = GetComponentLookup<RoadZoning>(true);
             m_SubBlockLookup = GetBufferLookup<SubBlock>(true);
 
             m_SelectedEntities = new NativeList<Entity>(Allocator.Persistent);
@@ -144,7 +144,7 @@ namespace ARTZone.Tools
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            m_AdvancedRoadLookup.Update(this);
+            m_RoadZoningLookup.Update(this);
             m_SubBlockLookup.Update(this);
 
             inputDeps = Dependency;
@@ -212,7 +212,7 @@ namespace ARTZone.Tools
 
                 case Mode.Apply:
                     {
-                        JobHandle setJob = new SetAdvancedRoadJob
+                        JobHandle setJob = new SetRoadZoningJob
                         {
                             TempZoningLookup = GetComponentLookup<TempZoning>(true),
                             Entities = m_SelectedEntities.AsArray().AsReadOnly(),
@@ -276,7 +276,7 @@ namespace ARTZone.Tools
             if (!base.GetRaycastResult(out entity, out hit))
                 return false;
 
-            var hasAdvancedRoad = m_AdvancedRoadLookup.TryGetComponent(entity, out AdvancedRoad data);
+            var hasRoadZoning = m_RoadZoningLookup.TryGetComponent(entity, out RoadZoning data);
             var hasSubBlock = m_SubBlockLookup.TryGetBuffer(entity, out _);
 
             if (!hasSubBlock)
@@ -285,7 +285,7 @@ namespace ARTZone.Tools
                 return false;
             }
 
-            if (hasAdvancedRoad)
+            if (hasRoadZoning)
             {
                 if (math.any(Depths != data.Depths))
                     return true;
@@ -365,7 +365,7 @@ namespace ARTZone.Tools
             }
         }
 
-        public struct SetAdvancedRoadJob : IJob
+        public struct SetRoadZoningJob : IJob
         {
             public NativeArray<Entity>.ReadOnly Entities;
             public ComponentLookup<TempZoning> TempZoningLookup;
@@ -379,7 +379,7 @@ namespace ARTZone.Tools
                         continue;
 
                     ECB.RemoveComponent<TempZoning>(e);
-                    ECB.AddComponent(e, new AdvancedRoad { Depths = temp.Depths });
+                    ECB.AddComponent(e, new RoadZoning { Depths = temp.Depths });
                 }
             }
         }

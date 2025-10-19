@@ -1,11 +1,14 @@
-// Components/AdvancedRoad.cs
+// File: src/Components/RoadZoning.cs
+// Purpose: Persistent per-road zoning depths (left/right). Applied by SyncBlockSystem.
+
 namespace ARTZone.Components
 {
     using System;
     using Colossal.Serialization.Entities;
     using Unity.Entities;
     using Unity.Mathematics;
-    public struct AdvancedRoad : IComponentData, IEquatable<AdvancedRoad>, ISerializable
+
+    public struct RoadZoning : IComponentData, IEquatable<RoadZoning>, ISerializable
     {
         public int depthLeft;
         public int depthRight;
@@ -20,7 +23,7 @@ namespace ARTZone.Components
             }
         }
 
-        public bool Equals(AdvancedRoad other) => other.depthLeft == depthLeft && other.depthRight == depthRight;
+        public bool Equals(RoadZoning other) => other.depthLeft == depthLeft && other.depthRight == depthRight;
 
         public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
         {

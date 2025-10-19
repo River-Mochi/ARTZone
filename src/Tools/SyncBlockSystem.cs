@@ -49,7 +49,7 @@ namespace ARTZone
                 ValidAreaLookup = GetComponentLookup<ValidArea>(true),
                 OwnerLookup = GetComponentLookup<Owner>(true),
                 CellLookup = GetBufferLookup<Cell>(true),
-                AdvancedRoadLookup = GetComponentLookup<AdvancedRoad>(true),
+                RoadZoningLookup = GetComponentLookup<RoadZoning>(true),
                 TempZoningLookup = GetComponentLookup<TempZoning>(true),
             }.Schedule(m_UpdatedBlocksQuery.CalculateEntityCount(), 32, this.Dependency);
 
@@ -67,7 +67,7 @@ namespace ARTZone
             [ReadOnly] public ComponentLookup<ValidArea> ValidAreaLookup;
             [ReadOnly] public BufferLookup<Cell> CellLookup;
             [ReadOnly] public ComponentLookup<Owner> OwnerLookup;
-            [ReadOnly] public ComponentLookup<AdvancedRoad> AdvancedRoadLookup;
+            [ReadOnly] public ComponentLookup<RoadZoning> RoadZoningLookup;
             [ReadOnly] public ComponentLookup<TempZoning> TempZoningLookup;
 
             public void Execute(int index)
@@ -86,7 +86,7 @@ namespace ARTZone
                 int depth;
                 if (TempZoningLookup.TryGetComponent(roadEntity, out TempZoning tempZoning))
                     depth = left ? tempZoning.Depths.x : tempZoning.Depths.y;
-                else if (AdvancedRoadLookup.TryGetComponent(roadEntity, out AdvancedRoad data))
+                else if (RoadZoningLookup.TryGetComponent(roadEntity, out RoadZoning data))
                     depth = left ? data.Depths.x : data.Depths.y;
                 else
                     return;

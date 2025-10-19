@@ -1,5 +1,5 @@
 // SyncCreatedRoadsSystem.cs
-// Purpose: adds AdvancedRoad component to newly created roads using the current RoadDepths from UI.
+// Purpose: adds RoadZoning component to newly created roads using the current RoadDepths from UI.
 // Without this, freshly drawn roads won’t inherit the chosen zoning side depths.
 using ARTZone.Components;
 using ARTZone.Tools;
@@ -42,7 +42,7 @@ namespace ARTZone
             if (!m_NewCreatedRoadsQuery.IsEmpty && math.any(depths != new int2(6)))
             {
                 NativeArray<Entity> entities = m_NewCreatedRoadsQuery.ToEntityArray(Allocator.TempJob);
-                JobHandle job = new AddAdvancedRoadToCreatedRoadsJob
+                JobHandle job = new AddRoadZoningToCreatedRoadsJob
                 {
                     Entities = entities.AsReadOnly(),
                     ECB = ECB.AsParallelWriter(),
@@ -56,7 +56,7 @@ namespace ARTZone
             m_ModificationBarrier.AddJobHandleForProducer(this.Dependency);
         }
 
-        public struct AddAdvancedRoadToCreatedRoadsJob : IJobParallelFor
+        public struct AddRoadZoningToCreatedRoadsJob : IJobParallelFor
         {
             public NativeArray<Entity>.ReadOnly Entities;
             public EntityCommandBuffer.ParallelWriter ECB;
@@ -70,7 +70,7 @@ namespace ARTZone
 
                 if ((temp.m_Flags & TempFlags.Create) == TempFlags.Create)
                 {
-                    ECB.AddComponent(index, entity, new AdvancedRoad { Depths = Depths });
+                    ECB.AddComponent(index, entity, new RoadZoning { Depths = Depths });
                 }
             }
         }

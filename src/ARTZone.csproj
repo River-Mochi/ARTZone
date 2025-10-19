@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <!-- File: src/AdvancedRoadTools/AdvancedRoadTools.csproj -->
+  <!-- File: src/ARTZone.csproj -->
 
   <PropertyGroup>
     <Configurations>Debug;Release</Configurations>
@@ -63,7 +63,7 @@
     <None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
   </ItemGroup>
 
-  <!-- Copy UI assets so COUI can find them via coui://AdvancedRoadTools/... -->
+  <!-- Copy UI assets so COUI can find them via coui://RoadZoningTools/... -->
   <ItemGroup>
     <Content Include="UI\mod.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
