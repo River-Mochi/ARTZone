@@ -1,0 +1,8 @@
+{
+  "Assets.NAME[Zone Controller Tool]": "Controlador de zonificación",
+  "Assets.DESCRIPTION[Zone Controller Tool]": "Herramienta para controlar la zonificación a lo largo de una carretera.\nPermite elegir entre ambos lados, solo izquierda, solo derecha o ninguno.\nPor defecto, clic derecho invierte la selección.",
+  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "[ART] Lado de zonificación",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "Zonificar ambos lados.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "Zonificar solo el lado izquierdo.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "Zonificar solo el lado derecho."
+}

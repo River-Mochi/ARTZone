@@ -1,0 +1,8 @@
+{
+  "Assets.NAME[Zone Controller Tool]": "分区控制器",
+  "Assets.DESCRIPTION[Zone Controller Tool]": "用于控制道路两侧的分区行为。\n可选择两侧、仅左侧、仅右侧或无分区。\n默认右键点击可反转当前设置。",
+  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "[ART] 分区方向",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "在两侧分区。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "仅在左侧分区。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "仅在右侧分区。"
+}

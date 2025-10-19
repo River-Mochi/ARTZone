@@ -1,0 +1,8 @@
+{
+  "Assets.NAME[Zone Controller Tool]": "Zonierungssteuerung",
+  "Assets.DESCRIPTION[Zone Controller Tool]": "Werkzeug zur Steuerung der Zonierung entlang einer Straße.\nErmöglicht das Zonieren auf beiden Seiten, nur links, nur rechts oder gar nicht.\nRechtsklick kehrt die Auswahl um.",
+  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "[ART] Zonierungsseite",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "Beide Seiten zonieren.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "Nur linke Seite zonieren.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "Nur rechte Seite zonieren."
+}

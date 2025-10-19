@@ -99,7 +99,6 @@
 
   <!-- Keep lang/** copied (localization files) -->
   <ItemGroup>
-    <Folder Include="lang\" />
     <Content Include="lang\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

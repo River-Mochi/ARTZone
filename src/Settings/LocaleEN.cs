@@ -1,7 +1,7 @@
-// File: src/LocaleEN.cs
-// Built-in English strings for Options UI + tool palette text.
-
-#nullable enable
+// File: src/Settings/LocaleEN.cs
+/// <summary>
+/// English locale (en-US)
+/// </summary>
 namespace ARTZone
 {
     using System.Collections.Generic;
@@ -21,7 +21,7 @@ namespace ARTZone
         {
             return new Dictionary<string, string>
             {
-                // Settings root title
+                // Settings title
                 { m_Setting.GetSettingsLocaleID(), "ART-Zone" },
 
                 // Tabs
