@@ -1,5 +1,5 @@
 // File: src/Components/RoadZoning.cs
-// Purpose: Persistent per-road zoning depths (left/right). Applied by SyncBlockSystem.
+// Purpose: Persistent per-road zoning depths (left/right). stored on the road entity and later read by SyncBlockSystem.
 
 namespace ARTZone.Components
 {

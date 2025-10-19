@@ -1,4 +1,4 @@
-// Tools/ToolHighlightSystem.cs
+// src/Tools/ToolHighlightSystem.cs
 
 namespace ARTZone
 {
