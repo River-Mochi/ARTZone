@@ -1,7 +1,5 @@
-﻿// AdvancedRoadToolsMod.cs
-// Purpose: Mod entrypoint; settings + locales; keybinding hookup (polling); legacy m_Setting field kept.
-
-#nullable enable
+// Mod.cs
+// Purpose: Mod entrypoint; settings + locales; keybinding hookup (polling)
 
 namespace AdvancedRoadTools
 {
@@ -9,7 +7,6 @@ namespace AdvancedRoadTools
     using Colossal;
     using Colossal.IO.AssetDatabase;
     using Colossal.Logging;
-    using Colossal.Serialization.Entities; // Purpose
     using Game;
     using Game.Input;
     using Game.Modding;
@@ -43,7 +40,7 @@ namespace AdvancedRoadTools
             s_Log.Info("[ART] OnLoad");
 
             // Settings instance
-            Setting settings = new Setting(this);
+            var settings = new Setting(this);
             s_Settings = settings;
             m_Setting = settings; // keep legacy callers working
 
@@ -56,7 +53,7 @@ namespace AdvancedRoadTools
             // Show settings in Options UI
             settings.RegisterInOptionsUI();
 
-            // REQUIRED with attribute-based bindings
+            // Key binding
             try
             {
                 settings.RegisterKeyBindings();
@@ -73,12 +70,17 @@ namespace AdvancedRoadTools
                 s_Log.Warn($"[ART] Key binding setup skipped: {ex.GetType().Name}: {ex.Message}");
             }
 
-            // Systems
+            // --- Register our systems in the update loop ---
+            // (Put these exactly in this order)
             updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
             updateSystem.UpdateAt<ToolHighlightSystem>(SystemUpdatePhase.ToolUpdate);
             updateSystem.UpdateAt<SyncCreatedRoadsSystem>(SystemUpdatePhase.Modification4);
             updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
             updateSystem.UpdateAt<ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
+
+            // IMPORTANT: bootstrap AFTER vanilla prefabs/UI are around.
+            // This polls for a Road Services anchor, then creates our palette prefab.
+            updateSystem.UpdateAt<ToolBootstrapSystem>(SystemUpdatePhase.UIUpdate);
 
             // Optional: log active locale flips
             Colossal.Localization.LocalizationManager? lm = GameManager.instance?.localizationManager;
@@ -86,18 +88,6 @@ namespace AdvancedRoadTools
             {
                 lm.onActiveDictionaryChanged -= OnLocaleChanged;
                 lm.onActiveDictionaryChanged += OnLocaleChanged;
-            }
-
-            // Create tool prefabs once preloading starts (guard instance for CS8602)
-            GameManager? gm = GameManager.instance;
-            if (gm != null)
-            {
-                gm.onGamePreload -= CreateTools; // ensure no double subscription
-                gm.onGamePreload += CreateTools;
-            }
-            else
-            {
-                s_Log.Warn("[ART] GameManager.instance is null during OnLoad; skipping onGamePreload hook.");
             }
         }
 
@@ -109,7 +99,6 @@ namespace AdvancedRoadTools
             GameManager gm = GameManager.instance;
             if (gm != null)
             {
-                gm.onGamePreload -= CreateTools;
                 Colossal.Localization.LocalizationManager lm = gm.localizationManager;
                 if (lm != null)
                     lm.onActiveDictionaryChanged -= OnLocaleChanged;
@@ -117,7 +106,6 @@ namespace AdvancedRoadTools
 
             if (m_InvertZoningAction != null)
             {
-                // No event subscriptions to remove (we're polling)
                 m_InvertZoningAction.shouldBeEnabled = false;
                 m_InvertZoningAction = null;
             }
@@ -144,22 +132,8 @@ namespace AdvancedRoadTools
         private static void OnLocaleChanged()
         {
             Colossal.Localization.LocalizationManager? lm = GameManager.instance?.localizationManager;
-            string id = lm?.activeLocaleId ?? "(unknown)";
+            var id = lm?.activeLocaleId ?? "(unknown)";
             s_Log.Info("[ART] Active locale = " + id);
-        }
-
-        private void CreateTools(Purpose purpose, GameMode mode)
-        {
-            try
-            {
-                ToolsHelper.InstantiateTools();
-            }
-            finally
-            {
-                GameManager gm = GameManager.instance;
-                if (gm != null)
-                    gm.onGamePreload -= CreateTools;
-            }
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿// SyncCreatedRoadsSystem.cs
+// SyncCreatedRoadsSystem.cs
+// Purpose: adds AdvancedRoad component to newly created roads using the current RoadDepths from UI.
+// Without this, freshly drawn roads won’t inherit the chosen zoning side depths.
 using AdvancedRoadTools.Components;
 using AdvancedRoadTools.Tools;
 using Game;

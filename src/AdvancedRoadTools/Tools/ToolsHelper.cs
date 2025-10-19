@@ -1,4 +1,4 @@
-﻿// File: src/AdvancedRoadTools/Tools/ToolsHelper.cs
+// File: src/AdvancedRoadTools/Tools/ToolsHelper.cs
 // Original behavior, no Harmony. Broader anchor probe + DEBUG-only reflective fallback.
 //
 // - Don’t wipe ToolDefinitions after registration.
@@ -71,7 +71,7 @@ namespace AdvancedRoadTools.Tools
             }
         }
 
-        public static void InstantiateTools()
+        public static void InstantiateTools(bool logIfNoAnchor = true)
         {
             if (!Initialized)
                 Initialize();
@@ -103,27 +103,29 @@ namespace AdvancedRoadTools.Tools
                 return;
             }
 
+
             if (!TryResolveAnchor(out s_AnchorPrefab!, out s_AnchorUI!))
             {
-                AdvancedRoadToolsMod.s_Log.Error("Could not find Road Services anchor. Tools will not be created.");
+                if (logIfNoAnchor)
+                    AdvancedRoadToolsMod.s_Log.Error("Could not find Road Services anchor. Tools will not be created.");
                 return;
             }
 
-            foreach (var definition in ToolDefinitions)
+            foreach (ToolDefinition definition in ToolDefinitions)
             {
                 try
                 {
-                    var toolPrefab = Object.Instantiate(s_AnchorPrefab!);
+                    PrefabBase toolPrefab = Object.Instantiate(s_AnchorPrefab!);
                     toolPrefab.name = definition.ToolID;
 
                     toolPrefab.Remove<UIObject>();
                     toolPrefab.Remove<Unlockable>();
                     toolPrefab.Remove<NetSubObjects>();
 
-                    var uiObject = ScriptableObject.CreateInstance<UIObject>();
+                    UIObject uiObject = ScriptableObject.CreateInstance<UIObject>();
 
-                    // where the UIObject is created for the Road Services palette tile
-                    uiObject.m_Icon = "coui://AdvancedRoadTools/UI/images/Tool_Icon/ToolsIcon_2048px.png";
+                    // Road Services Palette tile icon – served by the webpack host
+                    uiObject.m_Icon = definition.ui.ImagePath;   // use the path from ToolDefinition
                     uiObject.name = definition.ToolID;
                     uiObject.m_IsDebugObject = s_AnchorUI!.m_IsDebugObject;
                     uiObject.m_Priority = definition.Priority;        // Original behavior
@@ -131,7 +133,7 @@ namespace AdvancedRoadTools.Tools
                     uiObject.active = s_AnchorUI!.active;
                     toolPrefab.AddComponentFrom(uiObject);
 
-                    var netUpgrade = ScriptableObject.CreateInstance<NetUpgrade>();
+                    NetUpgrade netUpgrade = ScriptableObject.CreateInstance<NetUpgrade>();
                     toolPrefab.AddComponentFrom(netUpgrade);
 
                     if (s_World.GetOrCreateSystemManaged(definition.Type) is not ToolBaseSystem toolSystem
@@ -174,12 +176,12 @@ namespace AdvancedRoadTools.Tools
 
             AdvancedRoadToolsMod.s_Log.Info($"Setting up tools. {s_ToolsLookup.Count} registered tools");
 
-            foreach (var (def, pair) in s_ToolsLookup)
+            foreach ((ToolDefinition def, (PrefabBase Prefab, UIObject UI) pair) in s_ToolsLookup)
             {
-                var prefab = pair.Prefab;
+                PrefabBase prefab = pair.Prefab;
                 try
                 {
-                    var placeable = s_PrefabSystem.GetComponentData<PlaceableNetData>(s_AnchorPrefab);
+                    PlaceableNetData placeable = s_PrefabSystem.GetComponentData<PlaceableNetData>(s_AnchorPrefab);
                     placeable.m_SetUpgradeFlags = def.SetFlags;
                     placeable.m_UnsetUpgradeFlags = def.UnsetFlags;
                     placeable.m_PlacementFlags = def.PlacementFlags;
@@ -212,18 +214,12 @@ namespace AdvancedRoadTools.Tools
                 "Sound Barrier",
                 "Traffic Lights",
                 "Crosswalk",
-                "Grass",
                 "Quay",
                 "Retaining Wall",
                 "Elevated",
                 "Tunnel",
-                "Trees",
-                "Lighting",
                 "Road Maintenance Depot",
-                "Stop Signs",
-                "No Left Turn",
-                "No Straight Ahead",
-                "No Right Turn",
+
             };
 
             var candidates = new List<string>(uiNames.Length * 2);
@@ -254,7 +250,7 @@ namespace AdvancedRoadTools.Tools
                     var id = new PrefabID(type, name);
                     if (s_PrefabSystem.TryGetPrefab(id, out PrefabBase? p) && p is not null)
                     {
-                        var u = p.GetComponent<UIObject>();
+                        UIObject? u = p.GetComponent<UIObject>();
                         if (u is not null)
                         {
 #if ART_DIAGNOSTICS
@@ -295,7 +291,7 @@ namespace AdvancedRoadTools.Tools
                 if (s_PrefabSystem is null)
                     return false;
 
-                var field = s_PrefabSystem.GetType().GetField("m_Prefabs", BindingFlags.Instance | BindingFlags.NonPublic);
+                FieldInfo field = s_PrefabSystem.GetType().GetField("m_Prefabs", BindingFlags.Instance | BindingFlags.NonPublic);
                 if (field == null)
                 {
                     AdvancedRoadToolsMod.s_Log.Warn("[ART] Reflective scan: cannot find m_Prefabs.");
@@ -307,7 +303,7 @@ namespace AdvancedRoadTools.Tools
 
                 AdvancedRoadToolsMod.s_Log.Info("[ART] Reflective scan: listing prefabs with UIObject …");
 
-                int bestScore = int.MinValue;
+                var bestScore = int.MinValue;
                 PrefabBase? best = null;
                 UIObject? bestUI = null;
 
@@ -316,17 +312,17 @@ namespace AdvancedRoadTools.Tools
                     if (obj is not PrefabBase p)
                         continue;
 
-                    var u = p.GetComponent<UIObject>();
+                    UIObject? u = p.GetComponent<UIObject>();
                     if (u is null)
                         continue;
 
-                    string name = p.name ?? "";
-                    string norm = Normalize(name);
-                    string groupName = u.m_Group != null ? u.m_Group.name ?? "" : "";
+                    var name = p.name ?? "";
+                    var norm = Normalize(name);
+                    var groupName = u.m_Group != null ? u.m_Group.name ?? "" : "";
 
                     AdvancedRoadToolsMod.s_Log.Info($"[ART] UI Prefab: name=\"{name}\" group={groupName} prio={u.m_Priority}");
 
-                    int score = ScoreForRoadServices(norm, groupName);
+                    var score = ScoreForRoadServices(norm, groupName);
                     if (score > bestScore)
                     {
                         bestScore = score;

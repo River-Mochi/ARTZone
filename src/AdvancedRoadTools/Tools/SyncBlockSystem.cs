@@ -1,5 +1,6 @@
-﻿// src/AdvancedRoadTools/SyncBlockSystem.cs
-// Purpose: Apply previewed/committed zoning depth to blocks, honoring settings.
+// src/AdvancedRoadTools/SyncBlockSystem.cs
+// Purpose: applies the preview/committed zoning depth to actual zone blocks
+// respecting settings (RemoveZonedCells / RemoveOccupiedCells). Tool won’t function without it
 
 namespace AdvancedRoadTools
 {
@@ -80,7 +81,7 @@ namespace AdvancedRoadTools
 
                 Entity roadEntity = owner.m_Owner;
 
-                bool left = (math.dot(1, block.m_Direction) < 0);
+                var left = (math.dot(1, block.m_Direction) < 0);
 
                 int depth;
                 if (TempZoningLookup.TryGetComponent(roadEntity, out TempZoning tempZoning))
@@ -111,11 +112,11 @@ namespace AdvancedRoadTools
                 if (validArea.m_Area.y * validArea.m_Area.w == 0)
                     return false;
 
-                for (int z = validArea.m_Area.z; z < validArea.m_Area.w; z++)
+                for (var z = validArea.m_Area.z; z < validArea.m_Area.w; z++)
                 {
-                    for (int x = validArea.m_Area.x; x < validArea.m_Area.y; x++)
+                    for (var x = validArea.m_Area.x; x < validArea.m_Area.y; x++)
                     {
-                        int idx = z * block.m_Size.x + x;
+                        var idx = z * block.m_Size.x + x;
                         Cell cell = cells[idx];
                         if ((cell.m_State & CellFlags.Occupied) != 0)
                             return true;
@@ -129,11 +130,11 @@ namespace AdvancedRoadTools
                 if (validArea.m_Area.y * validArea.m_Area.w == 0)
                     return false;
 
-                for (int z = validArea.m_Area.z; z < validArea.m_Area.w; z++)
+                for (var z = validArea.m_Area.z; z < validArea.m_Area.w; z++)
                 {
-                    for (int x = validArea.m_Area.x; x < validArea.m_Area.y; x++)
+                    for (var x = validArea.m_Area.x; x < validArea.m_Area.y; x++)
                     {
-                        int idx = z * block.m_Size.x + x;
+                        var idx = z * block.m_Size.x + x;
                         Cell cell = cells[idx];
                         if (cell.m_Zone.m_Index != ZoneType.None.m_Index)
                             return true;

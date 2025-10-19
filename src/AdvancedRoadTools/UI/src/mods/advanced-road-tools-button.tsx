@@ -1,16 +1,17 @@
 ﻿// File: src/AdvancedRoadTools/UI/src/mods/advanced-road-tools-button.tsx
 // Purpose: Floating HUD button to toggle the Zone Controller Tool.
-
+// File: src/AdvancedRoadTools/UI/src/mods/advanced-road-tools-button.tsx
 import { FloatingButton } from "cs2/ui";
 import React from "react";
 import { useLocalization } from "cs2/l10n";
 import { trigger } from "cs2/api";
 import mod from "../../mod.json";
 
-// if svg doesn't work, can use ToolsIcon.png
-import zoneIcon from "../../images/ZoneControllerTool.svg";
+// Import so webpack emits to coui://ui-mods/images/ToolsIcon.png
+import buttonIcon from "../../images/Tool_Icon/ToolsIcon.png";
+// Keep we want this for GameTop Right icon
+// import zoneIcon from "../../images/ZoneControllerTool.svg";
 
-// Keep resolver (used by descriptionTooltip)
 import { VanillaComponentResolver } from "../YenYang/VanillaComponentResolver";
 
 function ToggleZoneControllerTool() {
@@ -39,7 +40,7 @@ function ZoningToolControllerButton(): JSX.Element {
     return (
         <FloatingButton
             onClick={ToggleZoneControllerTool}
-            src={zoneIcon}
+            src={buttonIcon}                 // ← use the PNG (emitted by webpack)
             tooltipLabel={buttonTooltip}
         />
     );

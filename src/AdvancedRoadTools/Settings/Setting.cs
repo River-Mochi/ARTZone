@@ -1,4 +1,4 @@
-﻿// File: src/AdvancedRoadTools/Setting.cs
+// File: src/AdvancedRoadTools/Settings/Setting.cs
 // Options UI + keybinding definition (mouse). Toggles shown first, keybinding below.
 
 #nullable enable

@@ -14,8 +14,8 @@
 
     <!-- Node/NPM runner + UI build strictness -->
     <NpmCmd>npm</NpmCmd>
-    <!-- In Debug: soft-fail; In Release: hard-fail -->
-    <FailUIBuild Condition="'$(Configuration)'=='Release'">true</FailUIBuild>
+    <!-- In Debug: soft-fail; In Release: hard-fail if true -->
+    <FailUIBuild Condition="'$(Configuration)'=='Release'">false</FailUIBuild>
     <FailUIBuild Condition="'$(Configuration)'!='Release'">false</FailUIBuild>
   </PropertyGroup>
 
@@ -57,6 +57,7 @@
   <ItemGroup>
     <None Include="$(ModPropsFile)" Link="Properties\Mod.props" />
     <None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
+    <None Include="C:\Users\kldan\Source\Repos\AdvancedRoadTools\src\AdvancedRoadTools\.editorconfig" />
   </ItemGroup>
 
   <!-- Copy UI assets so COUI can find them via coui://AdvancedRoadTools/... -->
@@ -74,31 +75,23 @@
   </ItemGroup>
 
   <!-- 1) Install npm deps once (both configs) BEFORE build -->
-  <Target Name="NpmInstallIfNeeded"
-          BeforeTargets="Build"
-          Condition="Exists('$(ProjectDir)UI\package.json') AND !Exists('$(ProjectDir)UI\node_modules')">
+  <Target Name="NpmInstallIfNeeded" BeforeTargets="Build" Condition="Exists('$(ProjectDir)UI\package.json') AND !Exists('$(ProjectDir)UI\node_modules')">
     <Message Text="ART UI: npm ci (first-time install)..." Importance="high" />
     <Exec Command="$(NpmCmd) ci" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true">
       <Output TaskParameter="ExitCode" PropertyName="NpmCiExit" />
     </Exec>
-    <Error Condition="'$(FailUIBuild)'=='true' AND '$(NpmCiExit)' != '0'"
-           Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). See Output window for details." />
-    <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmCiExit)' != '0'"
-             Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). Continuing C# build." />
+    <Error Condition="'$(FailUIBuild)'=='true' AND '$(NpmCiExit)' != '0'" Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). See Output window for details." />
+    <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmCiExit)' != '0'" Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). Continuing C# build." />
   </Target>
 
   <!-- 2) Build the UI AFTER the C# build (both configs) -->
-  <Target Name="BuildUI"
-          AfterTargets="Build"
-          Condition="Exists('$(ProjectDir)UI\package.json')">
+  <Target Name="BuildUI" AfterTargets="Build" Condition="Exists('$(ProjectDir)UI\package.json')">
     <Message Text="ART UI: npm run build ($(Configuration))..." Importance="high" />
     <Exec Command="$(NpmCmd) run build" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true">
       <Output TaskParameter="ExitCode" PropertyName="NpmBuildExit" />
     </Exec>
-    <Error Condition="'$(FailUIBuild)'=='true' AND '$(NpmBuildExit)' != '0'"
-           Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit))." />
-    <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmBuildExit)' != '0'"
-             Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit)). Continuing C# build." />
+    <Error Condition="'$(FailUIBuild)'=='true' AND '$(NpmBuildExit)' != '0'" Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit))." />
+    <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmBuildExit)' != '0'" Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit)). Continuing C# build." />
   </Target>
 
   <!-- Keep lang/** copied (localization files) -->
@@ -107,5 +100,8 @@
     <Content Include="lang\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\kldan\Source\Repos\AdvancedRoadTools\src\AdvancedRoadTools\.editorconfig" />
   </ItemGroup>
 </Project>

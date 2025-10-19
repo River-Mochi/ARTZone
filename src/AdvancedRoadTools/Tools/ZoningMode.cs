@@ -1,5 +1,5 @@
-﻿// Tools/ZoningMode.cs
-// Bitmask for left/right/both zoning toggles.
+// ZoningMode.cs
+// Bitmask used by UI and tool systems for left/right/both zoning toggles.
 
 namespace AdvancedRoadTools
 {

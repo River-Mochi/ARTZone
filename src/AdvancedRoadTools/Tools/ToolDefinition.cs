@@ -46,16 +46,12 @@ namespace AdvancedRoadTools.Tools
 
         public struct UI
         {
-            public const string PathPrefix = "coui://AdvancedRoadTools/UI/images/Tool_Icon/";
             public const string ImageFormat = ".png";
-
+            public const string PathPrefix = "coui://ui-mods/images/";
             public string ImagePath;
-
-            public UI(string imagePath)
-            {
-                ImagePath = imagePath;
-            }
+            public UI(string imagePath) => ImagePath = imagePath;
         }
+
 
         public bool Equals(ToolDefinition other) => ToolID == other.ToolID;
         public override bool Equals(object obj) => obj is ToolDefinition other && Equals(other);
