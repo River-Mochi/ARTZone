@@ -39,7 +39,7 @@ namespace AdvancedRoadTools.Tools
         // === For checking active tool/prefab and toggling tool ===
         private ToolSystem mainToolSystem = null!;
         private ZoningControllerToolSystem toolSystem = null!;
-        private Game.Input.ProxyAction? m_InvertZoningAction;
+
 
         // Public helpers used by the tool system
         public ZoningMode ToolZoningMode => (ZoningMode)toolZoningMode.value;
@@ -101,8 +101,7 @@ namespace AdvancedRoadTools.Tools
 
             // For toggling our tool on demand from the floating button
             toolSystem = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
-            // pick up the same action the tool uses; it's already enabled in Mod.cs
-            m_InvertZoningAction = AdvancedRoadToolsMod.m_InvertZoningAction;
+
 
         }
 
@@ -116,24 +115,8 @@ namespace AdvancedRoadTools.Tools
         {
             base.OnUpdate();
 
-            // Allow invert (RMB) while using the vanilla Net Tool / RoadPrefab path.
-            // This mirrors the standalone tool’s behavior but flips the RoadZoningMode.
-            if (m_InvertZoningAction != null && m_InvertZoningAction.WasPressedThisFrame())
-            {
-                // If the user is currently placing roads (isRoadPrefab == true),
-                // flip the current road zoning mode:
-                // Both <-> None, Left <-> Right.
-                if (isRoadPrefab.value)
-                {
-                    var current = (ZoningMode)roadZoningMode.value;
-                    // Invert the Left|Right bitmask – identical behavior to the tool.
-                    var inverted = (ZoningMode)((int)current ^ (int)ZoningMode.Both);
-                    roadZoningMode.Update((int)inverted);
-                    // no further action needed; SyncCreatedRoadsSystem reads RoadDepths
-                    // and applies to Temp/Created roads. preview updates ride along with vanilla
-                }
-            }
         }
+
 
         private void EventPrefabChanged(PrefabBase prefab)
         {
@@ -173,6 +156,9 @@ namespace AdvancedRoadTools.Tools
         {
             roadZoningMode.Update(value);
         }
+
+        public void SetRoadZoningMode(ZoningMode mode) => roadZoningMode.Update((int)mode);
+
 
         public void InvertZoningMode()
         {

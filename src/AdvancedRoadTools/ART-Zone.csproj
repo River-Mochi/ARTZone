@@ -6,9 +6,9 @@
     <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
 
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <AssemblyTitle>Advanced Road Tools</AssemblyTitle>
+    <AssemblyTitle>ART-Zone</AssemblyTitle>
     <AssemblyName>AdvancedRoadTools</AssemblyName>
-    <Product>Advanced Road Tools</Product>
+    <Product>ART-Zone</Product>
 
     <Nullable>enable</Nullable>
 

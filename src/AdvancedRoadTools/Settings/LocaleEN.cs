@@ -1,4 +1,4 @@
-﻿// File: src/AdvancedRoadTools/LocaleEN.cs
+// File: src/AdvancedRoadTools/LocaleEN.cs
 // Built-in English strings for Options UI + tool palette text.
 
 #nullable enable
@@ -21,8 +21,8 @@ namespace AdvancedRoadTools
         {
             return new Dictionary<string, string>
             {
-                { m_Setting.GetSettingsLocaleID(), "Advanced Road Tools" },
-                { m_Setting.GetOptionTabLocaleID(Setting.kSection), "Main" },
+                { m_Setting.GetSettingsLocaleID(), "ART-Zone" },
+                { m_Setting.GetOptionTabLocaleID(Setting.kSection), "Actions" },
 
                 { m_Setting.GetOptionGroupLocaleID(Setting.kToggleGroup), "Zone Controller Tool Options" },
                 { m_Setting.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Key bindings" },

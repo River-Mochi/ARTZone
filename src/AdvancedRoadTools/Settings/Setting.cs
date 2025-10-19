@@ -9,7 +9,7 @@ namespace AdvancedRoadTools
     using Game.Modding;
     using Game.Settings;
 
-    [FileLocation("ModsSettings/AdvancedRoadTools/AdvancedRoadTools")]
+    [FileLocation("ModsSettings/ART-Zone/ART-Zone")]
     // Show toggles group first, then the keybinding group
     [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup)]
     [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup)]
