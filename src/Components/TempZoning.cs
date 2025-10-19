@@ -1,11 +1,12 @@
 // Components/TempZoning.cs
-// Purpose: temporary component the tool uses while previewing and before commit. ZoningControllerToolSystem and SyncBlockSystem reference this.
+// Purpose: temporary ECS component the tool uses while previewing and before commit.
+// Used by ZoningControllerToolSystem and SyncBlockSystem.
+
 using Unity.Entities;
 using Unity.Mathematics;
 
-namespace ARTZone
+namespace ARTZone.Components
 {
-
     public struct TempZoning : IComponentData
     {
         public int2 Depths;
