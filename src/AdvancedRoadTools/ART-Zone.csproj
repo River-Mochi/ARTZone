@@ -5,10 +5,10 @@
     <Configurations>Debug;Release</Configurations>
     <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
 
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <AssemblyTitle>ART-Zone</AssemblyTitle>
+
+  
     <AssemblyName>AdvancedRoadTools</AssemblyName>
-    <Product>ART-Zone</Product>
+
 
     <Nullable>enable</Nullable>
 
