@@ -1,64 +1,130 @@
 // File: src/Tools/ToolBootstrapSystem.cs
-// Purpose: Retry ToolsHelper.InstantiateTools() until our tool prefab exists,
-//          then disable. Uses DOTS World.Time (no UnityEngine).
+// Purpose:
+//   After vanilla prefabs & UI exist, attach a UIObject to our tool prefab so it
+//   shows in the Road Services palette (group="RoadsServices") right after a donor
+//   item (e.g., "Wide Sidewalk"). Runs once and disables itself.
 
 namespace ARTZone.Tools
 {
-    using Game;              // GameSystemBase
-    using Unity.Entities;    // World.Time
+    using Game;
+    using Game.Prefabs;   // PrefabSystem, PrefabBase
+    using Game.UI;        // UIObject
+    using Unity.Collections;
+    using Unity.Entities;
 
-    public sealed partial class ToolBootstrapSystem : GameSystemBase
+    public partial class ToolBootstrapSystem : GameSystemBase
     {
-        private const int kLogEvery = 120;       // ~2s @ 60 FPS
-        private const double kSoftWarnAfter = 8; // seconds
-
-        private bool m_Done;
-        private int m_Ticks;
-        private double m_StartElapsed; // World.Time.ElapsedTime at start
+        private PrefabSystem _prefabSystem = null!;
+        private bool _done;
 
         protected override void OnCreate()
         {
             base.OnCreate();
-            m_Done = false;
-            m_Ticks = 0;
-            // Store current DOTS elapsed time (seconds) as baseline
-            m_StartElapsed = World.Time.ElapsedTime;
+            _prefabSystem = World.GetOrCreateSystemManaged<PrefabSystem>();
+            _done = false;
         }
 
         protected override void OnUpdate()
         {
-            if (m_Done)
+            if (_done)
                 return;
 
-            // If our tool already holds a prefab, we’re done.
-            ZoningControllerToolSystem? tool = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
-            if (tool != null && tool.GetPrefab() != null)
+            // Our tool prefab is created when ZoningControllerToolSystem registers its ToolDefinition.
+            var ourPrefab = TryFindPrefabByName(ZoningControllerToolSystem.ToolID);
+            if (ourPrefab == null)
             {
-                ARTZoneMod.s_Log.Info("[ART] Bootstrap: tool prefab present; nothing to do.");
-                m_Done = true;
-                Enabled = false;
+                // Not ready yet; try again next frame.
                 return;
             }
 
-            // Ask the helper to try (quietly) — no error spam while anchor isn’t ready yet.
-            ToolsHelper.InstantiateTools(logIfNoAnchor: false);
+            // Try to attach a palette tile after the first available donor in this list.
+            var donors = new[] { "Wide Sidewalk", "Grass", "Sound Barrier", "Crosswalk", "Quay" };
+            bool ok = TryAttachPaletteTileAfterDonor(_prefabSystem, ourPrefab, donors);
 
-            // Check again after trying.
-            if (tool != null && tool.GetPrefab() != null)
+            if (!ok)
+                ARTZoneMod.s_Log.Warn("[ART] No donor in RoadsServices found; palette tile not created.");
+
+            _done = true; // one-shot; we did our job.
+        }
+
+        private PrefabBase? TryFindPrefabByName(string name)
+        {
+            try
             {
-                ARTZoneMod.s_Log.Info("[ART] Bootstrap: tools created.");
-                m_Done = true;
-                Enabled = false;
-                return;
+                // Most builds provide this generic lookup:
+                var p = _prefabSystem.FindPrefab<PrefabBase>(name);
+                if (p != null)
+                    return p;
+            }
+            catch
+            {
+                // Fall through to slow path
             }
 
-            // Throttled, soft logging after we’ve waited a bit.
-            m_Ticks++;
-            var waited = World.Time.ElapsedTime - m_StartElapsed;
-            if (waited > kSoftWarnAfter && (m_Ticks % kLogEvery) == 0)
+            // Fallback: scan for a PrefabRef with a UIObject
+            var q = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<PrefabRef, UIObject>()
+                .Build(this);
+
+            using var entities = q.ToEntityArray(Allocator.Temp);
+            var prefLookup = GetComponentLookup<PrefabRef>(true);
+
+            foreach (var e in entities)
             {
-                ARTZoneMod.s_Log.Warn("[ART] Bootstrap: still waiting for Road Services to initialize …");
+                var pr = prefLookup[e];
+                if (pr.m_Prefab != null && pr.m_Prefab.name == name)
+                    return pr.m_Prefab;
             }
+
+            return null;
+        }
+
+        // --- Your helper, wrapped here so it compiles and is reusable ---
+
+        private static bool TryAttachPaletteTileAfterDonor(
+            PrefabSystem prefabSystem,
+            PrefabBase ourPrefab,
+            string[] donorNamesOrdered)
+        {
+            // 1) Ensure our prefab has a UIObject
+            var ui = ourPrefab.GetComponent<UIObject>();
+            if (ui == null)
+            {
+                ui = ourPrefab.AddComponent<UIObject>();
+                ui.m_Priority = 0;
+                ui.m_Group = ""; // set below
+            }
+
+            // 2) Find a donor in RoadsServices
+            UIObject? donorUI = null;
+            foreach (string donorName in donorNamesOrdered)
+            {
+                var donor = prefabSystem.FindPrefab<PrefabBase>(donorName);
+                if (donor == null)
+                    continue;
+
+                var dui = donor.GetComponent<UIObject>();
+                if (dui == null)
+                    continue;
+
+                if (string.Equals(dui.m_Group, "RoadsServices", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    donorUI = dui;
+                    ARTZoneMod.s_Log.Info($"[ART] Using donor \"{donorName}\" group={dui.m_Group} prio={dui.m_Priority}");
+                    break;
+                }
+            }
+
+            if (donorUI == null)
+                return false;
+
+            // 3) Copy donor group, place just after donor
+            ui.m_Group = donorUI.m_Group;           // "RoadsServices"
+            ui.m_Priority = donorUI.m_Priority + 1; // appear right after donor
+            ui.m_UITag = "ARTZone:ZoneController";  // optional tag for debugging
+
+            ARTZoneMod.s_Log.Info($"[ART] UI tile attached: group={ui.m_Group} prio={ui.m_Priority}");
+            return true;
         }
     }
 }
