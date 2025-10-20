@@ -1,4 +1,4 @@
-// File: src/AdvancedRoadTools/UI/src/index.tsx
+// File: ArtZone/src/UI/src/index.tsx
 // Purpose: Wire the React pieces into the game UI registry.
 //  • Appends our floating button at GameTopRight.
 //  • Extends the MouseToolOptions panel to render our "Zoning Side" buttons.
@@ -12,7 +12,7 @@ const register: ModRegistrar = (moduleRegistry) => {
     VanillaComponentResolver.setRegistry(moduleRegistry);
 
     // Your request: put the button on the top right instead of top left.
-    moduleRegistry.append("GameTopRight", ZoningToolControllerButton);
+    moduleRegistry.append("GameTopLeft", ZoningToolControllerButton);
 
     // Adds the "Zoning Side" section with three buttons (All/Left/Right).
     moduleRegistry.extend(
