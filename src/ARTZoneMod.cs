@@ -100,7 +100,7 @@ namespace ARTZone
             updateSystem.UpdateAt<Tools.ToolBootstrapSystem>(SystemUpdatePhase.UIUpdate);
 
             // Log locale changes (don’t remove sources on dispose)
-            var lm = GameManager.instance?.localizationManager;
+            Colossal.Localization.LocalizationManager? lm = GameManager.instance?.localizationManager;
             if (lm != null)
             {
                 lm.onActiveDictionaryChanged -= OnLocaleChanged;
@@ -112,7 +112,7 @@ namespace ARTZone
         {
             s_Log.Info($"{Name} - OnDispose");
 
-            var lm = GameManager.instance?.localizationManager;
+            Colossal.Localization.LocalizationManager? lm = GameManager.instance?.localizationManager;
             if (lm != null)
                 lm.onActiveDictionaryChanged -= OnLocaleChanged;
 
@@ -139,7 +139,7 @@ namespace ARTZone
 
         private static void AddLocale(string localeId, IDictionarySource source)
         {
-            var lm = GameManager.instance?.localizationManager;
+            Colossal.Localization.LocalizationManager? lm = GameManager.instance?.localizationManager;
             if (lm == null)
             {
                 s_Log.Warn($"[ART] No LocalizationManager; cannot add locale {localeId}");

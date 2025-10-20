@@ -35,7 +35,7 @@ namespace ARTZone.Tools
                 ((ZoningMode)m_ToolZoningMode.value & ZoningMode.Right) == ZoningMode.Right ? 6 : 0);
             set
             {
-                var mode = ZoningMode.Both;
+                ZoningMode mode = ZoningMode.Both;
                 if (value.x == 0)
                     mode ^= ZoningMode.Left;
                 if (value.y == 0)
@@ -51,7 +51,7 @@ namespace ARTZone.Tools
                 ((ZoningMode)m_RoadZoningMode.value & ZoningMode.Right) == ZoningMode.Right ? 6 : 0);
             set
             {
-                var mode = ZoningMode.Both;
+                ZoningMode mode = ZoningMode.Both;
                 if (value.x == 0)
                     mode ^= ZoningMode.Left;
                 if (value.y == 0)
@@ -102,7 +102,7 @@ namespace ARTZone.Tools
             base.OnUpdate();
 
             // Optional keyboard: Toggle tool (Shift+Z) — handled via Colossal action created by Setting.cs
-            var toggle = ARTZoneMod.m_ToggleToolAction;
+            Game.Input.ProxyAction? toggle = ARTZoneMod.m_ToggleToolAction;
             if (toggle != null && toggle.WasPressedThisFrame())
             {
                 ToggleTool();

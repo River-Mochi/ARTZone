@@ -5,22 +5,28 @@
     <Configurations>Debug;Release</Configurations>
     <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
 
+    <!-- Labels/metadata for humans; we'll let CS2 toolchain emit attributes to avoid dupes -->
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <!-- User-facing labels can keep hyphen -->
     <AssemblyTitle>ART-Zone</AssemblyTitle>
     <Product>ART-Zone</Product>
-
-    <!-- Assembly/DLL + namespace: NO hyphen -->
     <AssemblyName>ARTZone</AssemblyName>
     <RootNamespace>ARTZone</RootNamespace>
 
     <Nullable>enable</Nullable>
 
+    <!-- Prevent SDK from generating assembly + TFM attributes (CS0579 fix) -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+
     <!-- Node/NPM runner + UI build strictness -->
     <NpmCmd>npm</NpmCmd>
-    <!-- In Debug: soft-fail; In Release: hard-fail if true, otherwise both same -->
-    <FailUIBuild Condition="'$(Configuration)'=='Release'">false</FailUIBuild>
-    <FailUIBuild Condition="'$(Configuration)'!='Release'">false</FailUIBuild>
+
+    <!-- keep UI build ON, but skip npm ci by default -->
+    <NpmEnabled>1</NpmEnabled>
+    <NpmSkipCi>true</NpmSkipCi>
+
+    <!-- In Debug: soft-fail UI build; in Release: you can flip this to true later -->
+    <FailUIBuild>false</FailUIBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -45,16 +51,15 @@
     <Reference Include="Colossal.Localization"><Private>false</Private></Reference>
     <Reference Include="Colossal.UI"><Private>false</Private></Reference>
     <Reference Include="Colossal.UI.Binding"><Private>false</Private></Reference>
-	<Reference Include="Colossal.Mathematics"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Mathematics"><Private>false</Private></Reference>
 
     <Reference Include="UnityEngine.CoreModule"><Private>false</Private></Reference>
     <Reference Include="UnityEngine.AudioModule"><Private>false</Private></Reference>
-	<Reference Include="Unity.InputSystem"><Private>false</Private></Reference>
+    <Reference Include="Unity.InputSystem"><Private>false</Private></Reference>
     <Reference Include="Unity.Burst"><Private>false</Private></Reference>
     <Reference Include="Unity.Collections"><Private>false</Private></Reference>
     <Reference Include="Unity.Entities"><Private>false</Private></Reference>
     <Reference Include="Unity.Mathematics"><Private>false</Private></Reference>
-
   </ItemGroup>
 
   <!-- Convenience: make common toolchain files viewable in Properties/ -->
@@ -77,24 +82,36 @@
     </Content>
   </ItemGroup>
 
-  <!-- 1) Install npm deps once (both configs) BEFORE build -->
-  <Target Name="NpmInstallIfNeeded" BeforeTargets="Build" Condition="Exists('$(ProjectDir)UI\package.json') AND !Exists('$(ProjectDir)UI\node_modules')">
+  <!-- 1) Install npm deps ONCE, but only when allowed and needed -->
+  <Target Name="NpmInstallIfNeeded"
+          BeforeTargets="Build"
+          Condition=" '$(NpmEnabled)'=='1'
+                   AND '$(NpmSkipCi)'!='true'
+                   AND Exists('$(ProjectDir)UI\package.json')
+                   AND !Exists('$(ProjectDir)UI\node_modules') ">
     <Message Text="ART UI: npm ci (first-time install)..." Importance="high" />
     <Exec Command="$(NpmCmd) ci" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true">
       <Output TaskParameter="ExitCode" PropertyName="NpmCiExit" />
     </Exec>
-    <Error Condition="'$(FailUIBuild)'=='true' AND '$(NpmCiExit)' != '0'" Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). See Output window for details." />
-    <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmCiExit)' != '0'" Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). Continuing C# build." />
+    <Error   Condition="'$(FailUIBuild)'=='true' AND '$(NpmCiExit)' != '0'"
+             Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). See Output window for details." />
+    <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmCiExit)' != '0'"
+             Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). Continuing C# build." />
   </Target>
 
-  <!-- 2) Build the UI AFTER the C# build (both configs) -->
-  <Target Name="BuildUI" AfterTargets="Build" Condition="Exists('$(ProjectDir)UI\package.json')">
+  <!-- 2) Build the UI bundle after C# build -->
+  <Target Name="BuildUI"
+          AfterTargets="Build"
+          Condition=" '$(NpmEnabled)'=='1'
+                   AND Exists('$(ProjectDir)UI\package.json') ">
     <Message Text="ART UI: npm run build ($(Configuration))..." Importance="high" />
     <Exec Command="$(NpmCmd) run build" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true">
       <Output TaskParameter="ExitCode" PropertyName="NpmBuildExit" />
     </Exec>
-    <Error Condition="'$(FailUIBuild)'=='true' AND '$(NpmBuildExit)' != '0'" Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit))." />
-    <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmBuildExit)' != '0'" Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit)). Continuing C# build." />
+    <Error   Condition="'$(FailUIBuild)'=='true' AND '$(NpmBuildExit)' != '0'"
+             Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit))." />
+    <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmBuildExit)' != '0'"
+             Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit)). Continuing C# build." />
   </Target>
 
   <!-- Keep lang/** copied (localization files) -->

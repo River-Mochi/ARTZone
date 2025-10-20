@@ -8,7 +8,6 @@ namespace ARTZone.Tools
 {
     using Game;
     using Game.Prefabs;   // PrefabSystem, PrefabBase, UIObject, PrefabRef
-    using Game.UI;        // UIObject
     using Unity.Collections;
     using Unity.Entities;
 
@@ -29,7 +28,7 @@ namespace ARTZone.Tools
             if (_done)
                 return;
 
-            var ourPrefab = TryFindPrefabByName(ZoningControllerToolSystem.ToolID);
+            PrefabBase? ourPrefab = TryFindPrefabByName(ZoningControllerToolSystem.ToolID);
             if (ourPrefab == null)
             {
                 // Not created yet; try again next frame.
@@ -38,7 +37,7 @@ namespace ARTZone.Tools
 
             // Prefer items you listed; first found wins.
             var donors = new[] { "Wide Sidewalk", "Grass", "Sound Barrier", "Crosswalk", "Quay" };
-            bool ok = TryAttachPaletteTileAfterDonor(_prefabSystem, ourPrefab, donors);
+            var ok = TryAttachPaletteTileAfterDonor(_prefabSystem, ourPrefab, donors);
 
             if (!ok)
                 ARTZoneMod.s_Log.Warn("[ART] No donor in RoadsServices found; palette tile not created.");
@@ -49,15 +48,15 @@ namespace ARTZone.Tools
         // Find a PrefabBase by its name by scanning PrefabRef+UIObject entities.
         private PrefabBase? TryFindPrefabByName(string name)
         {
-            var q = new EntityQueryBuilder(Allocator.Temp)
+            EntityQuery q = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<PrefabRef, UIObject>()
                 .Build(this);
 
-            using var entities = q.ToEntityArray(Allocator.Temp);
-            foreach (var e in entities)
+            using NativeArray<Entity> entities = q.ToEntityArray(Allocator.Temp);
+            foreach (Entity e in entities)
             {
                 // Compare prefab name via API (entity itself has no .name)
-                string prefabName = _prefabSystem.GetPrefabName(e);
+                var prefabName = _prefabSystem.GetPrefabName(e);
                 if (prefabName == name)
                 {
                     return _prefabSystem.GetPrefab<PrefabBase>(e);
@@ -72,7 +71,7 @@ namespace ARTZone.Tools
             string[] donorNamesOrdered)
         {
             // 1) Ensure our prefab has a UIObject
-            var ui = ourPrefab.GetComponent<UIObject>();
+            UIObject ui = ourPrefab.GetComponent<UIObject>();
             if (ui == null)
             {
                 ui = ourPrefab.AddComponent<UIObject>();
@@ -83,24 +82,24 @@ namespace ARTZone.Tools
             // 2) Find a donor with UIObject in the RoadsServices group
             UIObject? donorUI = null;
 
-            var q = new EntityQueryBuilder(Allocator.Temp)
+            EntityQuery q = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<PrefabRef, UIObject>()
                 .Build(prefabSystem);
 
-            using var entities = q.ToEntityArray(Allocator.Temp);
-            var prLookup = prefabSystem.GetComponentLookup<PrefabRef>(true);
+            using NativeArray<Entity> entities = q.ToEntityArray(Allocator.Temp);
+            ComponentLookup<PrefabRef> prLookup = prefabSystem.GetComponentLookup<PrefabRef>(true);
 
-            foreach (string donorName in donorNamesOrdered)
+            foreach (var donorName in donorNamesOrdered)
             {
-                foreach (var e in entities)
+                foreach (Entity e in entities)
                 {
-                    string prefabName = prefabSystem.GetPrefabName(e);
+                    var prefabName = prefabSystem.GetPrefabName(e);
                     if (prefabName != donorName)
                         continue;
 
-                    var pr = prLookup[e];
-                    var donor = prefabSystem.GetPrefab<PrefabBase>(pr);
-                    var dui = donor.GetComponent<UIObject>();
+                    PrefabRef pr = prLookup[e];
+                    PrefabBase donor = prefabSystem.GetPrefab<PrefabBase>(pr);
+                    UIObject dui = donor.GetComponent<UIObject>();
                     if (dui != null && dui.m_Group != null && dui.m_Group.name == "RoadsServices")
                     {
                         donorUI = dui;

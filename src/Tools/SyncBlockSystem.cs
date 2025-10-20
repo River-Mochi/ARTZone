@@ -4,7 +4,6 @@
 
 namespace ARTZone
 {
-    using System;
     using ARTZone.Components;
     using Game;
     using Game.Common;
@@ -90,7 +89,7 @@ namespace ARTZone
                 Entity roadEntity = owner.m_Owner;
 
                 // Which side are we updating?
-                bool left = (math.dot(1, block.m_Direction) < 0);
+                var left = (math.dot(1, block.m_Direction) < 0);
 
                 // Determine depth from temp (preview) or current zoning data
                 int depth;
@@ -112,7 +111,7 @@ namespace ARTZone
                     return;
 
                 // --- settings driven early-outs (null-safe) ---
-                var settings = ARTZoneMod.s_Settings;
+                Setting? settings = ARTZoneMod.s_Settings;
                 if (settings != null)
                 {
                     if (settings.RemoveOccupiedCells &&
@@ -142,11 +141,11 @@ namespace ARTZone
                 if (validArea.m_Area.y * validArea.m_Area.w == 0)
                     return false;
 
-                for (int z = validArea.m_Area.z; z < validArea.m_Area.w; z++)
+                for (var z = validArea.m_Area.z; z < validArea.m_Area.w; z++)
                 {
-                    for (int x = validArea.m_Area.x; x < validArea.m_Area.y; x++)
+                    for (var x = validArea.m_Area.x; x < validArea.m_Area.y; x++)
                     {
-                        int idx = z * block.m_Size.x + x;
+                        var idx = z * block.m_Size.x + x;
                         Cell cell = cells[idx];
                         if ((cell.m_State & CellFlags.Occupied) != 0)
                             return true;
@@ -160,11 +159,11 @@ namespace ARTZone
                 if (validArea.m_Area.y * validArea.m_Area.w == 0)
                     return false;
 
-                for (int z = validArea.m_Area.z; z < validArea.m_Area.w; z++)
+                for (var z = validArea.m_Area.z; z < validArea.m_Area.w; z++)
                 {
-                    for (int x = validArea.m_Area.x; x < validArea.m_Area.y; x++)
+                    for (var x = validArea.m_Area.x; x < validArea.m_Area.y; x++)
                     {
-                        int idx = z * block.m_Size.x + x;
+                        var idx = z * block.m_Size.x + x;
                         Cell cell = cells[idx];
                         if (cell.m_Zone.m_Index != ZoneType.None.m_Index)
                             return true;
