@@ -9,15 +9,15 @@
 // Build: define ART_DIAGNOSTICS in Debug (your csproj already does).
 
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using Colossal.Serialization.Entities;
 using Game;
 using Game.Net;
 using Game.Prefabs;
 using Game.SceneFlow;
 using Game.Tools;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using Unity.Entities;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -176,9 +176,12 @@ namespace ARTZone.Tools
 
             ARTZoneMod.s_Log.Info($"Setting up tools. {s_ToolsLookup.Count} registered tools");
 
-            foreach ((ToolDefinition def, (PrefabBase Prefab, UIObject UI) pair) in s_ToolsLookup)
+            foreach (KeyValuePair<ToolDefinition, (PrefabBase Prefab, UIObject UI)> kvp in s_ToolsLookup)
             {
+                ToolDefinition def = kvp.Key;
+                var pair = kvp.Value; // (PrefabBase Prefab, UIObject UI)
                 PrefabBase prefab = pair.Prefab;
+
                 try
                 {
                     PlaceableNetData placeable = s_PrefabSystem.GetComponentData<PlaceableNetData>(s_AnchorPrefab);
@@ -196,6 +199,7 @@ namespace ARTZone.Tools
                     ARTZoneMod.s_Log.Error($"\tCould not setup tool {def.ToolID}: {e}");
                 }
             }
+
         }
 
         // -------- Anchor resolution ----------

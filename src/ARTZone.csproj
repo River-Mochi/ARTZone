@@ -5,28 +5,21 @@
     <Configurations>Debug;Release</Configurations>
     <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
 
-    <!-- Labels/metadata for humans; we'll let CS2 toolchain emit attributes to avoid dupes -->
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <AssemblyTitle>ART-Zone</AssemblyTitle>
-    <Product>ART-Zone</Product>
-    <AssemblyName>ARTZone</AssemblyName>
-    <RootNamespace>ARTZone</RootNamespace>
 
     <Nullable>enable</Nullable>
-
-    <!-- Prevent SDK from generating assembly + TFM attributes (CS0579 fix) -->
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
 
     <!-- Node/NPM runner + UI build strictness -->
     <NpmCmd>npm</NpmCmd>
 
-    <!-- keep UI build ON, but skip npm ci by default -->
-    <NpmEnabled>1</NpmEnabled>
-    <NpmSkipCi>true</NpmSkipCi>
+    <!-- UI build knobs -->
+    <!-- Disable npm ci by default; flip to true when you want it -->
+    <UIEnableNpmCi>false</UIEnableNpmCi>
 
-    <!-- In Debug: soft-fail UI build; in Release: you can flip this to true later -->
+    <!-- If UI build fails, don't fail C# build -->
     <FailUIBuild>false</FailUIBuild>
+<!-- Stop SDK from generating attributes that collide with the CS2 toolchain -->
+
+	  
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -62,13 +55,13 @@
     <Reference Include="Unity.Mathematics"><Private>false</Private></Reference>
   </ItemGroup>
 
-  <!-- Convenience: make common toolchain files viewable in Properties/ -->
+  <!-- Convenience: show toolchain files in Properties/ -->
   <ItemGroup>
     <None Include="$(ModPropsFile)" Link="Properties\Mod.props" />
     <None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
   </ItemGroup>
 
-  <!-- Copy UI assets so COUI can find them via coui://RoadZoningTools/... -->
+  <!-- Copy UI assets so COUI can find them via coui://ARTZone/... -->
   <ItemGroup>
     <Content Include="UI\mod.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -82,36 +75,24 @@
     </Content>
   </ItemGroup>
 
-  <!-- 1) Install npm deps ONCE, but only when allowed and needed -->
-  <Target Name="NpmInstallIfNeeded"
-          BeforeTargets="Build"
-          Condition=" '$(NpmEnabled)'=='1'
-                   AND '$(NpmSkipCi)'!='true'
-                   AND Exists('$(ProjectDir)UI\package.json')
-                   AND !Exists('$(ProjectDir)UI\node_modules') ">
+  <!-- 1) OPTIONAL npm ci (off by default) -->
+  <Target Name="NpmInstallIfNeeded" BeforeTargets="Build" Condition="'$(UIEnableNpmCi)'=='true' AND Exists('$(ProjectDir)UI\package.json') AND !Exists('$(ProjectDir)UI\node_modules')">
     <Message Text="ART UI: npm ci (first-time install)..." Importance="high" />
     <Exec Command="$(NpmCmd) ci" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true">
       <Output TaskParameter="ExitCode" PropertyName="NpmCiExit" />
     </Exec>
-    <Error   Condition="'$(FailUIBuild)'=='true' AND '$(NpmCiExit)' != '0'"
-             Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). See Output window for details." />
-    <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmCiExit)' != '0'"
-             Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). Continuing C# build." />
+    <Error Condition="'$(FailUIBuild)'=='true' AND '$(NpmCiExit)' != '0'" Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). See Output window for details." />
+    <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmCiExit)' != '0'" Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). Continuing C# build." />
   </Target>
 
-  <!-- 2) Build the UI bundle after C# build -->
-  <Target Name="BuildUI"
-          AfterTargets="Build"
-          Condition=" '$(NpmEnabled)'=='1'
-                   AND Exists('$(ProjectDir)UI\package.json') ">
+  <!-- 2) Always try to build the UI after the C# build -->
+  <Target Name="BuildUI" AfterTargets="Build" Condition="Exists('$(ProjectDir)UI\package.json')">
     <Message Text="ART UI: npm run build ($(Configuration))..." Importance="high" />
     <Exec Command="$(NpmCmd) run build" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true">
       <Output TaskParameter="ExitCode" PropertyName="NpmBuildExit" />
     </Exec>
-    <Error   Condition="'$(FailUIBuild)'=='true' AND '$(NpmBuildExit)' != '0'"
-             Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit))." />
-    <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmBuildExit)' != '0'"
-             Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit)). Continuing C# build." />
+    <Error Condition="'$(FailUIBuild)'=='true' AND '$(NpmBuildExit)' != '0'" Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit))." />
+    <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmBuildExit)' != '0'" Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit)). Continuing C# build." />
   </Target>
 
   <!-- Keep lang/** copied (localization files) -->
