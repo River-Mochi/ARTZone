@@ -1,80 +1,62 @@
 // File: src/Tools/ZoningControllerToolUISystem.cs
 // Purpose:
-//  Renders the “Zoning Side” section in-game with three buttons. Reads values from ZoningControllerToolUISystem bindings
-//   and calls its triggers when clicked.
-//   This is the UI system that exposes bindings to the JS/TS UI and holds two values:
-//   - ToolZoningMode (for our standalone tool)
-//   - RoadZoningMode (for future use while placing roads; original mod shows the same buttons)
-//   And a flag:
-//   - IsRoadPrefab (so the UI knows whether to render the section under the vanilla net tool or our tool)
-//
-//   The JS/TS (ZoningToolSections.tsx) reads these bindings and renders three buttons:
-//     Both / Left / Right  (with icons)
-//   It also calls the triggers to change them or flip "both".
-//  ToolSystem reads ToolDepths (from UISystem) each frame, previews on hover,
-//  and applies changes on LMB release. It also listens for the invert key and asks the UISystem to flip the mode.
-//
-//   NOTE: this does not deal with palette icon which is in ToolsHelper.cs via UIObject.
-//
-// Nullability:
-//   using `= null!;` for fields that are set in OnCreate() to satisfy <Nullable>enable</Nullable>.
-
-#nullable enable
-
-using Colossal.UI.Binding;
-using Game.Prefabs;
-using Game.Tools;
-using Game.UI;
-using Unity.Mathematics;
+//  Exposes “Zoning Side” values/bindings to the web UI, and offers triggers the TS calls.
+//  Holds two bitmasks (ToolZoningMode / RoadZoningMode) and a bool (IsRoadPrefab).
+//  Also reacts to the optional ToggleTool keybind (surfaced via ARTZoneMod.m_ToggleToolAction).
 
 namespace ARTZone.Tools
 {
+    using Colossal.UI.Binding;
+    using Game.Prefabs;
+    using Game.Tools;
+    using Game.UI;
+    using Unity.Mathematics;
+
     public partial class ZoningControllerToolUISystem : UISystemBase
     {
-        // === UI value bindings exposed to the web UI ===
-        private ValueBinding<int> toolZoningMode = null!;
-        private ValueBinding<int> roadZoningMode = null!;
-        private ValueBinding<bool> isRoadPrefab = null!;
+        // === Bindings visible to JS/TS ===
+        private ValueBinding<int> m_ToolZoningMode = null!;
+        private ValueBinding<int> m_RoadZoningMode = null!;
+        private ValueBinding<bool> m_IsRoadPrefab = null!;
 
-        // === For checking active tool/prefab and toggling tool ===
-        private ToolSystem mainToolSystem = null!;
-        private ZoningControllerToolSystem toolSystem = null!;
+        // === Tool systems we interact with ===
+        private ToolSystem m_MainToolSystem = null!;
+        private ZoningControllerToolSystem m_ToolSystem = null!;
 
+        // Public helpers for other systems
+        public ZoningMode ToolZoningMode => (ZoningMode)m_ToolZoningMode.value;
+        public ZoningMode RoadZoningMode => (ZoningMode)m_RoadZoningMode.value;
 
-        // Public helpers used by the tool system
-        public ZoningMode ToolZoningMode => (ZoningMode)toolZoningMode.value;
-        public ZoningMode RoadZoningMode => (ZoningMode)roadZoningMode.value;
-
-        // Convert "Both/Left/Right" to left/right depths (6 = on, 0 = off)
+        // Convert bitmask to per-side depths (6 = on, 0 = off)
         public int2 ToolDepths
         {
             get => new(
-                ((ZoningMode)toolZoningMode.value & ZoningMode.Left) == ZoningMode.Left ? 6 : 0,
-                ((ZoningMode)toolZoningMode.value & ZoningMode.Right) == ZoningMode.Right ? 6 : 0);
+                ((ZoningMode)m_ToolZoningMode.value & ZoningMode.Left) == ZoningMode.Left ? 6 : 0,
+                ((ZoningMode)m_ToolZoningMode.value & ZoningMode.Right) == ZoningMode.Right ? 6 : 0);
             set
             {
-                ZoningMode newZoningMode = ZoningMode.Both;
+                var mode = ZoningMode.Both;
                 if (value.x == 0)
-                    newZoningMode ^= ZoningMode.Left;
+                    mode ^= ZoningMode.Left;
                 if (value.y == 0)
-                    newZoningMode ^= ZoningMode.Right;
-                ChangeToolZoningMode((int)newZoningMode);
+                    mode ^= ZoningMode.Right;
+                ChangeToolZoningMode((int)mode);
             }
         }
 
         public int2 RoadDepths
         {
             get => new(
-                ((ZoningMode)roadZoningMode.value & ZoningMode.Left) == ZoningMode.Left ? 6 : 0,
-                ((ZoningMode)roadZoningMode.value & ZoningMode.Right) == ZoningMode.Right ? 6 : 0);
+                ((ZoningMode)m_RoadZoningMode.value & ZoningMode.Left) == ZoningMode.Left ? 6 : 0,
+                ((ZoningMode)m_RoadZoningMode.value & ZoningMode.Right) == ZoningMode.Right ? 6 : 0);
             set
             {
-                ZoningMode newZoningMode = ZoningMode.Both;
+                var mode = ZoningMode.Both;
                 if (value.x == 0)
-                    newZoningMode ^= ZoningMode.Left;
+                    mode ^= ZoningMode.Left;
                 if (value.y == 0)
-                    newZoningMode ^= ZoningMode.Right;
-                ChangeRoadZoningMode((int)newZoningMode);
+                    mode ^= ZoningMode.Right;
+                ChangeRoadZoningMode((int)mode);
             }
         }
 
@@ -82,87 +64,90 @@ namespace ARTZone.Tools
         {
             base.OnCreate();
 
-            // Bindings exposed to JS/TS (ids must match your UI code)
-            AddBinding(toolZoningMode = new ValueBinding<int>(ARTZoneMod.ModID, "ToolZoningMode", (int)ZoningMode.Both));
-            AddBinding(roadZoningMode = new ValueBinding<int>(ARTZoneMod.ModID, "RoadZoningMode", (int)ZoningMode.Both));
-            AddBinding(isRoadPrefab = new ValueBinding<bool>(ARTZoneMod.ModID, "IsRoadPrefab", false));
+            // Value bindings (ids used by TS):
+            AddBinding(m_ToolZoningMode = new ValueBinding<int>(ARTZoneMod.ModID, "ToolZoningMode", (int)ZoningMode.Both));
+            AddBinding(m_RoadZoningMode = new ValueBinding<int>(ARTZoneMod.ModID, "RoadZoningMode", (int)ZoningMode.Both));
+            AddBinding(m_IsRoadPrefab = new ValueBinding<bool>(ARTZoneMod.ModID, "IsRoadPrefab", false));
 
-            // Triggers callable from JS/TS
+            // Triggers TS calls:
             AddBinding(new TriggerBinding<int>(ARTZoneMod.ModID, "ChangeRoadZoningMode", ChangeRoadZoningMode));
             AddBinding(new TriggerBinding<int>(ARTZoneMod.ModID, "ChangeToolZoningMode", ChangeToolZoningMode));
             AddBinding(new TriggerBinding(ARTZoneMod.ModID, "FlipToolBothMode", FlipToolBothMode));
             AddBinding(new TriggerBinding(ARTZoneMod.ModID, "FlipRoadBothMode", FlipRoadBothMode));
             AddBinding(new TriggerBinding(ARTZoneMod.ModID, "ToggleZoneControllerTool", ToggleTool));
 
-            // Observe active tool/prefab to decide where to render the section in the UI
-            mainToolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
-            mainToolSystem.EventPrefabChanged += EventPrefabChanged;
-            mainToolSystem.EventToolChanged += EventToolChanged;
+            // Observe vanilla tool/prefab, so TS knows when to show the section
+            m_MainToolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
+            m_MainToolSystem.EventPrefabChanged -= OnPrefabChanged;
+            m_MainToolSystem.EventToolChanged -= OnToolChanged;
+            m_MainToolSystem.EventPrefabChanged += OnPrefabChanged;
+            m_MainToolSystem.EventToolChanged += OnToolChanged;
 
-            // For toggling our tool on demand from the floating button
-            toolSystem = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
-
-
+            // Our tool instance
+            m_ToolSystem = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
         }
 
-        private void EventToolChanged(ToolBaseSystem tool)
+        protected override void OnDestroy()
         {
-            // Update IsRoadPrefab when the active tool changes
-            isRoadPrefab.Update(tool.GetPrefab() is RoadPrefab);
+            if (m_MainToolSystem != null)
+            {
+                m_MainToolSystem.EventPrefabChanged -= OnPrefabChanged;
+                m_MainToolSystem.EventToolChanged -= OnToolChanged;
+            }
+            base.OnDestroy();
         }
 
         protected override void OnUpdate()
         {
             base.OnUpdate();
 
+            // Optional keyboard: Toggle tool (Shift+Z) — handled via Colossal action created by Setting.cs
+            var toggle = ARTZoneMod.m_ToggleToolAction;
+            if (toggle != null && toggle.WasPressedThisFrame())
+            {
+                ToggleTool();
+                // Keep the orange-panel buttons in sync with the tool mode when toggled on
+                m_ToolZoningMode.Update(m_RoadZoningMode.value);
+            }
         }
 
-
-        private void EventPrefabChanged(PrefabBase prefab)
+        private void OnToolChanged(ToolBaseSystem tool)
         {
-            // Update IsRoadPrefab when the selected prefab changes
-            isRoadPrefab.Update(prefab is RoadPrefab);
+            m_IsRoadPrefab.Update(tool.GetPrefab() is RoadPrefab);
+        }
+
+        private void OnPrefabChanged(PrefabBase prefab)
+        {
+            m_IsRoadPrefab.Update(prefab is RoadPrefab);
         }
 
         private void ToggleTool()
         {
-            // This is hooked by the floating button. Flip our tool on/off.
-            toolSystem.SetToolEnabled(mainToolSystem.activeTool != toolSystem);
+            if (m_MainToolSystem == null || m_ToolSystem == null)
+                return;
+
+            var wantEnable = m_MainToolSystem.activeTool != m_ToolSystem;
+            m_ToolSystem.SetToolEnabled(wantEnable);
         }
 
         private void FlipToolBothMode()
         {
-            if (ToolZoningMode == ZoningMode.Both)
-                toolZoningMode.Update((int)ZoningMode.None);
-            else
-                toolZoningMode.Update((int)ZoningMode.Both);
+            m_ToolZoningMode.Update(ToolZoningMode == ZoningMode.Both ? (int)ZoningMode.None : (int)ZoningMode.Both);
         }
 
         private void FlipRoadBothMode()
         {
-            if (RoadZoningMode == ZoningMode.Both)
-                roadZoningMode.Update((int)ZoningMode.None);
-            else
-                roadZoningMode.Update((int)ZoningMode.Both);
+            m_RoadZoningMode.Update(RoadZoningMode == ZoningMode.Both ? (int)ZoningMode.None : (int)ZoningMode.Both);
         }
 
-        private void ChangeToolZoningMode(int value)
-        {
-            // (ZoningMode) cast kept for readability in debug, but we only store the int
-            toolZoningMode.Update(value);
-        }
+        private void ChangeToolZoningMode(int value) => m_ToolZoningMode.Update(value);
+        private void ChangeRoadZoningMode(int value) => m_RoadZoningMode.Update(value);
 
-        private void ChangeRoadZoningMode(int value)
-        {
-            roadZoningMode.Update(value);
-        }
-
-        public void SetRoadZoningMode(ZoningMode mode) => roadZoningMode.Update((int)mode);
-
+        public void SetRoadZoningMode(ZoningMode mode) => m_RoadZoningMode.Update((int)mode);
 
         public void InvertZoningMode()
         {
-            // Keybind toggles tool-side bitmask
+            // Tool-side invert (bitwise)
             ChangeToolZoningMode((int)~ToolZoningMode);
         }
     }

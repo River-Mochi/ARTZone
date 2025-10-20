@@ -1,5 +1,5 @@
 // File: src/Settings/Setting.cs
-// Options UI: Actions (toggles+keybind) + About (links)
+// Options UI + keybinding definition. RMB = invert zoning. Shift+Z = toggle tool on/off.
 
 namespace ARTZone
 {
@@ -10,80 +10,85 @@ namespace ARTZone
     using Game.Settings;
     using UnityEngine; // Application.OpenURL
 
-    [FileLocation("ModsSettings/ART-Zone/ART-Zone")]    // save Options settings here
-    // Show tabs in this order:
+    [FileLocation("ModsSettings/ART-Zone/ART-Zone")]
     [SettingsUITabOrder(kActionsTab, kAboutTab)]
-    // Show groups (section groups) in this order where they appear:
     [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup, kAboutLinksGroup)]
-    // Show group headers for these:
     [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup, kAboutLinksGroup)]
-    // Define our mouse action once
+
+    // Declare actions once
     [SettingsUIMouseAction(ARTZoneMod.kInvertZoningActionName, ActionType.Button, usages: new[] { "Zone Controller Tool" })]
+    [SettingsUIKeyboardAction(ARTZoneMod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
     public sealed class Setting : ModSetting
     {
         // Tabs
         public const string kActionsTab = "Actions";
         public const string kAboutTab = "About";
 
-        // Section id used on the Actions tab
-        public const string kSection = "Main";
-
-        // Group names
+        // Groups
         public const string kToggleGroup = "Zone Controller Tool";
         public const string kKeybindingGroup = "Key bindings";
         public const string kAboutLinksGroup = "Links";
 
+        // Section name
+        public const string kSection = "Main";
+
         public Setting(IMod mod) : base(mod) { }
 
-        // === External links (About tab) ===
-        private const string UrlParadoxMods = "https://mods.paradoxplaza.com/"; // TODO: set your mod page
-        private const string UrlDiscord = "https://discord.gg/HTav7ARPs2";
-
-        // === Toggles (Actions tab) ===
+        // --- Toggles ---
         [SettingsUISection(kSection, kToggleGroup)]
         public bool RemoveZonedCells { get; set; } = true;
 
         [SettingsUISection(kSection, kToggleGroup)]
         public bool RemoveOccupiedCells { get; set; } = true;
 
-        // === Keybinding (Actions tab) ===
-        // Default: RMB (user can change in Options)
+        // --- Keybindings (RMB invert) ---
         [SettingsUIMouseBinding(BindingMouse.Right, ARTZoneMod.kInvertZoningActionName)]
         [SettingsUISection(kSection, kKeybindingGroup)]
+
         public ProxyBinding InvertZoning
         {
             get; set;
         }
 
-        // === About tab buttons ===
-        [SettingsUISection(kAboutTab, kAboutLinksGroup)]
-        [SettingsUIButtonGroup("Social")]
+        // Shift+Z toggle (open Zoning Side panel)
+        [SettingsUIKeyboardBinding(BindingKeyboard.Z, ARTZoneMod.kToggleToolActionName, shift: true)]
+        [SettingsUISection(kSection, kKeybindingGroup)]
+        public ProxyBinding ToggleZoneTool
+        {
+            get; set;
+        }
+
+        // --- About tab link buttons ---
+        private const string UrlParadoxMods = "https://mods.paradoxplaza.com/";
+        private const string UrlDiscord = "https://discord.gg/HTav7ARPs2";
+
         [SettingsUIButton]
+        [SettingsUISection(kAboutTab, kAboutLinksGroup)]
         public bool OpenParadoxModsButton
         {
             set
             {
-                try
-                {
-                    Application.OpenURL(UrlParadoxMods);
-                }
-                catch (Exception ex) { ARTZoneMod.s_Log.Warn($"Open Paradox Mods failed: {ex.Message}"); }
+                TryOpen(UrlParadoxMods);
             }
         }
 
-        [SettingsUISection(kAboutTab, kAboutLinksGroup)]
-        [SettingsUIButtonGroup("Social")]
         [SettingsUIButton]
+        [SettingsUISection(kAboutTab, kAboutLinksGroup)]
         public bool OpenDiscordButton
         {
             set
             {
-                try
-                {
-                    Application.OpenURL(UrlDiscord);
-                }
-                catch (Exception ex) { ARTZoneMod.s_Log.Warn($"Open Discord failed: {ex.Message}"); }
+                TryOpen(UrlDiscord);
             }
+        }
+
+        private static void TryOpen(string url)
+        {
+            try
+            {
+                Application.OpenURL(url);
+            }
+            catch (Exception ex) { ARTZoneMod.s_Log.Warn($"OpenURL failed: {ex.Message}"); }
         }
 
         public override void SetDefaults()

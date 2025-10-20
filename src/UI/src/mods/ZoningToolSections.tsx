@@ -1,4 +1,4 @@
-﻿// src/UI/src/mods/ZoningToolSections.tsx
+﻿// File: src/UI/src/mods/ZoningToolSections.tsx
 import { ModuleRegistryExtend } from "cs2/modding";
 import { bindValue, trigger, useValue } from "cs2/api";
 import { tool } from "cs2/bindings";
@@ -10,122 +10,110 @@ import all_icon from "../../images/Toolbar/all/ico-all.svg";
 import left_icon from "../../images/Toolbar/left/ico-left.svg";
 import right_icon from "../../images/Toolbar/right/ico-right.svg";
 
+// Keep a local TS enum (cannot import C# into TS)
 export enum ZoningMode {
     None = 0,
     Right = 1,
     Left = 2,
-    Both = 3
-}
-const uilStandard = "coui://uil/Standard/";
-const allSrc = uilStandard + "StarAll.svg";
-
-const RoadZoningMode$ = bindValue<number>(mod.id, 'RoadZoningMode');
-const ToolZoningMode$ = bindValue<number>(mod.id, 'ToolZoningMode');
-const isRoadPrefab$ = bindValue<boolean>(mod.id, 'IsRoadPrefab');
-
-function changeToolZoningMode(zoningMode: ZoningMode) {
-    trigger(mod.id, "ChangeToolZoningMode", zoningMode);
+    Both = 3,
 }
 
-function changeRoadZoningMode(zoningMode: ZoningMode) {
-    trigger(mod.id, "ChangeRoadZoningMode", zoningMode);
-}
+const RoadZoningMode$ = bindValue<number>(mod.id, "RoadZoningMode");
+const ToolZoningMode$ = bindValue<number>(mod.id, "ToolZoningMode");
 
-function flipRoadBothMode() {
-    trigger(mod.id, "FlipRoadBothMode");
-}
-function flipToolBothMode() {
-    trigger(mod.id, "FlipToolBothMode");
-}
+function changeToolZoningMode(z: ZoningMode) { trigger(mod.id, "ChangeToolZoningMode", z); }
+function changeRoadZoningMode(z: ZoningMode) { trigger(mod.id, "ChangeRoadZoningMode", z); }
+function flipRoadBothMode() { trigger(mod.id, "FlipRoadBothMode"); }
+function flipToolBothMode() { trigger(mod.id, "FlipToolBothMode"); }
 
 export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
     return (props) => {
-        const { children, ...otherProps } = props || {};
+        const { children, ..._otherProps } = props || {};
 
-        // These get the value of the bindings.
-        const netToolActive = useValue(tool.activeTool$).id == tool.NET_TOOL;
-        const isRoadPrefab = useValue(isRoadPrefab$);
-        const zoningToolActive = useValue(tool.activeTool$).id == "Zone Controller Tool";
-        const SelectedToolZoningMode = useValue(ToolZoningMode$) as ZoningMode;
-        const SelectedRoadZoningMode = useValue(RoadZoningMode$) as ZoningMode;
+        const activeTool = useValue(tool.activeTool$);
+        const netToolActive = activeTool.id === tool.NET_TOOL;
+        const zoningToolActive = activeTool.id === "Zone Controller Tool";
+        const SelectedToolMode = useValue(ToolZoningMode$) as ZoningMode;
+        const SelectedRoadMode = useValue(RoadZoningMode$) as ZoningMode;
 
-        // translation handling. Translates using locale keys that are defined in C# or fallback string here.
         const { translate } = useLocalization();
+        const title = translate("ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]", "Zoning Side");
+        const tipBoth = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]", "Zone on both sides.");
+        const tipLeft = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]", "Zone only on the left side.");
+        const tipRight = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]", "Zone only on the right side.");
 
-        const ZoningModeTitle = translate("ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]", "Zoning Side");
-        const ZoningModeBothTooltipDescription = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]", "Zone on both sides.");
-        const ZoningModeLeftTooltipDescription = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]", "Zone only on the left side.");
-        const ZoningModeRightTooltipDescription = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]", "Zone only on the right side.");
-
-        var result = Component();
-
-
-        //Currently the mod doesn't work when placing roads, only with the Zoning TOol
-        if (isRoadPrefab) {
-            result.props.children?.push(
-                <>
-                    {(<VanillaComponentResolver.instance.Section title={ZoningModeTitle}>
-                        <>
-                            <VanillaComponentResolver.instance.ToolButton
-                                selected={((SelectedRoadZoningMode & ZoningMode.Both) == ZoningMode.Both)}
-                                tooltip={ZoningModeBothTooltipDescription}
-                                onSelect={flipRoadBothMode}
-                                src={all_icon}
-                                focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
-                                className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}></label></VanillaComponentResolver.instance.ToolButton>
-                            <VanillaComponentResolver.instance.ToolButton
-                                selected={((SelectedRoadZoningMode & ZoningMode.Left) == ZoningMode.Left)}
-                                tooltip={ZoningModeLeftTooltipDescription}
-                                onSelect={() => changeRoadZoningMode(SelectedRoadZoningMode ^ ZoningMode.Left)}
-                                src={left_icon}
-                                focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
-                                className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}></label></VanillaComponentResolver.instance.ToolButton>
-                            <VanillaComponentResolver.instance.ToolButton
-                                selected={((SelectedRoadZoningMode & ZoningMode.Right) == ZoningMode.Right)}
-                                tooltip={ZoningModeRightTooltipDescription}
-                                onSelect={() => changeRoadZoningMode(SelectedRoadZoningMode ^ ZoningMode.Right)}
-                                src={right_icon}
-                                focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
-                                className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}></label></VanillaComponentResolver.instance.ToolButton>
-                        </>
-                    </VanillaComponentResolver.instance.Section>
-                    )}
-                </>
-            )
+        function ensureTool() {
+            if (!zoningToolActive) trigger(mod.id, "ToggleZoneControllerTool");
         }
-        else if (zoningToolActive) {
+
+        const result = Component();
+
+        if (netToolActive) {
             result.props.children?.push(
-                <>
-                    {(<VanillaComponentResolver.instance.Section title={ZoningModeTitle}>
-                        <>
-                            <VanillaComponentResolver.instance.ToolButton
-                                selected={((SelectedToolZoningMode & ZoningMode.Both) == ZoningMode.Both)}
-                                tooltip={ZoningModeBothTooltipDescription}
-                                onSelect={flipToolBothMode}
-                                src={all_icon}
-                                focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
-                                className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}></label></VanillaComponentResolver.instance.ToolButton>
-                            <VanillaComponentResolver.instance.ToolButton
-                                selected={((SelectedToolZoningMode & ZoningMode.Left) == ZoningMode.Left)}
-                                tooltip={ZoningModeLeftTooltipDescription}
-                                onSelect={() => changeToolZoningMode(SelectedToolZoningMode ^ ZoningMode.Left)}
-                                src={left_icon}
-                                focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
-                                className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}></label></VanillaComponentResolver.instance.ToolButton>
-                            <VanillaComponentResolver.instance.ToolButton
-                                selected={((SelectedToolZoningMode & ZoningMode.Right) == ZoningMode.Right)}
-                                tooltip={ZoningModeRightTooltipDescription}
-                                onSelect={() => changeToolZoningMode(SelectedToolZoningMode ^ ZoningMode.Right)}
-                                src={right_icon}
-                                focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
-                                className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}><label className={styles.centeredContentButton}></label></VanillaComponentResolver.instance.ToolButton>
-                        </>
-                    </VanillaComponentResolver.instance.Section>
-                    )}
-                </>
-            )
+                <VanillaComponentResolver.instance.Section title={title}>
+                    <>
+                        <VanillaComponentResolver.instance.ToolButton
+                            selected={(SelectedRoadMode & ZoningMode.Both) === ZoningMode.Both}
+                            tooltip={tipBoth}
+                            onSelect={() => changeRoadZoningMode(SelectedRoadMode ^ ZoningMode.Both)}
+                            src={all_icon}
+                            focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
+                            className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}
+                        />
+                        <VanillaComponentResolver.instance.ToolButton
+                            selected={(SelectedRoadMode & ZoningMode.Left) === ZoningMode.Left}
+                            tooltip={tipLeft}
+                            onSelect={() => changeRoadZoningMode(SelectedRoadMode ^ ZoningMode.Left)}
+                            src={left_icon}
+                            focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
+                            className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}
+                        />
+                        <VanillaComponentResolver.instance.ToolButton
+                            selected={(SelectedRoadMode & ZoningMode.Right) === ZoningMode.Right}
+                            tooltip={tipRight}
+                            onSelect={() => changeRoadZoningMode(SelectedRoadMode ^ ZoningMode.Right)}
+                            src={right_icon}
+                            focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
+                            className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}
+                        />
+                    </>
+                </VanillaComponentResolver.instance.Section>
+            );
+        }
+
+        if (zoningToolActive) {
+            result.props.children?.push(
+                <VanillaComponentResolver.instance.Section title={title}>
+                    <>
+                        <VanillaComponentResolver.instance.ToolButton
+                            selected={(SelectedToolMode & ZoningMode.Both) === ZoningMode.Both}
+                            tooltip={tipBoth}
+                            onSelect={() => { ensureTool(); flipToolBothMode(); }}
+                            src={all_icon}
+                            focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
+                            className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}
+                        />
+                        <VanillaComponentResolver.instance.ToolButton
+                            selected={(SelectedToolMode & ZoningMode.Left) === ZoningMode.Left}
+                            tooltip={tipLeft}
+                            onSelect={() => { ensureTool(); changeToolZoningMode(SelectedToolMode ^ ZoningMode.Left); }}
+                            src={left_icon}
+                            focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
+                            className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}
+                        />
+                        <VanillaComponentResolver.instance.ToolButton
+                            selected={(SelectedToolMode & ZoningMode.Right) === ZoningMode.Right}
+                            tooltip={tipRight}
+                            onSelect={() => { ensureTool(); changeToolZoningMode(SelectedToolMode ^ ZoningMode.Right); }}
+                            src={right_icon}
+                            focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
+                            className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}
+                        />
+                    </>
+                </VanillaComponentResolver.instance.Section>
+            );
         }
 
         return result;
-    }
-}
+    };
+};
