@@ -9,10 +9,10 @@ namespace ARTZone
 
     public sealed class LocaleEN : IDictionarySource
     {
-        private readonly Setting m_Setting;
+        private readonly Setting s_Settings;
         public LocaleEN(Setting setting)
         {
-            m_Setting = setting;
+            s_Settings = setting;
         }
 
         public IEnumerable<KeyValuePair<string, string>> ReadEntries(
@@ -22,41 +22,59 @@ namespace ARTZone
             return new Dictionary<string, string>
             {
                 // Settings title
-                { m_Setting.GetSettingsLocaleID(), "ART-Zone" },
+                { s_Settings.GetSettingsLocaleID(), "ART-Zone" },
 
                 // Tabs
-                { m_Setting.GetOptionTabLocaleID(Setting.kActionsTab), "Actions" },
-                { m_Setting.GetOptionTabLocaleID(Setting.kAboutTab),   "About" },
+                { s_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "Actions" },
+                { s_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "About" },
 
-                // Groups (Actions tab)
-                { m_Setting.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Zone Controller Tool Options" },
-                { m_Setting.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Key bindings" },
-
-                // Groups (About tab)
-                { m_Setting.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "Links" },
+                // Groups
+                { s_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Zone Controller Tool Options" },
+                { s_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Key bindings" },
+                { s_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
+                { s_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
                 // Toggles
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being removed" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Prevent zoned cells from being overridden during preview and apply phases." },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being removed" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Prevent zoned cells from being overridden during preview and apply phases." },
 
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Prevent occupied cells from being overridden during preview and apply phases." },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Prevent occupied cells from being overridden during preview and apply phases." },
 
-                // Keybind
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Invert Zoning Mouse Button" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.InvertZoning)),  "Bind a mouse button to invert zoning while the tool is active." },
-                { m_Setting.GetBindingKeyLocaleID(ARTZoneMod.kInvertZoningActionName), "Invert Zoning" },
+                // Keybinds
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Invert Zoning Mouse Button" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.InvertZoning)),  "Bind a mouse button to invert zoning while the tool is active." },
+
+                // Shift+Z (Toggle tool)
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Toggle Zone Controller Tool" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Open/close the Zone Controller tool." },
+
+                // Binding titles in the binding dialog
+                { s_Settings.GetBindingKeyLocaleID(ARTZoneMod.kInvertZoningActionName), "Invert Zoning" },
+                { s_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName),   "Toggle Zone Controller Tool" },
 
                 // Palette/asset text
                 { $"Assets.NAME[{Tools.ZoningControllerToolSystem.ToolID}]", "Zone Controller" },
                 { $"Assets.DESCRIPTION[{Tools.ZoningControllerToolSystem.ToolID}]",
                   "Control how zoning behaves along a road.\nChoose zoning on both sides, only left or right, or none.\nRight-click (by default) inverts the configuration." },
 
-                // About tab link buttons
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.OpenParadoxModsButton)), "Paradox Mods" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.OpenParadoxModsButton)),  "Open the Paradox Mods page in your browser." },
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.OpenDiscordButton)), "Discord" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.OpenDiscordButton)),  "Open the Discord for ART-Zone in your browser." },
+                // About — read-only labels
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)), "Mod Name" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),  "Display name of this mod." },
+
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "Version" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "Current mod version." },
+
+#if DEBUG
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.InformationalVersionText)), "Informational Version" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.InformationalVersionText)),  "Mod Version with Commit ID" },
+#endif
+
+                // About tab links
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadoxModsButton)), "Paradox Mods" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadoxModsButton)),  "Open the Paradox Mods page in your browser." },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscordButton)), "Discord" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscordButton)),  "Open the Discord for ART-Zone in your browser." },
             };
         }
 

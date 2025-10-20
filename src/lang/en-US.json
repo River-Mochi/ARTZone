@@ -1,7 +1,7 @@
 ﻿{
   "Assets.NAME[Zone Controller Tool]": "Zone Controller",
   "Assets.DESCRIPTION[Zone Controller Tool]": "Tool to control behavior of zoning next to a road.\nChooses: zoning on both sides of a road, only on the left or right, or no zoning.\nBy default, right-click flips the zoning choice.",
-  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "[ART] Zoning Side",
+  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "ART Zoning Side",
   "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "Zone both sides.",
   "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "Zone only on the left side.",
   "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "Zone only on the right side."

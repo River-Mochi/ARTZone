@@ -9,10 +9,10 @@ namespace ARTZone
 
     public sealed class LocaleDE : IDictionarySource
     {
-        private readonly Setting m_Setting;
+        private readonly Setting s_Settings;
         public LocaleDE(Setting setting)
         {
-            m_Setting = setting;
+            s_Settings = setting;
         }
 
         public IEnumerable<KeyValuePair<string, string>> ReadEntries(
@@ -22,30 +22,30 @@ namespace ARTZone
             return new Dictionary<string, string>
             {
                 // Settings title
-                { m_Setting.GetSettingsLocaleID(), "ART-Zone" },
+                { s_Settings.GetSettingsLocaleID(), "ART-Zone" },
 
                 // Tabs
-                { m_Setting.GetOptionTabLocaleID(Setting.kActionsTab), "Aktionen" },
-                { m_Setting.GetOptionTabLocaleID(Setting.kAboutTab),   "Über" },
+                { s_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "Aktionen" },
+                { s_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "Über" },
 
                 // Groups (Actions tab)
-                { m_Setting.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Optionen des Zonierungswerkzeugs" },
-                { m_Setting.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Tastenbelegung" },
+                { s_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Optionen des Zonierungswerkzeugs" },
+                { s_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Tastenbelegung" },
 
                 // Groups (About tab)
-                { m_Setting.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "Links" },
+                { s_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "Links" },
 
                 // Toggles
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Verhindere das Entfernen zonierter Felder" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Verhindert das Überschreiben vorhandener Zonen während der Vorschau oder Anwendung." },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Verhindere das Entfernen zonierter Felder" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Verhindert das Überschreiben vorhandener Zonen während der Vorschau oder Anwendung." },
 
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Verhindere das Entfernen belegter Felder" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Verhindert das Überschreiben belegter Felder mit Gebäuden." },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Verhindere das Entfernen belegter Felder" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Verhindert das Überschreiben belegter Felder mit Gebäuden." },
 
                 // Keybind
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Maustaste zum Umdrehen der Zonierung" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.InvertZoning)),  "Weise eine Maustaste zu, um die Zonierungsrichtung umzuschalten." },
-                { m_Setting.GetBindingKeyLocaleID(ARTZoneMod.kInvertZoningActionName), "Zonierung umkehren" },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Maustaste zum Umdrehen der Zonierung" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.InvertZoning)),  "Weise eine Maustaste zu, um die Zonierungsrichtung umzuschalten." },
+                { s_Settings.GetBindingKeyLocaleID(ARTZoneMod.kInvertZoningActionName), "Zonierung umkehren" },
 
                 // Palette/asset text
                 { $"Assets.NAME[{Tools.ZoningControllerToolSystem.ToolID}]", "Zonierungssteuerung" },
@@ -53,10 +53,10 @@ namespace ARTZone
                   "Steuert, wie die Zonierung entlang einer Straße funktioniert.\nWähle zwischen beiden Seiten, nur links, nur rechts oder keiner.\nRechtsklick zum Umdrehen der Einstellung." },
 
                 // About tab link buttons
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.OpenParadoxModsButton)), "Paradox Mods" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.OpenParadoxModsButton)),  "Öffne die Paradox-Mods-Seite im Browser." },
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.OpenDiscordButton)), "Discord" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.OpenDiscordButton)),  "Öffne den ART-Zone-Discord im Browser." },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadoxModsButton)), "Paradox Mods" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadoxModsButton)),  "Öffne die Paradox-Mods-Seite im Browser." },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscordButton)), "Discord" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscordButton)),  "Öffne den ART-Zone-Discord im Browser." },
             };
         }
 

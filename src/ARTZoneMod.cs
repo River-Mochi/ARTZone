@@ -1,9 +1,8 @@
 // File: src/ARTZoneMod.cs
-// Purpose: Mod entrypoint; settings + locales; keybinding hookup (polling)
+// Purpose: Mod entrypoint; settings + locales; keybinding hookup.
 
 namespace ARTZone
 {
-    using ARTZone.Tools;
     using Colossal;
     using Colossal.IO.AssetDatabase;
     using Colossal.Logging;
@@ -14,20 +13,27 @@ namespace ARTZone
 
     public sealed class ARTZoneMod : IMod
     {
+        // ---- Meta ----
         public const string ModID = "ARTZone";
+        public const string Name = "ART-Zone";
+        public const string VersionShort = "1.0.0";
+#if DEBUG
+        public const string InformationalVersion = VersionShort + " (DEBUG)";
+#else
+        public const string InformationalVersion = VersionShort;
+#endif
 
-        // Action names (must match attributes in Setting.cs)
+        // ---- Actions (must match Setting.cs attributes) ----
         public const string kInvertZoningActionName = "InvertZoning";
         public const string kToggleToolActionName = "ToggleZoneTool";
 
-        // Settings instance (legacy alias + property)
-        public static Setting m_Setting = null!;
+        // ---- Settings instance ----
         public static Setting? s_Settings
         {
             get; private set;
         }
 
-        // Runtime handles to configured actions
+        // ---- Runtime input actions ----
         public static ProxyAction? m_InvertZoningAction
         {
             get; private set;
@@ -37,31 +43,37 @@ namespace ARTZone
             get; private set;
         }
 
+        // ---- Logging ----
         public static readonly ILog s_Log =
             LogManager.GetLogger("ART-Zone").SetShowsErrorsInUI(false);
 
+        private static bool s_BannerLogged;
+
         public void OnLoad(UpdateSystem updateSystem)
         {
-            s_Log.Info("[ART] OnLoad");
+            if (!s_BannerLogged)
+            {
+                s_Log.Info($"{Name} v{VersionShort} - OnLoad");
+                s_BannerLogged = true;
+            }
 
-            // Settings before locales (labels need a settings instance)
+            // Settings must exist before locales (so labels resolve)
             var settings = new Setting(this);
             s_Settings = settings;
-            m_Setting = settings;
 
-            // Locales (add more later as you translate)
+            // Locales BEFORE Options UI registration
             AddLocale("en-US", new LocaleEN(settings));
             AddLocale("fr-FR", new LocaleFR(settings));
             AddLocale("de-DE", new LocaleDE(settings));
             AddLocale("es-ES", new LocaleES(settings));
-            AddLocale("zh-HANS", new LocaleZH_CN(settings));
-            AddLocale("zh-HANT", new LocaleZH_HANT(settings));
+            AddLocale("zh-HANS", new LocaleZH_CN(settings));   // Simplified Chinese
+            AddLocale("zh-HANT", new LocaleZH_HANT(settings)); // Traditional Chinese
 
-            // Load saved values, then show Options UI
+            // Load saved values (or defaults), then show Settings UI
             AssetDatabase.global.LoadSettings(ModID, settings, new Setting(this));
             settings.RegisterInOptionsUI();
 
-            // Create actions from the Setting.cs attributes and get live handles
+            // Key bindings (register + get runtime handles)
             try
             {
                 settings.RegisterKeyBindings();
@@ -80,14 +92,14 @@ namespace ARTZone
             }
 
             // Systems (order matters)
-            updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
-            updateSystem.UpdateAt<ToolHighlightSystem>(SystemUpdatePhase.ToolUpdate);
+            updateSystem.UpdateAt<Tools.ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
+            // (Removed: Tools.ToolHighlightSystem — not present in your project)
             updateSystem.UpdateAt<SyncCreatedRoadsSystem>(SystemUpdatePhase.Modification4);
             updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
-            updateSystem.UpdateAt<ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
-            updateSystem.UpdateAt<ToolBootstrapSystem>(SystemUpdatePhase.UIUpdate);
+            updateSystem.UpdateAt<Tools.ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
+            updateSystem.UpdateAt<Tools.ToolBootstrapSystem>(SystemUpdatePhase.UIUpdate);
 
-            // Optional: locale change log (do NOT remove locales on dispose)
+            // Log locale changes (don’t remove sources on dispose)
             var lm = GameManager.instance?.localizationManager;
             if (lm != null)
             {
@@ -98,10 +110,9 @@ namespace ARTZone
 
         public void OnDispose()
         {
-            s_Log.Info("[ART] OnDispose");
+            s_Log.Info($"{Name} - OnDispose");
 
-            var gm = GameManager.instance;
-            var lm = gm?.localizationManager;
+            var lm = GameManager.instance?.localizationManager;
             if (lm != null)
                 lm.onActiveDictionaryChanged -= OnLocaleChanged;
 
@@ -121,11 +132,11 @@ namespace ARTZone
             {
                 s_Settings.UnregisterInOptionsUI();
                 s_Settings = null;
-                m_Setting = null!;
             }
         }
 
-        // ----- Helpers -----
+        // ---- Helpers ----
+
         private static void AddLocale(string localeId, IDictionarySource source)
         {
             var lm = GameManager.instance?.localizationManager;
@@ -142,7 +153,7 @@ namespace ARTZone
             var id = GameManager.instance?.localizationManager?.activeLocaleId ?? "(unknown)";
             s_Log.Info("[ART] Active locale = " + id);
 
-            // Keep Options UI consistent
+            // Keep Options UI consistent after a locale flip
             s_Settings?.RegisterInOptionsUI();
         }
     }

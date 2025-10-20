@@ -9,10 +9,10 @@ namespace ARTZone
 
     public sealed class LocaleFR : IDictionarySource
     {
-        private readonly Setting m_Setting;
+        private readonly Setting s_Settings;
         public LocaleFR(Setting setting)
         {
-            m_Setting = setting;
+            s_Settings = setting;
         }
 
         public IEnumerable<KeyValuePair<string, string>> ReadEntries(
@@ -22,30 +22,30 @@ namespace ARTZone
             return new Dictionary<string, string>
             {
                 // Settings title
-                { m_Setting.GetSettingsLocaleID(), "ART-Zone" },
+                { s_Settings.GetSettingsLocaleID(), "ART-Zone" },
 
                 // Tabs
-                { m_Setting.GetOptionTabLocaleID(Setting.kActionsTab), "Actions" },
-                { m_Setting.GetOptionTabLocaleID(Setting.kAboutTab),   "À propos" },
+                { s_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "Actions" },
+                { s_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "À propos" },
 
                 // Groups (Actions tab)
-                { m_Setting.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Options de l’outil de zonage" },
-                { m_Setting.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Raccourcis clavier" },
+                { s_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Options de l’outil de zonage" },
+                { s_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Raccourcis clavier" },
 
                 // Groups (About tab)
-                { m_Setting.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "Liens" },
+                { s_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "Liens" },
 
                 // Toggles
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Empêcher la suppression des zones existantes" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Empêche le remplacement des zones existantes pendant l’aperçu ou l’application." },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Empêcher la suppression des zones existantes" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Empêche le remplacement des zones existantes pendant l’aperçu ou l’application." },
 
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Empêcher la suppression des cellules occupées" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Empêche le remplacement des cellules contenant des bâtiments pendant l’aperçu ou l’application." },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Empêcher la suppression des cellules occupées" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Empêche le remplacement des cellules contenant des bâtiments pendant l’aperçu ou l’application." },
 
                 // Keybind
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Bouton de souris pour inverser le zonage" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.InvertZoning)),  "Associez un bouton de souris pour inverser la direction du zonage lorsque l’outil est actif." },
-                { m_Setting.GetBindingKeyLocaleID(ARTZoneMod.kInvertZoningActionName), "Inverser le zonage" },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Bouton de souris pour inverser le zonage" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.InvertZoning)),  "Associez un bouton de souris pour inverser la direction du zonage lorsque l’outil est actif." },
+                { s_Settings.GetBindingKeyLocaleID(ARTZoneMod.kInvertZoningActionName), "Inverser le zonage" },
 
                 // Palette/asset text
                 { $"Assets.NAME[{Tools.ZoningControllerToolSystem.ToolID}]", "Contrôleur de zone" },
@@ -53,10 +53,10 @@ namespace ARTZone
                   "Contrôle le comportement du zonage le long d’une route.\nChoisissez entre les deux côtés, gauche, droite ou aucun.\nClic droit pour inverser la configuration." },
 
                 // About tab link buttons
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.OpenParadoxModsButton)), "Paradox Mods" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.OpenParadoxModsButton)),  "Ouvrir la page Paradox Mods dans votre navigateur." },
-                { m_Setting.GetOptionLabelLocaleID(nameof(Setting.OpenDiscordButton)), "Discord" },
-                { m_Setting.GetOptionDescLocaleID(nameof(Setting.OpenDiscordButton)),  "Ouvrir le Discord ART-Zone dans votre navigateur." },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadoxModsButton)), "Paradox Mods" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadoxModsButton)),  "Ouvrir la page Paradox Mods dans votre navigateur." },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscordButton)), "Discord" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscordButton)),  "Ouvrir le Discord ART-Zone dans votre navigateur." },
             };
         }
 

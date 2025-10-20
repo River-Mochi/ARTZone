@@ -11,10 +11,10 @@ import ZoningToolControllerButton from "./mods/ZoneGameTopButton";
 const register: ModRegistrar = (moduleRegistry) => {
     VanillaComponentResolver.setRegistry(moduleRegistry);
 
-    // Your request: put the button on the top right instead of top left.
+    // Put the button on the top right
     moduleRegistry.append("GameTopRight", ZoningToolControllerButton);
 
-    // Adds the "Zoning Side" section with three buttons (All/Left/Right).
+    // Adds the "Zoning Side" section with three buttons (Both/Left/Right).
     moduleRegistry.extend(
         "game-ui/game/components/tool-options/mouse-tool-options/mouse-tool-options.tsx",
         "MouseToolOptions",

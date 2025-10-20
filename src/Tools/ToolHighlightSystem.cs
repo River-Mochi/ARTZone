@@ -30,6 +30,10 @@ namespace ARTZone
         /// <summary>
         /// Toggle highlight bookkeeping for an entity.
         /// </summary>
+
+        /// <summary>
+        /// Toggle highlight bookkeeping for an entity.
+        /// </summary>
         public void HighlightEntity(Entity entity, bool enable)
         {
             if (!EntityManager.Exists(entity))
@@ -40,7 +44,8 @@ namespace ARTZone
                 if (m_Highlighted.Add(entity))
                 {
                     // Nudge dependent visuals/systems.
-                    EntityManager.AddComponent<Updated>(entity);
+                    if (!EntityManager.HasComponent<Updated>(entity))
+                        EntityManager.AddComponent<Updated>(entity);
                 }
             }
             else
@@ -48,7 +53,8 @@ namespace ARTZone
                 if (m_Highlighted.Remove(entity))
                 {
                     // Nudge dependent visuals/systems.
-                    EntityManager.AddComponent<Updated>(entity);
+                    if (!EntityManager.HasComponent<Updated>(entity))
+                        EntityManager.AddComponent<Updated>(entity);
                 }
             }
         }
@@ -63,7 +69,7 @@ namespace ARTZone
 
             foreach (Entity e in m_Highlighted)
             {
-                if (EntityManager.Exists(e))
+                if (EntityManager.Exists(e) && !EntityManager.HasComponent<Updated>(e))
                 {
                     EntityManager.AddComponent<Updated>(e);
                 }
@@ -71,5 +77,6 @@ namespace ARTZone
 
             m_Highlighted.Clear();
         }
+
     }
 }

@@ -210,15 +210,12 @@ namespace ARTZone.Tools
             // Your Road Services names (probe spaced + compact)
             var uiNames = new[]
             {
+                "Grass",
                 "Wide Sidewalk",
                 "Sound Barrier",
-                "Traffic Lights",
                 "Crosswalk",
                 "Quay",
-                "Retaining Wall",
-                "Elevated",
                 "Tunnel",
-                "Road Maintenance Depot",
 
             };
 
