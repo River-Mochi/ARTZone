@@ -1,22 +1,27 @@
 // File: src/Settings/Setting.cs
-// Options UI + keybinding definition. RMB = invert zoning. Shift+Z = toggle tool on/off.
+// Options UI + keybinding definition. Actions tab first, About tab second.
 
 namespace ARTZone
 {
     using System;
     using Colossal.IO.AssetDatabase;
+    using Colossal.Logging;
     using Game.Input;
     using Game.Modding;
     using Game.Settings;
     using UnityEngine; // Application.OpenURL
 
     [FileLocation("ModsSettings/ART-Zone/ART-Zone")]
-    [SettingsUITabOrder(kActionsTab, kAboutTab)]
-    [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup, kAboutLinksGroup)]
-    [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup, kAboutLinksGroup)]
 
-    // Declare actions once
-    [SettingsUIMouseAction(ARTZoneMod.kInvertZoningActionName, ActionType.Button, usages: new[] { "Zone Controller Tool" })]
+    // === Tab order: Actions first, About second ===
+    [SettingsUITabOrder(kActionsTab, kAboutTab)]
+
+    // === Group order within Actions tab ===
+    [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup, kAboutLinksGroup)]
+    [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup)] // hide About group header
+
+    // --- Declare actions (names must match ARTZoneMod constants) ---
+    [SettingsUIMouseAction(ARTZoneMod.kInvertZoningActionName, ActionType.Button, usages: new[] { "Game" })]
     [SettingsUIKeyboardAction(ARTZoneMod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
     public sealed class Setting : ModSetting
     {
@@ -24,42 +29,44 @@ namespace ARTZone
         public const string kActionsTab = "Actions";
         public const string kAboutTab = "About";
 
-        // Groups
+        // Sections (tabs have their own sections)
+        public const string kSection = "Main";
+
+        // Groups on Actions tab
         public const string kToggleGroup = "Zone Controller Tool";
         public const string kKeybindingGroup = "Key bindings";
-        public const string kAboutLinksGroup = "Links";
 
-        // Section name
-        public const string kSection = "Main";
+        // Group on About tab (header name hidden)
+        public const string kAboutLinksGroup = "Links";
 
         public Setting(IMod mod) : base(mod) { }
 
-        // --- Toggles ---
-        [SettingsUISection(kSection, kToggleGroup)]
+        // ====== TOGGLES (Actions tab) ======
+        [SettingsUISection(kActionsTab, kToggleGroup)]
         public bool RemoveZonedCells { get; set; } = true;
 
-        [SettingsUISection(kSection, kToggleGroup)]
+        [SettingsUISection(kActionsTab, kToggleGroup)]
         public bool RemoveOccupiedCells { get; set; } = true;
 
-        // --- Keybindings (RMB invert) ---
+        // ====== KEYBINDINGS (Actions tab) ======
+        // RMB invert
         [SettingsUIMouseBinding(BindingMouse.Right, ARTZoneMod.kInvertZoningActionName)]
-        [SettingsUISection(kSection, kKeybindingGroup)]
-
+        [SettingsUISection(kActionsTab, kKeybindingGroup)]
         public ProxyBinding InvertZoning
         {
             get; set;
         }
 
-        // Shift+Z toggle (open Zoning Side panel)
+        // Shift+Z toggles the tool (matches UI GameTopRight button behavior)
         [SettingsUIKeyboardBinding(BindingKeyboard.Z, ARTZoneMod.kToggleToolActionName, shift: true)]
-        [SettingsUISection(kSection, kKeybindingGroup)]
+        [SettingsUISection(kActionsTab, kKeybindingGroup)]
         public ProxyBinding ToggleZoneTool
         {
             get; set;
         }
 
-        // --- About tab link buttons ---
-        private const string UrlParadoxMods = "https://mods.paradoxplaza.com/";
+        // ====== ABOUT tab: external links ======
+        private const string UrlParadoxMods = "TBD";
         private const string UrlDiscord = "https://discord.gg/HTav7ARPs2";
 
         [SettingsUIButton]
@@ -68,7 +75,11 @@ namespace ARTZone
         {
             set
             {
-                TryOpen(UrlParadoxMods);
+                try
+                {
+                    Application.OpenURL(UrlParadoxMods);
+                }
+                catch (Exception ex) { ARTZoneMod.s_Log.Warn($"[ART] Failed to open Paradox Mods: {ex.Message}"); }
             }
         }
 
@@ -78,17 +89,12 @@ namespace ARTZone
         {
             set
             {
-                TryOpen(UrlDiscord);
+                try
+                {
+                    Application.OpenURL(UrlDiscord);
+                }
+                catch (Exception ex) { ARTZoneMod.s_Log.Warn($"[ART] Failed to open Discord: {ex.Message}"); }
             }
-        }
-
-        private static void TryOpen(string url)
-        {
-            try
-            {
-                Application.OpenURL(url);
-            }
-            catch (Exception ex) { ARTZoneMod.s_Log.Warn($"OpenURL failed: {ex.Message}"); }
         }
 
         public override void SetDefaults()
