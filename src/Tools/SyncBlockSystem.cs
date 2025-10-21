@@ -1,4 +1,4 @@
-// src/AdvancedRoadTools/SyncBlockSystem.cs
+// src/Tools/SyncBlockSystem.cs
 // Purpose: applies the preview/committed zoning depth to actual zone blocks
 // respecting settings (RemoveZonedCells / RemoveOccupiedCells). Tool won’t function without it
 
@@ -91,11 +91,11 @@ namespace AdvancedRoadTools
                 else
                     return;
 
-                if (AdvancedRoadToolsMod.m_Setting.RemoveOccupiedCells &&
+                if (AdvancedRoadToolsMod.s_Settings!.RemoveOccupiedCells &&
                     IsAnyCellOccupied(CellLookup[blockEntity], block, validArea))
                     return;
 
-                if (AdvancedRoadToolsMod.m_Setting.RemoveZonedCells &&
+                if (AdvancedRoadToolsMod.s_Settings.RemoveZonedCells &&
                     IsAnyCellZoned(CellLookup[blockEntity], block, validArea))
                     return;
 

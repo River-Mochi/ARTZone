@@ -1,4 +1,4 @@
-// File: src/AdvancedRoadTools/Tools/ToolsHelper.cs
+// File: src/Tools/ToolsHelper.cs
 // Original behavior, no Harmony. Broader anchor probe + DEBUG-only reflective fallback.
 //
 // - Don’t wipe ToolDefinitions after registration.
@@ -6,9 +6,8 @@
 // - If not found, DEBUG scan PrefabSystem.m_Prefabs and auto-pick a good anchor.
 // - Clone anchor, copy UI group, use definition.Priority, add NetUpgrade, copy PlaceableNetData.
 //
-// Build: define ART_DIAGNOSTICS in Debug (your csproj already does).
+// Build: define ART_DIAGNOSTICS in Debug (csproj does this).
 
-#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -124,12 +123,17 @@ namespace AdvancedRoadTools.Tools
 
                     UIObject uiObject = ScriptableObject.CreateInstance<UIObject>();
 
-                    // Road Services Palette tile icon – served by the webpack host
-                    uiObject.m_Icon = definition.ui.ImagePath;   // use the path from ToolDefinition
+                    // Palette tile icon
+                    uiObject.m_Icon = definition.ui.ImagePath;
                     uiObject.name = definition.ToolID;
                     uiObject.m_IsDebugObject = s_AnchorUI!.m_IsDebugObject;
-                    uiObject.m_Priority = definition.Priority;        // Original behavior
+
+                    // Priority: anchor + 1 (ties are allowed; engine resolves deterministically)
+                    uiObject.m_Priority = s_AnchorUI!.m_Priority + 1;
+
+                    // Group: exactly RoadServices (same as anchor)
                     uiObject.m_Group = s_AnchorUI!.m_Group;
+
                     uiObject.active = s_AnchorUI!.active;
                     toolPrefab.AddComponentFrom(uiObject);
 
@@ -152,7 +156,7 @@ namespace AdvancedRoadTools.Tools
                     }
 
                     s_ToolsLookup[definition] = (toolPrefab, uiObject);
-                    AdvancedRoadToolsMod.s_Log.Info($"\tTool \"{definition.ToolID}\" was successfully created");
+                    AdvancedRoadToolsMod.s_Log.Info($"\tTool \"{definition.ToolID}\" created in group=RoadsServices prio={uiObject.m_Priority}");
                 }
                 catch (Exception e)
                 {
@@ -207,38 +211,41 @@ namespace AdvancedRoadTools.Tools
             if (s_PrefabSystem is null)
                 return false;
 
-            // Your Road Services names (probe spaced + compact)
+            // Probe by UI names; require group == "RoadsServices"
             var uiNames = new[]
             {
                 "Wide Sidewalk",
                 "Sound Barrier",
-                "Traffic Lights",
+                "Grass",
+                "Trees",
                 "Crosswalk",
                 "Quay",
                 "Retaining Wall",
-                "Elevated",
                 "Tunnel",
+                "RoadMaintenanceDepot01",
                 "Road Maintenance Depot",
-
             };
 
-            var candidates = new List<string>(uiNames.Length * 2);
-            foreach (var n in uiNames)
+            foreach (var name in uiNames)
             {
-                candidates.Add(n);
-                candidates.Add(n.Replace(" ", "")); // compact
+                var id = new PrefabID(nameof(PrefabBase), name);
+                if (s_PrefabSystem.TryGetPrefab(id, out PrefabBase? p) && p is not null)
+                {
+                    UIObject? u = p.GetComponent<UIObject>();
+                    if (u is not null && u.m_Group != null && string.Equals(u.m_Group.name, "RoadsServices", StringComparison.Ordinal))
+                    {
+                        prefab = p;
+                        ui = u;
+                        return true;
+                    }
+                }
             }
 
-            var types = new[]
-            {
-                "RoadPrefab",
-                "NetPrefab",
-                "ContentPrefab",
-                nameof(PrefabBase),
-            };
+            return false;
+        }
 
 #if ART_DIAGNOSTICS
-            AdvancedRoadToolsMod.s_Log.Info("[ART] Begin anchor probe (Road Services candidates) …");
+        AdvancedRoadToolsMod.s_Log.Info("[ART] Begin anchor probe (Road Services candidates) …");
 #endif
             foreach (var name in candidates)
             {
@@ -253,13 +260,19 @@ namespace AdvancedRoadTools.Tools
                         UIObject? u = p.GetComponent<UIObject>();
                         if (u is not null)
                         {
+                            // Require RoadsServices group to avoid wrong tabs
+                            var groupName = u.m_Group != null ? (u.m_Group.name ?? "") : "";
+                            if (!string.Equals(groupName, "RoadsServices", StringComparison.Ordinal))
+                                continue;
+
 #if ART_DIAGNOSTICS
-                            AdvancedRoadToolsMod.s_Log.Info($"[ART] Anchor resolved: {name} ({type}), group={u.m_Group?.name ?? "(null)"} prio={u.m_Priority}");
+                            AdvancedRoadToolsMod.s_Log.Info($"[ART] Anchor resolved: {name} ({type}), group={groupName} prio={u.m_Priority}");
 #endif
                             prefab = p;
                             ui = u;
                             return true;
                         }
+
 #if ART_DIAGNOSTICS
                         else
                         {
@@ -273,132 +286,121 @@ namespace AdvancedRoadTools.Tools
             // DEBUG-only reflective fallback: enumerate PrefabSystem’s list and auto-pick.
 #if ART_DIAGNOSTICS
             if (TryDebugReflectivePick(out prefab, out ui))
-            {
-                return true;
-            }
+{
+    return true;
+}
 #endif
-            return false;
+return false;
         }
 
 #if ART_DIAGNOSTICS
         private static bool TryDebugReflectivePick(out PrefabBase prefab, out UIObject ui)
+{
+    prefab = null!;
+    ui = null!;
+
+    try
+    {
+        if (s_PrefabSystem is null)
+            return false;
+
+        FieldInfo field = s_PrefabSystem.GetType().GetField("m_Prefabs", BindingFlags.Instance | BindingFlags.NonPublic);
+        if (field == null)
         {
-            prefab = null!;
-            ui = null!;
+            AdvancedRoadToolsMod.s_Log.Warn("[ART] Reflective scan: cannot find m_Prefabs.");
+            return false;
+        }
 
-            try
+        if (field.GetValue(s_PrefabSystem) is not System.Collections.IEnumerable list)
+            return false;
+
+        AdvancedRoadToolsMod.s_Log.Info("[ART] Reflective scan: listing prefabs with UIObject …");
+
+        var bestScore = int.MinValue;
+        PrefabBase? best = null;
+        UIObject? bestUI = null;
+
+        foreach (var obj in list)
+        {
+            if (obj is not PrefabBase p)
+                continue;
+
+            UIObject? u = p.GetComponent<UIObject>();
+            if (u is null)
+                continue;
+
+            var name = p.name ?? "";
+            var norm = Normalize(name);
+            var groupName = u.m_Group != null ? u.m_Group.name ?? "" : "";
+
+            AdvancedRoadToolsMod.s_Log.Info($"[ART] UI Prefab: name=\"{name}\" group={groupName} prio={u.m_Priority}");
+
+            var score = ScoreForRoadServices(norm, groupName);
+            if (score > bestScore)
             {
-                if (s_PrefabSystem is null)
-                    return false;
-
-                FieldInfo field = s_PrefabSystem.GetType().GetField("m_Prefabs", BindingFlags.Instance | BindingFlags.NonPublic);
-                if (field == null)
-                {
-                    AdvancedRoadToolsMod.s_Log.Warn("[ART] Reflective scan: cannot find m_Prefabs.");
-                    return false;
-                }
-
-                if (field.GetValue(s_PrefabSystem) is not System.Collections.IEnumerable list)
-                    return false;
-
-                AdvancedRoadToolsMod.s_Log.Info("[ART] Reflective scan: listing prefabs with UIObject …");
-
-                var bestScore = int.MinValue;
-                PrefabBase? best = null;
-                UIObject? bestUI = null;
-
-                foreach (var obj in list)
-                {
-                    if (obj is not PrefabBase p)
-                        continue;
-
-                    UIObject? u = p.GetComponent<UIObject>();
-                    if (u is null)
-                        continue;
-
-                    var name = p.name ?? "";
-                    var norm = Normalize(name);
-                    var groupName = u.m_Group != null ? u.m_Group.name ?? "" : "";
-
-                    AdvancedRoadToolsMod.s_Log.Info($"[ART] UI Prefab: name=\"{name}\" group={groupName} prio={u.m_Priority}");
-
-                    var score = ScoreForRoadServices(norm, groupName);
-                    if (score > bestScore)
-                    {
-                        bestScore = score;
-                        best = p;
-                        bestUI = u;
-                    }
-                }
-
-                if (best != null && bestUI != null && bestScore >= 50)
-                {
-                    AdvancedRoadToolsMod.s_Log.Info($"[ART] Reflective pick: \"{best.name}\" group={bestUI.m_Group?.name ?? "(null)"} prio={bestUI.m_Priority} (score {bestScore})");
-                    prefab = best;
-                    ui = bestUI;
-                    return true;
-                }
-
-                AdvancedRoadToolsMod.s_Log.Warn("[ART] Reflective scan found no strong Road Services anchor.");
-                return false;
-            }
-            catch (Exception ex)
-            {
-                AdvancedRoadToolsMod.s_Log.Error($"[ART] Reflective scan error: {ex}");
-                return false;
+                bestScore = score;
+                best = p;
+                bestUI = u;
             }
         }
 
-        private static int ScoreForRoadServices(string normName, string groupName)
+        if (best != null && bestUI != null && bestScore >= 50)
         {
-            // Very simple, portable scoring (no culture-specific APIs).
-            // Prefer obvious Road Services items.
-            if (normName.Contains("widesidewalk"))
-                return 100;
-            if (normName.Contains("soundbarrier"))
-                return 95;
-            if (normName.Contains("trafficlights"))
-                return 90;
-            if (normName.Contains("crosswalk"))
-                return 85;
-
-            if (normName.Contains("retainingwall"))
-                return 70;
-            if (normName.Contains("quay"))
-                return 65;
-            if (normName.Contains("tunnel"))
-                return 65;
-            if (normName.Contains("lighting"))
-                return 60;
-            if (normName.Contains("trees"))
-                return 60;
-            if (normName.Contains("grass"))
-                return 58;
-            if (normName.Contains("roadmaintenance"))
-                return 58;
-            if (normName.Contains("stopsigns"))
-                return 58;
-
-            // Nudge if the group label smells like services.
-            var g = Normalize(groupName);
-            if (g.Contains("service"))
-                return 55;
-            if (g.Contains("road"))
-                return 52;
-
-            return 0;
+            AdvancedRoadToolsMod.s_Log.Info($"[ART] Reflective pick: \"{best.name}\" group={bestUI.m_Group?.name ?? "(null)"} prio={bestUI.m_Priority} (score {bestScore})");
+            prefab = best;
+            ui = bestUI;
+            return true;
         }
+
+        AdvancedRoadToolsMod.s_Log.Warn("[ART] Reflective scan found no strong Road Services anchor.");
+        return false;
+    }
+    catch (Exception ex)
+    {
+        AdvancedRoadToolsMod.s_Log.Error($"[ART] Reflective scan error: {ex}");
+        return false;
+    }
+}
+
+private static int ScoreForRoadServices(string normName, string groupName)
+{
+    // Very simple, portable scoring (no culture-specific APIs).
+    // Prefer obvious Road Services items.
+    if (normName.Contains("widesidewalk"))
+        return 100;
+    if (normName.Contains("soundbarrier"))
+        return 95;
+    if (normName.Contains("crosswalk"))
+        return 85;
+
+    if (normName.Contains("quay"))
+        return 65;
+    if (normName.Contains("tunnel"))
+        return 65;
+
+    if (normName.Contains("grass"))
+        return 58;
+
+    // Nudge if the group label smells like RoadsServices.
+    var g = Normalize(groupName);
+    if (g.Contains("RoadsServices"))
+        return 55;
+    if (g.Contains("service"))
+        return 52;
+
+    return 0;
+}
 #endif
 
-        private static string Normalize(string s)
-        {
-            if (string.IsNullOrEmpty(s))
-                return string.Empty;
-            // lower, remove spaces/underscores only – keep it portable.
-            s = s.ToLowerInvariant();
-            s = s.Replace(" ", "");
-            s = s.Replace("_", "");
-            return s;
-        }
+private static string Normalize(string s)
+{
+    if (string.IsNullOrEmpty(s))
+        return string.Empty;
+    // lower, remove spaces/underscores only – keep it portable.
+    s = s.ToLowerInvariant();
+    s = s.Replace(" ", "");
+    s = s.Replace("_", "");
+    return s;
+}
     }
 }

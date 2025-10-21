@@ -7,3 +7,4 @@ A Cities: Skyline 2 mod which aims to improve the player's interactions with roa
 - **Parallel Tool** - Create parallel roads just by clicking on the desired reference road.
 - **Gradient Slope Tool** - Ease slopes in roads.
 - **Advanced Grid Tool** - Better and more controlled grids.
+ 

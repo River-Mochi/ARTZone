@@ -1,6 +1,5 @@
-﻿// Tools/ToolHighlightSystem.cs
-
-namespace AdvancedRoadTools
+// Tools/ToolHighlightSystem.cs
+namespace AdvancedRoadTools.Tools
 {
     using System.Collections.Generic;
     using Game;
@@ -39,7 +38,6 @@ namespace AdvancedRoadTools
             {
                 if (m_Highlighted.Add(entity))
                 {
-                    // Nudge dependent visuals/systems.
                     EntityManager.AddComponent<Updated>(entity);
                 }
             }
@@ -47,7 +45,6 @@ namespace AdvancedRoadTools
             {
                 if (m_Highlighted.Remove(entity))
                 {
-                    // Nudge dependent visuals/systems.
                     EntityManager.AddComponent<Updated>(entity);
                 }
             }

@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <!-- File: src/AdvancedRoadTools/AdvancedRoadTools.csproj -->
+  <!-- File: src/AdvancedRoadTools.csproj -->
 
   <PropertyGroup>
     <Configurations>Debug;Release</Configurations>
@@ -17,6 +17,7 @@
     <FailUIBuild Condition="'$(Configuration)'!='Release'">false</FailUIBuild>
   </PropertyGroup>
 
+	<!-- Informational Version in DEBUG -->
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
     <DefineConstants>TRACE;DEBUG;ART_DIAGNOSTICS</DefineConstants>
@@ -27,7 +28,7 @@
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 
-	<!-- Helper to point to your game Managed folder -->
+	<!-- Helper to point to game Managed folder -->
 	<PropertyGroup>
 		<GameAssemblies>C:\Program Files (x86)\Steam\steamapps\common\Cities Skylines II\Cities2_Data\Managed</GameAssemblies>
 	</PropertyGroup>
@@ -62,7 +63,6 @@
   <ItemGroup>
     <None Include="$(ModPropsFile)" Link="Properties\Mod.props" />
     <None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
-    <None Include="C:\Users\kldan\Source\Repos\AdvancedRoadTools\src\AdvancedRoadTools\.editorconfig" />
   </ItemGroup>
 
   <!-- Copy UI assets so COUI can find them via coui://AdvancedRoadTools/... -->
@@ -99,14 +99,10 @@
     <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmBuildExit)' != '0'" Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit)). Continuing C# build." />
   </Target>
 
-  <!-- Keep lang/** copied (localization files) -->
+  <!-- Keep lang/** copied (in-game localization files) -->
   <ItemGroup>
-    <Folder Include="lang\" />
     <Content Include="lang\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <EditorConfigFiles Remove="C:\Users\kldan\Source\Repos\AdvancedRoadTools\src\AdvancedRoadTools\.editorconfig" />
   </ItemGroup>
 </Project>

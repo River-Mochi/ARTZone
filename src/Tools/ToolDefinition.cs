@@ -1,4 +1,4 @@
-﻿// File: src/AdvancedRoadTools/Tools/ToolDefinition.cs
+// File: src/Tools/ToolDefinition.cs
 // Purpose: Small POD describing a tool + its UI icon path and palette priority.
 
 using System;

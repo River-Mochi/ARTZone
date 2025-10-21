@@ -1,46 +1,31 @@
-﻿// File: src/AdvancedRoadTools/Tools/ZoningControllerToolSystem.cs
+// File: src/Tools/ZoningControllerToolSystem.cs
 // Purpose:
-//   This is the runtime tool "system" (a DOTS system derived from ToolBaseSystem).
-//   Decides what happens when you click, what gets highlighted, and when changes become permanent.
-//   Handles:
-//     - input (mouse LMB/RMB via ToolBaseSystem's apply/cancel actions),
-//     - entity preview/highlight,
-//     - applying zone-side changes (via jobs),
-//     - reacting to the "invert" keybind (toggles left/right/both in the UI).
+//   Runtime tool “system” (DOTS ToolBaseSystem).
+//   Handles input (LMB/RMB), preview/highlight, apply via jobs, and keybind invert.
+//   RMB pressed over a valid road now flips Left<->Right (does not cancel).
 //
-// Palette tile vs internal tool order:
-//   • The icon in the Road Services TAB is NOT controlled here. That's in ToolsHelper.cs
-//     where we clone a UIObject from "Sound Barrier" (or Wide Sidewalk) and use priority + 1.
-//   • The line m_ToolSystem.tools.Insert(5, this) below only sets the INTERNAL order of tools
-//     inside ToolSystem.tools mainly for tool cycling.
-// Mouse behavior (matches Original):
-//   • Press/hold LMB (applyAction): SELECT highlight; release LMB over a valid hit = APPLY.
-//   • Release LMB away from a valid hit = CANCEL (clears preview).
-//   • RMB (cancelAction) = CANCEL.
-//   • Invert keybind toggles left/right/both in the UI system.
-//
-// Notes about keybinding handle:
-//   • We do NOT assign to ProxyAction.enabled here.
-//     It's already enabled via shouldBeEnabled in AdvancedRoadToolsMod.OnLoad(), so here it's only polled.
-
-using System;
-using AdvancedRoadTools.Components;
-using Colossal.Serialization.Entities; // Purpose enum used by game hooks
-using Game;
-using Game.Audio;
-using Game.Common;
-using Game.Input;
-using Game.Net;         // PlacementFlags
-using Game.Prefabs;
-using Game.Tools;
-using Game.Zones;
-using Unity.Collections;
-using Unity.Entities;
-using Unity.Jobs;
-using Unity.Mathematics;
+// Notes:
+//   • Palette icon path changed to coui://AdvancedRoadTools/images/Tool_Icon.png
+//   • Tool tile anchored via ToolsHelper (priority handled there)
 
 namespace AdvancedRoadTools.Tools
 {
+    using System;
+    using AdvancedRoadTools.Components;
+    using Colossal.Serialization.Entities;
+    using Game;
+    using Game.Audio;
+    using Game.Common;
+    using Game.Input;
+    using Game.Net;
+    using Game.Prefabs;
+    using Game.Tools;
+    using Game.Zones;
+    using Unity.Collections;
+    using Unity.Entities;
+    using Unity.Jobs;
+    using Unity.Mathematics;
+
     public partial class ZoningControllerToolSystem : ToolBaseSystem
     {
         public const string ToolID = "Zone Controller Tool";
@@ -94,12 +79,11 @@ namespace AdvancedRoadTools.Tools
 
             m_SelectedEntities = new NativeList<Entity>(Allocator.Persistent);
 
-            // --- Register tool & palette tile (icon served by webpack host: coui://ui-mods/images/ToolsIcon.png)
+            // --- Register tool & palette tile; explicit icon path matches mod output
             var def = new ToolDefinition(
                 typeof(ZoningControllerToolSystem),
                 toolID,
-                59,
-                new ToolDefinition.UI(ToolDefinition.UI.PathPrefix + "ToolsIcon.png"))
+                new ToolDefinition.UI("coui://AdvancedRoadTools/images/Tool_Icon.png"))
             {
                 PlacementFlags = PlacementFlags.UndergroundUpgrade
             };
@@ -120,7 +104,7 @@ namespace AdvancedRoadTools.Tools
             if (m_ToolSystem != null && m_ToolSystem.tools != null)
             {
                 m_ToolSystem.tools.Remove(this);
-                m_ToolSystem.tools.Insert(5, this);
+                m_ToolSystem.tools.Insert(5, this); // internal order for tool cycling
             }
         }
 
@@ -167,16 +151,38 @@ namespace AdvancedRoadTools.Tools
             if (haveSoundbank)
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
+            // --- RMB handling: if pressed over a valid hit, flip Left<->Right and DO NOT cancel.
             if (cancelAction.WasPressedThisFrame())
-                m_Mode = Mode.Cancel;
+            {
+                if (hasHit)
+                {
+                    m_ZoningControllerToolUISystem.InvertZoningSideOnly();
+                    if (haveSoundbank)
+                        AudioManager.instance.PlayUISound(soundbank.m_ToolOptionClickSound);
+                    // Treat as preview afterwards
+                    m_Mode = Mode.Preview;
+                }
+                else
+                {
+                    m_Mode = Mode.Cancel;
+                }
+            }
             else if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
+            {
                 m_Mode = Mode.Select;
+            }
             else if (applyAction.WasReleasedThisFrame() && hasHit)
+            {
                 m_Mode = Mode.Apply;
+            }
             else if (applyAction.WasReleasedThisFrame() && !hasHit)
+            {
                 m_Mode = Mode.Cancel;
+            }
             else
+            {
                 m_Mode = Mode.Preview;
+            }
 
             EntityCommandBuffer ecb = m_ToolOutputBarrier.CreateCommandBuffer();
 
@@ -243,7 +249,7 @@ namespace AdvancedRoadTools.Tools
             if (invert != null && invert.WasPressedThisFrame())
                 m_ZoningControllerToolUISystem.InvertZoningMode();
 
-            ComponentLookup<TempZoning> tempLookup = GetComponentLookup<TempZoning>(true);
+            var tempLookup = GetComponentLookup<TempZoning>(true);
 
             JobHandle syncTempJob = new SyncTempJob
             {
