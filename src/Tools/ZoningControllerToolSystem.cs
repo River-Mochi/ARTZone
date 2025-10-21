@@ -158,7 +158,7 @@ namespace AdvancedRoadTools.Tools
                 {
                     m_ZoningControllerToolUISystem.InvertZoningSideOnly();
                     if (haveSoundbank)
-                        AudioManager.instance.PlayUISound(soundbank.m_ToolOptionClickSound);
+                        AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
                     // Treat as preview afterwards
                     m_Mode = Mode.Preview;
                 }

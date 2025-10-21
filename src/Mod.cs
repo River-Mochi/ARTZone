@@ -14,12 +14,16 @@ namespace AdvancedRoadTools
     public sealed class AdvancedRoadToolsMod : IMod
     {
         public const string ModID = "AdvancedRoadTools";
+        public const string CouiRoot = "coui://" + ModID; // resolves to coui://AdvancedRoadTools (or ARTZone if change ModID)
+
         public const string VersionShort = "1.0.0";
 #if DEBUG
         public const string InformationalVersion = VersionShort + " (DEBUG)";
 #else
         public const string InformationalVersion = VersionShort;
 #endif
+
+
 
         // Action names used by Setting attributes
         public const string kInvertZoningActionName = "InvertZoning";
@@ -90,7 +94,7 @@ namespace AdvancedRoadTools
                 new Tools.ToolDefinition(
                     typeof(Tools.ZoningControllerToolSystem),
                     Tools.ZoningControllerToolSystem.ToolID,
-                    new Tools.ToolDefinition.UI($"{Tools.ToolDefinition.UI.PathPrefix}Tool_Icon.png") // UI image
+                    new Tools.ToolDefinition.UI($"{CouiRoot}/images/ToolsIcon.png")
                 )
             );
             // ToolBootstrapSystem will keep trying until Road Services is ready
