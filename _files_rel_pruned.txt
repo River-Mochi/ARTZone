@@ -1,3 +1,5 @@
+.\_files_rel_pruned.txt
+.\_folders_rel_pruned.txt
 .\AdvancedRoadTools.sln
 .\global.json
 .\LICENSE
@@ -19,6 +21,7 @@
 .\src\AdvancedRoadTools\README.md
 .\src\AdvancedRoadTools\Settings\LocaleEN.cs
 .\src\AdvancedRoadTools\Settings\Setting.cs
+.\src\AdvancedRoadTools\Tools\HotkeyToggleSystem.cs
 .\src\AdvancedRoadTools\Tools\SyncBlockSystem.cs
 .\src\AdvancedRoadTools\Tools\SyncCreatedRoadsSystem.cs
 .\src\AdvancedRoadTools\Tools\ToolBootstrapSystem.cs
@@ -71,5 +74,6 @@
 .\src\AdvancedRoadTools\UI\types\utils.d.ts
 .\src\AdvancedRoadTools\UI\types\validateTypes.ts
 .\src\AdvancedRoadTools\UI\webpack.config.js
+.\src\Library\ilpp.pid
 .gitattributes
 .gitignore

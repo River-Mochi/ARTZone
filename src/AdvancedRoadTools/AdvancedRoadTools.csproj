@@ -27,6 +27,11 @@
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 
+	<!-- Helper to point to your game Managed folder -->
+	<PropertyGroup>
+		<GameAssemblies>C:\Program Files (x86)\Steam\steamapps\common\Cities Skylines II\Cities2_Data\Managed</GameAssemblies>
+	</PropertyGroup>
+
   <!-- CS2 toolchain (sets net48, refs, analyzers, etc.) -->
   <Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.props" />
   <Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.targets" />
@@ -49,6 +54,8 @@
       <HintPath>$(ManagedPath)\Colossal.Mathematics.dll</HintPath>
       <Private>false</Private>
     </Reference>
+	  <!-- Required by Colossal.SettingsUIKeyboardBindingAttribute to compile; safe even if unused -->
+	  <Reference Include="Unity.InputSystem"><Private>false</Private></Reference>
   </ItemGroup>
 
   <!-- Convenience: make common toolchain files viewable in Properties/ -->

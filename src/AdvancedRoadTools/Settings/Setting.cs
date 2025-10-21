@@ -1,8 +1,7 @@
-// File: src/Settings/Setting.cs
-// Options UI + keybinding definition. Actions first, About second.
-// About tab shows Mod Name + Version (read-only) and two side-by-side link buttons.
+// File: src/AdvancedRoadTools/Settings/Setting.cs
+// Options UI + keybinding definitions using Colossal API ONLY.
 
-namespace ARTZone
+namespace AdvancedRoadTools
 {
     using System;
     using Colossal.IO.AssetDatabase;
@@ -11,18 +10,19 @@ namespace ARTZone
     using Game.Settings;
     using UnityEngine; // Application.OpenURL
 
-    [FileLocation("ModsSettings/ART-Zone/ART-Zone")]
+    // Where your settings asset lives (folder/name). Adjust if you prefer another path.
+    [FileLocation("ModsSettings/AdvancedRoadTools/AdvancedRoadTools")]
 
     // Tabs order
     [SettingsUITabOrder(kActionsTab, kAboutTab)]
 
-    // Group order (we hide the About group header)
+    // Group order (we hide About group headers)
     [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup, kAboutInfoGroup, kAboutLinksGroup)]
     [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup)] // (no header for About groups)
 
-    // Declare actions (names match ARTZoneMod constants)
-    [SettingsUIMouseAction(ARTZoneMod.kInvertZoningActionName, ActionType.Button, usages: new[] { "Game" })]
-    [SettingsUIKeyboardAction(ARTZoneMod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
+    // Declare actions (names must match AdvancedRoadToolsMod constants)
+    [SettingsUIMouseAction(AdvancedRoadToolsMod.kInvertZoningActionName, ActionType.Button, usages: new[] { "Game" })]
+    [SettingsUIKeyboardAction(AdvancedRoadToolsMod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
     public sealed class Setting : ModSetting
     {
         // Tabs
@@ -41,23 +41,25 @@ namespace ARTZone
 
         // ====== ACTIONS TAB ======
 
-        // Toggles
+        // Example toggles (keep if you actually use these in tool logic)
         [SettingsUISection(kActionsTab, kToggleGroup)]
         public bool RemoveZonedCells { get; set; } = true;
 
         [SettingsUISection(kActionsTab, kToggleGroup)]
         public bool RemoveOccupiedCells { get; set; } = true;
 
-        // Keybindings
-        [SettingsUIMouseBinding(BindingMouse.Right, ARTZoneMod.kInvertZoningActionName)]
+        // Keybindings (Colossal API ONLY — no Unity.InputSystem.Key anywhere)
+
+        // Mouse: Invert zoning while tool is active (default: RMB)
+        [SettingsUIMouseBinding(BindingMouse.Right, AdvancedRoadToolsMod.kInvertZoningActionName)]
         [SettingsUISection(kActionsTab, kKeybindingGroup)]
         public ProxyBinding InvertZoning
         {
             get; set;
         }
 
-        // Shift + Z toggles the tool
-        [SettingsUIKeyboardBinding(BindingKeyboard.Z, ARTZoneMod.kToggleToolActionName, shift: true)]
+        // Keyboard: Shift + Z toggles our tool
+        [SettingsUIKeyboardBinding(BindingKeyboard.Z, AdvancedRoadToolsMod.kToggleToolActionName, shift: true)]
         [SettingsUISection(kActionsTab, kKeybindingGroup)]
         public ProxyBinding ToggleZoneTool
         {
@@ -66,17 +68,11 @@ namespace ARTZone
 
         // ====== ABOUT TAB ======
 
-        // Read-only meta
         [SettingsUISection(kAboutTab, kAboutInfoGroup)]
-        public string NameText => "ART-Zone";
+        public string NameText => AdvancedRoadToolsMod.Name;
 
         [SettingsUISection(kAboutTab, kAboutInfoGroup)]
-        public string VersionText => ARTZoneMod.VersionShort;
-
-#if DEBUG
-        [SettingsUISection(kAboutTab, kAboutInfoGroup)]
-        public string InformationalVersionText => ARTZoneMod.InformationalVersion;
-#endif
+        public string VersionText => AdvancedRoadToolsMod.VersionShort;
 
         // External links (side-by-side via the same UIButtonGroup)
         private const string UrlParadoxMods = "TBD";
@@ -93,7 +89,7 @@ namespace ARTZone
                 {
                     Application.OpenURL(UrlParadoxMods);
                 }
-                catch (Exception ex) { ARTZoneMod.s_Log.Warn($"[ART] Failed to open Paradox Mods: {ex.Message}"); }
+                catch (Exception ex) { AdvancedRoadToolsMod.s_Log.Warn($"[ART] Failed to open Paradox Mods: {ex.Message}"); }
             }
         }
 
@@ -108,7 +104,7 @@ namespace ARTZone
                 {
                     Application.OpenURL(UrlDiscord);
                 }
-                catch (Exception ex) { ARTZoneMod.s_Log.Warn($"[ART] Failed to open Discord: {ex.Message}"); }
+                catch (Exception ex) { AdvancedRoadToolsMod.s_Log.Warn($"[ART] Failed to open Discord: {ex.Message}"); }
             }
         }
 
