@@ -26,7 +26,7 @@ namespace AdvancedRoadTools.Tools
 
         protected override void OnUpdate()
         {
-            if (m_Toggle != null && m_Toggle.WasPerformedThisFrame())
+            if (m_Toggle != null && m_Toggle.WasPressedThisFrame())
             {
                 // Same as clicking GameTopLeft icon per current UX: open mini panel
                 m_UI.ToggleFromHotkey();

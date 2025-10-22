@@ -88,8 +88,6 @@ namespace AdvancedRoadTools
             updateSystem.UpdateAt<Tools.ToolBootstrapSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<Tools.KeybindHotkeySystem>(SystemUpdatePhase.ToolUpdate); // listens for Shift+Z, RMB
 
-
-
             // Keep strings in sync if player changes game language
             var lm = GameManager.instance?.localizationManager;
             if (lm != null)
@@ -97,6 +95,14 @@ namespace AdvancedRoadTools
                 lm.onActiveDictionaryChanged -= OnLocaleChanged;
                 lm.onActiveDictionaryChanged += OnLocaleChanged;
             }
+
+            Tools.ToolsHelper.RegisterTool(
+                new Tools.ToolDefinition(
+                    typeof(Tools.ZoningControllerToolSystem),
+                    Tools.ZoningControllerToolSystem.ToolID,
+                    new Tools.ToolDefinition.UI("coui://ui-mods/images/ToolsIcon.png")
+                )
+            );
         }
 
         public void OnDispose()

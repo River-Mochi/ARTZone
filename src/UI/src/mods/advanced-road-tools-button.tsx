@@ -1,21 +1,22 @@
-﻿// File: src/AdvancedRoadTools/UI/src/mods/advanced-road-tools-button.tsx
-// Purpose: Floating HUD button to toggle the Zone Controller Tool.
-// File: src/AdvancedRoadTools/UI/src/mods/advanced-road-tools-button.tsx
+﻿// File: src/UI/src/mods/advanced-road-tools-button.tsx
+// Purpose: Floating HUD button in GameTopLeft that toggles the Zone Controller Tool.
+// NOTE: We use a direct import so webpack emits the asset to coui://ui-mods/images/grid-color.svg.
+
 import { FloatingButton } from "cs2/ui";
 import React from "react";
 import { useLocalization } from "cs2/l10n";
 import { trigger } from "cs2/api";
 import mod from "../../mod.json";
 
-// Import so webpack emits to coui://ui-mods/images/ToolsIcon.png
-import buttonIcon from "../../images/Tool_Icon/ToolsIcon.png";
-// Keep we want this for GameTop Right icon
-// import zoneIcon from "../../images/ZoneControllerTool.svg";
+// === Icon for the GameTopLeft button ===
+// Using a direct import keeps things simple and robust with your current webpack config.
+import gridIcon from "../../images/grid-color.svg";
 
 import { VanillaComponentResolver } from "../YenYang/VanillaComponentResolver";
 
 function ToggleZoneControllerTool() {
-    trigger(mod.id, "ToggleZoneControllerTool");
+    // Toggle the same mini panel the hotkey opens
+    trigger(mod.id, "ToggleMiniPanel");
 }
 
 export function descriptionTooltip(
@@ -37,13 +38,13 @@ export function descriptionTooltip(
 function ZoningToolControllerButton(): JSX.Element {
     const { translate } = useLocalization();
     const buttonTooltip = translate("AdvancedRoadTools.Zone_Controller.ToolName", "ACT");
+
     return (
         <FloatingButton
-            onClick={ToggleZoneControllerTool}
-            src={buttonIcon}                 // ← use the PNG (emitted by webpack)
+            onClick={ToggleZoneControllerTool}   // this calls trigger(mod.id, "ToggleMiniPanel")
+            src={gridIcon}                      // ← now uses grid-color.svg
             tooltipLabel={buttonTooltip}
         />
     );
 }
-
 export default ZoningToolControllerButton;

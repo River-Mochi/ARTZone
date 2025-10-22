@@ -79,19 +79,6 @@ namespace AdvancedRoadTools.Tools
 
             m_SelectedEntities = new NativeList<Entity>(Allocator.Persistent);
 
-            // Register our tool once (palette tile icon path comes from CouiRoot)
-            var definition = new Tools.ToolDefinition(
-                typeof(ZoningControllerToolSystem),
-                toolID,
-                60,         // priority ignored; ToolsHelper will place us at anchor+1
-                new Tools.ToolDefinition.UI($"{AdvancedRoadToolsMod.CouiRoot}/images/ToolsIcon.png")
-            )
-            {
-                PlacementFlags = Game.Net.PlacementFlags.UndergroundUpgrade
-            };
-
-            ToolsHelper.Initialize();
-            ToolsHelper.RegisterTool(definition);
         }
 
         protected override void OnDestroy()
@@ -155,16 +142,16 @@ namespace AdvancedRoadTools.Tools
             if (haveSoundbank)
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
+
             // --- RMB handling: if pressed over a valid hit, flip Left<->Right and DO NOT cancel.
-            // RMB: over a valid hit -> FlipSmart (Both<->None, else Left<->Right); otherwise cancel like vanilla.
             if (cancelAction.WasPressedThisFrame())
             {
                 if (hasHit)
                 {
-                    m_ZoningControllerToolUISystem.FlipSmart();
+                    m_ZoningControllerToolUISystem.InvertZoningSideOnly();
                     if (haveSoundbank)
                         AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
-                    m_Mode = Mode.Preview;
+                    m_Mode = Mode.Preview; // stay in preview, don't cancel selection
                 }
                 else
                 {
@@ -187,6 +174,7 @@ namespace AdvancedRoadTools.Tools
             {
                 m_Mode = Mode.Preview;
             }
+
 
 
             EntityCommandBuffer ecb = m_ToolOutputBarrier.CreateCommandBuffer();

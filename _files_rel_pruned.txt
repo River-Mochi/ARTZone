@@ -3,6 +3,7 @@
 .\AdvancedRoadTools.sln
 .\global.json
 .\LICENSE
+.\MapGrid.svg
 .\README.md
 .\src\.editorconfig
 .\src\.gitattributes
@@ -32,6 +33,11 @@
 .\src\Tools\ZoningControllerToolUISystem.cs
 .\src\Tools\ZoningMode.cs
 .\src\UI\.eslintrc.json
+.\src\UI\images\grid-color.svg
+.\src\UI\images\grid4.svg
+.\src\UI\images\MapGrid.svg
+.\src\UI\images\MapGridColor.svg
+.\src\UI\images\menu_icon.svg
 .\src\UI\images\Tool_Icon\ToolsIcon_1024px.png
 .\src\UI\images\Tool_Icon\ToolsIcon_2048px.png
 .\src\UI\images\Tool_Icon\ToolsIcon_4096px.png

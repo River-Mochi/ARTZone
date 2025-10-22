@@ -18,7 +18,7 @@ namespace AdvancedRoadTools
     {
         private EntityQuery m_UpdatedBlocksQuery;
 
-        // Initialize with null! — assigned in OnCreate, avoids CS8618.
+        // Initialize with null! — assigned in OnCreate
         private ModificationBarrier4B m_ModificationBarrier = null!;
 
         protected override void OnCreate()
