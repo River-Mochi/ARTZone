@@ -88,16 +88,7 @@ namespace AdvancedRoadTools
             updateSystem.UpdateAt<Tools.ToolBootstrapSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<Tools.KeybindHotkeySystem>(SystemUpdatePhase.ToolUpdate); // listens for Shift+Z, RMB
 
-            // Road Services palette tile registration
-            Tools.ToolsHelper.Initialize();
-            Tools.ToolsHelper.RegisterTool(
-                new Tools.ToolDefinition(
-                    typeof(Tools.ZoningControllerToolSystem),
-                    Tools.ZoningControllerToolSystem.ToolID,
-                    new Tools.ToolDefinition.UI($"{CouiRoot}/images/ToolsIcon.png")
-                )
-            );
-            // ToolBootstrapSystem will keep trying until Road Services is ready
+
 
             // Keep strings in sync if player changes game language
             var lm = GameManager.instance?.localizationManager;

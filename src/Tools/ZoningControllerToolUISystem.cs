@@ -1,13 +1,14 @@
 // File: src/Tools/ZoningControllerToolUISystem.cs
 // Purpose:
-//  Renders the “Zoning Side” section in-game with three buttons. Reads values from ZoningControllerToolUISystem bindings
-//  and calls its triggers when clicked.
+//  Renders the “Zoning Side” section in-game with three buttons. Exposes values/triggers to JS/TS.
 //  Holds bindings for:
-//    - ToolZoningMode (for standalone tool)
-//    - RoadZoningMode (for future vanilla net placement use)
+//    - ToolZoningMode (standalone tool)
+//    - RoadZoningMode (future vanilla net placement)
 //    - IsRoadPrefab (UI decides where to render)
-//  Exposes static helpers so hotkeys and other entry points can open the same mini panel.
-//  Also exposes InvertZoningSideOnly(): flips Left<->Right without ever producing Both/None from RMB.
+//  Helpers for hotkeys and tool actions:
+//    - InvertZoningMode(): toggles both bits (bitwise ^ Both) — used by Shift+Z
+//    - FlipSmart(): Both↔None, otherwise Left↔Right — used by RMB when hovering a road
+//    - InvertZoningSideOnly(): strict Left↔Right with fallback to Left
 
 namespace AdvancedRoadTools.Tools
 {
@@ -28,10 +29,6 @@ namespace AdvancedRoadTools.Tools
         private ToolSystem m_MainToolSystem = null!;
         private ZoningControllerToolSystem m_ToolSystem = null!;
 
-        // Mini panel visibility (same behavior for GameTopLeft icon and Shift+Z)
-        private static ZoningControllerToolUISystem? s_Instance;
-        private bool m_PanelVisible;
-
         // Public helpers used by the tool system
         public ZoningMode ToolZoningMode => (ZoningMode)m_ToolZoningMode.value;
         public ZoningMode RoadZoningMode => (ZoningMode)m_RoadZoningMode.value;
@@ -39,7 +36,7 @@ namespace AdvancedRoadTools.Tools
         // Convert "Both/Left/Right" to left/right depths (6 = on, 0 = off)
         public int2 ToolDepths
         {
-            get => new(
+            get => new int2(
                 ((ZoningMode)m_ToolZoningMode.value & ZoningMode.Left) == ZoningMode.Left ? 6 : 0,
                 ((ZoningMode)m_ToolZoningMode.value & ZoningMode.Right) == ZoningMode.Right ? 6 : 0);
             set
@@ -55,7 +52,7 @@ namespace AdvancedRoadTools.Tools
 
         public int2 RoadDepths
         {
-            get => new(
+            get => new int2(
                 ((ZoningMode)m_RoadZoningMode.value & ZoningMode.Left) == ZoningMode.Left ? 6 : 0,
                 ((ZoningMode)m_RoadZoningMode.value & ZoningMode.Right) == ZoningMode.Right ? 6 : 0);
             set
@@ -90,17 +87,17 @@ namespace AdvancedRoadTools.Tools
             m_MainToolSystem.EventPrefabChanged += EventPrefabChanged;
             m_MainToolSystem.EventToolChanged += EventToolChanged;
 
-            // For toggling our tool on demand from the floating button
+            // For toggling our tool on demand from the floating button / hotkey
             m_ToolSystem = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
-
-            s_Instance = this;
-            m_PanelVisible = false;
         }
 
         protected override void OnDestroy()
         {
-            if (s_Instance == this)
-                s_Instance = null;
+            if (m_MainToolSystem != null)
+            {
+                m_MainToolSystem.EventPrefabChanged -= EventPrefabChanged;
+                m_MainToolSystem.EventToolChanged -= EventToolChanged;
+            }
             base.OnDestroy();
         }
 
@@ -123,7 +120,7 @@ namespace AdvancedRoadTools.Tools
 
         private void ToggleTool()
         {
-            // Hooked by floating button. Flip our tool on/off.
+            // Called by the floating button; flip our tool on/off.
             m_ToolSystem.SetToolEnabled(m_MainToolSystem.activeTool != m_ToolSystem);
         }
 
@@ -155,61 +152,55 @@ namespace AdvancedRoadTools.Tools
 
         public void InvertZoningMode()
         {
-            // Debug helper: flip both bits together (kept for compatibility with existing TS)
-            var next = ToolZoningMode ^ ZoningMode.Both; // toggles both bits at once
+            // Bitwise flip both bits together (used by Shift+Z)
+            var next = ToolZoningMode ^ ZoningMode.Both;
             ChangeToolZoningMode((int)next);
+        }
+
+        public void FlipSmart()
+        {
+            var current = ToolZoningMode;
+
+            if (current == ZoningMode.Both)
+            {
+                ChangeToolZoningMode((int)ZoningMode.None);
+                return;
+            }
+            if (current == ZoningMode.None)
+            {
+                ChangeToolZoningMode((int)ZoningMode.Both);
+                return;
+            }
+
+            // Otherwise flip Left <-> Right
+            if (current == ZoningMode.Left)
+                ChangeToolZoningMode((int)ZoningMode.Right);
+            else if (current == ZoningMode.Right)
+                ChangeToolZoningMode((int)ZoningMode.Left);
+            else
+                ChangeToolZoningMode((int)ZoningMode.Both); // safety fallback
         }
 
         /// <summary>
         /// Flip strictly Left <-> Right. If Both or None, pick Left first.
-        /// Used by RMB when hovering an existing road.
         /// </summary>
         public void InvertZoningSideOnly()
         {
             var mode = ToolZoningMode;
-            ZoningMode next;
-            if (mode == ZoningMode.Left)
-                next = ZoningMode.Right;
-            else if (mode == ZoningMode.Right)
-                next = ZoningMode.Left;
-            else
-                next = ZoningMode.Left; // Both or None -> Left
+            var next =
+                (mode == ZoningMode.Left) ? ZoningMode.Right :
+                (mode == ZoningMode.Right) ? ZoningMode.Left :
+                ZoningMode.Left; // Both or None -> Left
             ChangeToolZoningMode((int)next);
         }
 
-        // ===== Mini panel visibility control (shared entry for hotkey + GameTopLeft) =====
-
-        private void SetPanelVisible(bool visible)
-        {
-            if (m_PanelVisible == visible)
-                return;
-            m_PanelVisible = visible;
-            // TS side listens to a binding or a trigger. If needed, add a ValueBinding<bool> later.
-            // For now, rely on JS to query state via existing bindings on demand.
-        }
-
-        public static void ToggleMiniPanel()
-        {
-            var inst = s_Instance;
-            if (inst == null)
-                return;
-            inst.SetPanelVisible(!inst.m_PanelVisible);
-        }
-
-        public static void EnsureMiniPanelVisible()
-        {
-            var inst = s_Instance;
-            if (inst == null)
-                return;
-            inst.SetPanelVisible(true);
-        }
-
         /// <summary>
-        /// Hotkey bridge: previously toggled the tool; now opens the same mini panel as the GameTopLeft icon.
+        /// Hotkey bridge (Shift+Z behavior): toggles the tool like the floating button.
+        /// If your UI wants “open panel” instead, do it in JS — this just flips the tool on/off.
         /// </summary>
         public void ToggleFromHotkey()
         {
-            ToggleMiniPanel();
+            ToggleTool();
         }
     }
 }

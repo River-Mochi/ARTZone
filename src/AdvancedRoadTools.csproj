@@ -45,17 +45,14 @@
     <Reference Include="Colossal.Localization"><Private>false</Private></Reference>
     <Reference Include="Colossal.UI"><Private>false</Private></Reference>
     <Reference Include="Colossal.UI.Binding"><Private>false</Private></Reference>
-	<Reference Include="Colossal.Serialization.Entities"><Private>false</Private></Reference>
-	  <Reference Include="UnityEngine.CoreModule"><Private>false</Private></Reference>
+	  
+	 <Reference Include="UnityEngine.CoreModule"><Private>false</Private></Reference>
     <Reference Include="UnityEngine.AudioModule"><Private>false</Private></Reference>
     <Reference Include="Unity.Burst"><Private>false</Private></Reference>
     <Reference Include="Unity.Collections"><Private>false</Private></Reference>
     <Reference Include="Unity.Entities"><Private>false</Private></Reference>
     <Reference Include="Unity.Mathematics"><Private>false</Private></Reference>
-    <Reference Include="Colossal.Mathematics">
-      <HintPath>$(ManagedPath)\Colossal.Mathematics.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
+    <Reference Include="Colossal.Mathematics"><Private>false</Private></Reference>
 	  <!-- Required by Colossal.SettingsUIKeyboardBindingAttribute to compile; safe even if unused -->
 	  <Reference Include="Unity.InputSystem"><Private>false</Private></Reference>
   </ItemGroup>

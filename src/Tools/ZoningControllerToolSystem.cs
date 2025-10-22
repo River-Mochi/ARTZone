@@ -79,15 +79,19 @@ namespace AdvancedRoadTools.Tools
 
             m_SelectedEntities = new NativeList<Entity>(Allocator.Persistent);
 
-            // --- Register tool & palette tile; explicit icon path matches mod output
-            var def = new ToolDefinition(
+            // Register our tool once (palette tile icon path comes from CouiRoot)
+            var definition = new Tools.ToolDefinition(
                 typeof(ZoningControllerToolSystem),
                 toolID,
-                new ToolDefinition.UI("coui://AdvancedRoadTools/images/Tool_Icon.png"))
+                60,         // priority ignored; ToolsHelper will place us at anchor+1
+                new Tools.ToolDefinition.UI($"{AdvancedRoadToolsMod.CouiRoot}/images/ToolsIcon.png")
+            )
             {
-                PlacementFlags = PlacementFlags.UndergroundUpgrade
+                PlacementFlags = Game.Net.PlacementFlags.UndergroundUpgrade
             };
-            ToolsHelper.RegisterTool(def);
+
+            ToolsHelper.Initialize();
+            ToolsHelper.RegisterTool(definition);
         }
 
         protected override void OnDestroy()
@@ -152,14 +156,14 @@ namespace AdvancedRoadTools.Tools
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
             // --- RMB handling: if pressed over a valid hit, flip Left<->Right and DO NOT cancel.
+            // RMB: over a valid hit -> FlipSmart (Both<->None, else Left<->Right); otherwise cancel like vanilla.
             if (cancelAction.WasPressedThisFrame())
             {
                 if (hasHit)
                 {
-                    m_ZoningControllerToolUISystem.InvertZoningSideOnly();
+                    m_ZoningControllerToolUISystem.FlipSmart();
                     if (haveSoundbank)
                         AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
-                    // Treat as preview afterwards
                     m_Mode = Mode.Preview;
                 }
                 else
@@ -183,6 +187,7 @@ namespace AdvancedRoadTools.Tools
             {
                 m_Mode = Mode.Preview;
             }
+
 
             EntityCommandBuffer ecb = m_ToolOutputBarrier.CreateCommandBuffer();
 
