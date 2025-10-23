@@ -231,57 +231,56 @@ namespace AdvancedRoadTools.Tools
         /// Probe for a stable RoadsServices donor with a UIObject (Grass / Wide Sidewalk / Crosswalk).
         /// Returns true only when both prefab & UIObject are found and group == "RoadsServices".
         /// </summary>
+
+        // ToolsHelper.cs — REPLACE the entire TryResolveAnchor method with this one.
+        // Uses a locked donor (FencePrefab/Wide Sidewalk) with a single fallback,
+        // and only scans in DEBUG if both are missing or not in RoadsServices.
+
         public static bool TryResolveAnchor(PrefabSystem prefabSystem, out PrefabBase prefab, out UIObject ui)
         {
-            prefab = default!;
-            ui = default!;
+            prefab = null!;
+            ui = null!;
 
             if (prefabSystem == null)
                 return false;
 
-            // Prefer NetUpgradePrefab (earlier success), then fall back.
-            var probes = new (string typeName, string name)[]
+            // Locked default + single fallback
+            var locked = new (string typeName, string name)[]
             {
-                ("NetUpgradePrefab", "Grass"),
-                ("NetUpgradePrefab", "Wide Sidewalk"),
-                ("NetUpgradePrefab", "Crosswalk"),
-
-                ("PrefabBase",       "Crosswalk"),
-                ("PrefabBase",       "Wide Sidewalk"),
-                ("PrefabBase",       "Sound Barrier"),
+        ("FencePrefab", "Wide Sidewalk"),
+        ("FencePrefab", "Crosswalk"),
             };
 
-            for (int i = 0; i < probes.Length; i++)
+            foreach (var (typeName, name) in locked)
             {
-                var typeName = probes[i].typeName;
-                var name = probes[i].name;
-
                 var id = new PrefabID(typeName, name);
 
-                PrefabBase? cand = null;
-                PrefabBase tmp;
-                if (prefabSystem.TryGetPrefab(id, out tmp) && tmp != null)
-                    cand = tmp;
-
-#if DEBUG
-                Dbg($"Probe {typeName}:{name}: {(cand != null ? "FOUND" : "missing")}");
-#endif
-                if (cand == null)
-                    continue;
-
-                UIObject? uioMaybe;
-                if (!cand.TryGet(out uioMaybe) || uioMaybe == null)
+                PrefabBase p;
+                if (!prefabSystem.TryGetPrefab(id, out p) || p == null)
                 {
 #if DEBUG
-                    Dbg("  …found prefab but it has no UIObject → skip");
+                    Dbg($"Probe {typeName}:{name}: missing");
 #endif
                     continue;
                 }
 
-                var group = uioMaybe.m_Group;
-                string groupName = group != null ? group.name : "(null)";
-                bool inRoadsServices = string.Equals(groupName, "RoadsServices", StringComparison.OrdinalIgnoreCase);
-                if (!inRoadsServices)
+                UIObject u;
+                if (!p.TryGet(out u) || u == null)
+                {
+#if DEBUG
+                    Dbg($"Probe {typeName}:{name}: found prefab but it has no UIObject → skip");
+#endif
+                    continue;
+                }
+
+                string groupName = u.m_Group != null ? u.m_Group.name : "(null)";
+                bool inRoads = string.Equals(groupName, "RoadsServices", StringComparison.OrdinalIgnoreCase);
+
+#if DEBUG
+                Dbg($"Probe {typeName}:{name}: found; group='{groupName}'");
+#endif
+
+                if (!inRoads)
                 {
 #if DEBUG
                     Dbg($"  …UIObject group is '{groupName}', not 'RoadsServices' → skip");
@@ -290,20 +289,80 @@ namespace AdvancedRoadTools.Tools
                 }
 
 #if DEBUG
-                Dbg($"Anchor OK (probe): {name}  Group={groupName}  Priority={uioMaybe.m_Priority}");
+                Dbg($"Anchor OK (locked): {name}  group='{groupName}'  priority={u.m_Priority}");
 #endif
-                prefab = cand;   // cand proven non-null
-                ui = uioMaybe;   // uioMaybe proven non-null
+                prefab = p;
+                ui = u;
                 return true;
             }
 
-            // Probes missed → robust fallback scan.
-            return TryResolveAnchorByScan(prefabSystem, out prefab, out ui);
+#if DEBUG
+            // DEBUG-only reflection scan (safety net & diagnostics)
+            //    Scan path also logs group names and filters to RoadsServices.
+            try
+            {
+                var all = GetAllPrefabsUnsafe(prefabSystem); // existing DEBUG helper
+                PrefabBase bestP = null!;
+                UIObject bestU = null!;
+                int bestScore = int.MinValue;
+
+                foreach (var p in all)
+                {
+                    if (p == null)
+                        continue;
+
+                    UIObject u;
+                    if (!p.TryGet(out u) || u == null)
+                        continue;
+
+                    string groupName = u.m_Group != null ? u.m_Group.name : "(null)";
+                    if (!string.Equals(groupName, "RoadsServices", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    // score by name, preference Wide Sidewalk > Crosswalk > Grass
+                    int score = 0;
+                    string n = p.name ?? string.Empty;
+                    if (n.Contains("Wide Sidewalk", StringComparison.OrdinalIgnoreCase))
+                        score += 1000;
+                    else if (n.Contains("Crosswalk", StringComparison.OrdinalIgnoreCase))
+                        score += 900;
+                    else if (n.Contains("Grass", StringComparison.OrdinalIgnoreCase))
+                        score += 800;
+
+                    // small bias by priority (higher first)
+                    score += u.m_Priority;
+
+                    // emit one compact line per candidate
+                    Dbg($"Scan candidate: {p.GetType().Name}:{n}  score={score}  group='{groupName}'  hasPlaceable={p.Has<PlaceableNetData>()}  priority={u.m_Priority}");
+
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                        bestP = p;
+                        bestU = u;
+                    }
+                }
+
+                if (bestP != null && bestU != null)
+                {
+                    Dbg($"Anchor OK (scan): {bestP.name}  group='{bestU.m_Group?.name ?? "(null)"}'  priority={bestU.m_Priority}");
+                    prefab = bestP;
+                    ui = bestU;
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Dbg($"DEBUG scan failed: {ex}");
+            }
+#endif
+
+            return false;
         }
 
         /// <summary>
         /// Slow but robust fallback: reflect PrefabSystem.m_Prefabs and find any prefab whose UIObject is in RoadsServices.
-        /// Prefers names you expect (Wide Sidewalk / Crosswalk / Grass), otherwise any with PlaceableNetData.
+        /// Prefers expected names (Wide Sidewalk / Crosswalk / Grass), otherwise any with PlaceableNetData.
         /// </summary>
         private static bool TryResolveAnchorByScan(PrefabSystem prefabSystem, out PrefabBase prefab, out UIObject ui)
         {
