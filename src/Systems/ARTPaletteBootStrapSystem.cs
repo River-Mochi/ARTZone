@@ -78,22 +78,25 @@ namespace AdvancedRoadTools.Systems
             dbg("GameLoadingComplete → armed; will begin polling for RoadsServices anchors…");
 #endif
         }
-
         protected override void OnUpdate()
         {
             if (!m_Armed || m_Done || m_Prefabs == null)
                 return;
 
-            // Probe for a donor tile (Wide Sidewalk / Crosswalk) already in RoadsServices.
-            if (ToolsHelper.TryResolveAnchor(m_Prefabs, out var donor, out var donorUI))
+            // Probe for a donor tile (Wide Sidewalk / Crosswalk) already in group RoadsServices
+            if (ToolsHelper.TryResolveAnchor(m_Prefabs, out PrefabBase? donor, out UIObject? donorUI))
             {
 #if DEBUG
-                string groupName = donorUI.m_Group?.name ?? "(null)";
-                dbg($"Donor found: '{donor?.name}' Group='{groupName}' Priority={donorUI.m_Priority}");
+                // Guard all accesses to prevent analyzer spam
+                if (donorUI != null)
+                {
+                    string groupName = donorUI.m_Group != null ? donorUI.m_Group.name : "(null)";
+                    dbg($"Donor found: '{(donor != null ? donor.name : "(null)")}' Group='{groupName}' Priority={donorUI.m_Priority}");
+                }
 #endif
                 ToolsHelper.InstantiateTools(logIfNoAnchor: true);
                 m_Done = true;
-                Enabled = false;         // no more per-frame updates needed
+                Enabled = false; // no more per-frame updates needed
                 return;
             }
 
@@ -105,10 +108,10 @@ namespace AdvancedRoadTools.Systems
 
             if (m_Tries >= kMaxTries)
             {
-                AdvancedRoadToolsMod.s_Log?.Error("[ART][Bootstrap] Giving up; RoadsServices donors never appeared.");
+                AdvancedRoadToolsMod.s_Log.Error("[ART][Bootstrap] Giving up; RoadsServices donors never appeared.");
                 m_Armed = false;
-                Enabled = false;
             }
         }
+
     }
 }

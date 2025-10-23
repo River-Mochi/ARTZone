@@ -1,29 +1,30 @@
 // File: src/Tools/ToolsHelper.cs
-// Purpose: Duplicate a RoadsServices donor (Wide Sidewalk / Crosswalk / Grass) and create our tile
+// Purpose: Duplicate a RoadsServices donor (Wide Sidewalk / Crosswalk) and create our tile
 //          with the same UI group and priority+1. Donor prefab is never modified.
 // Notes:
-//   • Probes prefer NetUpgradePrefab, then fall back to PrefabBase.
-//   • If probes miss, do a safe reflective scan of PrefabSystem to find a RoadsServices candidate.
-//   • DuplicatePrefab + AddComponentFrom(UIObject, NetUpgrade) + UpdatePrefab to register ECS components.
-//   • Icon path comes from definition.ui.ImagePath (single source of truth).
-//   • Debug logging is null-safe and compiled out in Release.
-//   • All nullable accesses are guarded; no CS860x warnings.
+//   • Primary lookup: PrefabID("FencePrefab","Wide Sidewalk") then ("FencePrefab","Crosswalk").
+//   • If both miss, DEBUG-only reflection scan over PrefabSystem to find best RoadsServices candidate.
+//   • DuplicatePrefab + AddComponentFrom(UIObject, NetUpgrade) + UpdatePrefab to lock in components.
+//   • Icon path comes from definition.ui.ImagePath.
+//   • Cached donor so we don’t keep probing; guarded DEBUG logging; no #nullable directive used.
 
 namespace AdvancedRoadTools.Tools
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Reflection;
-    using AdvancedRoadTools.Systems;
     using Colossal.Serialization.Entities;
     using Game;
-    using Game.Net;
+    using Game.Net;          // PlacementFlags
     using Game.Prefabs;
     using Game.SceneFlow;
     using Game.Tools;
     using Unity.Entities;
     using UnityEngine;
+#if DEBUG
+    using System.Reflection;
+    using AdvancedRoadTools.Systems;
+#endif
 
     public static class ToolsHelper
     {
@@ -33,17 +34,18 @@ namespace AdvancedRoadTools.Tools
 
         private static readonly Dictionary<ToolDefinition, (PrefabBase Prefab, UIObject UI)> s_ToolsLookup = new(4);
 
-        private static bool s_Instantiated;
+        // Make these nullable and ALWAYS null-check before use → no CS8618 and no CS8602
         private static World? s_World;
         private static PrefabSystem? s_PrefabSystem;
 
+        // Cached donor from RoadsServices (kept for placeable copy)
         private static PrefabBase? s_AnchorPrefab;
         private static UIObject? s_AnchorUI;
 
         // Allows bootstrapper to know when a tile has been created.
         public static bool IsReady => s_Instantiated && s_ToolsLookup.Count > 0;
+        private static bool s_Instantiated;
 
-        // Null-safe debug logger. Compiled out in Release.
 #if DEBUG
         [Conditional("DEBUG")]
         private static void Dbg(string message)
@@ -55,7 +57,7 @@ namespace AdvancedRoadTools.Tools
             {
                 log.Info(message);
             }
-            catch { /* swallow early logger NREs */ }
+            catch { /* swallow early logger hiccups */ }
         }
 #else
         [Conditional("DEBUG")]
@@ -72,7 +74,7 @@ namespace AdvancedRoadTools.Tools
             s_Instantiated = false;
 
             s_World = World.DefaultGameObjectInjectionWorld;
-            s_PrefabSystem = s_World != null ? s_World.GetExistingSystemManaged<PrefabSystem>() : null;
+            s_PrefabSystem = (s_World != null) ? s_World.GetExistingSystemManaged<PrefabSystem>() : null;
         }
 
         public static void RegisterTool(ToolDefinition toolDefinition)
@@ -98,7 +100,7 @@ namespace AdvancedRoadTools.Tools
                 return;
 
             s_World ??= World.DefaultGameObjectInjectionWorld;
-            s_PrefabSystem ??= s_World != null ? s_World.GetExistingSystemManaged<PrefabSystem>() : null;
+            s_PrefabSystem ??= (s_World != null) ? s_World.GetExistingSystemManaged<PrefabSystem>() : null;
 
             if (s_PrefabSystem == null)
             {
@@ -106,15 +108,16 @@ namespace AdvancedRoadTools.Tools
                 return;
             }
 
+            // Resolve donor (cached on success). Out params are nullable to avoid CS8625 on failure path.
             if ((s_AnchorPrefab == null || s_AnchorUI == null) &&
-                !TryResolveAnchor(s_PrefabSystem, out s_AnchorPrefab!, out s_AnchorUI!))
+                !TryResolveAnchor(s_PrefabSystem, out s_AnchorPrefab, out s_AnchorUI))
             {
                 if (logIfNoAnchor)
                     AdvancedRoadToolsMod.s_Log.Error("[ART][Tools] Could not find RoadsServices anchor. Will retry later.");
                 return;
             }
 
-            // local non-null copies for analyzer clarity
+            // Local non-null copies for clarity (we only get here when anchor is found)
             var anchorPrefab = s_AnchorPrefab!;
             var anchorUI = s_AnchorUI!;
 
@@ -138,12 +141,10 @@ namespace AdvancedRoadTools.Tools
                     // Fresh UIObject; keep donor group, bump priority, use mod-specified icon.
                     var uiObject = ScriptableObject.CreateInstance<UIObject>();
                     uiObject.name = definition.ToolID;
-                    uiObject.m_Icon = definition.ui.ImagePath; // single source of truth is Mod.cs
-
-                    // Copy group & active/debug flags from donor UI.
+                    uiObject.m_Icon = definition.ui.ImagePath;            // single source of truth
                     uiObject.m_IsDebugObject = anchorUI.m_IsDebugObject;
                     uiObject.m_Priority = anchorUI.m_Priority + 1;
-                    uiObject.m_Group = anchorUI.m_Group; // "RoadsServices"
+                    uiObject.m_Group = anchorUI.m_Group;                  // "RoadsServices"
                     uiObject.active = anchorUI.active;
 
                     toolPrefab.AddComponentFrom(uiObject);
@@ -228,59 +229,64 @@ namespace AdvancedRoadTools.Tools
         }
 
         /// <summary>
-        /// Probe for a stable RoadsServices donor with a UIObject (Grass / Wide Sidewalk / Crosswalk).
+        /// Probe for a stable RoadsServices donor (FencePrefab/Wide Sidewalk primary, Crosswalk fallback).
         /// Returns true only when both prefab & UIObject are found and group == "RoadsServices".
+        /// Caches success so we don’t keep probing.
         /// </summary>
-
-        // ToolsHelper.cs — REPLACE the entire TryResolveAnchor method with this one.
-        // Uses a locked donor (FencePrefab/Wide Sidewalk) with a single fallback,
-        // and only scans in DEBUG if both are missing or not in RoadsServices.
-
-        public static bool TryResolveAnchor(PrefabSystem prefabSystem, out PrefabBase prefab, out UIObject ui)
+        public static bool TryResolveAnchor(PrefabSystem prefabSystem, out PrefabBase? prefab, out UIObject? ui)
         {
-            prefab = null!;
-            ui = null!;
+            prefab = null;
+            ui = null;
 
             if (prefabSystem == null)
                 return false;
 
-            // Locked default + single fallback
+            // 0) Return cached match immediately
+            if (s_AnchorPrefab != null && s_AnchorUI != null)
+            {
+#if DEBUG
+                var cachedGroup = s_AnchorUI.m_Group != null ? s_AnchorUI.m_Group.name : "(null)";
+                Dbg($"[Anchor] cached: {s_AnchorPrefab.name}  group='{cachedGroup}'");
+#endif
+                prefab = s_AnchorPrefab;
+                ui = s_AnchorUI;
+                return true;
+            }
+
+            // 1) Locked donors (type+name exact)
             var locked = new (string typeName, string name)[]
             {
-        ("FencePrefab", "Wide Sidewalk"),
-        ("FencePrefab", "Crosswalk"),
+                ("FencePrefab", "Wide Sidewalk"),
+                ("FencePrefab", "Crosswalk"),
             };
 
-            foreach (var (typeName, name) in locked)
+            for (int i = 0; i < locked.Length; i++)
             {
+                var typeName = locked[i].typeName;
+                var name = locked[i].name;
                 var id = new PrefabID(typeName, name);
 
-                PrefabBase p;
-                if (!prefabSystem.TryGetPrefab(id, out p) || p == null)
+                PrefabBase? candidate;
+                bool found = prefabSystem.TryGetPrefab(id, out candidate) && candidate is not null;
+
+#if DEBUG
+                Dbg($"Probe {typeName}:{name}: {(found ? "FOUND" : "missing")}");
+#endif
+                if (!found)
+                    continue;
+
+                UIObject? candidateUI;
+                bool hasUI = candidate!.TryGet(out candidateUI) && candidateUI is not null;
+                if (!hasUI)
                 {
 #if DEBUG
-                    Dbg($"Probe {typeName}:{name}: missing");
+                    Dbg("  …found prefab but it has no UIObject → skip");
 #endif
                     continue;
                 }
 
-                UIObject u;
-                if (!p.TryGet(out u) || u == null)
-                {
-#if DEBUG
-                    Dbg($"Probe {typeName}:{name}: found prefab but it has no UIObject → skip");
-#endif
-                    continue;
-                }
-
-                string groupName = u.m_Group != null ? u.m_Group.name : "(null)";
-                bool inRoads = string.Equals(groupName, "RoadsServices", StringComparison.OrdinalIgnoreCase);
-
-#if DEBUG
-                Dbg($"Probe {typeName}:{name}: found; group='{groupName}'");
-#endif
-
-                if (!inRoads)
+                string groupName = candidateUI!.m_Group != null ? candidateUI.m_Group.name : "(null)";
+                if (!string.Equals(groupName, "RoadsServices", StringComparison.OrdinalIgnoreCase))
                 {
 #if DEBUG
                     Dbg($"  …UIObject group is '{groupName}', not 'RoadsServices' → skip");
@@ -289,21 +295,22 @@ namespace AdvancedRoadTools.Tools
                 }
 
 #if DEBUG
-                Dbg($"Anchor OK (locked): {name}  group='{groupName}'  priority={u.m_Priority}");
+                Dbg($"Anchor OK (locked): {name}  group='{groupName}'  priority={candidateUI.m_Priority}");
 #endif
-                prefab = p;
-                ui = u;
+                s_AnchorPrefab = candidate;
+                s_AnchorUI = candidateUI;
+                prefab = candidate;
+                ui = candidateUI;
                 return true;
             }
 
+            // 2) DEBUG-only scan (reflection) — only if locked donors fail
 #if DEBUG
-            // DEBUG-only reflection scan (safety net & diagnostics)
-            //    Scan path also logs group names and filters to RoadsServices.
             try
             {
-                var all = GetAllPrefabsUnsafe(prefabSystem); // existing DEBUG helper
-                PrefabBase bestP = null!;
-                UIObject bestU = null!;
+                var all = GetAllPrefabsUnsafe(prefabSystem);
+                PrefabBase? bestP = null;
+                UIObject? bestU = null;
                 int bestScore = int.MinValue;
 
                 foreach (var p in all)
@@ -311,43 +318,45 @@ namespace AdvancedRoadTools.Tools
                     if (p == null)
                         continue;
 
-                    UIObject u;
-                    if (!p.TryGet(out u) || u == null)
+                    UIObject? uComp;
+                    if (!p.TryGet(out uComp) || uComp == null)
                         continue;
 
-                    string groupName = u.m_Group != null ? u.m_Group.name : "(null)";
+                    string groupName = uComp.m_Group != null ? uComp.m_Group.name : "(null)";
                     if (!string.Equals(groupName, "RoadsServices", StringComparison.OrdinalIgnoreCase))
                         continue;
 
-                    // score by name, preference Wide Sidewalk > Crosswalk > Grass
                     int score = 0;
                     string n = p.name ?? string.Empty;
-                    if (n.Contains("Wide Sidewalk", StringComparison.OrdinalIgnoreCase))
+                    if (n.IndexOf("Wide Sidewalk", StringComparison.OrdinalIgnoreCase) >= 0)
                         score += 1000;
-                    else if (n.Contains("Crosswalk", StringComparison.OrdinalIgnoreCase))
+                    else if (n.IndexOf("Crosswalk", StringComparison.OrdinalIgnoreCase) >= 0)
                         score += 900;
-                    else if (n.Contains("Grass", StringComparison.OrdinalIgnoreCase))
+                    else if (n.IndexOf("Grass", StringComparison.OrdinalIgnoreCase) >= 0)
                         score += 800;
 
-                    // small bias by priority (higher first)
-                    score += u.m_Priority;
+                    // small bias by priority (higher is better)
+                    score += uComp.m_Priority;
 
-                    // emit one compact line per candidate
-                    Dbg($"Scan candidate: {p.GetType().Name}:{n}  score={score}  group='{groupName}'  hasPlaceable={p.Has<PlaceableNetData>()}  priority={u.m_Priority}");
+                    bool hasPlaceable = prefabSystem.TryGetComponentData(p, out PlaceableNetData _);
+                    Dbg($"Scan candidate: {p.GetType().Name}:{n}  score={score}  group='{groupName}'  hasPlaceable={hasPlaceable}  priority={uComp.m_Priority}");
 
                     if (score > bestScore)
                     {
                         bestScore = score;
                         bestP = p;
-                        bestU = u;
+                        bestU = uComp;
                     }
                 }
 
                 if (bestP != null && bestU != null)
                 {
-                    Dbg($"Anchor OK (scan): {bestP.name}  group='{bestU.m_Group?.name ?? "(null)"}'  priority={bestU.m_Priority}");
+                    s_AnchorPrefab = bestP;
+                    s_AnchorUI = bestU;
                     prefab = bestP;
                     ui = bestU;
+                    var g = bestU.m_Group != null ? bestU.m_Group.name : "(null)";
+                    Dbg($"Anchor OK (scan): {bestP.name}  group='{g}'  priority={bestU.m_Priority}");
                     return true;
                 }
             }
@@ -357,102 +366,39 @@ namespace AdvancedRoadTools.Tools
             }
 #endif
 
+            // Not found (out params remain null by design)
             return false;
         }
 
-        /// <summary>
-        /// Slow but robust fallback: reflect PrefabSystem.m_Prefabs and find any prefab whose UIObject is in RoadsServices.
-        /// Prefers expected names (Wide Sidewalk / Crosswalk / Grass), otherwise any with PlaceableNetData.
-        /// </summary>
-        private static bool TryResolveAnchorByScan(PrefabSystem prefabSystem, out PrefabBase prefab, out UIObject ui)
+#if DEBUG
+        // DEBUG helper: reflect PrefabSystem to get the raw list of prefabs.
+        private static List<PrefabBase> GetAllPrefabsUnsafe(PrefabSystem ps)
         {
-            prefab = default!;
-            ui = default!;
-
+            // Prefer a hidden property if present
             try
             {
-                var fi = typeof(PrefabSystem).GetField("m_Prefabs", BindingFlags.Instance | BindingFlags.NonPublic);
-                var listObj = fi != null ? fi.GetValue(prefabSystem) as System.Collections.IEnumerable : null;
-                if (listObj == null)
+                var prop = typeof(PrefabSystem).GetProperty("prefabs", BindingFlags.NonPublic | BindingFlags.Instance);
+                if (prop != null)
                 {
-#if DEBUG
-                    Dbg("Scan fallback: m_Prefabs not accessible.");
-#endif
-                    return false;
-                }
-
-                PrefabBase? best = null;
-                UIObject? bestUI = null;
-                int bestScore = int.MinValue;
-
-                foreach (var obj in listObj)
-                {
-                    var p = obj as PrefabBase;
-                    if (p == null)
-                        continue;
-
-                    UIObject? uioMaybe;
-                    if (!p.TryGet(out uioMaybe) || uioMaybe == null)
-                        continue;
-
-                    var group = uioMaybe.m_Group;
-                    string groupName = group != null ? group.name : "(null)"; // avoid null to satisfy nullable analysis
-                    if (!string.Equals(groupName, "RoadsServices", StringComparison.OrdinalIgnoreCase))
-                        continue;
-
-                    // Score the candidate:
-                    //  +1000 if name matches our favorites
-                    //  +100  if it has PlaceableNetData
-                    //  + priority as minor tiebreaker
-                    int score = 0;
-                    string n = p.name ?? string.Empty;
-                    if (string.Equals(n, "Wide Sidewalk", StringComparison.OrdinalIgnoreCase))
-                        score += 1000;
-                    else if (string.Equals(n, "Crosswalk", StringComparison.OrdinalIgnoreCase))
-                        score += 900;
-                    else if (string.Equals(n, "Grass", StringComparison.OrdinalIgnoreCase))
-                        score += 800;
-
-                    if (prefabSystem.HasComponent<PlaceableNetData>(p))
-                        score += 100;
-
-                    score += uioMaybe.m_Priority;
-
-#if DEBUG
-                    string typeName = p.GetType().Name;
-                    bool hasPlaceable = prefabSystem.HasComponent<PlaceableNetData>(p);
-                    Dbg($"Scan candidate: {typeName}:{n}  score={score}  hasPlaceable={hasPlaceable}  priority={uioMaybe.m_Priority}");
-#endif
-
-                    if (score > bestScore)
-                    {
-                        bestScore = score;
-                        best = p;
-                        bestUI = uioMaybe;
-                    }
-                }
-
-                if (best != null && bestUI != null)
-                {
-#if DEBUG
-                    Dbg($"Anchor OK (scan): {best.name}  priority={bestUI.m_Priority}");
-#endif
-                    prefab = best;
-                    ui = bestUI;
-                    return true;
+                    var ie = prop.GetValue(ps) as IEnumerable<PrefabBase>;
+                    if (ie != null)
+                        return new List<PrefabBase>(ie);
                 }
             }
-            catch (Exception ex)
+            catch { }
+
+            // Fallback to known private field (dnSpy)
+            try
             {
-                var log = AdvancedRoadToolsMod.s_Log;
-                if (log != null)
-                    log.Warn("Scan fallback failed: " + ex);
+                var fi = typeof(PrefabSystem).GetField("m_Prefabs", BindingFlags.NonPublic | BindingFlags.Instance);
+                var list = fi != null ? (fi.GetValue(ps) as List<PrefabBase>) : null;
+                return (list != null) ? new List<PrefabBase>(list) : new List<PrefabBase>(0);
             }
-
-#if DEBUG
-            Dbg("No RoadsServices candidate found by scan.");
-#endif
-            return false;
+            catch
+            {
+                return new List<PrefabBase>(0);
+            }
         }
+#endif
     }
 }

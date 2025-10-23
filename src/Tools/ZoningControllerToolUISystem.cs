@@ -64,7 +64,7 @@ namespace AdvancedRoadTools.Systems
         }
 
 #if DEBUG
-        private static void dbg(string msg)
+        private static void Dbg(string msg)
         {
             var log = AdvancedRoadToolsMod.s_Log;
             if (log == null)
@@ -117,7 +117,7 @@ namespace AdvancedRoadTools.Systems
             catch { /* guard in ToggleTool() anyway */ }
 
 #if DEBUG
-            dbg("UISystem created and bindings registered.");
+            Dbg("UISystem created and bindings registered.");
 #endif
         }
 
@@ -137,20 +137,8 @@ namespace AdvancedRoadTools.Systems
 
         protected override void OnUpdate()
         {
+            // UI bindings only; hotkey toggle is handled in KeybindHotkeySystem.
             base.OnUpdate();
-
-            // Optional keyboard: Shift+Z toggle (via Colossal action)
-            var toggle = AdvancedRoadToolsMod.m_ToggleToolAction;
-            try
-            {
-                if (toggle != null && toggle.WasPressedThisFrame())
-                {
-                    ToggleTool();
-                    // keep panel state consistent when toggled on
-                    m_ToolZoningMode.Update(m_RoadZoningMode.value);
-                }
-            }
-            catch { /* ignore input hiccups */ }
         }
 
         private void OnToolChanged(ToolBaseSystem tool)
@@ -159,7 +147,7 @@ namespace AdvancedRoadTools.Systems
             {
                 m_IsRoadPrefab.Update(tool is not null && tool.GetPrefab() is RoadPrefab);
 #if DEBUG
-                dbg($"OnToolChanged: activeTool={(tool != null ? tool.GetType().Name : "(null)")}  isRoad={(tool != null && tool.GetPrefab() is RoadPrefab)}");
+                Dbg($"OnToolChanged: activeTool={(tool != null ? tool.GetType().Name : "(null)")}  isRoad={(tool != null && tool.GetPrefab() is RoadPrefab)}");
 #endif
             }
             catch { /* guard against transient nulls */ }
@@ -171,7 +159,7 @@ namespace AdvancedRoadTools.Systems
             {
                 m_IsRoadPrefab.Update(prefab is RoadPrefab);
 #if DEBUG
-                dbg($"OnPrefabChanged: prefab={(prefab != null ? prefab.name : "(null)")}  isRoad={(prefab is RoadPrefab)}");
+                Dbg($"OnPrefabChanged: prefab={(prefab != null ? prefab.name : "(null)")}  isRoad={(prefab is RoadPrefab)}");
 #endif
             }
             catch { /* guard */ }
@@ -188,7 +176,7 @@ namespace AdvancedRoadTools.Systems
                 m_ToolSystem.SetToolEnabled(enable);
 
 #if DEBUG
-                dbg($"ToggleTool → enable={enable}");
+                Dbg($"ToggleTool → enable={enable}");
 #endif
             }
             catch { /* guard */ }
@@ -200,7 +188,7 @@ namespace AdvancedRoadTools.Systems
             {
                 m_ToolZoningMode.Update(ToolZoningMode == ZoningMode.Both ? (int)ZoningMode.None : (int)ZoningMode.Both);
 #if DEBUG
-                dbg($"FlipToolBothMode → {(ZoningMode)m_ToolZoningMode.value}");
+                Dbg($"FlipToolBothMode → {(ZoningMode)m_ToolZoningMode.value}");
 #endif
             }
             catch { }
@@ -212,7 +200,7 @@ namespace AdvancedRoadTools.Systems
             {
                 m_RoadZoningMode.Update(RoadZoningMode == ZoningMode.Both ? (int)ZoningMode.None : (int)ZoningMode.Both);
 #if DEBUG
-                dbg($"FlipRoadBothMode → {(ZoningMode)m_RoadZoningMode.value}");
+                Dbg($"FlipRoadBothMode → {(ZoningMode)m_RoadZoningMode.value}");
 #endif
             }
             catch { }

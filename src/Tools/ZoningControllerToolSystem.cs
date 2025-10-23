@@ -102,19 +102,52 @@ namespace AdvancedRoadTools.Systems
         protected override void OnStartRunning()
         {
             base.OnStartRunning();
-            applyAction.enabled = true;
+
+            // Enable the actions used by this tool.
+            applyAction.enabled = true;      // LMB (apply/confirm)
+            cancelAction.enabled = true;     // RMB (flip/cancel)
+
+            // Tool gating.
             requireZones = true;
             requireNet = Layer.Road;
             allowUnderground = true;
+
+#if DEBUG
+            try
+            {
+                var log = AdvancedRoadToolsMod.s_Log;
+                if (log != null)
+                {
+                    log.Info("[ART][Tool] StartRunning: applyAction.enabled=true, cancelAction.enabled=true, requireNet=Road");
+                }
+            }
+            catch { /* guard */ }
+#endif
         }
 
         protected override void OnStopRunning()
         {
             base.OnStartRunning();
+
+            // Disable actions while tool is not active.
             applyAction.enabled = false;
+            cancelAction.enabled = false;
+
             requireZones = false;
             requireNet = Layer.None;
             allowUnderground = false;
+
+#if DEBUG
+            try
+            {
+                var log = AdvancedRoadToolsMod.s_Log;
+                if (log != null)
+                {
+                    log.Info("[ART][Tool] StopRunning: actions disabled");
+                }
+            }
+            catch { /* guard */ }
+#endif
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
