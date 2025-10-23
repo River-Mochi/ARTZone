@@ -1,15 +1,11 @@
 ﻿// File: src/UI/src/mods/advanced-road-tools-button.tsx
-// Purpose: Color SVG in GameTopLeft (no monochrome mask).
-// Change: Use <Button variant="floating"> instead of <FloatingButton>.
-
-import React from "react";
+// Purpose: Color SVG in GameTopLeft. Use <Button variant="floating"> to avoid masking.
 import { Button } from "cs2/ui";
 import { useLocalization } from "cs2/l10n";
 import { trigger } from "cs2/api";
 import mod from "../../mod.json";
 
-// Prefer a COUI URL so it's not re-processed as a mask by the wrapper.
-const GRID_ICON = "coui://ui-mods/images/grid-color.svg";
+import gridIconUrl from "../../images/grid-color.svg";
 
 function onClickTopLeft() {
     trigger(mod.id, "ToggleZoneControllerTool");
@@ -21,7 +17,7 @@ export default function ZoningToolControllerButton(): JSX.Element {
     return (
         <Button
             variant="floating"
-            src={GRID_ICON}
+            src={gridIconUrl}
             onClick={onClickTopLeft}
             tooltipLabel={tooltip}
         />

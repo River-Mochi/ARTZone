@@ -1,12 +1,13 @@
 // File: src/Tools/ZoningControllerToolSystem.cs
 // Purpose:
 //   Runtime tool “system” (DOTS ToolBaseSystem).
-//   Handles input (LMB/RMB), preview/highlight, apply via jobs, and keybind invert.
-//   RMB pressed over a valid road now flips Left<->Right (does not cancel).
+//   Handles input (LMB/RMB/Esc via cancelAction), preview/highlight, apply via jobs.
+//   RMB pressed over a valid road flips Left<->Right or Both<->None (deterministic).
+//   RMB/Esc on empty space behaves like vanilla Esc: clears & closes palette.
 //
 // Notes:
-//   • Palette icon path changed to coui://AdvancedRoadTools/images/Tool_Icon.png
-//   • Tool tile anchored via ToolsHelper (priority handled there)
+//   • Palette icon path handled in ToolsHelper (anchor duplicate).
+//   • All RMB logic centralized here; TSX only draws buttons & fires triggers.
 
 namespace AdvancedRoadTools.Systems
 {
@@ -56,6 +57,22 @@ namespace AdvancedRoadTools.Systems
 
         private int2 Depths => m_ZoningControllerToolUISystem.ToolDepths;
 
+#if DEBUG
+        private static void Dbg(string msg)
+        {
+            var log = AdvancedRoadToolsMod.s_Log;
+            if (log == null)
+                return;
+            try
+            {
+                log.Info("[ART][Tool] " + msg);
+            }
+            catch { }
+        }
+#else
+        private static void Dbg(string msg) { }
+#endif
+
         protected override void OnCreate()
         {
             base.OnCreate();
@@ -78,7 +95,6 @@ namespace AdvancedRoadTools.Systems
             m_SubBlockLookup = GetBufferLookup<SubBlock>(true);
 
             m_SelectedEntities = new NativeList<Entity>(Allocator.Persistent);
-
         }
 
         protected override void OnDestroy()
@@ -102,52 +118,19 @@ namespace AdvancedRoadTools.Systems
         protected override void OnStartRunning()
         {
             base.OnStartRunning();
-
-            // Enable the actions used by this tool.
-            applyAction.enabled = true;      // LMB (apply/confirm)
-            cancelAction.enabled = true;     // RMB (flip/cancel)
-
-            // Tool gating.
+            applyAction.enabled = true;
             requireZones = true;
             requireNet = Layer.Road;
             allowUnderground = true;
-
-#if DEBUG
-            try
-            {
-                var log = AdvancedRoadToolsMod.s_Log;
-                if (log != null)
-                {
-                    log.Info("[ART][Tool] StartRunning: applyAction.enabled=true, cancelAction.enabled=true, requireNet=Road");
-                }
-            }
-            catch { /* guard */ }
-#endif
         }
 
         protected override void OnStopRunning()
         {
             base.OnStartRunning();
-
-            // Disable actions while tool is not active.
             applyAction.enabled = false;
-            cancelAction.enabled = false;
-
             requireZones = false;
             requireNet = Layer.None;
             allowUnderground = false;
-
-#if DEBUG
-            try
-            {
-                var log = AdvancedRoadToolsMod.s_Log;
-                if (log != null)
-                {
-                    log.Info("[ART][Tool] StopRunning: actions disabled");
-                }
-            }
-            catch { /* guard */ }
-#endif
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
@@ -160,35 +143,39 @@ namespace AdvancedRoadTools.Systems
             bool hasHit;
             Entity hitEntity;
             RaycastHit hit;
+
             try
             {
                 hasHit = GetRaycastResult(out hitEntity, out hit);
             }
-            catch
-            {
-                hasHit = false;
-                hitEntity = Entity.Null;
-            }
+            catch { hasHit = false; hitEntity = Entity.Null; }
 
             var haveSoundbank = m_SoundbankQuery.CalculateEntityCount() > 0;
             ToolUXSoundSettingsData soundbank = default;
             if (haveSoundbank)
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
-
-            // --- RMB handling: if pressed over a valid hit, flip left<->right without cancelling.
+            // ---- Input handling
             if (cancelAction.WasPressedThisFrame())
             {
                 if (hasHit)
                 {
-                    m_ZoningControllerToolUISystem.InvertZoningSideOnly(); // left <-> right, keep both/none as-is
+                    FlipForRmb(); // Left<->Right, Both<->None
                     if (haveSoundbank)
                         AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
-                    m_Mode = Mode.Preview; // stay in preview so the highlight remains
+                    m_Mode = Mode.Preview; // keep highlight
                 }
                 else
                 {
-                    m_Mode = Mode.Cancel; // no hit under cursor, treat as cancel
+                    // Treat as Esc on empty space/UI: clear selection & close palette.
+                    ClearSelectionAndHighlight();
+                    if (haveSoundbank)
+                        AudioManager.instance.PlayUISound(soundbank.m_NetCancelSound);
+#if DEBUG
+                    Dbg("Esc/Cancel on empty → closing palette and disabling tool");
+#endif
+                    SetToolEnabled(false);
+                    return inputDeps; // early out this frame
                 }
             }
             else if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
@@ -207,7 +194,6 @@ namespace AdvancedRoadTools.Systems
             {
                 m_Mode = Mode.Preview; // idle hover
             }
-
 
             EntityCommandBuffer ecb = m_ToolOutputBarrier.CreateCommandBuffer();
 
@@ -262,9 +248,7 @@ namespace AdvancedRoadTools.Systems
                     }
 
                 case Mode.Cancel:
-                    for (var i = 0; i < m_SelectedEntities.Length; i++)
-                        m_ToolHighlightSystem.HighlightEntity(m_SelectedEntities[i], false);
-                    m_SelectedEntities.Clear();
+                    ClearSelectionAndHighlight();
                     if (haveSoundbank)
                         AudioManager.instance.PlayUISound(soundbank.m_NetCancelSound);
                     break;
@@ -272,7 +256,7 @@ namespace AdvancedRoadTools.Systems
 
             ProxyAction? invert = m_InvertZoningAction;
             if (invert != null && invert.WasPressedThisFrame())
-                m_ZoningControllerToolUISystem.InvertZoningMode();
+                m_ZoningControllerToolUISystem.FlipToolBothOrNone();
 
             var tempLookup = GetComponentLookup<TempZoning>(true);
 
@@ -300,6 +284,41 @@ namespace AdvancedRoadTools.Systems
 
             m_ToolOutputBarrier.AddJobHandleForProducer(inputDeps);
             return inputDeps;
+        }
+
+        private void FlipForRmb()
+        {
+            var mode = m_ZoningControllerToolUISystem.ToolZoningMode;
+            switch (mode)
+            {
+                case ZoningMode.Both:
+                case ZoningMode.None:
+                    m_ZoningControllerToolUISystem.FlipToolBothOrNone(); // Both <-> None
+#if DEBUG
+                    Dbg("RMB flip: Both<->None");
+#endif
+                    break;
+
+                case ZoningMode.Left:
+                case ZoningMode.Right:
+                default:
+                    m_ZoningControllerToolUISystem.InvertZoningSideOnly(); // Left <-> Right
+#if DEBUG
+                    Dbg("RMB flip: Left<->Right");
+#endif
+                    break;
+            }
+        }
+
+        private void ClearSelectionAndHighlight()
+        {
+            if (m_SelectedEntities.IsCreated)
+            {
+                for (var i = 0; i < m_SelectedEntities.Length; i++)
+                    m_ToolHighlightSystem.HighlightEntity(m_SelectedEntities[i], false);
+                m_SelectedEntities.Clear();
+            }
+            m_PreviewEntity = Entity.Null;
         }
 
         private new bool GetRaycastResult(out Entity entity, out RaycastHit hit)

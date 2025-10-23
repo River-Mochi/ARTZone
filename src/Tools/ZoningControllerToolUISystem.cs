@@ -3,6 +3,8 @@
 //  • Expose bindings the UI reads/writes (ToolZoningMode, RoadZoningMode, IsRoadPrefab).
 //  • Handle triggers (Change/Flip/Toggle).
 //  • Robust NRE guards and DEBUG logs in all event handlers.
+//  • NEW: public helpers SetToolZoningMode(...) and FlipToolBothOrNone() so RMB logic
+//         can live entirely inside the tool system.
 //
 // Note: The palette tile / prefab creation is handled by ARTPaletteBootstrapSystem + ToolsHelper
 // after a real gameplay load completes. This UISystem just binds and reacts to tool changes.
@@ -43,7 +45,7 @@ namespace AdvancedRoadTools.Systems
                     mode ^= ZoningMode.Left;
                 if (value.y == 0)
                     mode ^= ZoningMode.Right;
-                ChangeToolZoningMode((int)mode);
+                SetToolZoningMode(mode);
             }
         }
 
@@ -76,7 +78,7 @@ namespace AdvancedRoadTools.Systems
             catch { }
         }
 #else
-        private static void dbg(string msg) { }
+        private static void Dbg(string msg) { }
 #endif
 
         protected override void OnCreate()
@@ -107,7 +109,7 @@ namespace AdvancedRoadTools.Systems
                     m_MainToolSystem.EventToolChanged += OnToolChanged;
                 }
             }
-            catch { /* be defensive; UI still functional without these */ }
+            catch { /* defensive: UI still functional without these */ }
 
             // Our tool instance
             try
@@ -131,7 +133,7 @@ namespace AdvancedRoadTools.Systems
                     m_MainToolSystem.EventToolChanged -= OnToolChanged;
                 }
             }
-            catch { /* ignore */ }
+            catch { }
             base.OnDestroy();
         }
 
@@ -150,7 +152,7 @@ namespace AdvancedRoadTools.Systems
                 Dbg($"OnToolChanged: activeTool={(tool != null ? tool.GetType().Name : "(null)")}  isRoad={(tool != null && tool.GetPrefab() is RoadPrefab)}");
 #endif
             }
-            catch { /* guard against transient nulls */ }
+            catch { }
         }
 
         private void OnPrefabChanged(PrefabBase prefab)
@@ -162,7 +164,7 @@ namespace AdvancedRoadTools.Systems
                 Dbg($"OnPrefabChanged: prefab={(prefab != null ? prefab.name : "(null)")}  isRoad={(prefab is RoadPrefab)}");
 #endif
             }
-            catch { /* guard */ }
+            catch { }
         }
 
         private void ToggleTool()
@@ -174,12 +176,11 @@ namespace AdvancedRoadTools.Systems
 
                 bool enable = m_MainToolSystem.activeTool != m_ToolSystem;
                 m_ToolSystem.SetToolEnabled(enable);
-
 #if DEBUG
                 Dbg($"ToggleTool → enable={enable}");
 #endif
             }
-            catch { /* guard */ }
+            catch { }
         }
 
         private void FlipToolBothMode()
@@ -224,13 +225,29 @@ namespace AdvancedRoadTools.Systems
             catch { }
         }
 
-        // Helpers used by tool & hotkeys
-        public void InvertZoningMode()
+        // === Public helpers for the Tool (RMB logic lives there) ===
+
+        /// <summary>Set exact ToolZoningMode (updates the bound value & UI).</summary>
+        public void SetToolZoningMode(ZoningMode mode)
         {
             try
             {
-                var next = ToolZoningMode ^ ZoningMode.Both; // Both<->None
-                ChangeToolZoningMode((int)next);
+                m_ToolZoningMode.Update((int)mode);
+            }
+            catch { }
+        }
+
+        /// <summary>Toggle strictly Both &lt;-&gt; None.</summary>
+        public void FlipToolBothOrNone()
+        {
+            try
+            {
+                var next = ToolZoningMode == ZoningMode.Both ? ZoningMode.None :
+                           ToolZoningMode == ZoningMode.None ? ZoningMode.Both : ToolZoningMode;
+                m_ToolZoningMode.Update((int)next);
+#if DEBUG
+                Dbg($"FlipToolBothOrNone → {next}");
+#endif
             }
             catch { }
         }
@@ -245,7 +262,10 @@ namespace AdvancedRoadTools.Systems
                     mode == ZoningMode.Left ? ZoningMode.Right :
                     mode == ZoningMode.Right ? ZoningMode.Left :
                     ZoningMode.Left;
-                ChangeToolZoningMode((int)next);
+                m_ToolZoningMode.Update((int)next);
+#if DEBUG
+                Dbg($"InvertZoningSideOnly → {next}");
+#endif
             }
             catch { }
         }

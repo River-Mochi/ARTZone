@@ -108,7 +108,7 @@ namespace AdvancedRoadTools.Systems
                 Dbg("Invert pressed");
 #endif
                 if (m_UI != null)
-                    m_UI.InvertZoningMode();
+                    m_UI.FlipToolBothOrNone();
             }
         }
     }
