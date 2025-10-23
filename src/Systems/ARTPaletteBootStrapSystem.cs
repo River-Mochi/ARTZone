@@ -1,18 +1,18 @@
 // File: src/Systems/ARTPaletteBootstrapSystem.cs
-// Purpose: Wait until RoadsServices anchor exists, then call ToolsHelper.InstantiateTools().
-// Arms on OnGameLoadingComplete only when entering a playable city (Game + Load/New).
+// Purpose: Wait until a RoadsServices anchor exists, then call ToolsHelper.InstantiateTools().
+// Arms only after a real game load (LoadGame/NewGame). Logs periodically in DEBUG.
 
 namespace AdvancedRoadTools.Systems
 {
     using AdvancedRoadTools.Tools;
-    using Colossal.Serialization.Entities;
-    using Game;
-    using Game.Prefabs;
+    using Colossal.Serialization.Entities; // Purpose
+    using Game;                            // GameMode, GameSystemBase
+    using Game.Prefabs;                    // PrefabSystem
     using Unity.Entities;
 
     public sealed partial class ARTPaletteBootstrapSystem : GameSystemBase
     {
-        private PrefabSystem? m_Prefabs;
+        private PrefabSystem m_Prefabs = null!;
         private bool m_Armed;
         private bool m_Done;
         private int m_Tries;
@@ -23,13 +23,15 @@ namespace AdvancedRoadTools.Systems
 #if DEBUG
         private static void dbg(string m)
         {
-            try
+            var log = AdvancedRoadToolsMod.s_Log;
+            if (log != null)
             {
-                var log = AdvancedRoadToolsMod.s_Log;
-                if (log != null)
+                try
+                {
                     log.Info("[ART][Bootstrap] " + m);
+                }
+                catch { /* swallow */ }
             }
-            catch { }
         }
 #else
         private static void dbg(string m) { }
@@ -38,32 +40,31 @@ namespace AdvancedRoadTools.Systems
         protected override void OnCreate()
         {
             base.OnCreate();
-
-            var world = World.DefaultGameObjectInjectionWorld;
-            m_Prefabs = world != null ? world.GetOrCreateSystemManaged<PrefabSystem>() : null;
-
+            m_Prefabs = World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<PrefabSystem>();
             m_Armed = false;
             m_Done = false;
             m_Tries = 0;
-            Enabled = false; // no per-frame update until we arm
+
+            // Stay idle until a real game load finishes.
+            Enabled = false;
         }
 
         protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
         {
             base.OnGameLoadingComplete(purpose, mode);
 
-            // Only arm when actually entering a playable city.
-            bool isPlayable = mode == GameMode.Game &&
-                              (purpose == Purpose.LoadGame || purpose == Purpose.NewGame);
+            // Only arm when actually entering a playable game world.
+            bool realGame = mode == GameMode.Game &&
+                            (purpose == Purpose.LoadGame || purpose == Purpose.NewGame);
 
-            if (!isPlayable)
+            if (!realGame)
             {
                 m_Armed = false;
-                m_Done = true;   // OnUpdate becomes a no-op
+                m_Done = true;
                 m_Tries = 0;
                 Enabled = false;
 #if DEBUG
-                dbg($"GameLoadingComplete(mode={mode}, purpose={purpose}) → not a playable city; staying disarmed.");
+                dbg($"GameLoadingComplete(mode={mode}, purpose={purpose}) → not gameplay; staying disarmed.");
 #endif
                 return;
             }
@@ -72,8 +73,9 @@ namespace AdvancedRoadTools.Systems
             m_Done = false;
             m_Tries = 0;
             Enabled = true;
+
 #if DEBUG
-            dbg("Armed; will begin polling for RoadsServices anchors…");
+            dbg("GameLoadingComplete → armed; will begin polling for RoadsServices anchors…");
 #endif
         }
 
@@ -82,20 +84,16 @@ namespace AdvancedRoadTools.Systems
             if (!m_Armed || m_Done || m_Prefabs == null)
                 return;
 
-            // Probe for a donor tile (Wide Sidewalk / Crosswalk) inside RoadsServices.
-            PrefabBase? donor;
-            UIObject? donorUI;
-            bool ok = ToolsHelper.TryResolveAnchor(m_Prefabs, out donor, out donorUI);
-
-            if (ok && donor != null && donorUI != null)
+            // Probe for a donor tile (Wide Sidewalk / Crosswalk) already in RoadsServices.
+            if (ToolsHelper.TryResolveAnchor(m_Prefabs, out var donor, out var donorUI))
             {
 #if DEBUG
-                var groupName = donorUI.m_Group != null ? donorUI.m_Group.name : "(null)";
-                dbg($"Donor found: '{donor.name}' Group='{groupName}' Priority={donorUI.m_Priority}");
+                string groupName = donorUI.m_Group?.name ?? "(null)";
+                dbg($"Donor found: '{donor?.name}' Group='{groupName}' Priority={donorUI.m_Priority}");
 #endif
                 ToolsHelper.InstantiateTools(logIfNoAnchor: true);
                 m_Done = true;
-                Enabled = false; // stop per-frame work after success
+                Enabled = false;         // no more per-frame updates needed
                 return;
             }
 
@@ -107,9 +105,7 @@ namespace AdvancedRoadTools.Systems
 
             if (m_Tries >= kMaxTries)
             {
-                var log = AdvancedRoadToolsMod.s_Log;
-                if (log != null)
-                    log.Error("[ART][Bootstrap] Giving up; RoadsServices donors never appeared.");
+                AdvancedRoadToolsMod.s_Log?.Error("[ART][Bootstrap] Giving up; RoadsServices donors never appeared.");
                 m_Armed = false;
                 Enabled = false;
             }
