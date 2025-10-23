@@ -1,12 +1,14 @@
 // File: src/Tools/ZoningControllerToolUISystem.cs
 // Purpose:
-//  • Exposes bindings the UI reads/writes (ToolZoningMode, RoadZoningMode, IsRoadPrefab, ShowMiniPanel).
-//  • Hotkey + GameTopLeft button toggle the same mini panel via ShowMiniPanel.
-//  • Helpers for RMB flip (Left<->Right), Both/None flip, and tool toggle.
-
+//  • Expose bindings the UI reads/writes (ToolZoningMode, RoadZoningMode, IsRoadPrefab).
+//  • Handle triggers (Change/Flip/Toggle).
+//  • NEW: Instantiate our prefab/tile AFTER game load so Road Services anchors exist.
+//
 namespace AdvancedRoadTools.Tools
 {
+    using Colossal.Serialization.Entities;
     using Colossal.UI.Binding;
+    using Game;
     using Game.Prefabs;
     using Game.Tools;
     using Game.UI;
@@ -14,20 +16,20 @@ namespace AdvancedRoadTools.Tools
 
     public partial class ZoningControllerToolUISystem : UISystemBase
     {
-        // === Value bindings exposed to the web UI ===
+        // === UI bindings ===
         private ValueBinding<int> m_ToolZoningMode = null!;
         private ValueBinding<int> m_RoadZoningMode = null!;
         private ValueBinding<bool> m_IsRoadPrefab = null!;
-        private ValueBinding<bool> m_ShowMiniPanel = null!; // NEW: drives the small panel visibility
 
-        // === For checking active tool/prefab and toggling tool ===
+        // === Tool access ===
         private ToolSystem m_MainToolSystem = null!;
         private ZoningControllerToolSystem m_ToolSystem = null!;
 
+        // Public helpers (used by other systems)
         public ZoningMode ToolZoningMode => (ZoningMode)m_ToolZoningMode.value;
         public ZoningMode RoadZoningMode => (ZoningMode)m_RoadZoningMode.value;
 
-        // Convert mode to depths (6 = on, 0 = off)
+        // Convert mode<->depths (6 = on, 0 = off)
         public int2 ToolDepths
         {
             get => new(
@@ -35,12 +37,12 @@ namespace AdvancedRoadTools.Tools
                 ((ZoningMode)m_ToolZoningMode.value & ZoningMode.Right) == ZoningMode.Right ? 6 : 0);
             set
             {
-                var newZoningMode = ZoningMode.Both;
+                var mode = ZoningMode.Both;
                 if (value.x == 0)
-                    newZoningMode ^= ZoningMode.Left;
+                    mode ^= ZoningMode.Left;
                 if (value.y == 0)
-                    newZoningMode ^= ZoningMode.Right;
-                ChangeToolZoningMode((int)newZoningMode);
+                    mode ^= ZoningMode.Right;
+                ChangeToolZoningMode((int)mode);
             }
         }
 
@@ -51,12 +53,12 @@ namespace AdvancedRoadTools.Tools
                 ((ZoningMode)m_RoadZoningMode.value & ZoningMode.Right) == ZoningMode.Right ? 6 : 0);
             set
             {
-                var newZoningMode = ZoningMode.Both;
+                var mode = ZoningMode.Both;
                 if (value.x == 0)
-                    newZoningMode ^= ZoningMode.Left;
+                    mode ^= ZoningMode.Left;
                 if (value.y == 0)
-                    newZoningMode ^= ZoningMode.Right;
-                ChangeRoadZoningMode((int)newZoningMode);
+                    mode ^= ZoningMode.Right;
+                ChangeRoadZoningMode((int)mode);
             }
         }
 
@@ -64,84 +66,99 @@ namespace AdvancedRoadTools.Tools
         {
             base.OnCreate();
 
-            // Value bindings (ids must match UI code)
+            // Bindings (IDs must match TS)
             AddBinding(m_ToolZoningMode = new ValueBinding<int>(AdvancedRoadToolsMod.ModID, "ToolZoningMode", (int)ZoningMode.Both));
             AddBinding(m_RoadZoningMode = new ValueBinding<int>(AdvancedRoadToolsMod.ModID, "RoadZoningMode", (int)ZoningMode.Both));
             AddBinding(m_IsRoadPrefab = new ValueBinding<bool>(AdvancedRoadToolsMod.ModID, "IsRoadPrefab", false));
-            AddBinding(m_ShowMiniPanel = new ValueBinding<bool>(AdvancedRoadToolsMod.ModID, "ShowMiniPanel", false)); // NEW
 
-            // Triggers callable from JS/TS
+            // Triggers (from TS)
             AddBinding(new TriggerBinding<int>(AdvancedRoadToolsMod.ModID, "ChangeRoadZoningMode", ChangeRoadZoningMode));
             AddBinding(new TriggerBinding<int>(AdvancedRoadToolsMod.ModID, "ChangeToolZoningMode", ChangeToolZoningMode));
             AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "FlipToolBothMode", FlipToolBothMode));
             AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "FlipRoadBothMode", FlipRoadBothMode));
             AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "ToggleZoneControllerTool", ToggleTool));
-            AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "ToggleMiniPanel", ToggleFromHotkey));
 
-
-
-            // Observe active tool/prefab to decide where to render the section under vanilla tool
+            // Observe vanilla tool/prefab to decide when to show the UI section
             m_MainToolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
-            m_MainToolSystem.EventPrefabChanged += EventPrefabChanged;
-            m_MainToolSystem.EventToolChanged += EventToolChanged;
+            m_MainToolSystem.EventPrefabChanged -= OnPrefabChanged;
+            m_MainToolSystem.EventToolChanged -= OnToolChanged;
+            m_MainToolSystem.EventPrefabChanged += OnPrefabChanged;
+            m_MainToolSystem.EventToolChanged += OnToolChanged;
 
+            // Our tool instance
             m_ToolSystem = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
         }
 
         protected override void OnDestroy()
         {
-            m_MainToolSystem.EventPrefabChanged -= EventPrefabChanged;
-            m_MainToolSystem.EventToolChanged -= EventToolChanged;
+            if (m_MainToolSystem != null)
+            {
+                m_MainToolSystem.EventPrefabChanged -= OnPrefabChanged;
+                m_MainToolSystem.EventToolChanged -= OnToolChanged;
+            }
             base.OnDestroy();
         }
 
-        private void EventToolChanged(ToolBaseSystem tool)
+        // IMPORTANT: defer prefab/tile creation here — after RoadsServices has loaded.
+        protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
+        {
+            base.OnGameLoadingComplete(purpose, mode);
+
+            AdvancedRoadToolsMod.s_Log.Info("[ART] UISystem OnGameLoadingComplete: instantiating tools");
+            ToolsHelper.Initialize(force: false);
+            ToolsHelper.InstantiateTools(logIfNoAnchor: true);
+        }
+
+        protected override void OnUpdate()
+        {
+            base.OnUpdate();
+
+            // Optional keyboard: Shift+Z toggle (via Colossal action)
+            var toggle = AdvancedRoadToolsMod.m_ToggleToolAction;
+            if (toggle != null && toggle.WasPressedThisFrame())
+            {
+                ToggleTool();
+                // keep panel state consistent when toggled on
+                m_ToolZoningMode.Update(m_RoadZoningMode.value);
+            }
+        }
+
+        private void OnToolChanged(ToolBaseSystem tool)
         {
             m_IsRoadPrefab.Update(tool.GetPrefab() is RoadPrefab);
         }
 
-        private void EventPrefabChanged(PrefabBase prefab)
+        private void OnPrefabChanged(PrefabBase prefab)
         {
             m_IsRoadPrefab.Update(prefab is RoadPrefab);
         }
 
         private void ToggleTool()
         {
-            // Floating button legacy behavior (kept): flip our tool on/off.
-            m_ToolSystem.SetToolEnabled(m_MainToolSystem.activeTool != m_ToolSystem);
-        }
+            if (m_MainToolSystem == null || m_ToolSystem == null)
+                return;
 
-        private void ToggleMiniPanel()
-        {
-            // Single source of truth for UI panel visibility
-            m_ShowMiniPanel.Update(!m_ShowMiniPanel.value);
+            bool enable = m_MainToolSystem.activeTool != m_ToolSystem;
+            m_ToolSystem.SetToolEnabled(enable);
         }
 
         private void FlipToolBothMode()
         {
-            if (ToolZoningMode == ZoningMode.Both)
-                m_ToolZoningMode.Update((int)ZoningMode.None);
-            else
-                m_ToolZoningMode.Update((int)ZoningMode.Both);
+            m_ToolZoningMode.Update(ToolZoningMode == ZoningMode.Both ? (int)ZoningMode.None : (int)ZoningMode.Both);
         }
 
         private void FlipRoadBothMode()
         {
-            if (RoadZoningMode == ZoningMode.Both)
-                m_RoadZoningMode.Update((int)ZoningMode.None);
-            else
-                m_RoadZoningMode.Update((int)ZoningMode.Both);
+            m_RoadZoningMode.Update(RoadZoningMode == ZoningMode.Both ? (int)ZoningMode.None : (int)ZoningMode.Both);
         }
 
         private void ChangeToolZoningMode(int value) => m_ToolZoningMode.Update(value);
         private void ChangeRoadZoningMode(int value) => m_RoadZoningMode.Update(value);
 
-        // == Helpers used from tool & hotkeys ==
-
+        // Helpers used by tool & hotkeys
         public void InvertZoningMode()
         {
-            // classic invert both bits (Both<->None)
-            var next = ToolZoningMode ^ ZoningMode.Both;
+            var next = ToolZoningMode ^ ZoningMode.Both; // Both<->None
             ChangeToolZoningMode((int)next);
         }
 
@@ -154,12 +171,6 @@ namespace AdvancedRoadTools.Tools
                 mode == ZoningMode.Right ? ZoningMode.Left :
                 ZoningMode.Left;
             ChangeToolZoningMode((int)next);
-        }
-
-        /// <summary>Hotkey bridge: open/close the same mini panel as the GameTopLeft icon.</summary>
-        public void ToggleFromHotkey()
-        {
-            ToggleMiniPanel();
         }
     }
 }

@@ -1,8 +1,10 @@
 // File: src/Mod.cs
-// Purpose: Mod entrypoint; settings + keybindings via Colossal API (no Unity.InputSystem)
+// Purpose: Mod entrypoint; settings + keybindings + tool registration (no Harmony).
+// Change: DO NOT instantiate tools here; UISystem does it after load.
 
 namespace AdvancedRoadTools
 {
+    using AdvancedRoadTools.Tools;
     using Colossal;
     using Colossal.IO.AssetDatabase;
     using Colossal.Logging;
@@ -14,7 +16,7 @@ namespace AdvancedRoadTools
     public sealed class AdvancedRoadToolsMod : IMod
     {
         public const string ModID = "AdvancedRoadTools";
-        public const string CouiRoot = "coui://" + ModID; // resolves to coui://AdvancedRoadTools (or ARTZone if change ModID)
+        public const string CouiRoot = "coui://" + ModID;
 
         public const string VersionShort = "1.0.0";
 #if DEBUG
@@ -23,9 +25,6 @@ namespace AdvancedRoadTools
         public const string InformationalVersion = VersionShort;
 #endif
 
-
-
-        // Action names used by Setting attributes
         public const string kInvertZoningActionName = "InvertZoning";
         public const string kToggleToolActionName = "ToggleZoneTool";
 
@@ -33,8 +32,6 @@ namespace AdvancedRoadTools
         {
             get; private set;
         }
-
-        // Runtime input handles CO ProxyAction
         public static ProxyAction? m_InvertZoningAction
         {
             get; private set;
@@ -44,24 +41,20 @@ namespace AdvancedRoadTools
             get; private set;
         }
 
-        public static readonly ILog s_Log =
-            LogManager.GetLogger("AdvancedRoadTools").SetShowsErrorsInUI(false);
+        public static readonly ILog s_Log = LogManager.GetLogger(ModID).SetShowsErrorsInUI(false);
 
         public void OnLoad(UpdateSystem updateSystem)
         {
-            s_Log.Info($"[ART] OnLoad v{VersionShort}");
+            s_Log.Info($"[ART] OnLoad v{InformationalVersion}");
 
-            // Settings FIRST, then locales, then load, then register UI
+            // Settings + locales
             var settings = new Setting(this);
             s_Settings = settings;
-
-            // Locales BEFORE Options UI
             TryAddLocale("en-US", new LocaleEN(settings));
-
             AssetDatabase.global.LoadSettings(ModID, settings, new Setting(this));
             settings.RegisterInOptionsUI();
 
-            // Key binding registration (creates actions) + get runtime handles
+            // Key bindings (ProxyAction)
             try
             {
                 settings.RegisterKeyBindings();
@@ -79,14 +72,23 @@ namespace AdvancedRoadTools
                 s_Log.Warn($"[ART] Keybinding setup skipped: {ex.GetType().Name}: {ex.Message}");
             }
 
-            // Register systems (order matters)
-            updateSystem.UpdateAt<Tools.ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
-            updateSystem.UpdateAt<Tools.ToolHighlightSystem>(SystemUpdatePhase.ToolUpdate);
+            // Systems
+            updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
+            updateSystem.UpdateAt<ToolHighlightSystem>(SystemUpdatePhase.ToolUpdate);
             updateSystem.UpdateAt<SyncCreatedRoadsSystem>(SystemUpdatePhase.Modification4);
             updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
-            updateSystem.UpdateAt<Tools.ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
-            updateSystem.UpdateAt<Tools.ToolBootstrapSystem>(SystemUpdatePhase.UIUpdate);
-            updateSystem.UpdateAt<Tools.KeybindHotkeySystem>(SystemUpdatePhase.ToolUpdate); // listens for Shift+Z, RMB
+            updateSystem.UpdateAt<ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
+            updateSystem.UpdateAt<KeybindHotkeySystem>(SystemUpdatePhase.ToolUpdate);
+
+            // Register tool definition ONLY (no instantiation here)
+            ToolsHelper.Initialize(force: false);
+            ToolsHelper.RegisterTool(
+                new ToolDefinition(
+                    typeof(ZoningControllerToolSystem),
+                    ZoningControllerToolSystem.ToolID,
+                    new ToolDefinition.UI("coui://ui-mods/images/grid-color.svg")   // tile for inside Road Services group
+                )
+            );
 
             // Keep strings in sync if player changes game language
             var lm = GameManager.instance?.localizationManager;
@@ -95,14 +97,6 @@ namespace AdvancedRoadTools
                 lm.onActiveDictionaryChanged -= OnLocaleChanged;
                 lm.onActiveDictionaryChanged += OnLocaleChanged;
             }
-
-            Tools.ToolsHelper.RegisterTool(
-                new Tools.ToolDefinition(
-                    typeof(Tools.ZoningControllerToolSystem),
-                    Tools.ZoningControllerToolSystem.ToolID,
-                    new Tools.ToolDefinition.UI("coui://ui-mods/images/ToolsIcon.png")
-                )
-            );
         }
 
         public void OnDispose()
@@ -143,7 +137,7 @@ namespace AdvancedRoadTools
         {
             var id = GameManager.instance?.localizationManager?.activeLocaleId ?? "(unknown)";
             s_Log.Info("[ART] Active locale = " + id);
-            s_Settings?.RegisterInOptionsUI(); // keep labels refreshed
+            s_Settings?.RegisterInOptionsUI();
         }
     }
 }

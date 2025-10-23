@@ -143,28 +143,28 @@ namespace AdvancedRoadTools.Tools
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
 
-            // --- RMB handling: if pressed over a valid hit, flip Left<->Right and DO NOT cancel.
+            // --- RMB handling: if pressed over a valid hit, flip left<->right without cancelling.
             if (cancelAction.WasPressedThisFrame())
             {
                 if (hasHit)
                 {
-                    m_ZoningControllerToolUISystem.InvertZoningSideOnly();
+                    m_ZoningControllerToolUISystem.InvertZoningSideOnly(); // left <-> right, keep both/none as-is
                     if (haveSoundbank)
                         AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
-                    m_Mode = Mode.Preview; // stay in preview, don't cancel selection
+                    m_Mode = Mode.Preview; // stay in preview so the highlight remains
                 }
                 else
                 {
-                    m_Mode = Mode.Cancel;
+                    m_Mode = Mode.Cancel; // no hit under cursor, treat as cancel
                 }
             }
             else if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
             {
-                m_Mode = Mode.Select;
+                m_Mode = Mode.Select; // accumulate selection while held
             }
             else if (applyAction.WasReleasedThisFrame() && hasHit)
             {
-                m_Mode = Mode.Apply;
+                m_Mode = Mode.Apply; // confirm on release over a valid hit
             }
             else if (applyAction.WasReleasedThisFrame() && !hasHit)
             {
@@ -172,9 +172,8 @@ namespace AdvancedRoadTools.Tools
             }
             else
             {
-                m_Mode = Mode.Preview;
+                m_Mode = Mode.Preview; // idle hover
             }
-
 
 
             EntityCommandBuffer ecb = m_ToolOutputBarrier.CreateCommandBuffer();
