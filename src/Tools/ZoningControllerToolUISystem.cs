@@ -6,9 +6,7 @@
 //
 namespace AdvancedRoadTools.Tools
 {
-    using Colossal.Serialization.Entities;
     using Colossal.UI.Binding;
-    using Game;
     using Game.Prefabs;
     using Game.Tools;
     using Game.UI;
@@ -99,15 +97,6 @@ namespace AdvancedRoadTools.Tools
             base.OnDestroy();
         }
 
-        // IMPORTANT: defer prefab/tile creation here — after RoadsServices has loaded.
-        protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
-        {
-            base.OnGameLoadingComplete(purpose, mode);
-
-            AdvancedRoadToolsMod.s_Log.Info("[ART] UISystem OnGameLoadingComplete: instantiating tools");
-            ToolsHelper.Initialize(force: false);
-            ToolsHelper.InstantiateTools(logIfNoAnchor: true);
-        }
 
         protected override void OnUpdate()
         {

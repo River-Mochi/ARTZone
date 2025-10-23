@@ -73,6 +73,7 @@ namespace AdvancedRoadTools
             }
 
             // Systems
+            updateSystem.UpdateAt<ArtAssetSystem>(SystemUpdatePhase.Modification3); // new: PAF-style owner
             updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
             updateSystem.UpdateAt<ToolHighlightSystem>(SystemUpdatePhase.ToolUpdate);
             updateSystem.UpdateAt<SyncCreatedRoadsSystem>(SystemUpdatePhase.Modification4);
