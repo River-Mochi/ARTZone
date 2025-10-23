@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Game.Net;
 using Game.Prefabs;
 
-namespace AdvancedRoadTools.Tools
+namespace AdvancedRoadTools.Systems
 {
     public struct ToolDefinition : IEquatable<ToolDefinition>
     {

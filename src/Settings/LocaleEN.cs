@@ -48,8 +48,8 @@ namespace AdvancedRoadTools
                 { s_Settings.GetBindingKeyLocaleID(AdvancedRoadToolsMod.kToggleToolActionName),   "Toggle Zone Control Panel" },
 
                 // Palette (Road Services tile) — ensure ToolID matches instantiated prefab name
-                { $"Assets.NAME[{Tools.ZoningControllerToolSystem.ToolID}]", "Zone Changer" },
-                { $"Assets.DESCRIPTION[{Tools.ZoningControllerToolSystem.ToolID}]",
+                { $"Assets.NAME[{Systems.ZoningControllerToolSystem.ToolID}]", "Zone Changer" },
+                { $"Assets.DESCRIPTION[{Systems.ZoningControllerToolSystem.ToolID}]",
                   "Change zoning on desired side of roads: both, left, right, or none.\n Right-click inverts the choice." },
 
                 // About tab

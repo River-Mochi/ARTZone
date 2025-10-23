@@ -1,7 +1,8 @@
 // File: src/Tools/KeybindHotkeySystem.cs
 // Purpose: Shift+Z toggles the tool (same as GameTopLeft). Optional invert hotkey retained.
+// Notes:   NRE-hardened; guarded logging in DEBUG; no #nullable usage.
 
-namespace AdvancedRoadTools.Tools
+namespace AdvancedRoadTools.Systems
 {
     using Game;
     using Game.Input;
@@ -15,6 +16,21 @@ namespace AdvancedRoadTools.Tools
         private ProxyAction? m_Toggle;
         private ProxyAction? m_Invert;
 
+#if DEBUG
+        private static void dbg(string m)
+        {
+            try
+            {
+                var log = AdvancedRoadToolsMod.s_Log;
+                if (log != null)
+                    log.Info("[ART][Hotkeys] " + m);
+            }
+            catch { }
+        }
+#else
+        private static void dbg(string m) { }
+#endif
+
         protected override void OnCreate()
         {
             base.OnCreate();
@@ -22,30 +38,36 @@ namespace AdvancedRoadTools.Tools
             m_Tool = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
             m_Toggle = AdvancedRoadToolsMod.m_ToggleToolAction;
             m_Invert = AdvancedRoadToolsMod.m_InvertZoningAction;
+
+#if DEBUG
+            dbg("Created; hotkeys wired.");
+#endif
         }
+
         protected override void OnUpdate()
         {
+            // Toggle tool with Shift+Z (or whatever user bound)
             if (m_Toggle != null && m_Toggle.WasPressedThisFrame())
             {
                 var toolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
-                bool willEnable = toolSystem.activeTool != m_Tool;
+                bool willEnable = (toolSystem != null && m_Tool != null) && (toolSystem.activeTool != m_Tool);
 
-                if (willEnable)
-                {
-                    // Activate our prefab tool — this opens the RoadsServices palette and selects ART tile
-                    m_Tool.SetToolEnabled(true);
-                }
-                else
-                {
-                    m_Tool.SetToolEnabled(false);
-                }
+#if DEBUG
+                dbg($"Toggle pressed → willEnable={willEnable}");
+#endif
+                if (m_Tool != null)
+                    m_Tool.SetToolEnabled(willEnable);
             }
 
+            // Optional invert binding
             if (m_Invert != null && m_Invert.WasPressedThisFrame())
             {
-                m_UI.InvertZoningMode();
+#if DEBUG
+                dbg("Invert pressed");
+#endif
+                if (m_UI != null)
+                    m_UI.InvertZoningMode();
             }
         }
-
     }
 }

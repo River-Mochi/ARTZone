@@ -1,8 +1,9 @@
-// src/Tools/SyncCreatedRoadsSystem.cs
+// File: src/Tools/SyncCreatedRoadsSystem.cs
 // Purpose: adds AdvancedRoad component to newly created roads using the current RoadDepths from UI.
 // Without this, freshly drawn roads won’t inherit the chosen zoning side depths.
+
 using AdvancedRoadTools.Components;
-using AdvancedRoadTools.Tools;
+using AdvancedRoadTools.Systems;
 using Game;
 using Game.Common;
 using Game.Net;
@@ -36,36 +37,53 @@ namespace AdvancedRoadTools
 
         protected override void OnUpdate()
         {
-            EntityCommandBuffer ECB = m_ModificationBarrier.CreateCommandBuffer();
+            // UISystem is created in OnCreate, but be defensive.
+            if (m_UISystem == null)
+                return;
+
             int2 depths = m_UISystem.RoadDepths;
 
-            if (!m_NewCreatedRoadsQuery.IsEmpty && math.any(depths != new int2(6)))
-            {
-                NativeArray<Entity> entities = m_NewCreatedRoadsQuery.ToEntityArray(Allocator.TempJob);
-                JobHandle job = new AddAdvancedRoadToCreatedRoadsJob
-                {
-                    Entities = entities.AsReadOnly(),
-                    ECB = ECB.AsParallelWriter(),
-                    Depths = depths,
-                    TempLookup = GetComponentLookup<Temp>(true)
-                }.Schedule(entities.Length, 32, this.Dependency);
-                entities.Dispose(job);
-                this.Dependency = JobHandle.CombineDependencies(this.Dependency, job);
-            }
+            // Only act when there are brand new roads AND the chosen depth is not the vanilla default (6,6).
+            if (m_NewCreatedRoadsQuery.IsEmpty || !math.any(depths != new int2(6)))
+                return;
 
-            m_ModificationBarrier.AddJobHandleForProducer(this.Dependency);
+            var ecb = m_ModificationBarrier.CreateCommandBuffer();
+            NativeArray<Entity> entities = m_NewCreatedRoadsQuery.ToEntityArray(Allocator.TempJob);
+
+#if DEBUG
+            AdvancedRoadToolsMod.s_Log.Info($"[ART][SyncCreated] newRoads={entities.Length} depths=({depths.x},{depths.y})");
+#endif
+
+            JobHandle job = new AddAdvancedRoadToCreatedRoadsJob
+            {
+                Entities = entities.AsReadOnly(),
+                ECB = ecb.AsParallelWriter(),
+                Depths = depths,
+                TempLookup = GetComponentLookup<Temp>(true)
+            }.Schedule(entities.Length, 32, Dependency);
+
+            entities.Dispose(job);
+
+            Dependency = JobHandle.CombineDependencies(Dependency, job);
+            m_ModificationBarrier.AddJobHandleForProducer(Dependency);
         }
 
         public struct AddAdvancedRoadToCreatedRoadsJob : IJobParallelFor
         {
             public NativeArray<Entity>.ReadOnly Entities;
             public EntityCommandBuffer.ParallelWriter ECB;
+
             [ReadOnly] public ComponentLookup<Temp> TempLookup;
             public int2 Depths;
 
             public void Execute(int index)
             {
                 Entity entity = Entities[index];
+
+                // If Temp was removed mid-frame, skip quietly.
+                if (!TempLookup.HasComponent(entity))
+                    return;
+
                 Temp temp = TempLookup[entity];
 
                 if ((temp.m_Flags & TempFlags.Create) == TempFlags.Create)

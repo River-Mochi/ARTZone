@@ -22,10 +22,12 @@
 .\src\README.md
 .\src\Settings\LocaleEN.cs
 .\src\Settings\Setting.cs
+.\src\Systems\ARTAssetSystem.cs
+.\src\Systems\ARTPaletteBootStrapSystem.cs
+.\src\Tools\IARTTool.cs
 .\src\Tools\KeybindHotkeySystem.cs
 .\src\Tools\SyncBlockSystem.cs
 .\src\Tools\SyncCreatedRoadsSystem.cs
-.\src\Tools\ToolBootstrapSystem.cs
 .\src\Tools\ToolDefinition.cs
 .\src\Tools\ToolHighlightSystem.cs
 .\src\Tools\ToolsHelper.cs
@@ -63,6 +65,7 @@
 .\src\UI\package.json
 .\src\UI\src\index.tsx
 .\src\UI\src\mods\advanced-road-tools-button.tsx
+.\src\UI\src\mods\ToolOptionsVisible\toolOptionsVisible.tsx
 .\src\UI\src\mods\ZoningToolSections.module.scss
 .\src\UI\src\mods\ZoningToolSections.tsx
 .\src\UI\src\YenYang\VanillaComponentResolver.tsx

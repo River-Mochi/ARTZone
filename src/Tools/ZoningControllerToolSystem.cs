@@ -8,7 +8,7 @@
 //   • Palette icon path changed to coui://AdvancedRoadTools/images/Tool_Icon.png
 //   • Tool tile anchored via ToolsHelper (priority handled there)
 
-namespace AdvancedRoadTools.Tools
+namespace AdvancedRoadTools.Systems
 {
     using System;
     using AdvancedRoadTools.Components;

@@ -1,5 +1,5 @@
 // Tools/ToolHighlightSystem.cs
-namespace AdvancedRoadTools.Tools
+namespace AdvancedRoadTools.Systems
 {
     using System.Collections.Generic;
     using Game;
