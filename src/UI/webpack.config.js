@@ -74,7 +74,7 @@ module.exports = {
                 test: /\.(png|jpe?g|gif|svg)$/i,
                 type: "asset/resource",
                 generator: {
-                    filename: "images/[name][ext][query]",
+                    filename: "images/[name][ext][query]",   // => writes to Mods/<MOD.id>/images/...
                 },
             },
         ],
@@ -91,7 +91,7 @@ module.exports = {
         library: {
             type: "module",
         },
-        publicPath: `coui://ui-mods/`,
+        publicPath: `coui://ui-mods/`,   // => runtime URLs like coui://ui-mods/images/grid-icon.svg
     },
     optimization: {
         minimize: true,

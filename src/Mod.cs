@@ -1,6 +1,10 @@
 // File: src/Mod.cs
 // Purpose: Mod entrypoint; settings + keybindings + tool registration (no Harmony).
-// Change: DO NOT instantiate tools here; UISystem does it after load.
+// Change: Add a single COUI icon constant; use it in ToolDefinition.UI.
+// Notes:
+//   • Webpack emits images to Mods/<MOD.id>/images/* per webpack.config.js (asset/resource generator).
+//   • publicPath is "coui://ui-mods/", so the runtime URL is "coui://ui-mods/images/<file>.svg".
+//   • If you rename/move the SVG, just update PaletteIconPath below.
 
 namespace AdvancedRoadTools
 {
@@ -17,7 +21,14 @@ namespace AdvancedRoadTools
     public sealed class AdvancedRoadToolsMod : IMod
     {
         public const string ModID = "AdvancedRoadTools";
+
+        // Keep existing; not used for UI paths, but leaving for compatibility.
         public const string CouiRoot = "coui://" + ModID;
+
+        // === UI icon path (single point of change) ===
+        // Matches webpack: output.publicPath = "coui://ui-mods" and images -> "images/[name][ext]"
+        public const string UiCouiRoot = "coui://ui-mods";
+        public const string PaletteIconPath = UiCouiRoot + "/images/grid-road.svg";  // single source of truth for the main icon
 
         public const string VersionShort = "1.0.0";
 #if DEBUG
@@ -88,7 +99,7 @@ namespace AdvancedRoadTools
                 new ToolDefinition(
                     typeof(ZoningControllerToolSystem),
                     ZoningControllerToolSystem.ToolID,
-                    new ToolDefinition.UI("coui://ui-mods/images/grid-color.svg")   // tile for inside Road Services group
+                    new ToolDefinition.UI(PaletteIconPath) // tile icon inside Road Services group
                 )
             );
 

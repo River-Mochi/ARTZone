@@ -24,6 +24,9 @@ namespace AdvancedRoadTools.Systems
         private ValueBinding<int> m_RoadZoningMode = null!;
         private ValueBinding<bool> m_IsRoadPrefab = null!;
 
+        // NEW: expose icon path to TS/JS (so top-left button uses the same icon)
+        private ValueBinding<string> m_MainIconPath = null!;
+
         // === Tool access ===
         private ToolSystem m_MainToolSystem = null!;
         private ZoningControllerToolSystem m_ToolSystem = null!;
@@ -89,6 +92,10 @@ namespace AdvancedRoadTools.Systems
             AddBinding(m_ToolZoningMode = new ValueBinding<int>(AdvancedRoadToolsMod.ModID, "ToolZoningMode", (int)ZoningMode.Both));
             AddBinding(m_RoadZoningMode = new ValueBinding<int>(AdvancedRoadToolsMod.ModID, "RoadZoningMode", (int)ZoningMode.Both));
             AddBinding(m_IsRoadPrefab = new ValueBinding<bool>(AdvancedRoadToolsMod.ModID, "IsRoadPrefab", false));
+            // Expose the single source-of-truth icon path to the UI
+            AddBinding(m_MainIconPath = new ValueBinding<string>(
+                AdvancedRoadToolsMod.ModID, "MainIconPath", AdvancedRoadToolsMod.PaletteIconPath));
+
 
             // Triggers (from TS)
             AddBinding(new TriggerBinding<int>(AdvancedRoadToolsMod.ModID, "ChangeRoadZoningMode", ChangeRoadZoningMode));
@@ -96,6 +103,9 @@ namespace AdvancedRoadTools.Systems
             AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "FlipToolBothMode", FlipToolBothMode));
             AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "FlipRoadBothMode", FlipRoadBothMode));
             AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "ToggleZoneControllerTool", ToggleTool));
+
+
+
 
             // Observe vanilla tool/prefab to decide when to show the UI section
             try
