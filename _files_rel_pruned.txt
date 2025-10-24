@@ -1,5 +1,3 @@
-.\_files_rel_pruned.txt
-.\_folders_rel_pruned.txt
 .\AdvancedRoadTools.sln
 .\global.json
 .\LICENSE
@@ -22,7 +20,6 @@
 .\src\README.md
 .\src\Settings\LocaleEN.cs
 .\src\Settings\Setting.cs
-.\src\Systems\ARTAssetSystem.cs
 .\src\Systems\ARTPaletteBootStrapSystem.cs
 .\src\Tools\IARTTool.cs
 .\src\Tools\KeybindHotkeySystem.cs
@@ -34,9 +31,11 @@
 .\src\Tools\ZoningControllerToolSystem.cs
 .\src\Tools\ZoningControllerToolUISystem.cs
 .\src\Tools\ZoningMode.cs
+.\src\UI\.eslintignore
 .\src\UI\.eslintrc.json
-.\src\UI\images\grid-color.svg
-.\src\UI\images\grid4.svg
+.\src\UI\images\grid-color-gbpy.svg
+.\src\UI\images\grid-road.svg
+.\src\UI\images\grid-road10.svg
 .\src\UI\images\MapGrid.svg
 .\src\UI\images\MapGridColor.svg
 .\src\UI\images\menu_icon.svg
@@ -59,7 +58,6 @@
 .\src\UI\images\Toolbar\right\ico-right_64px.png
 .\src\UI\images\Toolbar\right\ico-right_96px.png
 .\src\UI\images\Toolbar\right\ico-right.svg
-.\src\UI\images\ZoneControllerTool.svg
 .\src\UI\mod.json
 .\src\UI\package-lock.json
 .\src\UI\package.json

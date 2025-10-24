@@ -1,10 +1,10 @@
 // File: src/Mod.cs
 // Purpose: Mod entrypoint; settings + keybindings + tool registration (no Harmony).
-// Change: Add a single COUI icon constant; use it in ToolDefinition.UI.
 // Notes:
-//   • Webpack emits images to Mods/<MOD.id>/images/* per webpack.config.js (asset/resource generator).
-//   • publicPath is "coui://ui-mods/", so the runtime URL is "coui://ui-mods/images/<file>.svg".
-//   • If you rename/move the SVG, just update PaletteIconPath below.
+//   • Webpack emits images to Mods/<ModID>/images/* (via asset/resource generator).
+//   • publicPath is "coui://ui-mods/", so runtime URL is "coui://ui-mods/images/<file>.svg".
+//   • Keep PaletteIconPath as the single source of truth for the tool tile icon.
+//   • (Icon also used by the top-left floating button via TSX import.)
 
 namespace AdvancedRoadTools
 {
@@ -22,13 +22,9 @@ namespace AdvancedRoadTools
     {
         public const string ModID = "AdvancedRoadTools";
 
-        // Keep existing; not used for UI paths, but leaving for compatibility.
-        public const string CouiRoot = "coui://" + ModID;
-
-        // === UI icon path (single point of change) ===
-        // Matches webpack: output.publicPath = "coui://ui-mods" and images -> "images/[name][ext]"
+        // Single source of truth for COUI root & icon path
         public const string UiCouiRoot = "coui://ui-mods";
-        public const string PaletteIconPath = UiCouiRoot + "/images/grid-road.svg";  // single source of truth for the main icon
+        public const string PaletteIconPath = UiCouiRoot + "/images/grid-road.svg";
 
         public const string VersionShort = "1.0.0";
 #if DEBUG

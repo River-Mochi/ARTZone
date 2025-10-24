@@ -155,27 +155,37 @@ namespace AdvancedRoadTools.Systems
             if (haveSoundbank)
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
-            // ---- Input handling
+            // --- RMB handling: click-to-flip, no hover-driven changes.
             if (cancelAction.WasPressedThisFrame())
             {
                 if (hasHit)
                 {
-                    FlipForRmb(); // Left<->Right, Both<->None
+                    // Decide which pair to flip based on current tool mode.
+                    var mode = m_ZoningControllerToolUISystem.ToolZoningMode;
+                    switch (mode)
+                    {
+                        case ZoningMode.Left:
+                        case ZoningMode.Right:
+                            m_ZoningControllerToolUISystem.InvertZoningSideOnly();   // Left <-> Right
+                            break;
+
+                        case ZoningMode.Both:
+                        case ZoningMode.None:
+                        default:
+                            m_ZoningControllerToolUISystem.FlipToolBothOrNone();     // Both <-> None
+                            break;
+                    }
+
                     if (haveSoundbank)
                         AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
-                    m_Mode = Mode.Preview; // keep highlight
+
+                    // Stay in preview; do not select/apply until LMB.
+                    m_Mode = Mode.Preview;
                 }
                 else
                 {
-                    // Treat as Esc on empty space/UI: clear selection & close palette.
-                    ClearSelectionAndHighlight();
-                    if (haveSoundbank)
-                        AudioManager.instance.PlayUISound(soundbank.m_NetCancelSound);
-#if DEBUG
-                    Dbg("Esc/Cancel on empty → closing palette and disabling tool");
-#endif
-                    SetToolEnabled(false);
-                    return inputDeps; // early out this frame
+                    // RMB with no target under cursor behaves as cancel.
+                    m_Mode = Mode.Cancel;
                 }
             }
             else if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
@@ -184,7 +194,7 @@ namespace AdvancedRoadTools.Systems
             }
             else if (applyAction.WasReleasedThisFrame() && hasHit)
             {
-                m_Mode = Mode.Apply; // confirm on release over a valid hit
+                m_Mode = Mode.Apply;  // confirm on release over a valid hit
             }
             else if (applyAction.WasReleasedThisFrame() && !hasHit)
             {
@@ -194,6 +204,8 @@ namespace AdvancedRoadTools.Systems
             {
                 m_Mode = Mode.Preview; // idle hover
             }
+
+
 
             EntityCommandBuffer ecb = m_ToolOutputBarrier.CreateCommandBuffer();
 
