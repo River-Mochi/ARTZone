@@ -1,13 +1,13 @@
-// File: src/Mod.cs
-// Purpose: Mod entrypoint; settings + keybindings + tool registration (no Harmony).
+ï»¿// File: src/Mod.cs
+// Purpose: Mod entrypoint; locales + settings + keybindings + tool registration (no Harmony).
 // Notes:
-//   • Webpack emits images to Mods/<ModID>/images/* (via asset/resource generator).
-//   • publicPath is "coui://ui-mods/", so runtime URL is "coui://ui-mods/images/<file>.svg".
-//   • Keep PaletteIconPath as the single source of truth for the tool tile icon.
-//   • (Icon also used by the top-left floating button via TSX import.)
+//   â€¢ Locales are installed BEFORE Options UI (so labels render correctly).
+//   â€¢ RMB flip uses vanilla ToolBaseSystem.cancelAction â†’ no custom binding here.
+//   â€¢ Top-left button & palette tile use the same icon path (single source of truth).
 
 namespace AdvancedRoadTools
 {
+    using System.Collections.Generic; // HashSet
     using AdvancedRoadTools.Systems;
     using AdvancedRoadTools.Tools;
     using Colossal;
@@ -22,9 +22,9 @@ namespace AdvancedRoadTools
     {
         public const string ModID = "AdvancedRoadTools";
 
-        // Single source of truth for COUI root & icon path
+        // Single source of truth for icon path (webpack publicPath = coui://ui-mods/)
         public const string UiCouiRoot = "coui://ui-mods";
-        public const string PaletteIconPath = UiCouiRoot + "/images/grid-road.svg";
+        public const string MainIconPath = UiCouiRoot + "/images/ico-4square-color.svg";
 
         public const string VersionShort = "1.0.0";
 #if DEBUG
@@ -33,14 +33,10 @@ namespace AdvancedRoadTools
         public const string InformationalVersion = VersionShort;
 #endif
 
-        public const string kInvertZoningActionName = "InvertZoning";
-        public const string kToggleToolActionName = "ToggleZoneTool";
+        // Rebindable action IDs exposed in Options UI
+        public const string kToggleToolActionName = "ToggleZoneTool"; // Shift+Z
 
         public static Setting? s_Settings
-        {
-            get; private set;
-        }
-        public static ProxyAction? m_InvertZoningAction
         {
             get; private set;
         }
@@ -51,25 +47,33 @@ namespace AdvancedRoadTools
 
         public static readonly ILog s_Log = LogManager.GetLogger(ModID).SetShowsErrorsInUI(false);
 
+        // Locale management guard (avoid double-install on reload)
+        private static readonly HashSet<string> s_InstalledLocales = new();
+        private static bool s_ReapplyingLocale;
+
         public void OnLoad(UpdateSystem updateSystem)
         {
             s_Log.Info($"[ART] OnLoad v{InformationalVersion}");
 
-            // Settings + locales
+            // Settings object first
             var settings = new Setting(this);
             s_Settings = settings;
-            TryAddLocale("en-US", new LocaleEN(settings));
+
+            // --- Install locales BEFORE Options UI ---
+            AddLocale("en-US", new LocaleEN(settings));
+            AddLocale("zh-HANS", new LocaleZH_CN(settings)); // Simplified Chinese
+            // Future locales: add files then uncomment
+            // AddLocale("fr-FR",   new LocaleFR(settings));
+            // AddLocale("es-ES",   new LocaleES(settings));
+
+            // Load saved settings + register Options UI
             AssetDatabase.global.LoadSettings(ModID, settings, new Setting(this));
             settings.RegisterInOptionsUI();
 
-            // Key bindings (ProxyAction)
+            // Key bindings (only Shift+Z)
             try
             {
                 settings.RegisterKeyBindings();
-
-                m_InvertZoningAction = settings.GetAction(kInvertZoningActionName);
-                if (m_InvertZoningAction != null)
-                    m_InvertZoningAction.shouldBeEnabled = true;
 
                 m_ToggleToolAction = settings.GetAction(kToggleToolActionName);
                 if (m_ToggleToolAction != null)
@@ -89,17 +93,17 @@ namespace AdvancedRoadTools
             updateSystem.UpdateAt<ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<KeybindHotkeySystem>(SystemUpdatePhase.ToolUpdate);
 
-            // Register tool definition ONLY (no instantiation here)
+            // Tool registration (definition only; prefab created after game load)
             ToolsHelper.Initialize(force: false);
             ToolsHelper.RegisterTool(
                 new ToolDefinition(
                     typeof(ZoningControllerToolSystem),
                     ZoningControllerToolSystem.ToolID,
-                    new ToolDefinition.UI(PaletteIconPath) // tile icon inside Road Services group
+                    new ToolDefinition.UI(MainIconPath) // palette + top-left import use same asset name
                 )
             );
 
-            // Keep strings in sync if player changes game language
+            // Keep strings updated when game language changes
             var lm = GameManager.instance?.localizationManager;
             if (lm != null)
             {
@@ -116,11 +120,6 @@ namespace AdvancedRoadTools
             if (lm != null)
                 lm.onActiveDictionaryChanged -= OnLocaleChanged;
 
-            if (m_InvertZoningAction != null)
-            {
-                m_InvertZoningAction.shouldBeEnabled = false;
-                m_InvertZoningAction = null;
-            }
             if (m_ToggleToolAction != null)
             {
                 m_ToggleToolAction.shouldBeEnabled = false;
@@ -131,7 +130,9 @@ namespace AdvancedRoadTools
             s_Settings = null;
         }
 
-        private static void TryAddLocale(string id, IDictionarySource src)
+        // ===== Locale helpers =====
+
+        private static void AddLocale(string id, IDictionarySource src)
         {
             var lm = GameManager.instance?.localizationManager;
             if (lm == null)
@@ -139,14 +140,30 @@ namespace AdvancedRoadTools
                 s_Log.Warn($"[ART] No LocalizationManager; cannot add locale {id}");
                 return;
             }
+
+            if (!s_InstalledLocales.Add(id))
+                return;
+
             lm.AddSource(id, src);
+            s_Log.Info($"[ART] Locale installed: {id}");
         }
 
         private static void OnLocaleChanged()
         {
-            var id = GameManager.instance?.localizationManager?.activeLocaleId ?? "(unknown)";
-            s_Log.Info("[ART] Active locale = " + id);
-            s_Settings?.RegisterInOptionsUI();
+            if (s_ReapplyingLocale)
+                return;
+
+            s_ReapplyingLocale = true;
+            try
+            {
+                var id = GameManager.instance?.localizationManager?.activeLocaleId ?? "(unknown)";
+                s_Log.Info("[ART] Active locale = " + id);
+                s_Settings?.RegisterInOptionsUI();
+            }
+            finally
+            {
+                s_ReapplyingLocale = false;
+            }
         }
     }
 }

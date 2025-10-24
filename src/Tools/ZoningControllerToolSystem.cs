@@ -1,20 +1,13 @@
 // File: src/Tools/ZoningControllerToolSystem.cs
 // Purpose:
-//   Runtime tool “system” (DOTS ToolBaseSystem).
-//   Handles input (LMB/RMB/Esc via cancelAction), preview/highlight, apply via jobs.
-//   RMB pressed over a valid road flips Left<->Right or Both<->None (deterministic).
-//   RMB/Esc on empty space behaves like vanilla Esc: clears & closes palette.
-//
-// Notes:
-//   • Palette icon path handled in ToolsHelper (anchor duplicate).
-//   • All RMB logic centralized here; TSX only draws buttons & fires triggers.
+//   Runtime tool. RMB (mouse invert) flips over valid roads; if the dedicated mouse
+//   action is missing, we FALL BACK to the vanilla cancelAction (RMB).
+//   LMB confirms. Preview always reflects the current mode for the hovered segment.
 
 namespace AdvancedRoadTools.Systems
 {
     using System;
     using AdvancedRoadTools.Components;
-    using Colossal.Serialization.Entities;
-    using Game;
     using Game.Audio;
     using Game.Common;
     using Game.Input;
@@ -33,10 +26,10 @@ namespace AdvancedRoadTools.Systems
         public override string toolID => ToolID;
 
         private ToolOutputBarrier m_ToolOutputBarrier = null!;
-        private ZoningControllerToolUISystem m_ZoningControllerToolUISystem = null!;
-        private ToolHighlightSystem m_ToolHighlightSystem = null!;
+        private ZoningControllerToolUISystem m_UISystem = null!;
+        private ToolHighlightSystem m_Highlight = null!;
 
-        private ProxyAction? m_InvertZoningAction;
+        private ProxyAction? m_InvertZoningMouseAction; // RMB-bindable
 
         private ComponentLookup<AdvancedRoad> m_AdvancedRoadLookup;
         private BufferLookup<SubBlock> m_SubBlockLookup;
@@ -55,7 +48,7 @@ namespace AdvancedRoadTools.Systems
         private Mode m_Mode;
         private Entity m_PreviewEntity;
 
-        private int2 Depths => m_ZoningControllerToolUISystem.ToolDepths;
+        private int2 Depths => m_UISystem.ToolDepths;
 
 #if DEBUG
         private static void Dbg(string msg)
@@ -78,18 +71,14 @@ namespace AdvancedRoadTools.Systems
             base.OnCreate();
 
             m_ToolOutputBarrier = World.GetOrCreateSystemManaged<ToolOutputBarrier>();
-            m_ZoningControllerToolUISystem = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
-            m_ToolHighlightSystem = World.GetOrCreateSystemManaged<ToolHighlightSystem>();
+            m_UISystem = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
+            m_Highlight = World.GetOrCreateSystemManaged<ToolHighlightSystem>();
 
-            m_InvertZoningAction = AdvancedRoadToolsMod.m_InvertZoningAction;
+            // Actions
+            m_InvertZoningMouseAction = AdvancedRoadToolsMod.m_InvertZoningMouseAction;
 
-            m_TempZoningQuery = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<TempZoning>()
-                .Build(this);
-
-            m_SoundbankQuery = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<ToolUXSoundSettingsData>()
-                .Build(this);
+            m_TempZoningQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<TempZoning>().Build(this);
+            m_SoundbankQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<ToolUXSoundSettingsData>().Build(this);
 
             m_AdvancedRoadLookup = GetComponentLookup<AdvancedRoad>(true);
             m_SubBlockLookup = GetBufferLookup<SubBlock>(true);
@@ -104,30 +93,22 @@ namespace AdvancedRoadTools.Systems
             base.OnDestroy();
         }
 
-        protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
-        {
-            base.OnGameLoadingComplete(purpose, mode);
-
-            if (m_ToolSystem != null && m_ToolSystem.tools != null)
-            {
-                m_ToolSystem.tools.Remove(this);
-                m_ToolSystem.tools.Insert(5, this); // internal order for tool cycling
-            }
-        }
-
         protected override void OnStartRunning()
         {
             base.OnStartRunning();
             applyAction.enabled = true;
+            cancelAction.enabled = true;   // explicit so no doubt it's live
             requireZones = true;
             requireNet = Layer.Road;
             allowUnderground = true;
+
         }
 
         protected override void OnStopRunning()
         {
-            base.OnStartRunning();
+            base.OnStopRunning();
             applyAction.enabled = false;
+            cancelAction.enabled = false;
             requireZones = false;
             requireNet = Layer.None;
             allowUnderground = false;
@@ -137,13 +118,11 @@ namespace AdvancedRoadTools.Systems
         {
             m_AdvancedRoadLookup.Update(this);
             m_SubBlockLookup.Update(this);
-
             inputDeps = Dependency;
 
             bool hasHit;
             Entity hitEntity;
             RaycastHit hit;
-
             try
             {
                 hasHit = GetRaycastResult(out hitEntity, out hit);
@@ -155,46 +134,59 @@ namespace AdvancedRoadTools.Systems
             if (haveSoundbank)
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
-            // --- RMB handling: click-to-flip, no hover-driven changes.
-            if (cancelAction.WasPressedThisFrame())
+            // --- Invert via MOUSE: prefer dedicated mouse action; fall back to cancelAction (RMB)
+            bool invertPressed = false;
+            try
             {
-                if (hasHit)
-                {
-                    // Decide which pair to flip based on current tool mode.
-                    var mode = m_ZoningControllerToolUISystem.ToolZoningMode;
-                    switch (mode)
-                    {
-                        case ZoningMode.Left:
-                        case ZoningMode.Right:
-                            m_ZoningControllerToolUISystem.InvertZoningSideOnly();   // Left <-> Right
-                            break;
-
-                        case ZoningMode.Both:
-                        case ZoningMode.None:
-                        default:
-                            m_ZoningControllerToolUISystem.FlipToolBothOrNone();     // Both <-> None
-                            break;
-                    }
-
-                    if (haveSoundbank)
-                        AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
-
-                    // Stay in preview; do not select/apply until LMB.
-                    m_Mode = Mode.Preview;
-                }
-                else
-                {
-                    // RMB with no target under cursor behaves as cancel.
-                    m_Mode = Mode.Cancel;
-                }
+                invertPressed = (m_InvertZoningMouseAction != null && m_InvertZoningMouseAction.WasPressedThisFrame())
+                                || cancelAction.WasPressedThisFrame();
             }
+            catch { invertPressed = false; }
+
+            if (invertPressed && hasHit)
+            {
+                // Ensure the hovered entity is in preview selection (so flipping shows immediately)
+                if (m_PreviewEntity == Entity.Null || m_PreviewEntity != hitEntity)
+                {
+                    if (m_PreviewEntity != Entity.Null)
+                        m_Highlight.HighlightEntity(m_PreviewEntity, false);
+
+                    m_SelectedEntities.Clear();
+                    m_Highlight.HighlightEntity(hitEntity, true);
+                    m_SelectedEntities.Add(hitEntity);
+                    m_PreviewEntity = hitEntity;
+                }
+                else if (!m_SelectedEntities.Contains(hitEntity))
+                {
+                    m_SelectedEntities.Add(hitEntity);
+                    m_Highlight.HighlightEntity(hitEntity, true);
+                }
+
+                // Flip the correct pair based on current mode
+                var mode = m_UISystem.ToolZoningMode;
+                if (mode == ZoningMode.Left || mode == ZoningMode.Right)
+                    m_UISystem.InvertZoningSideOnly(); // Left <-> Right
+                else
+                    m_UISystem.FlipToolBothOrNone();   // Both <-> None
+
+                if (haveSoundbank)
+                    AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
+                m_Mode = Mode.Preview; // stay in preview; LMB will confirm
+            }
+
+            // Cancel when RMB (cancelAction) is pressed with NO road under cursor
+            if (cancelAction.WasPressedThisFrame() && !hasHit)
+            {
+                m_Mode = Mode.Cancel;
+            }
+            // LMB select/apply flow
             else if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
             {
-                m_Mode = Mode.Select; // accumulate selection while held
+                m_Mode = Mode.Select;
             }
             else if (applyAction.WasReleasedThisFrame() && hasHit)
             {
-                m_Mode = Mode.Apply;  // confirm on release over a valid hit
+                m_Mode = Mode.Apply;
             }
             else if (applyAction.WasReleasedThisFrame() && !hasHit)
             {
@@ -202,10 +194,8 @@ namespace AdvancedRoadTools.Systems
             }
             else
             {
-                m_Mode = Mode.Preview; // idle hover
+                m_Mode = Mode.Preview;
             }
-
-
 
             EntityCommandBuffer ecb = m_ToolOutputBarrier.CreateCommandBuffer();
 
@@ -215,14 +205,14 @@ namespace AdvancedRoadTools.Systems
                     if (m_PreviewEntity != hitEntity)
                     {
                         if (m_PreviewEntity != Entity.Null)
-                            m_ToolHighlightSystem.HighlightEntity(m_PreviewEntity, false);
+                            m_Highlight.HighlightEntity(m_PreviewEntity, false);
 
                         m_SelectedEntities.Clear();
                         m_PreviewEntity = Entity.Null;
 
                         if (hasHit)
                         {
-                            m_ToolHighlightSystem.HighlightEntity(hitEntity, true);
+                            m_Highlight.HighlightEntity(hitEntity, true);
                             m_SelectedEntities.Add(hitEntity);
                             m_PreviewEntity = hitEntity;
                         }
@@ -233,7 +223,7 @@ namespace AdvancedRoadTools.Systems
                     if (!m_SelectedEntities.Contains(hitEntity))
                     {
                         m_SelectedEntities.Add(hitEntity);
-                        m_ToolHighlightSystem.HighlightEntity(hitEntity, true);
+                        m_Highlight.HighlightEntity(hitEntity, true);
                         if (haveSoundbank)
                             AudioManager.instance.PlayUISound(soundbank.m_SelectEntitySound);
                     }
@@ -251,7 +241,7 @@ namespace AdvancedRoadTools.Systems
                         inputDeps = JobHandle.CombineDependencies(inputDeps, setJob);
 
                         for (var i = 0; i < m_SelectedEntities.Length; i++)
-                            m_ToolHighlightSystem.HighlightEntity(m_SelectedEntities[i], false);
+                            m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
                         m_SelectedEntities.Clear();
 
                         if (haveSoundbank)
@@ -265,10 +255,6 @@ namespace AdvancedRoadTools.Systems
                         AudioManager.instance.PlayUISound(soundbank.m_NetCancelSound);
                     break;
             }
-
-            ProxyAction? invert = m_InvertZoningAction;
-            if (invert != null && invert.WasPressedThisFrame())
-                m_ZoningControllerToolUISystem.FlipToolBothOrNone();
 
             var tempLookup = GetComponentLookup<TempZoning>(true);
 
@@ -298,36 +284,12 @@ namespace AdvancedRoadTools.Systems
             return inputDeps;
         }
 
-        private void FlipForRmb()
-        {
-            var mode = m_ZoningControllerToolUISystem.ToolZoningMode;
-            switch (mode)
-            {
-                case ZoningMode.Both:
-                case ZoningMode.None:
-                    m_ZoningControllerToolUISystem.FlipToolBothOrNone(); // Both <-> None
-#if DEBUG
-                    Dbg("RMB flip: Both<->None");
-#endif
-                    break;
-
-                case ZoningMode.Left:
-                case ZoningMode.Right:
-                default:
-                    m_ZoningControllerToolUISystem.InvertZoningSideOnly(); // Left <-> Right
-#if DEBUG
-                    Dbg("RMB flip: Left<->Right");
-#endif
-                    break;
-            }
-        }
-
         private void ClearSelectionAndHighlight()
         {
             if (m_SelectedEntities.IsCreated)
             {
                 for (var i = 0; i < m_SelectedEntities.Length; i++)
-                    m_ToolHighlightSystem.HighlightEntity(m_SelectedEntities[i], false);
+                    m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
                 m_SelectedEntities.Clear();
             }
             m_PreviewEntity = Entity.Null;

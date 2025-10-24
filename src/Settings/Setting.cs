@@ -1,4 +1,12 @@
-// Options UI + keybinding definition (CO API)
+// File: src/Settings/Setting.cs
+// Purpose: Options UI + keybinding definition (CO API).
+// Shows ONE rebindable entry in Actions → Key bindings:
+//   • Toggle Zone Control panel → default Shift+Z
+//
+// RMB (right-click) keybind is NOT exposed here on purpose — the tool uses the
+// vanilla ToolBaseSystem 'cancelAction' for flipping, so RMB remains the
+// intuitive default and cannot be broken by user remapping inside this mod.
+
 namespace AdvancedRoadTools
 {
     using System;
@@ -8,7 +16,7 @@ namespace AdvancedRoadTools
     using Game.Settings;
     using UnityEngine;
 
-    // Location of settings to preserve for next reboot
+    // Persisted settings location
     [FileLocation("ModsSettings/AdvancedRoadTools/AdvancedRoadTools")]
 
     // Tabs & groups
@@ -16,38 +24,32 @@ namespace AdvancedRoadTools
     [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup, kAboutInfoGroup, kAboutLinksGroup)]
     [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup)]
 
-    // Declare actions (names must match the constants in AdvancedRoadToolsMod)
-    [SettingsUIMouseAction(AdvancedRoadToolsMod.kInvertZoningActionName, ActionType.Button, usages: new[] { "Game" })]
+    // Declare ONLY the keyboard action (Shift+Z). RMB is handled by vanilla cancelAction.
     [SettingsUIKeyboardAction(AdvancedRoadToolsMod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
     public sealed class Setting : ModSetting
     {
+        // Tabs
         public const string kActionsTab = "Actions";
         public const string kAboutTab = "About";
 
+        // Groups
         public const string kToggleGroup = "Zone Controller Tool";
         public const string kKeybindingGroup = "Key bindings";
-
         public const string kAboutInfoGroup = "Info";
         public const string kAboutLinksGroup = "Links";
 
         public Setting(IMod mod) : base(mod) { }
 
-        // Toggles
+        // --- Toggles ---
+
         [SettingsUISection(kActionsTab, kToggleGroup)]
         public bool RemoveZonedCells { get; set; } = true;
 
         [SettingsUISection(kActionsTab, kToggleGroup)]
         public bool RemoveOccupiedCells { get; set; } = true;
 
-        // RMB to invert
-        [SettingsUIMouseBinding(BindingMouse.Right, AdvancedRoadToolsMod.kInvertZoningActionName)]
-        [SettingsUISection(kActionsTab, kKeybindingGroup)]
-        public ProxyBinding InvertZoning
-        {
-            get; set;
-        }
+        // --- Key bindings (only Shift+Z is exposed) ---
 
-        // Shift+Z to toggle the panel/tool
         [SettingsUIKeyboardBinding(BindingKeyboard.Z, AdvancedRoadToolsMod.kToggleToolActionName, shift: true)]
         [SettingsUISection(kActionsTab, kKeybindingGroup)]
         public ProxyBinding ToggleZoneTool
@@ -55,7 +57,8 @@ namespace AdvancedRoadTools
             get; set;
         }
 
-        // About (read-only)
+        // --- About (read-only labels/buttons) ---
+
         [SettingsUISection(kAboutTab, kAboutInfoGroup)]
         public string NameText => "Advanced Road Tools — Zone Controller";
 

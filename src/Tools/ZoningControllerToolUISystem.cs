@@ -2,12 +2,8 @@
 // Purpose:
 //  • Expose bindings the UI reads/writes (ToolZoningMode, RoadZoningMode, IsRoadPrefab).
 //  • Handle triggers (Change/Flip/Toggle).
-//  • Robust NRE guards and DEBUG logs in all event handlers.
-//  • NEW: public helpers SetToolZoningMode(...) and FlipToolBothOrNone() so RMB logic
-//         can live entirely inside the tool system.
-//
-// Note: The palette tile / prefab creation is handled by ARTPaletteBootstrapSystem + ToolsHelper
-// after a real gameplay load completes. This UISystem just binds and reacts to tool changes.
+//  • NRE guards and DEBUG logs in all event handlers.
+//  • Public helpers SetToolZoningMode(...), FlipToolBothOrNone(), InvertZoningSideOnly().
 
 namespace AdvancedRoadTools.Systems
 {
@@ -23,9 +19,6 @@ namespace AdvancedRoadTools.Systems
         private ValueBinding<int> m_ToolZoningMode = null!;
         private ValueBinding<int> m_RoadZoningMode = null!;
         private ValueBinding<bool> m_IsRoadPrefab = null!;
-
-        // NEW: expose icon path to TS/JS (so top-left button uses the same icon)
-        private ValueBinding<string> m_MainIconPath = null!;
 
         // === Tool access ===
         private ToolSystem m_MainToolSystem = null!;
@@ -92,10 +85,6 @@ namespace AdvancedRoadTools.Systems
             AddBinding(m_ToolZoningMode = new ValueBinding<int>(AdvancedRoadToolsMod.ModID, "ToolZoningMode", (int)ZoningMode.Both));
             AddBinding(m_RoadZoningMode = new ValueBinding<int>(AdvancedRoadToolsMod.ModID, "RoadZoningMode", (int)ZoningMode.Both));
             AddBinding(m_IsRoadPrefab = new ValueBinding<bool>(AdvancedRoadToolsMod.ModID, "IsRoadPrefab", false));
-            // Expose the single source-of-truth icon path to the UI
-            AddBinding(m_MainIconPath = new ValueBinding<string>(
-                AdvancedRoadToolsMod.ModID, "MainIconPath", AdvancedRoadToolsMod.PaletteIconPath));
-
 
             // Triggers (from TS)
             AddBinding(new TriggerBinding<int>(AdvancedRoadToolsMod.ModID, "ChangeRoadZoningMode", ChangeRoadZoningMode));
@@ -103,9 +92,6 @@ namespace AdvancedRoadTools.Systems
             AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "FlipToolBothMode", FlipToolBothMode));
             AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "FlipRoadBothMode", FlipRoadBothMode));
             AddBinding(new TriggerBinding(AdvancedRoadToolsMod.ModID, "ToggleZoneControllerTool", ToggleTool));
-
-
-
 
             // Observe vanilla tool/prefab to decide when to show the UI section
             try
@@ -119,7 +105,7 @@ namespace AdvancedRoadTools.Systems
                     m_MainToolSystem.EventToolChanged += OnToolChanged;
                 }
             }
-            catch { /* defensive: UI still functional without these */ }
+            catch { /* defensive */ }
 
             // Our tool instance
             try
@@ -149,7 +135,7 @@ namespace AdvancedRoadTools.Systems
 
         protected override void OnUpdate()
         {
-            // UI bindings only; hotkey toggle is handled in KeybindHotkeySystem.
+            // UI bindings only; hotkey toggle is handled elsewhere.
             base.OnUpdate();
         }
 
@@ -225,7 +211,6 @@ namespace AdvancedRoadTools.Systems
             }
             catch { }
         }
-
         private void ChangeRoadZoningMode(int value)
         {
             try
@@ -237,7 +222,6 @@ namespace AdvancedRoadTools.Systems
 
         // === Public helpers for the Tool (RMB logic lives there) ===
 
-        /// <summary>Set exact ToolZoningMode (updates the bound value & UI).</summary>
         public void SetToolZoningMode(ZoningMode mode)
         {
             try
@@ -247,7 +231,6 @@ namespace AdvancedRoadTools.Systems
             catch { }
         }
 
-        /// <summary>Toggle strictly Both &lt;-&gt; None.</summary>
         public void FlipToolBothOrNone()
         {
             try

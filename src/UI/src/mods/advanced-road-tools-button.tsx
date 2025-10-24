@@ -1,13 +1,14 @@
 ﻿// File: src/UI/src/mods/advanced-road-tools-button.tsx
-// Purpose: Show the main ART button in GameTopLeft (floating). Uses the same SVG the tool tile uses.
-// Runtime path comes from webpack publicPath ("coui://ui-mods/") + asset generator ("images/[name][ext]").
+// Purpose: self-contained floating GameTopLeft button (launch/toggl tool/panel and shows icon + tooltip).
+// Uses the SAME SVG file name as C# MainIconPath points to.
 
 import { Button } from "cs2/ui";
 import { useLocalization } from "cs2/l10n";
 import { trigger } from "cs2/api";
 import mod from "../../mod.json";
 
-import gridIconUrl from "../../images/grid-road.svg";
+// Keep the identifier name aligned with C#: MainIconPath (TS side uses a URL string)
+import MainIconPath from "../../images/ico-4square-color.svg";
 
 function onClickTopLeft() {
     trigger(mod.id, "ToggleZoneControllerTool");
@@ -19,7 +20,7 @@ export default function ZoningToolControllerButton(): JSX.Element {
     return (
         <Button
             variant="floating"
-            src={gridIconUrl}        // -> resolves to "coui://ui-mods/images/grid-road.svg"
+            src={MainIconPath} // resolves to coui://ui-mods/images/ico-4square-color.svg or whatever image is MainIconPath
             onClick={onClickTopLeft}
             tooltipLabel={tooltip}
         />

@@ -91,7 +91,7 @@ module.exports = {
         library: {
             type: "module",
         },
-        publicPath: `coui://ui-mods/`,   // => runtime URLs like coui://ui-mods/images/grid-icon.svg
+        publicPath: `coui://ui-mods/`,   // => runtime URLs like coui://ui-mods/images/nameOfIcon.svg
     },
     optimization: {
         minimize: true,

@@ -1,4 +1,5 @@
-// English (en-US) for the Options UI + asset/palette text
+// File: src/Settings/LocaleEN.cs
+// English (en-US) strings for Options UI + palette text.
 
 namespace AdvancedRoadTools
 {
@@ -16,7 +17,7 @@ namespace AdvancedRoadTools
         {
             var d = new Dictionary<string, string>
             {
-                // Options > Settings title
+                // Settings title
                 { s_Settings.GetSettingsLocaleID(), "ART — Zoning" },
 
                 // Tabs
@@ -31,40 +32,36 @@ namespace AdvancedRoadTools
 
                 // Toggles
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being removed" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Prevent zoned cells from being overridden during preview and apply phases.\n Enable is recommended." },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Do not override already zoned cells during preview/apply." },
 
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Prevent occupied cells from being overridden during preview and apply phases.\n Enable is recommended." },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Do not override already occupied cells during preview/apply." },
 
-                // Keybinds
-                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.InvertZoning)), "Invert Zoning (mouse)" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.InvertZoning)),  "Click (right mouse button default) to invert left or right side while the zoning tool is active." },
-
+                // Keybind (only one visible)
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Toggle Zone Control panel" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Show/hide the Zone Control panel." },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Show or hide the ART Zone Controller panel (default Shift+Z)." },
 
-                // Binding titles in the binding dialog
-                { s_Settings.GetBindingKeyLocaleID(AdvancedRoadToolsMod.kInvertZoningActionName), "Invert Zoning" },
-                { s_Settings.GetBindingKeyLocaleID(AdvancedRoadToolsMod.kToggleToolActionName),   "Toggle Zone Control Panel" },
+                // Binding title in the keybinding dialog
+                { s_Settings.GetBindingKeyLocaleID(AdvancedRoadToolsMod.kToggleToolActionName), "Toggle Zone Control panel" },
 
-                // Palette (Road Services tile) — ensure ToolID matches instantiated prefab name
-                { $"Assets.NAME[{Systems.ZoningControllerToolSystem.ToolID}]", "Zone Changer" },
+                // Palette (Road Services tile)
+                { $"Assets.NAME[{Systems.ZoningControllerToolSystem.ToolID}]", "Zone Controller" },
                 { $"Assets.DESCRIPTION[{Systems.ZoningControllerToolSystem.ToolID}]",
-                  "Change zoning on desired side of roads: both, left, right, or none.\n Right-click inverts the choice." },
+                  "Change zoning: both, left, right, or none. Right-click flips the choice." },
 
-                // About tab
-                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Mod Name" },
+                // About tab labels
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Mod name" },
                 { s_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Display name of this mod." },
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "Version" },
                 { s_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "Current mod version." },
 #if DEBUG
-                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.InformationalVersionText)), "Informational Version" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.InformationalVersionText)),  "Version + commit id" },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.InformationalVersionText)), "Informational version" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.InformationalVersionText)),  "Version + build info" },
 #endif
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenMods)),    "Paradox Mods" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.OpenMods)),     "Open the Paradox Mods page in your browser." },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.OpenMods)),     "Open the Paradox Mods page." },
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Join the Discord for this mod." },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Join the mod Discord." },
             };
             return d;
         }

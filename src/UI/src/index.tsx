@@ -1,36 +1,71 @@
 // File: src/UI/src/index.tsx
-// Purpose: Wire the React pieces into the vanilla UI.
-//  • Appends our floating button at GameTopLeft.
-//  • Extends MouseToolOptions to render the “Zoning Side” buttons.
-//  • Ensures ToolsIcon.png is emitted so the palette can reference it.
-//  • Forces the Tool Options panel to stay visible for our tool.
+// Purpose: Registrar — wire React pieces into vanilla UI.
+//   • Floating button at GameTopLeft
+//   • “Zoning Side” section in MouseToolOptions
+//   • Keep Tool Options panel visible for our tool
+//   • Ensure main SVG icon is emitted
+//
+// Design: single source of truth for vanilla paths/ids; tiny guards; strict typing
+// to select the correct `append(AppendHookTargets, ...)` overload with your d.ts.
 
-import { ModRegistrar } from "cs2/modding";
+import type { ModRegistrar, ModuleRegistry, AppendHookTargets } from "cs2/modding";
 import { VanillaComponentResolver } from "./YenYang/VanillaComponentResolver";
-import { ZoningToolController } from "./mods/ZoningToolSections";
 import ZoningToolControllerButton from "./mods/advanced-road-tools-button";
+import { ZoningToolController } from "./mods/ZoningToolSections";
 import { ToolOptionsVisibility } from "./mods/ToolOptionsVisible/toolOptionsVisible";
 
-// Ensure the palette PNG is emitted to coui://ui-mods/images/ToolsIcon.png
-import "../images/Tool_Icon/ToolsIcon.png";
+// Emit the icon into coui://ui-mods/images/...
+import "../images/ico-4square-color.svg";
+
+// --- Single source of truth for vanilla modules/exports ---
+const APPEND_TARGET: AppendHookTargets = "GameTopLeft"; // typed literal => picks the right overload
+
+const VANILLA = {
+    MouseToolOptions: {
+        path: "game-ui/game/components/tool-options/mouse-tool-options/mouse-tool-options.tsx",
+        exportId: "MouseToolOptions",
+    },
+    ToolOptionsPanelVisible: {
+        path: "game-ui/game/components/tool-options/tool-options-panel.tsx",
+        exportId: "useToolOptionsVisible",
+    },
+};
+
+// Guarded extend (don’t crash registrar if a vanilla export shifts in a patch)
+function extendSafe(
+    registry: ModuleRegistry,
+    modulePath: string,
+    exportId: string,
+    extension: any
+) {
+    try {
+        registry.extend(modulePath, exportId, extension);
+    } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(`[ART][UI] extend failed for ${modulePath}#${exportId}`, err);
+    }
+}
 
 const register: ModRegistrar = (moduleRegistry) => {
+    // Allow our resolver to fetch vanilla components & themes
     VanillaComponentResolver.setRegistry(moduleRegistry);
 
-    // Put the main toggle button on the top left (vanilla slot)
-    moduleRegistry.append("GameTopLeft", ZoningToolControllerButton);
+    // 1) Floating top-left button (typed union => append(target, component) overload)
+    moduleRegistry.append(APPEND_TARGET, ZoningToolControllerButton);
 
-    // Extend the vanilla MouseToolOptions panel with our section (keep us near the bottom)
-    moduleRegistry.extend(
-        "game-ui/game/components/tool-options/mouse-tool-options/mouse-tool-options.tsx",
-        "MouseToolOptions",
+    // 2) Inject our “Zoning Side” section
+    extendSafe(
+        moduleRegistry,
+        VANILLA.MouseToolOptions.path,
+        VANILLA.MouseToolOptions.exportId,
         ZoningToolController
     );
 
-    // Force the small Tool Options panel to be visible while our tool is active
-    moduleRegistry.extend(
-        "game-ui/game/components/tool-options/tool-options-panel.tsx",
-        "useToolOptionsVisible",
+    // 3) Keep Tool Options panel visible while our tool is active
+    extendSafe(
+        moduleRegistry,
+        VANILLA.ToolOptionsPanelVisible.path,
+        VANILLA.ToolOptionsPanelVisible.exportId,
         ToolOptionsVisibility
     );
 };
