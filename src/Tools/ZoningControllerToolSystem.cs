@@ -10,7 +10,6 @@ namespace AdvancedRoadTools.Systems
     using AdvancedRoadTools.Components;
     using Game.Audio;
     using Game.Common;
-    using Game.Input;
     using Game.Net;
     using Game.Prefabs;
     using Game.Tools;
@@ -28,8 +27,6 @@ namespace AdvancedRoadTools.Systems
         private ToolOutputBarrier m_ToolOutputBarrier = null!;
         private ZoningControllerToolUISystem m_UISystem = null!;
         private ToolHighlightSystem m_Highlight = null!;
-
-        private ProxyAction? m_InvertZoningMouseAction; // RMB-bindable
 
         private ComponentLookup<AdvancedRoad> m_AdvancedRoadLookup;
         private BufferLookup<SubBlock> m_SubBlockLookup;
@@ -75,7 +72,6 @@ namespace AdvancedRoadTools.Systems
             m_Highlight = World.GetOrCreateSystemManaged<ToolHighlightSystem>();
 
             // Actions
-            m_InvertZoningMouseAction = AdvancedRoadToolsMod.m_InvertZoningMouseAction;
 
             m_TempZoningQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<TempZoning>().Build(this);
             m_SoundbankQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<ToolUXSoundSettingsData>().Build(this);
@@ -134,12 +130,11 @@ namespace AdvancedRoadTools.Systems
             if (haveSoundbank)
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
-            // --- Invert via MOUSE: prefer dedicated mouse action; fall back to cancelAction (RMB)
+            // --- Invert via MOUSE: use vanilla cancelAction (RMB) only
             bool invertPressed = false;
             try
             {
-                invertPressed = (m_InvertZoningMouseAction != null && m_InvertZoningMouseAction.WasPressedThisFrame())
-                                || cancelAction.WasPressedThisFrame();
+                invertPressed = cancelAction.WasPressedThisFrame();
             }
             catch { invertPressed = false; }
 
