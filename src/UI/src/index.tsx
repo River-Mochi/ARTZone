@@ -1,11 +1,10 @@
 // File: src/UI/src/index.tsx
-// Purpose: Registrar — wire React pieces into vanilla UI.
+// Purpose: Registrar — wire React bits into vanilla UI.
 //   • Floating button at GameTopLeft
 //   • “Zoning Side” section in MouseToolOptions
 //   • Keep Tool Options panel visible for our tool
 //   • Ensure main SVG icon is emitted
-//
-// Design: single source of truth for vanilla paths/ids; tiny guards; strict typing.
+//   • Log Topography/Contour candidates to UI.log for follow-up
 
 import type { ModRegistrar, ModuleRegistry } from "cs2/modding";
 import { VanillaComponentResolver } from "./YenYang/VanillaComponentResolver";
@@ -16,7 +15,7 @@ import { ToolOptionsVisibility } from "./mods/ToolOptionsVisible/toolOptionsVisi
 // Ensure the icon is emitted to coui://ui-mods/images/ico-4square-color.svg
 import "../images/ico-4square-color.svg";
 
-// --- Single source of truth for vanilla modules/exports we touch ---
+// Single source of truth for vanilla modules/exports we touch
 const VANILLA = {
     MouseToolOptions: {
         path: "game-ui/game/components/tool-options/mouse-tool-options/mouse-tool-options.tsx",
@@ -38,7 +37,7 @@ function extendSafe(
     try {
         registry.extend(modulePath, exportId, extension);
     } catch (err) {
-        // eslint-disable-next-line no-console
+        // Goes to UI.log in dev mode; safe to keep in production too.
         console.error(`[ART][UI] extend failed for ${modulePath}#${exportId}`, err);
     }
 }
@@ -47,17 +46,22 @@ const register: ModRegistrar = (moduleRegistry) => {
     // Centralize access to vanilla components for this session
     VanillaComponentResolver.setRegistry(moduleRegistry);
 
-    // --- One-time diagnostic to help locate vanilla Topography / Contours control ---
-    // You can see this output in the UI dev tools (http://localhost:9444/) or in Player.log.
+    // One-time diagnostic to help locate vanilla Topography / Contours control.
+    // You’ll see this in UI.log (short and easy to read).
     try {
         const candidates = moduleRegistry.find(/topograph|contour|terrain|overlay|elev|height/i);
         if (Array.isArray(candidates) && candidates.length) {
-            console.log("[ART][diag] topo candidates:", candidates);
+            for (const [path, ...exports] of candidates ?? []) {
+                if (/tool-options|topograph|contour/i.test(path)) {
+                    console.log(`[ART][diag] candidate: ${path}  ->  ${exports.join(",")}`);
+                }
+            }
+
         } else {
             console.log("[ART][diag] no topo/contour candidates found");
         }
     } catch {
-        /* silent in production */
+        /* silent */
     }
 
     // Put the main toggle button on the top left (vanilla slot)

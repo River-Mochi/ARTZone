@@ -264,5 +264,19 @@ namespace AdvancedRoadTools.Systems
             }
             catch { }
         }
+
+        /// <summary>RMB preview toggle: Left<->Right if on a side; otherwise Both<->None.</summary>
+        public void RmbPreviewToggle()
+        {
+            try
+            {
+                if (ToolZoningMode == ZoningMode.Left || ToolZoningMode == ZoningMode.Right)
+                    InvertZoningSideOnly();      // strict Left↔Right
+                else
+                    FlipToolBothOrNone();        // strict Both↔None
+            }
+            catch { }
+        }
+
     }
 }

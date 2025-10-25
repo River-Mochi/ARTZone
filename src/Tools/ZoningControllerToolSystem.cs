@@ -115,30 +115,22 @@ namespace AdvancedRoadTools.Systems
             m_SubBlockLookup.Update(this);
             inputDeps = Dependency;
 
-            bool hasRoad;             // broad: is there a road under cursor?
-            bool hasEligibleChange;   // narrow: does it differ from current mode/depths?
+            // Broad: is there a road under the cursor?
+            bool hasRoad;
             Entity hitEntity;
             RaycastHit hit;
-
             try
             {
                 hasRoad = TryGetRoadUnderCursor(out hitEntity, out hit);
             }
             catch { hasRoad = false; hitEntity = Entity.Null; }
 
-            try
-            {
-                hasEligibleChange = GetRaycastResult(out _, out _);
-            } // reuse your existing eligibility check
-            catch { hasEligibleChange = false; }
-
             var haveSoundbank = m_SoundbankQuery.CalculateEntityCount() > 0;
             ToolUXSoundSettingsData soundbank = default;
             if (haveSoundbank)
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
-
-            // RMB toggling should work whenever a road is under cursor — even if current state matches
+            // --- RMB flip (never cancels the tool) ---
             bool invertPressed = false;
             try
             {
@@ -148,7 +140,7 @@ namespace AdvancedRoadTools.Systems
 
             if (invertPressed && hasRoad)
             {
-                // Ensure selection uses the hovered entity (so flip shows immediately)
+                // ensure preview selection matches hovered entity
                 if (m_PreviewEntity == Entity.Null || m_PreviewEntity != hitEntity)
                 {
                     if (m_PreviewEntity != Entity.Null)
@@ -165,21 +157,15 @@ namespace AdvancedRoadTools.Systems
                     m_Highlight.HighlightEntity(hitEntity, true);
                 }
 
-                // Centralized RMB behavior: Left↔Right if a side; otherwise Both↔None
-                m_UISystem.RmbPreviewToggle(); // (add this helper as shown below)
+                // Strict Left<->Right if a side is selected; otherwise Both<->None
+                m_UISystem.RmbPreviewToggle();
 
                 if (haveSoundbank)
                     AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
 
                 m_Mode = Mode.Preview; // stay in preview; LMB confirms
             }
-
-            // Cancel
-            if (cancelAction.WasPressedThisFrame() && !hasRoad)
-            {
-                m_Mode = Mode.Cancel;
-            }
-            // LMB select/apply flow
+            // LMB select/apply flow (no RMB cancel at all)
             else if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
             {
                 m_Mode = Mode.Select;
@@ -187,10 +173,6 @@ namespace AdvancedRoadTools.Systems
             else if (applyAction.WasReleasedThisFrame() && hasRoad)
             {
                 m_Mode = Mode.Apply;
-            }
-            else if (applyAction.WasReleasedThisFrame() && !hasRoad)
-            {
-                m_Mode = Mode.Cancel;
             }
             else
             {
@@ -248,15 +230,9 @@ namespace AdvancedRoadTools.Systems
                             AudioManager.instance.PlayUISound(soundbank.m_NetBuildSound);
                         break;
                     }
-
-                case Mode.Cancel:
-                    ClearSelectionAndHighlight();
-                    if (haveSoundbank)
-                        AudioManager.instance.PlayUISound(soundbank.m_NetCancelSound);
-                    break;
             }
 
-
+            // keep temp zoning in sync with preview
             var tempLookup = GetComponentLookup<TempZoning>(true);
 
             JobHandle syncTempJob = new SyncTempJob
@@ -284,6 +260,7 @@ namespace AdvancedRoadTools.Systems
             m_ToolOutputBarrier.AddJobHandleForProducer(inputDeps);
             return inputDeps;
         }
+
 
         private void ClearSelectionAndHighlight()
         {
