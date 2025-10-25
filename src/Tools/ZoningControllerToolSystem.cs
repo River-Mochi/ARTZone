@@ -1,4 +1,4 @@
-// File: src/Tools/ZoningControllerToolSystem.cs
+﻿// File: src/Tools/ZoningControllerToolSystem.cs
 // Purpose:
 //   Runtime tool. RMB (mouse invert) flips over valid roads; RMB (cancelAction) flips
 //   LMB confirms. Preview always reflects the current mode for the hovered segment.
@@ -115,21 +115,30 @@ namespace AdvancedRoadTools.Systems
             m_SubBlockLookup.Update(this);
             inputDeps = Dependency;
 
-            bool hasHit;
+            bool hasRoad;             // broad: is there a road under cursor?
+            bool hasEligibleChange;   // narrow: does it differ from current mode/depths?
             Entity hitEntity;
             RaycastHit hit;
+
             try
             {
-                hasHit = GetRaycastResult(out hitEntity, out hit);
+                hasRoad = TryGetRoadUnderCursor(out hitEntity, out hit);
             }
-            catch { hasHit = false; hitEntity = Entity.Null; }
+            catch { hasRoad = false; hitEntity = Entity.Null; }
+
+            try
+            {
+                hasEligibleChange = GetRaycastResult(out _, out _);
+            } // reuse your existing eligibility check
+            catch { hasEligibleChange = false; }
 
             var haveSoundbank = m_SoundbankQuery.CalculateEntityCount() > 0;
             ToolUXSoundSettingsData soundbank = default;
             if (haveSoundbank)
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
-            // --- Invert via MOUSE: use vanilla cancelAction (RMB) only
+
+            // RMB toggling should work whenever a road is under cursor — even if current state matches
             bool invertPressed = false;
             try
             {
@@ -137,9 +146,9 @@ namespace AdvancedRoadTools.Systems
             }
             catch { invertPressed = false; }
 
-            if (invertPressed && hasHit)
+            if (invertPressed && hasRoad)
             {
-                // Ensure the hovered entity is in preview selection (so flipping shows immediately)
+                // Ensure selection uses the hovered entity (so flip shows immediately)
                 if (m_PreviewEntity == Entity.Null || m_PreviewEntity != hitEntity)
                 {
                     if (m_PreviewEntity != Entity.Null)
@@ -156,20 +165,17 @@ namespace AdvancedRoadTools.Systems
                     m_Highlight.HighlightEntity(hitEntity, true);
                 }
 
-                // Flip the correct pair based on current mode
-                var mode = m_UISystem.ToolZoningMode;
-                if (mode == ZoningMode.Left || mode == ZoningMode.Right)
-                    m_UISystem.InvertZoningSideOnly(); // Left <-> Right
-                else
-                    m_UISystem.FlipToolBothOrNone();   // Both <-> None
+                // Centralized RMB behavior: Left↔Right if a side; otherwise Both↔None
+                m_UISystem.RmbPreviewToggle(); // (add this helper as shown below)
 
                 if (haveSoundbank)
                     AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
-                m_Mode = Mode.Preview; // stay in preview; LMB will confirm
+
+                m_Mode = Mode.Preview; // stay in preview; LMB confirms
             }
 
-            // Cancel when RMB (cancelAction) is pressed with NO road under cursor
-            if (cancelAction.WasPressedThisFrame() && !hasHit)
+            // Cancel
+            if (cancelAction.WasPressedThisFrame() && !hasRoad)
             {
                 m_Mode = Mode.Cancel;
             }
@@ -178,11 +184,11 @@ namespace AdvancedRoadTools.Systems
             {
                 m_Mode = Mode.Select;
             }
-            else if (applyAction.WasReleasedThisFrame() && hasHit)
+            else if (applyAction.WasReleasedThisFrame() && hasRoad)
             {
                 m_Mode = Mode.Apply;
             }
-            else if (applyAction.WasReleasedThisFrame() && !hasHit)
+            else if (applyAction.WasReleasedThisFrame() && !hasRoad)
             {
                 m_Mode = Mode.Cancel;
             }
@@ -204,7 +210,7 @@ namespace AdvancedRoadTools.Systems
                         m_SelectedEntities.Clear();
                         m_PreviewEntity = Entity.Null;
 
-                        if (hasHit)
+                        if (hasRoad)
                         {
                             m_Highlight.HighlightEntity(hitEntity, true);
                             m_SelectedEntities.Add(hitEntity);
@@ -213,7 +219,7 @@ namespace AdvancedRoadTools.Systems
                     }
                     break;
 
-                case Mode.Select when hasHit:
+                case Mode.Select when hasRoad:
                     if (!m_SelectedEntities.Contains(hitEntity))
                     {
                         m_SelectedEntities.Add(hitEntity);
@@ -249,6 +255,7 @@ namespace AdvancedRoadTools.Systems
                         AudioManager.instance.PlayUISound(soundbank.m_NetCancelSound);
                     break;
             }
+
 
             var tempLookup = GetComponentLookup<TempZoning>(true);
 
@@ -401,5 +408,21 @@ namespace AdvancedRoadTools.Systems
                 }
             }
         }
+        // Helper
+        // Returns true if the cursor is over a road entity we can operate on, even if no change is needed.
+        private bool TryGetRoadUnderCursor(out Entity entity, out RaycastHit hit)
+        {
+            if (!base.GetRaycastResult(out entity, out hit))
+                return false;
+
+            // Must be a road sub-block so we operate on real zoning targets
+            if (!m_SubBlockLookup.TryGetBuffer(entity, out _))
+            {
+                entity = Entity.Null;
+                return false;
+            }
+            return true;
+        }
+
     }
 }

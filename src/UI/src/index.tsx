@@ -5,21 +5,18 @@
 //   • Keep Tool Options panel visible for our tool
 //   • Ensure main SVG icon is emitted
 //
-// Design: single source of truth for vanilla paths/ids; tiny guards; strict typing
-// to select the correct `append(AppendHookTargets, ...)` overload with your d.ts.
+// Design: single source of truth for vanilla paths/ids; tiny guards; strict typing.
 
-import type { ModRegistrar, ModuleRegistry, AppendHookTargets } from "cs2/modding";
+import type { ModRegistrar, ModuleRegistry } from "cs2/modding";
 import { VanillaComponentResolver } from "./YenYang/VanillaComponentResolver";
 import ZoningToolControllerButton from "./mods/advanced-road-tools-button";
 import { ZoningToolController } from "./mods/ZoningToolSections";
 import { ToolOptionsVisibility } from "./mods/ToolOptionsVisible/toolOptionsVisible";
 
-// Emit the icon into coui://ui-mods/images/...
+// Ensure the icon is emitted to coui://ui-mods/images/ico-4square-color.svg
 import "../images/ico-4square-color.svg";
 
-// --- Single source of truth for vanilla modules/exports ---
-const APPEND_TARGET: AppendHookTargets = "GameTopLeft"; // typed literal => picks the right overload
-
+// --- Single source of truth for vanilla modules/exports we touch ---
 const VANILLA = {
     MouseToolOptions: {
         path: "game-ui/game/components/tool-options/mouse-tool-options/mouse-tool-options.tsx",
@@ -47,13 +44,26 @@ function extendSafe(
 }
 
 const register: ModRegistrar = (moduleRegistry) => {
-    // Allow our resolver to fetch vanilla components & themes
+    // Centralize access to vanilla components for this session
     VanillaComponentResolver.setRegistry(moduleRegistry);
 
-    // 1) Floating top-left button (typed union => append(target, component) overload)
-    moduleRegistry.append(APPEND_TARGET, ZoningToolControllerButton);
+    // --- One-time diagnostic to help locate vanilla Topography / Contours control ---
+    // You can see this output in the UI dev tools (http://localhost:9444/) or in Player.log.
+    try {
+        const candidates = moduleRegistry.find(/topograph|contour|terrain|overlay|elev|height/i);
+        if (Array.isArray(candidates) && candidates.length) {
+            console.log("[ART][diag] topo candidates:", candidates);
+        } else {
+            console.log("[ART][diag] no topo/contour candidates found");
+        }
+    } catch {
+        /* silent in production */
+    }
 
-    // 2) Inject our “Zoning Side” section
+    // Put the main toggle button on the top left (vanilla slot)
+    moduleRegistry.append("GameTopLeft", ZoningToolControllerButton);
+
+    // Extend the vanilla MouseToolOptions panel with our section (keep us near the bottom)
     extendSafe(
         moduleRegistry,
         VANILLA.MouseToolOptions.path,
@@ -61,7 +71,7 @@ const register: ModRegistrar = (moduleRegistry) => {
         ZoningToolController
     );
 
-    // 3) Keep Tool Options panel visible while our tool is active
+    // Force the small Tool Options panel to be visible while our tool is active
     extendSafe(
         moduleRegistry,
         VANILLA.ToolOptionsPanelVisible.path,
