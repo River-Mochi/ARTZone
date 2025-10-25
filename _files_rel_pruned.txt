@@ -1,3 +1,5 @@
+.\_files_rel_pruned.txt
+.\_folders_rel_pruned.txt
 .\ARTZone.sln
 .\global.json
 .\LICENSE
@@ -18,7 +20,6 @@
 .\src\Properties\PublishProfiles\PublishNewVersion.pubxml
 .\src\Properties\PublishProfiles\UpdatePublishedConfiguration.pubxml
 .\src\Properties\Thumbnail.png
-.\src\README.md
 .\src\Settings\LocaleEN.cs
 .\src\Settings\LocaleZH_CN.cs
 .\src\Settings\Setting.cs

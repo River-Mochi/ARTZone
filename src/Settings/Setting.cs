@@ -17,7 +17,7 @@ namespace AdvancedRoadTools
     using UnityEngine;
 
     // Persisted settings location
-    [FileLocation("ModsSettings/AdvancedRoadTools/AdvancedRoadTools")]
+    [FileLocation("ModsSettings/ARTZone/ARTZone")]
 
     // Tabs & groups
     [SettingsUITabOrder(kActionsTab, kAboutTab)]
@@ -60,7 +60,7 @@ namespace AdvancedRoadTools
         // --- About (read-only labels/buttons) ---
 
         [SettingsUISection(kAboutTab, kAboutInfoGroup)]
-        public string NameText => "Advanced Road Tools — Zone Controller";
+        public string NameText => "ART — Zone";
 
         [SettingsUISection(kAboutTab, kAboutInfoGroup)]
         public string VersionText => AdvancedRoadToolsMod.VersionShort;
