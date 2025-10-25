@@ -1,4 +1,4 @@
-﻿// File: src/UI/src/mods/advanced-road-tools-button.tsx
+﻿// File: src/UI/src/mods/artzone-tool-button.tsx
 // Purpose: self-contained floating GameTopLeft button (launch/toggl tool/panel and shows icon + tooltip).
 // Uses the SAME SVG file name as C# MainIconPath points to.
 
@@ -14,7 +14,7 @@ function onClickTopLeft() {
     trigger(mod.id, "ToggleZoneControllerTool");
 }
 
-export default function ZoningToolControllerButton(): JSX.Element {
+export default function ARTZoneToolButton(): JSX.Element {
     const { translate } = useLocalization();
     const tooltip = translate("ARTZone.Zone_Controller.ToolName", "ART");
     return (

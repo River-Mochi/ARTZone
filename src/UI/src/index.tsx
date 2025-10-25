@@ -8,7 +8,7 @@
 
 import type { ModRegistrar, ModuleRegistry } from "cs2/modding";
 import { VanillaComponentResolver } from "./YenYang/VanillaComponentResolver";
-import ZoningToolControllerButton from "./mods/advanced-road-tools-button";
+import ARTZoneToolButton from "./mods/artzone-tool-button";
 import { ZoningToolController } from "./mods/ZoningToolSections";
 import { ToolOptionsVisibility } from "./mods/ToolOptionsVisible/toolOptionsVisible";
 
@@ -65,7 +65,7 @@ const register: ModRegistrar = (moduleRegistry) => {
     }
 
     // Put the main toggle button on the top left (vanilla slot)
-    moduleRegistry.append("GameTopLeft", ZoningToolControllerButton);
+    moduleRegistry.append("GameTopLeft", ARTZoneToolButton);
 
     // Extend the vanilla MouseToolOptions panel with our section (keep us near the bottom)
     extendSafe(

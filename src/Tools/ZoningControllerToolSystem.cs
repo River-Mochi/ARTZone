@@ -22,7 +22,7 @@ namespace ARTZone.Tools
 
     public partial class ZoningControllerToolSystem : ToolBaseSystem
     {
-        public const string ToolID = "ARTZone.ZoningControllerTool";
+        public const string ToolID = "ARTZone.ZoningTool";
         public override string toolID => ToolID;
 
         private ToolOutputBarrier m_ToolOutputBarrier = null!;

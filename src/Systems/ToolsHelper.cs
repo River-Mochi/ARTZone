@@ -8,10 +8,10 @@
 //   • Icon path comes from definition.ui.ImagePath.
 //   • Cached donor so we don’t keep probing; guarded DEBUG logging; no #nullable directive used.
 
-using ARTZone.Tools;
 
 namespace ARTZone.Systems
 {
+    using ARTZone.Tools;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;

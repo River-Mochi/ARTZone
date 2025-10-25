@@ -50,10 +50,10 @@ function flipToolBothMode() {
 export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
     return (props) => {
         const result = Component(props);
-
+        const ZONING_TOOL_ID = "ARTZone.ZoningTool";
         const activeTool = useValue(tool.activeTool$).id;
         const isRoadPrefab = useValue(isRoadPrefab$);
-        const zoningToolActive = activeTool === "Zone Controller Tool";
+        const zoningToolActive = activeTool === ZONING_TOOL_ID;       // ToolID from ZoningContollerToolSystem
 
         const toolMode = useValue(ToolZoningMode$) as ZoningMode;
         const roadMode = useValue(RoadZoningMode$) as ZoningMode;
