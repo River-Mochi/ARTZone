@@ -2,7 +2,7 @@
 
 - Edit zoning in Cities: Skylines II.
 - **New roads** can inherit your active zoning side/depth choice (so your preference carries forward while building).
-- Edit existing roads: intuitive, fast hover previews of zoning grids, RMB toggles choices and previews, one-click LMB apply, and a vanilla-style tool section.
+- **Existing roads**: editing is intuitive, fast hover previews of zoning grids, RMB toggles choices and previews, one-click LMB apply, and a vanilla-style tool section.
 
 ---
 
@@ -33,6 +33,7 @@
 
 ## Compatibility
 - Safe to remove anytime.
+- This mod does not use Reflection or Harmony; safe/compatible, less likely to break with game updates.
 - Designed to be minimal and conflict-free (extends vanilla UI panels).
 - Uses the game’s input system; RMB sounds and selection feedback mirror vanilla behavior.
 
