@@ -1,7 +1,6 @@
 // File: src/Tools/ZoningControllerToolSystem.cs
 // Purpose:
-//   Runtime tool. RMB (mouse invert) flips over valid roads; if the dedicated mouse
-//   action is missing, we FALL BACK to the vanilla cancelAction (RMB).
+//   Runtime tool. RMB (mouse invert) flips over valid roads; RMB (cancelAction) flips
 //   LMB confirms. Preview always reflects the current mode for the hovered segment.
 
 namespace AdvancedRoadTools.Systems

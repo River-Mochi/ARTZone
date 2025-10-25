@@ -245,7 +245,9 @@ namespace AdvancedRoadTools.Systems
             catch { }
         }
 
-        /// <summary>Flip strictly Left &lt;-&gt; Right. If Both/None, pick Left first.</summary>
+        /// <summary>
+        /// Toggle Left <-> Right. If called while mode is Both/None, set Left (seed the side-only toggle).
+        /// </summary>
         public void InvertZoningSideOnly()
         {
             try
