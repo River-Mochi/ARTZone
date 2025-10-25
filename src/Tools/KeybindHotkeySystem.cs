@@ -1,7 +1,7 @@
 // Purpose: Shift+Z toggles the tool (same as the top-left button).
 // Notes:   RMB is handled by ToolBaseSystem.cancelAction in the tool system (not here).
 
-namespace AdvancedRoadTools.Systems
+namespace ARTZone.Tools
 {
     using Game;
     using Game.Input;
@@ -22,7 +22,7 @@ namespace AdvancedRoadTools.Systems
         {
             try
             {
-                var log = AdvancedRoadToolsMod.s_Log;
+                var log = ARTZoneMod.s_Log;
                 if (log != null)
                     log.Info("[ART][Hotkeys] " + m);
             }
@@ -37,7 +37,7 @@ namespace AdvancedRoadTools.Systems
             base.OnCreate();
 
             m_Tool = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
-            m_Toggle = AdvancedRoadToolsMod.m_ToggleToolAction;
+            m_Toggle = ARTZoneMod.m_ToggleToolAction;
 
 #if DEBUG
             Dbg("Created; hotkeys wired.");

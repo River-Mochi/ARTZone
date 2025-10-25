@@ -1,4 +1,4 @@
-// File: src/Tools/ToolsHelper.cs
+// File: src/Systems/ToolsHelper.cs
 // Purpose: Duplicate a RoadsServices donor (Wide Sidewalk / Crosswalk) and create our tile
 //          with the same UI group and priority+1. Donor prefab is never modified.
 // Notes:
@@ -8,7 +8,9 @@
 //   • Icon path comes from definition.ui.ImagePath.
 //   • Cached donor so we don’t keep probing; guarded DEBUG logging; no #nullable directive used.
 
-namespace AdvancedRoadTools.Tools
+using ARTZone.Tools;
+
+namespace ARTZone.Systems
 {
     using System;
     using System.Collections.Generic;
@@ -23,7 +25,6 @@ namespace AdvancedRoadTools.Tools
     using UnityEngine;
 #if DEBUG
     using System.Reflection;
-    using AdvancedRoadTools.Systems;
 #endif
 
     public static class ToolsHelper
@@ -50,7 +51,7 @@ namespace AdvancedRoadTools.Tools
         [Conditional("DEBUG")]
         private static void Dbg(string message)
         {
-            var log = AdvancedRoadToolsMod.s_Log;
+            var log = ARTZoneMod.s_Log;
             if (log == null)
                 return;
             try
@@ -74,14 +75,14 @@ namespace AdvancedRoadTools.Tools
             s_Instantiated = false;
 
             s_World = World.DefaultGameObjectInjectionWorld;
-            s_PrefabSystem = (s_World != null) ? s_World.GetExistingSystemManaged<PrefabSystem>() : null;
+            s_PrefabSystem = s_World != null ? s_World.GetExistingSystemManaged<PrefabSystem>() : null;
         }
 
         public static void RegisterTool(ToolDefinition toolDefinition)
         {
             if (HasTool(toolDefinition))
             {
-                AdvancedRoadToolsMod.s_Log.Error($"Tool \"{toolDefinition.ToolID}\" already registered");
+                ARTZoneMod.s_Log.Error($"Tool \"{toolDefinition.ToolID}\" already registered");
                 return;
             }
 #if DEBUG
@@ -100,11 +101,11 @@ namespace AdvancedRoadTools.Tools
                 return;
 
             s_World ??= World.DefaultGameObjectInjectionWorld;
-            s_PrefabSystem ??= (s_World != null) ? s_World.GetExistingSystemManaged<PrefabSystem>() : null;
+            s_PrefabSystem ??= s_World != null ? s_World.GetExistingSystemManaged<PrefabSystem>() : null;
 
             if (s_PrefabSystem == null)
             {
-                AdvancedRoadToolsMod.s_Log.Error("[ART][Tools] PrefabSystem not available.");
+                ARTZoneMod.s_Log.Error("[ART][Tools] PrefabSystem not available.");
                 return;
             }
 
@@ -113,7 +114,7 @@ namespace AdvancedRoadTools.Tools
                 !TryResolveAnchor(s_PrefabSystem, out s_AnchorPrefab, out s_AnchorUI))
             {
                 if (logIfNoAnchor)
-                    AdvancedRoadToolsMod.s_Log.Error("[ART][Tools] Could not find RoadsServices anchor. Will retry later.");
+                    ARTZoneMod.s_Log.Error("[ART][Tools] Could not find RoadsServices anchor. Will retry later.");
                 return;
             }
 
@@ -160,7 +161,7 @@ namespace AdvancedRoadTools.Tools
                     var tb = s_World!.GetOrCreateSystemManaged(definition.Type) as ToolBaseSystem;
                     if (tb == null || !tb.TrySetPrefab(toolPrefab))
                     {
-                        AdvancedRoadToolsMod.s_Log.Error($"[ART][Tools] Failed to set up tool prefab for type \"{definition.Type}\"");
+                        ARTZoneMod.s_Log.Error($"[ART][Tools] Failed to set up tool prefab for type \"{definition.Type}\"");
                         continue;
                     }
 
@@ -171,7 +172,7 @@ namespace AdvancedRoadTools.Tools
                 }
                 catch (Exception ex)
                 {
-                    AdvancedRoadToolsMod.s_Log.Error($"[ART][Tools] Tool \"{definition.ToolID}\" could not be created: {ex}");
+                    ARTZoneMod.s_Log.Error($"[ART][Tools] Tool \"{definition.ToolID}\" could not be created: {ex}");
                 }
             }
 
@@ -189,7 +190,7 @@ namespace AdvancedRoadTools.Tools
         {
             if (s_PrefabSystem == null || s_AnchorPrefab == null)
             {
-                AdvancedRoadToolsMod.s_Log.Error("[ART][Tools] SetupToolsOnGameLoaded: missing PrefabSystem or anchor prefab.");
+                ARTZoneMod.s_Log.Error("[ART][Tools] SetupToolsOnGameLoaded: missing PrefabSystem or anchor prefab.");
                 return;
             }
 
@@ -223,7 +224,7 @@ namespace AdvancedRoadTools.Tools
                 }
                 catch (Exception ex)
                 {
-                    AdvancedRoadToolsMod.s_Log.Error($"[ART][Tools] Could not setup tool {def.ToolID}: {ex}");
+                    ARTZoneMod.s_Log.Error($"[ART][Tools] Could not setup tool {def.ToolID}: {ex}");
                 }
             }
         }
@@ -391,8 +392,8 @@ namespace AdvancedRoadTools.Tools
             try
             {
                 var fi = typeof(PrefabSystem).GetField("m_Prefabs", BindingFlags.NonPublic | BindingFlags.Instance);
-                var list = fi != null ? (fi.GetValue(ps) as List<PrefabBase>) : null;
-                return (list != null) ? new List<PrefabBase>(list) : new List<PrefabBase>(0);
+                var list = fi != null ? fi.GetValue(ps) as List<PrefabBase> : null;
+                return list != null ? new List<PrefabBase>(list) : new List<PrefabBase>(0);
             }
             catch
             {

@@ -7,7 +7,7 @@
 // vanilla ToolBaseSystem 'cancelAction' for flipping, so RMB remains the
 // intuitive default and cannot be broken by user remapping inside this mod.
 
-namespace AdvancedRoadTools
+namespace ARTZone.Settings
 {
     using System;
     using Colossal.IO.AssetDatabase;
@@ -25,7 +25,7 @@ namespace AdvancedRoadTools
     [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup)]
 
     // Declare ONLY the keyboard action (Shift+Z). RMB is handled by vanilla cancelAction.
-    [SettingsUIKeyboardAction(AdvancedRoadToolsMod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
+    [SettingsUIKeyboardAction(ARTZoneMod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
     public sealed class Setting : ModSetting
     {
         // Tabs
@@ -50,7 +50,7 @@ namespace AdvancedRoadTools
 
         // --- Key bindings (only Shift+Z is exposed) ---
 
-        [SettingsUIKeyboardBinding(BindingKeyboard.Z, AdvancedRoadToolsMod.kToggleToolActionName, shift: true)]
+        [SettingsUIKeyboardBinding(BindingKeyboard.Z, ARTZoneMod.kToggleToolActionName, shift: true)]
         [SettingsUISection(kActionsTab, kKeybindingGroup)]
         public ProxyBinding ToggleZoneTool
         {
@@ -63,11 +63,11 @@ namespace AdvancedRoadTools
         public string NameText => "ART — Zone";
 
         [SettingsUISection(kAboutTab, kAboutInfoGroup)]
-        public string VersionText => AdvancedRoadToolsMod.VersionShort;
+        public string VersionText => ARTZoneMod.VersionShort;
 
 #if DEBUG
         [SettingsUISection(kAboutTab, kAboutInfoGroup)]
-        public string InformationalVersionText => AdvancedRoadToolsMod.InformationalVersion;
+        public string InformationalVersionText => ARTZoneMod.InformationalVersion;
 #endif
 
         private const string UrlMods = "TBD";

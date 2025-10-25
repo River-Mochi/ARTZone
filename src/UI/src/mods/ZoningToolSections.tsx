@@ -60,19 +60,19 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
 
         const { translate } = useLocalization();
         const title =
-            translate("ToolOptions.SECTION[AdvancedRoadTools.Zone_Controller.SectionTitle]") ||
+            translate("ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]") ||
             "Zoning Side";
         const tipBoth =
             translate(
-                "ToolOptions.TOOLTIP_DESCRIPTION[AdvancedRoadTools.Zone_Controller.ZoningModeBothDescription]"
+                "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]"
             ) || "Toggle Both/None (Both highlights all three).";
         const tipLeft =
             translate(
-                "ToolOptions.TOOLTIP_DESCRIPTION[AdvancedRoadTools.Zone_Controller.ZoningModeLeftDescription]"
+                "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]"
             ) || "Zone only the left side.";
         const tipRight =
             translate(
-                "ToolOptions.TOOLTIP_DESCRIPTION[AdvancedRoadTools.Zone_Controller.ZoningModeRightDescription]"
+                "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]"
             ) || "Zone only the right side.";
 
         // Show under vanilla road placement OR under our tool

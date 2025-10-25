@@ -1,13 +1,12 @@
 // File: src/Tools/ToolDefinition.cs
 // Purpose: Small POD describing a tool + its UI icon path and palette priority.
 
-using System;
-using System.Collections.Generic;
-using Game.Net;
-using Game.Prefabs;
-
-namespace AdvancedRoadTools.Systems
+namespace ARTZone.Tools
 {
+    using System;
+    using System.Collections.Generic;
+    using Game.Net;
+    using Game.Prefabs;
     public struct ToolDefinition : IEquatable<ToolDefinition>
     {
         public Type Type;

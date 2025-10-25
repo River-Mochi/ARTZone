@@ -2,10 +2,10 @@
 // Purpose: applies the preview/committed zoning depth to actual zone blocks
 // respecting settings (RemoveZonedCells / RemoveOccupiedCells). Tool won’t function without it.
 
-namespace AdvancedRoadTools
+namespace ARTZone.Tools
 {
     using System;
-    using AdvancedRoadTools.Components;
+    using ARTZone.Components;
     using Game;
     using Game.Common;
     using Game.Zones;
@@ -52,7 +52,7 @@ namespace AdvancedRoadTools
             m_LogTick++;
             if (count != m_LastCount || (m_LogTick % 30) == 0)
             {
-                AdvancedRoadToolsMod.s_Log.Info($"[ART][SyncBlock] blocks={count} removeOcc={AdvancedRoadToolsMod.s_Settings?.RemoveOccupiedCells == true} removeZoned={AdvancedRoadToolsMod.s_Settings?.RemoveZonedCells == true}");
+                ARTZoneMod.s_Log.Info($"[ART][SyncBlock] blocks={count} removeOcc={ARTZoneMod.s_Settings?.RemoveOccupiedCells == true} removeZoned={ARTZoneMod.s_Settings?.RemoveZonedCells == true}");
                 m_LastCount = count;
             }
 #endif
@@ -112,13 +112,13 @@ namespace AdvancedRoadTools
                 else
                     return;
 
-                if (AdvancedRoadToolsMod.s_Settings != null)
+                if (ARTZoneMod.s_Settings != null)
                 {
-                    if (AdvancedRoadToolsMod.s_Settings.RemoveOccupiedCells &&
+                    if (ARTZoneMod.s_Settings.RemoveOccupiedCells &&
                         IsAnyCellOccupied(CellLookup[blockEntity], block, validArea))
                         return;
 
-                    if (AdvancedRoadToolsMod.s_Settings.RemoveZonedCells &&
+                    if (ARTZoneMod.s_Settings.RemoveZonedCells &&
                         IsAnyCellZoned(CellLookup[blockEntity], block, validArea))
                         return;
                 }

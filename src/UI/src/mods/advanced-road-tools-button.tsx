@@ -16,7 +16,7 @@ function onClickTopLeft() {
 
 export default function ZoningToolControllerButton(): JSX.Element {
     const { translate } = useLocalization();
-    const tooltip = translate("AdvancedRoadTools.Zone_Controller.ToolName", "ART");
+    const tooltip = translate("ARTZone.Zone_Controller.ToolName", "ART");
     return (
         <Button
             variant="floating"

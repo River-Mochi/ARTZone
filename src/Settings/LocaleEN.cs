@@ -1,9 +1,10 @@
 // File: src/Settings/LocaleEN.cs
 // English (en-US) strings for Options UI + palette text.
 
-namespace AdvancedRoadTools
+namespace ARTZone.Settings
 {
     using System.Collections.Generic;
+    using ARTZone.Tools;
     using Colossal;
 
     public sealed class LocaleEN : IDictionarySource
@@ -42,11 +43,11 @@ namespace AdvancedRoadTools
                 { s_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Show or hide the ART Zone Controller panel (default Shift+Z)." },
 
                 // Binding title in the keybinding dialog
-                { s_Settings.GetBindingKeyLocaleID(AdvancedRoadToolsMod.kToggleToolActionName), "Toggle Zone Control panel" },
+                { s_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "Toggle Zone Control panel" },
 
                 // Palette (Road Services tile)
-                { $"Assets.NAME[{Systems.ZoningControllerToolSystem.ToolID}]", "Zone Changer" },
-                { $"Assets.DESCRIPTION[{Systems.ZoningControllerToolSystem.ToolID}]",
+                { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Zone Changer" },
+                { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
                   "Change zoning on roads: both sides, left, right, or none. Right-click flips the choice. Left Click confirms." },
 
                 // About tab labels

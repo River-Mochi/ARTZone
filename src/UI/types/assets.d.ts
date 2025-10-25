@@ -1,4 +1,4 @@
-// File: src/AdvancedRoadTools/UI/src/types/assets.d.ts
+// File: src/ARTZone/UI/src/types/assets.d.ts
 // Purpose: Make TS understand non-code asset imports used by webpack.
 
 declare module "*.scss";

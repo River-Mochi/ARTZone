@@ -1,10 +1,10 @@
 // lang/zh-HANS.json
 // strings read by TSX via useLocalization() ToolOptions only.
 {
-  "AdvancedRoadTools.Zone_Controller.ToolName": "ART — 分区控制",
+  "ARTZone.Zone_Controller.ToolName": "ART — 分区控制",
 
-  "ToolOptions.SECTION[AdvancedRoadTools.Zone_Controller.SectionTitle]": "道路分区侧",
-  "ToolOptions.TOOLTIP_DESCRIPTION[AdvancedRoadTools.Zone_Controller.ZoningModeBothDescription]": "两侧均分区。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[AdvancedRoadTools.Zone_Controller.ZoningModeLeftDescription]": "仅在左侧分区。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[AdvancedRoadTools.Zone_Controller.ZoningModeRightDescription]": "仅在右侧分区。"
+  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "道路分区侧",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "两侧均分区。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "仅在左侧分区。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "仅在右侧分区。"
 }

@@ -2,9 +2,8 @@
 // Purpose: Wait until a RoadsServices anchor exists, then call ToolsHelper.InstantiateTools().
 // Arms only after a real game load (LoadGame/NewGame). Logs periodically in DEBUG.
 
-namespace AdvancedRoadTools.Systems
+namespace ARTZone.Systems
 {
-    using AdvancedRoadTools.Tools;
     using Colossal.Serialization.Entities; // Purpose
     using Game;                            // GameMode, GameSystemBase
     using Game.Prefabs;                    // PrefabSystem
@@ -23,7 +22,7 @@ namespace AdvancedRoadTools.Systems
 #if DEBUG
         private static void dbg(string m)
         {
-            var log = AdvancedRoadToolsMod.s_Log;
+            var log = ARTZoneMod.s_Log;
             if (log != null)
             {
                 try
@@ -108,7 +107,7 @@ namespace AdvancedRoadTools.Systems
 
             if (m_Tries >= kMaxTries)
             {
-                AdvancedRoadToolsMod.s_Log.Error("[ART][Bootstrap] Giving up; RoadsServices donors never appeared.");
+                ARTZoneMod.s_Log.Error("[ART][Bootstrap] Giving up; RoadsServices donors never appeared.");
                 m_Armed = false;
             }
         }

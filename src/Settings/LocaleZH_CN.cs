@@ -1,9 +1,10 @@
 ﻿// File: src/Settings/LocaleZH_CN.cs
 // Simplified Chinese (zh-HANS) strings for Options UI + palette text.
 
-namespace AdvancedRoadTools
+namespace ARTZone.Settings
 {
     using System.Collections.Generic;
+    using ARTZone.Tools;
     using Colossal;
 
     public sealed class LocaleZH_CN : IDictionarySource
@@ -42,11 +43,11 @@ namespace AdvancedRoadTools
                 { s_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "显示/隐藏 ART 分区控制面板（默认 Shift+Z）。" },
 
                 // Binding title in the keybinding dialog
-                { s_Settings.GetBindingKeyLocaleID(AdvancedRoadToolsMod.kToggleToolActionName), "切换分区控制面板" },
+                { s_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "切换分区控制面板" },
 
                 // Palette (Road Services tile)
-                { $"Assets.NAME[{Systems.ZoningControllerToolSystem.ToolID}]", "分区控制器" },
-                { $"Assets.DESCRIPTION[{Systems.ZoningControllerToolSystem.ToolID}]",
+                { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "分区控制器" },
+                { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
                   "更改分区：两侧、左侧、右侧或无。右键可反转选择。" },
 
                 // About tab labels

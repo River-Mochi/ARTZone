@@ -3,7 +3,7 @@
 using Unity.Entities;
 using Unity.Mathematics;
 
-namespace AdvancedRoadTools
+namespace ARTZone.Components
 {
 
     public struct TempZoning : IComponentData

@@ -1,15 +1,16 @@
-﻿// File: src/Mod.cs
+﻿// File: src/ARTZoneMod.cs
 // Purpose: Mod entrypoint; locales + settings + keybindings + tool registration (no Harmony).
 // Notes:
 //   • Locales are installed BEFORE Options UI (so labels render correctly).
 //   • RMB flip uses vanilla ToolBaseSystem.cancelAction → no custom binding here.
 //   • Top-left button & palette tile use the same icon path (single source of truth).
 
-namespace AdvancedRoadTools
+namespace ARTZone
 {
     using System.Collections.Generic; // HashSet
-    using AdvancedRoadTools.Systems;
-    using AdvancedRoadTools.Tools;
+    using ARTZone.Settings;
+    using ARTZone.Systems;
+    using ARTZone.Tools;
     using Colossal;
     using Colossal.IO.AssetDatabase;
     using Colossal.Logging;
@@ -18,9 +19,9 @@ namespace AdvancedRoadTools
     using Game.Modding;
     using Game.SceneFlow;
 
-    public sealed class AdvancedRoadToolsMod : IMod
+    public sealed class ARTZoneMod : IMod
     {
-        public const string ModID = "AdvancedRoadTools";
+        public const string ModID = "ARTZone";
 
         // Single source of truth for icon path (webpack publicPath = coui://ui-mods/)
         public const string UiCouiRoot = "coui://ui-mods";
@@ -86,7 +87,7 @@ namespace AdvancedRoadTools
 
             // Systems
             updateSystem.UpdateAt<ARTPaletteBootstrapSystem>(SystemUpdatePhase.Modification4);
-            updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
+            updateSystem.UpdateAt<Tools.ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
             updateSystem.UpdateAt<ToolHighlightSystem>(SystemUpdatePhase.ToolUpdate);
             updateSystem.UpdateAt<SyncCreatedRoadsSystem>(SystemUpdatePhase.Modification4);
             updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
@@ -97,8 +98,8 @@ namespace AdvancedRoadTools
             ToolsHelper.Initialize(force: false);
             ToolsHelper.RegisterTool(
                 new ToolDefinition(
-                    typeof(ZoningControllerToolSystem),
-                    ZoningControllerToolSystem.ToolID,
+                    typeof(Tools.ZoningControllerToolSystem),
+                    Tools.ZoningControllerToolSystem.ToolID,
                     new ToolDefinition.UI(MainIconPath) // palette + top-left import use same asset name
                 )
             );

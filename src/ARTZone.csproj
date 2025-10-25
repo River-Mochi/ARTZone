@@ -64,7 +64,7 @@
     <None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
   </ItemGroup>
 
-  <!-- Copy UI assets so COUI can find them via coui://AdvancedRoadTools/... -->
+  <!-- Copy UI assets so COUI can find them via coui://ARTZone/... -->
   <ItemGroup>
     <Content Include="UI\mod.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

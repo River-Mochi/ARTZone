@@ -1,5 +1,5 @@
 // Tools/ToolHighlightSystem.cs
-namespace AdvancedRoadTools.Systems
+namespace ARTZone.Tools
 {
     using System.Collections.Generic;
     using Game;

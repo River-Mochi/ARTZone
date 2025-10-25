@@ -1,5 +1,5 @@
 // Components/AdvancedRoad.cs
-namespace AdvancedRoadTools.Components
+namespace ARTZone.Components
 {
     using System;
     using Colossal.Serialization.Entities;

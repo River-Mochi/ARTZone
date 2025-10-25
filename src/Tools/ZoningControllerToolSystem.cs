@@ -4,10 +4,10 @@
 //   LMB confirms. ESC is not handled here (left to vanilla UI to close panels).
 //   Preview always reflects the current mode for the hovered segment.
 
-namespace AdvancedRoadTools.Systems
+namespace ARTZone.Tools
 {
     using System;
-    using AdvancedRoadTools.Components;
+    using ARTZone.Components;
     using Game.Audio;
     using Game.Common;
     using Game.Net;
@@ -22,7 +22,7 @@ namespace AdvancedRoadTools.Systems
 
     public partial class ZoningControllerToolSystem : ToolBaseSystem
     {
-        public const string ToolID = "Zone Controller Tool";
+        public const string ToolID = "ARTZone.ZoningControllerTool";
         public override string toolID => ToolID;
 
         private ToolOutputBarrier m_ToolOutputBarrier = null!;
@@ -51,7 +51,7 @@ namespace AdvancedRoadTools.Systems
 #if DEBUG
         private static void Dbg(string msg)
         {
-            var log = AdvancedRoadToolsMod.s_Log;
+            var log = ARTZoneMod.s_Log;
             if (log == null)
                 return;
             try
