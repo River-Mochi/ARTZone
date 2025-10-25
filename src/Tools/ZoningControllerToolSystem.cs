@@ -29,10 +29,10 @@ namespace ARTZone.Tools
         private ZoningControllerToolUISystem m_UISystem = null!;
         private ToolHighlightSystem m_Highlight = null!;
 
-        private ComponentLookup<AdvancedRoad> m_AdvancedRoadLookup;
+        private ComponentLookup<ZoningDepthComponent> m_ZoningDepthLookup;
         private BufferLookup<SubBlock> m_SubBlockLookup;
 
-        private EntityQuery m_TempZoningQuery;
+        private EntityQuery m_ZoningPreviewQuery;
         private EntityQuery m_SoundbankQuery;
 
         private PrefabBase m_ToolPrefab = null!;
@@ -72,15 +72,15 @@ namespace ARTZone.Tools
             m_UISystem = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
             m_Highlight = World.GetOrCreateSystemManaged<ToolHighlightSystem>();
 
-            m_TempZoningQuery = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<TempZoning>()
+            m_ZoningPreviewQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<ZoningPreviewComponent>()
                 .Build(this);
 
             m_SoundbankQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<ToolUXSoundSettingsData>()
                 .Build(this);
 
-            m_AdvancedRoadLookup = GetComponentLookup<AdvancedRoad>(true);
+            m_ZoningDepthLookup = GetComponentLookup<ZoningDepthComponent>(true);
             m_SubBlockLookup = GetBufferLookup<SubBlock>(true);
 
             m_SelectedEntities = new NativeList<Entity>(Allocator.Persistent);
@@ -115,7 +115,7 @@ namespace ARTZone.Tools
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            m_AdvancedRoadLookup.Update(this);
+            m_ZoningDepthLookup.Update(this);
             m_SubBlockLookup.Update(this);
             inputDeps = Dependency;
 
@@ -211,9 +211,9 @@ namespace ARTZone.Tools
 
                 case Mode.Apply:
                     {
-                        JobHandle setJob = new SetAdvancedRoadJob
+                        JobHandle setJob = new SetZoningDepthJob
                         {
-                            TempZoningLookup = GetComponentLookup<TempZoning>(true),
+                            ZoningPreviewLookup = GetComponentLookup<ZoningPreviewComponent>(true),
                             Entities = m_SelectedEntities.AsArray().AsReadOnly(),
                             ECB = ecb
                         }.Schedule(inputDeps);
@@ -230,29 +230,29 @@ namespace ARTZone.Tools
                     }
             }
 
-            var tempLookup = GetComponentLookup<TempZoning>(true);
+            var tempLookup = GetComponentLookup<ZoningPreviewComponent>(true);
 
             JobHandle syncTempJob = new SyncTempJob
             {
                 ECB = m_ToolOutputBarrier.CreateCommandBuffer().AsParallelWriter(),
-                TempZoningLookup = tempLookup,
+                ZoningPreviewLookup = tempLookup,
                 SelectedEntities = m_SelectedEntities.AsArray().AsReadOnly(),
                 Depths = Depths
             }.Schedule(m_SelectedEntities.Length, 32, inputDeps);
 
             inputDeps = JobHandle.CombineDependencies(inputDeps, syncTempJob);
 
-            NativeArray<Entity> tempZoningEntities = m_TempZoningQuery.ToEntityArray(Allocator.TempJob);
+            NativeArray<Entity> zoningPreviewEntities = m_ZoningPreviewQuery.ToEntityArray(Allocator.TempJob);
 
             JobHandle cleanupTempJob = new CleanupTempJob
             {
                 ECB = m_ToolOutputBarrier.CreateCommandBuffer().AsParallelWriter(),
                 SelectedEntities = m_SelectedEntities.AsArray().AsReadOnly(),
-                Entities = tempZoningEntities.AsReadOnly()
-            }.Schedule(tempZoningEntities.Length, 32, inputDeps);
+                Entities = zoningPreviewEntities.AsReadOnly()
+            }.Schedule(zoningPreviewEntities.Length, 32, inputDeps);
 
             inputDeps = JobHandle.CombineDependencies(inputDeps, cleanupTempJob);
-            tempZoningEntities.Dispose(inputDeps);
+            zoningPreviewEntities.Dispose(inputDeps);
 
             m_ToolOutputBarrier.AddJobHandleForProducer(inputDeps);
             return inputDeps;
@@ -303,7 +303,7 @@ namespace ARTZone.Tools
         public struct SyncTempJob : IJobParallelFor
         {
             public EntityCommandBuffer.ParallelWriter ECB;
-            public ComponentLookup<TempZoning> TempZoningLookup;
+            public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
             public NativeArray<Entity>.ReadOnly SelectedEntities;
             public int2 Depths;
 
@@ -311,10 +311,10 @@ namespace ARTZone.Tools
             {
                 Entity e = SelectedEntities[index];
 
-                if (TempZoningLookup.TryGetComponent(e, out TempZoning data) && math.any(data.Depths != Depths))
-                    ECB.SetComponent(index, e, new TempZoning { Depths = Depths });
+                if (ZoningPreviewLookup.TryGetComponent(e, out ZoningPreviewComponent data) && math.any(data.Depths != Depths))
+                    ECB.SetComponent(index, e, new ZoningPreviewComponent { Depths = Depths });
                 else
-                    ECB.AddComponent(index, e, new TempZoning { Depths = Depths });
+                    ECB.AddComponent(index, e, new ZoningPreviewComponent { Depths = Depths });
 
                 ECB.AddComponent<Updated>(index, e);
             }
@@ -332,26 +332,26 @@ namespace ARTZone.Tools
                 if (SelectedEntities.Contains(e))
                     return;
 
-                ECB.RemoveComponent<TempZoning>(index, e);
+                ECB.RemoveComponent<ZoningPreviewComponent>(index, e);
                 ECB.AddComponent<Updated>(index, e);
             }
         }
 
-        public struct SetAdvancedRoadJob : IJob
+        public struct SetZoningDepthJob : IJob
         {
             public NativeArray<Entity>.ReadOnly Entities;
-            public ComponentLookup<TempZoning> TempZoningLookup;
+            public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
             public EntityCommandBuffer ECB;
 
             public void Execute()
             {
                 foreach (Entity e in Entities)
                 {
-                    if (!TempZoningLookup.TryGetComponent(e, out TempZoning temp))
+                    if (!ZoningPreviewLookup.TryGetComponent(e, out ZoningPreviewComponent temp))
                         continue;
 
-                    ECB.RemoveComponent<TempZoning>(e);
-                    ECB.AddComponent(e, new AdvancedRoad { Depths = temp.Depths });
+                    ECB.RemoveComponent<ZoningPreviewComponent>(e);
+                    ECB.AddComponent(e, new ZoningDepthComponent { Depths = temp.Depths });
                 }
             }
         }

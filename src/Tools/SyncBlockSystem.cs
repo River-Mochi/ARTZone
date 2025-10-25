@@ -68,8 +68,8 @@ namespace ARTZone.Tools
                 ValidAreaLookup = GetComponentLookup<ValidArea>(true),
                 OwnerLookup = GetComponentLookup<Owner>(true),
                 CellLookup = GetBufferLookup<Cell>(true),
-                AdvancedRoadLookup = GetComponentLookup<AdvancedRoad>(true),
-                TempZoningLookup = GetComponentLookup<TempZoning>(true),
+                ZoningDepthLookup = GetComponentLookup<ZoningDepthComponent>(true),
+                ZoningPreviewLookup = GetComponentLookup<ZoningPreviewComponent>(true),
             }.Schedule(m_UpdatedBlocksQuery.CalculateEntityCount(), 32, this.Dependency);
 
             updatedBlocks.Dispose(syncBlockJob);
@@ -86,8 +86,8 @@ namespace ARTZone.Tools
             [ReadOnly] public ComponentLookup<ValidArea> ValidAreaLookup;
             [ReadOnly] public BufferLookup<Cell> CellLookup;
             [ReadOnly] public ComponentLookup<Owner> OwnerLookup;
-            [ReadOnly] public ComponentLookup<AdvancedRoad> AdvancedRoadLookup;
-            [ReadOnly] public ComponentLookup<TempZoning> TempZoningLookup;
+            [ReadOnly] public ComponentLookup<ZoningDepthComponent> ZoningDepthLookup;
+            [ReadOnly] public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
 
             public void Execute(int index)
             {
@@ -105,9 +105,9 @@ namespace ARTZone.Tools
                 bool left = (math.dot(1, block.m_Direction) < 0);
 
                 int depth;
-                if (TempZoningLookup.TryGetComponent(roadEntity, out TempZoning tempZoning))
-                    depth = left ? tempZoning.Depths.x : tempZoning.Depths.y;
-                else if (AdvancedRoadLookup.TryGetComponent(roadEntity, out AdvancedRoad data))
+                if (ZoningPreviewLookup.TryGetComponent(roadEntity, out ZoningPreviewComponent zoningPreview))
+                    depth = left ? zoningPreview.Depths.x : zoningPreview.Depths.y;
+                else if (ZoningDepthLookup.TryGetComponent(roadEntity, out ZoningDepthComponent data))
                     depth = left ? data.Depths.x : data.Depths.y;
                 else
                     return;
