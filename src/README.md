@@ -56,6 +56,7 @@
 * StarQ for technical support.
 * yenyang for technical support.
 * and the CS2 modding community for pointers and testing.
+* tested by Necko1996
 
 ### Supports languages
 * English, Français (French), Español (Spanish)

@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <!-- File: src/AdvancedRoadTools.csproj -->
+  <!-- File: src/ARTZone.csproj -->
 
   <PropertyGroup>
     <Configurations>Debug;Release</Configurations>
     <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
 
-    <AssemblyTitle>Advanced Road Tools</AssemblyTitle>
-    <AssemblyName>AdvancedRoadTools</AssemblyName>
+	  <AssemblyTitle>ARTZone</AssemblyTitle>
+	  <AssemblyName>ARTZone</AssemblyName>
+	  <RootNamespace>ARTZone</RootNamespace>
 
     <Nullable>enable</Nullable>
 

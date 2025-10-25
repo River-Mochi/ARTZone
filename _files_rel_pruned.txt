@@ -1,6 +1,4 @@
-.\_files_rel_pruned.txt
-.\_folders_rel_pruned.txt
-.\AdvancedRoadTools.sln
+.\ARTZone.sln
 .\global.json
 .\LICENSE
 .\MapGrid.svg
@@ -8,7 +6,7 @@
 .\src\.editorconfig
 .\src\.gitattributes
 .\src\.gitignore
-.\src\AdvancedRoadTools.csproj
+.\src\ARTZone.csproj
 .\src\Components\AdvancedRoad.cs
 .\src\Components\TempZoning.cs
 .\src\lang\en-US.json
@@ -25,7 +23,6 @@
 .\src\Settings\LocaleZH_CN.cs
 .\src\Settings\Setting.cs
 .\src\Systems\ARTPaletteBootStrapSystem.cs
-.\src\Tools\IARTTool.cs
 .\src\Tools\KeybindHotkeySystem.cs
 .\src\Tools\SyncBlockSystem.cs
 .\src\Tools\SyncCreatedRoadsSystem.cs
