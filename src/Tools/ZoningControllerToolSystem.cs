@@ -17,6 +17,7 @@ namespace AdvancedRoadTools.Systems
     using Unity.Entities;
     using Unity.Jobs;
     using Unity.Mathematics;
+    using UnityEngine.InputSystem;
 
     public partial class ZoningControllerToolSystem : ToolBaseSystem
     {
@@ -92,7 +93,7 @@ namespace AdvancedRoadTools.Systems
         {
             base.OnStartRunning();
             applyAction.enabled = true;
-            cancelAction.enabled = true;   // explicit so no doubt it's live
+            cancelAction.enabled = false;  // Let Esc bubble to UI; we handle RMB ourselves
             requireZones = true;
             requireNet = Layer.Road;
             allowUnderground = true;
@@ -115,32 +116,36 @@ namespace AdvancedRoadTools.Systems
             m_SubBlockLookup.Update(this);
             inputDeps = Dependency;
 
-            // Broad: is there a road under the cursor?
-            bool hasRoad;
+            bool hasRoad;             // broad: is there a road under cursor?
             Entity hitEntity;
             RaycastHit hit;
+
             try
             {
                 hasRoad = TryGetRoadUnderCursor(out hitEntity, out hit);
             }
             catch { hasRoad = false; hitEntity = Entity.Null; }
 
+            // Narrow “would change anything” check (reuses existing logic)
+            bool hasEligibleChange;
+            try
+            {
+                hasEligibleChange = GetRaycastResult(out _, out _);
+            }
+            catch { hasEligibleChange = false; }
+
+            // Sounds
             var haveSoundbank = m_SoundbankQuery.CalculateEntityCount() > 0;
             ToolUXSoundSettingsData soundbank = default;
             if (haveSoundbank)
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
-            // --- RMB flip (never cancels the tool) ---
-            bool invertPressed = false;
-            try
-            {
-                invertPressed = cancelAction.WasPressedThisFrame();
-            }
-            catch { invertPressed = false; }
+            // --- RMB toggle (raw), Esc is NOT handled here so UI gets it ---
+            bool rmbPressed = Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame;
 
-            if (invertPressed && hasRoad)
+            if (rmbPressed && hasRoad)
             {
-                // ensure preview selection matches hovered entity
+                // Ensure preview/selection uses the hovered entity so flip shows immediately
                 if (m_PreviewEntity == Entity.Null || m_PreviewEntity != hitEntity)
                 {
                     if (m_PreviewEntity != Entity.Null)
@@ -157,15 +162,15 @@ namespace AdvancedRoadTools.Systems
                     m_Highlight.HighlightEntity(hitEntity, true);
                 }
 
-                // Strict Left<->Right if a side is selected; otherwise Both<->None
+                // Centralized RMB behavior: Left<->Right if a side; otherwise Both<->None
                 m_UISystem.RmbPreviewToggle();
 
                 if (haveSoundbank)
                     AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
 
-                m_Mode = Mode.Preview; // stay in preview; LMB confirms
+                m_Mode = Mode.Preview; // LMB still confirms
             }
-            // LMB select/apply flow (no RMB cancel at all)
+            // LMB select/apply flow (unchanged)
             else if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
             {
                 m_Mode = Mode.Select;
@@ -230,9 +235,14 @@ namespace AdvancedRoadTools.Systems
                             AudioManager.instance.PlayUISound(soundbank.m_NetBuildSound);
                         break;
                     }
+
+                // No longer drive Cancel from here; Esc is handled by vanilla UI.
+                case Mode.Cancel:
+                    if (haveSoundbank)
+                        AudioManager.instance.PlayUISound(soundbank.m_NetCancelSound);
+                    break;
             }
 
-            // keep temp zoning in sync with preview
             var tempLookup = GetComponentLookup<TempZoning>(true);
 
             JobHandle syncTempJob = new SyncTempJob
@@ -260,7 +270,6 @@ namespace AdvancedRoadTools.Systems
             m_ToolOutputBarrier.AddJobHandleForProducer(inputDeps);
             return inputDeps;
         }
-
 
         private void ClearSelectionAndHighlight()
         {
