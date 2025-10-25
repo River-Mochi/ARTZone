@@ -1,7 +1,8 @@
 ﻿// File: src/Tools/ZoningControllerToolSystem.cs
 // Purpose:
-//   Runtime tool. RMB (mouse invert) flips over valid roads; RMB (cancelAction) flips
-//   LMB confirms. Preview always reflects the current mode for the hovered segment.
+//   Runtime tool. RMB toggles preview over valid roads (Left<->Right or Both<->None).
+//   LMB confirms. ESC is not handled here (left to vanilla UI to close panels).
+//   Preview always reflects the current mode for the hovered segment.
 
 namespace AdvancedRoadTools.Systems
 {
@@ -40,7 +41,7 @@ namespace AdvancedRoadTools.Systems
 
         private enum Mode
         {
-            None, Select, Apply, Cancel, Preview
+            None, Select, Apply, Preview
         }
         private Mode m_Mode;
         private Entity m_PreviewEntity;
@@ -71,10 +72,13 @@ namespace AdvancedRoadTools.Systems
             m_UISystem = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
             m_Highlight = World.GetOrCreateSystemManaged<ToolHighlightSystem>();
 
-            // Actions
+            m_TempZoningQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<TempZoning>()
+                .Build(this);
 
-            m_TempZoningQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<TempZoning>().Build(this);
-            m_SoundbankQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<ToolUXSoundSettingsData>().Build(this);
+            m_SoundbankQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<ToolUXSoundSettingsData>()
+                .Build(this);
 
             m_AdvancedRoadLookup = GetComponentLookup<AdvancedRoad>(true);
             m_SubBlockLookup = GetBufferLookup<SubBlock>(true);
@@ -93,11 +97,10 @@ namespace AdvancedRoadTools.Systems
         {
             base.OnStartRunning();
             applyAction.enabled = true;
-            cancelAction.enabled = false;  // Let Esc bubble to UI; we handle RMB ourselves
+            cancelAction.enabled = false;   // Let Esc bubble to vanilla UI
             requireZones = true;
             requireNet = Layer.Road;
             allowUnderground = true;
-
         }
 
         protected override void OnStopRunning()
@@ -116,36 +119,27 @@ namespace AdvancedRoadTools.Systems
             m_SubBlockLookup.Update(this);
             inputDeps = Dependency;
 
-            bool hasRoad;             // broad: is there a road under cursor?
+            bool hasRoad;
             Entity hitEntity;
             RaycastHit hit;
-
             try
             {
                 hasRoad = TryGetRoadUnderCursor(out hitEntity, out hit);
             }
             catch { hasRoad = false; hitEntity = Entity.Null; }
 
-            // Narrow “would change anything” check (reuses existing logic)
-            bool hasEligibleChange;
-            try
-            {
-                hasEligibleChange = GetRaycastResult(out _, out _);
-            }
-            catch { hasEligibleChange = false; }
-
-            // Sounds
+            // UI sounds
             var haveSoundbank = m_SoundbankQuery.CalculateEntityCount() > 0;
             ToolUXSoundSettingsData soundbank = default;
             if (haveSoundbank)
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
-            // --- RMB toggle (raw), Esc is NOT handled here so UI gets it ---
+            // RMB toggling (raw). ESC is NOT handled here so vanilla can close panels.
             bool rmbPressed = Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame;
 
             if (rmbPressed && hasRoad)
             {
-                // Ensure preview/selection uses the hovered entity so flip shows immediately
+                // Ensure hovered entity is selected so the flip previews immediately
                 if (m_PreviewEntity == Entity.Null || m_PreviewEntity != hitEntity)
                 {
                     if (m_PreviewEntity != Entity.Null)
@@ -162,15 +156,14 @@ namespace AdvancedRoadTools.Systems
                     m_Highlight.HighlightEntity(hitEntity, true);
                 }
 
-                // Centralized RMB behavior: Left<->Right if a side; otherwise Both<->None
+                // Left<->Right when on a side; otherwise Both<->None
                 m_UISystem.RmbPreviewToggle();
 
                 if (haveSoundbank)
                     AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
 
-                m_Mode = Mode.Preview; // LMB still confirms
+                m_Mode = Mode.Preview; // LMB confirms
             }
-            // LMB select/apply flow (unchanged)
             else if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
             {
                 m_Mode = Mode.Select;
@@ -235,12 +228,6 @@ namespace AdvancedRoadTools.Systems
                             AudioManager.instance.PlayUISound(soundbank.m_NetBuildSound);
                         break;
                     }
-
-                // No longer drive Cancel from here; Esc is handled by vanilla UI.
-                case Mode.Cancel:
-                    if (haveSoundbank)
-                        AudioManager.instance.PlayUISound(soundbank.m_NetCancelSound);
-                    break;
             }
 
             var tempLookup = GetComponentLookup<TempZoning>(true);
@@ -271,44 +258,18 @@ namespace AdvancedRoadTools.Systems
             return inputDeps;
         }
 
-        private void ClearSelectionAndHighlight()
-        {
-            if (m_SelectedEntities.IsCreated)
-            {
-                for (var i = 0; i < m_SelectedEntities.Length; i++)
-                    m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
-                m_SelectedEntities.Clear();
-            }
-            m_PreviewEntity = Entity.Null;
-        }
-
-        private new bool GetRaycastResult(out Entity entity, out RaycastHit hit)
+        // Helper — Returns true if the cursor is over an operable road entity
+        private bool TryGetRoadUnderCursor(out Entity entity, out RaycastHit hit)
         {
             if (!base.GetRaycastResult(out entity, out hit))
                 return false;
 
-            var hasAdvancedRoad = m_AdvancedRoadLookup.TryGetComponent(entity, out AdvancedRoad data);
-            var hasSubBlock = m_SubBlockLookup.TryGetBuffer(entity, out _);
-
-            if (!hasSubBlock)
+            if (!m_SubBlockLookup.TryGetBuffer(entity, out _))
             {
                 entity = Entity.Null;
                 return false;
             }
-
-            if (hasAdvancedRoad)
-            {
-                if (math.any(Depths != data.Depths))
-                    return true;
-            }
-            else
-            {
-                if (math.any(Depths != new int2(6)))
-                    return true;
-            }
-
-            entity = Entity.Null;
-            return false;
+            return true;
         }
 
         public override PrefabBase GetPrefab() => m_ToolPrefab;
@@ -394,21 +355,5 @@ namespace AdvancedRoadTools.Systems
                 }
             }
         }
-        // Helper
-        // Returns true if the cursor is over a road entity we can operate on, even if no change is needed.
-        private bool TryGetRoadUnderCursor(out Entity entity, out RaycastHit hit)
-        {
-            if (!base.GetRaycastResult(out entity, out hit))
-                return false;
-
-            // Must be a road sub-block so we operate on real zoning targets
-            if (!m_SubBlockLookup.TryGetBuffer(entity, out _))
-            {
-                entity = Entity.Null;
-                return false;
-            }
-            return true;
-        }
-
     }
 }
