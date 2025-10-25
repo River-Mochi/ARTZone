@@ -1,3 +1,5 @@
+.\_files_rel_pruned.txt
+.\_folders_rel_pruned.txt
 .\AdvancedRoadTools.sln
 .\global.json
 .\LICENSE
@@ -10,6 +12,7 @@
 .\src\Components\AdvancedRoad.cs
 .\src\Components\TempZoning.cs
 .\src\lang\en-US.json
+.\src\lang\zh-HANS.json
 .\src\Library\ilpp.pid
 .\src\Mod.cs
 .\src\Properties\PublishConfiguration.xml
@@ -19,6 +22,7 @@
 .\src\Properties\Thumbnail.png
 .\src\README.md
 .\src\Settings\LocaleEN.cs
+.\src\Settings\LocaleZH_CN.cs
 .\src\Settings\Setting.cs
 .\src\Systems\ARTPaletteBootStrapSystem.cs
 .\src\Tools\IARTTool.cs
@@ -33,9 +37,8 @@
 .\src\Tools\ZoningMode.cs
 .\src\UI\.eslintignore
 .\src\UI\.eslintrc.json
-.\src\UI\images\grid-color-gbpy.svg
 .\src\UI\images\grid-road.svg
-.\src\UI\images\grid-road10.svg
+.\src\UI\images\ico-4square-color.svg
 .\src\UI\images\MapGrid.svg
 .\src\UI\images\MapGridColor.svg
 .\src\UI\images\menu_icon.svg

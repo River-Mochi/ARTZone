@@ -2,34 +2,41 @@
 	<!--Id must be set in order to update existed mod. it is not required for publishing mod for the first time-->
 	<ModId Value="" />
 	<!--Name of the mod to display to players-->
-	<DisplayName Value="Advanced Road Tools" />
+	<DisplayName Value="ART-Zone" />
 	<!--Short description of the mod-->
-	<ShortDescription Value="A variety of tools for controlling roads and their behaviours for Cities: Skyline 2" />
+	<ShortDescription Value="Zone controller that allows custom changes to zoning any side of a road. Affects which way buildings grow." />
 	<!--Long description of the mod. Single line or multi line. Supports minimal markdown subset-->
 	<!--LongDescription Value="This is a long description" /-->
 	<LongDescription>
-# Advanced Road Tools (ART)
+# ART-Zone
 ---
-Advanced Road Tools (ART) is a mod that provides a variety of tools to control roads and their behaviour.
+ART is a mod that provides tools to control roads and the behaviour of zoning grid cells.
 
 ## Features
-- **Zoning Controller Tool** - Control zoning on roads, with a previewable tool where you can just hover the road and see what you'll get! Right-Click inverts the current zoning configuration
+Control zoning on roads, with a previewable tool where you can just hover the road and see what you'll get! Right-Click inverts the current zoning configuration
 
 
 ---
-## Translations
+### Supports languages
+* English, Français (French), Español (Spanish)
+* 日本語 (Japanese), 한국어 (Korean), 简体中文 (Simplified Chinese), 繁體中文 (Traditional Chinese)
+* Português (Brasil) (Brazilian Portuguese)
+* Future updates to add more languages.
 
 
 ## Credits
+* RiverMochi - mod author
+* inspired by LuxStice's original Advanced Road Tools
+* StarQ for technical support.
+* yenyang for technical support.
+* and the CS2 modding community for pointers and testing.
 
-
-
-	</LongDescription>
-	<!--Thumbnail-->
+</LongDescription>
+<!--Thumbnail-->
 	<Thumbnail Value="Properties/Thumbnail.png" />
 	<!--Screenshot, can be set multiple times-->
-	<Screenshot Value="Properties/screenshot-02.png" />
-	<Screenshot Value="Properties/screenshot-03.png" />
+	<Screenshot Value="Properties/screenshot-01.jpg" />
+	<Screenshot Value="Properties/screenshot-02.jpg" />
 	<!--Tag, can be set multiple times-->
 	<Tag Value="Code Mod" />
 	<!--Link to the forum post where the mod can be discussed-->
