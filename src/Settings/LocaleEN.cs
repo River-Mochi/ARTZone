@@ -25,17 +25,17 @@ namespace AdvancedRoadTools
                 { s_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "About" },
 
                 // Groups
-                { s_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Zone Controller Options" },
+                { s_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Zone Tool Options" },
                 { s_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Key bindings" },
                 { s_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { s_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
                 // Toggles
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being removed" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Do not override already zoned cells during preview/apply." },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Do not override already zoned cells during preview/apply.\n Recommend Enabled." },
 
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Do not override already occupied cells during preview/apply." },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Do not override already occupied cells during preview/apply.\n Recommend Enabled" },
 
                 // Keybind (only one visible)
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Toggle Zone Control panel" },
@@ -45,9 +45,9 @@ namespace AdvancedRoadTools
                 { s_Settings.GetBindingKeyLocaleID(AdvancedRoadToolsMod.kToggleToolActionName), "Toggle Zone Control panel" },
 
                 // Palette (Road Services tile)
-                { $"Assets.NAME[{Systems.ZoningControllerToolSystem.ToolID}]", "Zone Controller" },
+                { $"Assets.NAME[{Systems.ZoningControllerToolSystem.ToolID}]", "Zone Changer" },
                 { $"Assets.DESCRIPTION[{Systems.ZoningControllerToolSystem.ToolID}]",
-                  "Change zoning: both, left, right, or none. Right-click flips the choice." },
+                  "Change zoning on roads: both sides, left, right, or none. Right-click flips the choice. Left Click confirms." },
 
                 // About tab labels
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Mod name" },
