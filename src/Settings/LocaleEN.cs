@@ -26,29 +26,29 @@ namespace ARTZone.Settings
                 { s_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "About" },
 
                 // Groups
-                { s_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Zone Tool Options" },
+                { s_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Zone Options" },
                 { s_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Key bindings" },
                 { s_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { s_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
                 // Toggles
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being removed" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Do not override already zoned cells during preview/apply.\n Recommend Enabled." },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Do not override already zoned cells during preview/apply.\n <Enabled recommended.>" },
 
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Do not override already occupied cells during preview/apply.\n Recommend Enabled" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Do not override already occupied cells during preview/apply (e.g Buildings).\n <Enabled recommended>" },
 
                 // Keybind (only one visible)
-                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Toggle Zone Control panel" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Show or hide the ART Zone Controller panel (default Shift+Z)." },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Toggle Panel" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Show the ART-Zone panel button (default Shift+Z)." },
 
                 // Binding title in the keybinding dialog
-                { s_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "Toggle Zone Control panel" },
+                { s_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "Toggle Zone Button Panel" },
 
                 // Palette (Road Services tile)
                 { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Zone Changer" },
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                  "Change zoning on roads: both sides, left, right, or none. Right-click flips the choice. Left Click confirms." },
+                  "Change zoning on roads: both sides, left, right, or none. Right click flips the choice. Left click confirms." },
 
                 // About tab labels
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Mod name" },

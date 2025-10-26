@@ -13,7 +13,7 @@ import { ZoningToolController } from "./mods/ZoningToolSections";
 import { ToolOptionsVisibility } from "./mods/ToolOptionsVisible/toolOptionsVisible";
 
 // Ensure the icon is emitted to coui://ui-mods/images/ico-4square-color.svg
-import "../images/ico-4square-color.svg";
+// import "../images/ico-4square-color.svg";  already emitted in artzone-tool-button.tsx
 
 // Single source of truth for vanilla modules/exports we touch
 const VANILLA = {

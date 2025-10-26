@@ -46,14 +46,15 @@ function flipRoadBothMode() {
 function flipToolBothMode() {
     trigger(mod.id, "FlipToolBothMode");
 }
+const ZONING_TOOL_ID = "ARTZone.ZoningTool";        // ToolID from ZoningContollerToolSystem
 
 export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
     return (props) => {
         const result = Component(props);
-        const ZONING_TOOL_ID = "ARTZone.ZoningTool";
+
         const activeTool = useValue(tool.activeTool$).id;
         const isRoadPrefab = useValue(isRoadPrefab$);
-        const zoningToolActive = activeTool === ZONING_TOOL_ID;       // ToolID from ZoningContollerToolSystem
+        const zoningToolActive = activeTool === ZONING_TOOL_ID;     // must be same as C# Side or 3 icons do not appear  
 
         const toolMode = useValue(ToolZoningMode$) as ZoningMode;
         const roadMode = useValue(RoadZoningMode$) as ZoningMode;

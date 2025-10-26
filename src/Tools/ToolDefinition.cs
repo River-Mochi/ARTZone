@@ -1,59 +1,82 @@
-// File: src/Tools/ToolDefinition.cs
-// Purpose: Small POD describing a tool + its UI icon path and palette priority.
+// Tools/ToolDefinition.cs
+// Purpose:
+//   Describes one ARTZone tool so PaletteBuilder can create a clickable tile in RoadsServices.
+//   PaletteBuilder reads this struct to make One ToolDefinition
+//      = one palette tile (clone donor, set custom icon/ID, hook to ToolBaseSystem,
+//        apply placement flags (underground, etc.).
 
 namespace ARTZone.Tools
 {
     using System;
-    using System.Collections.Generic;
     using Game.Net;
     using Game.Prefabs;
-    public struct ToolDefinition : IEquatable<ToolDefinition>
+    using Game.Tools;
+
+    // --- Data type ------------------------------------------------------------
+    public readonly struct ToolDefinition : IEquatable<ToolDefinition>
     {
-        public Type Type;
-        public string ToolID;
-        public int Priority;
-        public bool Underground;
-        public UI ui;
+        // C# system that implements the tool
+        public readonly Type Type;      // Must inherit ToolBaseSystem
 
-        public PlacementFlags PlacementFlags;
-        public CompositionFlags SetFlags;
-        public CompositionFlags UnsetFlags;
+        // Unique ID; also becomes the cloned prefab name and must match UI’s tool.activeTool$.id.
+        public readonly string ToolID;
 
-        // Initialize to empty sequences to satisfy <Nullable>enable</Nullable>
-        public IEnumerable<NetPieceRequirements> SetState;
-        public IEnumerable<NetPieceRequirements> UnsetState;
+        // Icon and visual data for the tile.
+        public readonly UI Ui;
 
-        public ToolDefinition(Type toolSystemType, string toolId, int priority = 60, UI ui = default)
+        // Placement behavior (copied into PlaceableNetData).
+        public readonly bool Underground;
+        public readonly PlacementFlags PlacementFlags;
+        public readonly CompositionFlags SetFlags;
+        public readonly CompositionFlags UnsetFlags;
+
+        // ---- Constructor -----------------------------------------------------
+        public ToolDefinition(
+            Type toolSystemType,
+            string toolId,
+            UI ui,
+            bool underground = false,
+            PlacementFlags placementFlags = default,
+            CompositionFlags setFlags = default,
+            CompositionFlags unsetFlags = default)
         {
+            if (toolSystemType == null)
+                throw new ArgumentNullException(nameof(toolSystemType));
+            if (!typeof(ToolBaseSystem).IsAssignableFrom(toolSystemType))
+                throw new ArgumentException("Type must inherit ToolBaseSystem.", nameof(toolSystemType));
+
+            if (string.IsNullOrWhiteSpace(toolId))
+                throw new ArgumentException("ToolID must be non-empty.", nameof(toolId));
+
             Type = toolSystemType;
             ToolID = toolId;
-            Priority = priority;
-            Underground = false;
-            this.ui = ui;
+            Ui = ui;
 
-            PlacementFlags = default;
-            SetFlags = default;
-            UnsetFlags = default;
-
-            // Avoid nulls under nullable context
-            SetState = Array.Empty<NetPieceRequirements>();
-            UnsetState = Array.Empty<NetPieceRequirements>();
+            Underground = underground;
+            PlacementFlags = placementFlags;
+            SetFlags = setFlags;
+            UnsetFlags = unsetFlags;
         }
 
-        public ToolDefinition(Type toolSystemType, string toolId, UI ui)
-            : this(toolSystemType, toolId, 60, ui) { }
-
-        public struct UI
+        // ---- Nested UI descriptor ---------------------------------------------
+        public readonly struct UI
         {
-            public const string ImageFormat = ".png";
-            public const string PathPrefix = "coui://ui-mods/images/";
-            public string ImagePath;
-            public UI(string imagePath) => ImagePath = imagePath;
+            public readonly string ImagePath; // e.g., "coui://ui-mods/images/ico-4square-color.svg"
+
+            public UI(string imagePath)
+            {
+                ImagePath = imagePath ?? throw new ArgumentNullException(nameof(imagePath));
+            }
         }
 
+        // ---- Equality ----------------------------------------------------------
+        public bool Equals(ToolDefinition other) =>
+            string.Equals(ToolID, other.ToolID, StringComparison.Ordinal);
 
-        public bool Equals(ToolDefinition other) => ToolID == other.ToolID;
-        public override bool Equals(object obj) => obj is ToolDefinition other && Equals(other);
-        public override int GetHashCode() => ToolID != null ? ToolID.GetHashCode() : 0;
+        public override bool Equals(object obj) =>
+            obj is ToolDefinition other && Equals(other);
+
+        public override int GetHashCode() =>
+            StringComparer.Ordinal.GetHashCode(ToolID);
     }
 }

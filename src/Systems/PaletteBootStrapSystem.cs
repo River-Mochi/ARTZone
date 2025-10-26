@@ -1,6 +1,9 @@
 // File: src/Systems/ARTPaletteBootstrapSystem.cs
-// Purpose: Wait until a RoadsServices anchor exists, then call ToolsHelper.InstantiateTools().
-// Arms only after a real game load (LoadGame/NewGame). Logs periodically in DEBUG.
+// Purpose:
+//      Only Job: wait until a RoadsServices donor/anchor prefab exists, then call builder's PaletteBuilder.InstantiateTools()
+//      Arms only after a real game load, and turn off after calling builder.
+//         BootstrapSystem = waiter (when is it safe?)
+//         PaletteBuilder  = worker (do the cloning now)
 
 namespace ARTZone.Systems
 {
@@ -9,7 +12,8 @@ namespace ARTZone.Systems
     using Game.Prefabs;                    // PrefabSystem
     using Unity.Entities;
 
-    public sealed partial class ARTPaletteBootstrapSystem : GameSystemBase
+
+    public sealed partial class PaletteBootStrapSystem : GameSystemBase
     {
         private PrefabSystem m_Prefabs = null!;
         private bool m_Armed;
@@ -83,7 +87,7 @@ namespace ARTZone.Systems
                 return;
 
             // Probe for a donor tile (Wide Sidewalk / Crosswalk) already in group RoadsServices
-            if (ToolsHelper.TryResolveAnchor(m_Prefabs, out PrefabBase? donor, out UIObject? donorUI))
+            if (PaletteBuilder.TryResolveAnchor(m_Prefabs, out PrefabBase? donor, out UIObject? donorUI))
             {
 #if DEBUG
                 // Guard all accesses to prevent analyzer spam
@@ -93,7 +97,7 @@ namespace ARTZone.Systems
                     dbg($"Donor found: '{(donor != null ? donor.name : "(null)")}' Group='{groupName}' Priority={donorUI.m_Priority}");
                 }
 #endif
-                ToolsHelper.InstantiateTools(logIfNoAnchor: true);
+                PaletteBuilder.InstantiateTools(logIfNoAnchor: true);
                 m_Done = true;
                 Enabled = false; // no more per-frame updates needed
                 return;

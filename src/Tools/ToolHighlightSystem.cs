@@ -1,4 +1,12 @@
 // Tools/ToolHighlightSystem.cs
+// Purpose: track which road entities are "highlighted" by our zoning tool (hover / multi-select).
+//   Don't draw the highlight here, just:
+//     • remember which Entities are "on",
+//     • add Updated to entities when they toggle,
+//     • clear them when the tool shuts down.
+//   Other systems or vanilla can react to Updated the same frame.
+// Notes: intentionally lightweight and safe
+
 namespace ARTZone.Tools
 {
     using System.Collections.Generic;
@@ -6,11 +14,6 @@ namespace ARTZone.Tools
     using Game.Common;
     using Unity.Entities;
 
-    /// <summary>
-    /// Minimal, local highlighter that satisfies our tool’s needs.
-    /// It intentionally no-ops visual effects for now; we just track a set
-    /// and poke Updated so other systems can react.
-    /// </summary>
     public sealed partial class ToolHighlightSystem : GameSystemBase
     {
         private HashSet<Entity> m_Highlighted = null!;
@@ -21,13 +24,21 @@ namespace ARTZone.Tools
             m_Highlighted = new HashSet<Entity>();
         }
 
+        protected override void OnDestroy()
+        {
+            // Final signal so anything listening to Updated can reconcile state.
+            ClearAll();
+            base.OnDestroy();
+        }
+
         protected override void OnUpdate()
         {
-            // No per-frame work needed for now.
+            // No per-frame logic needed.
         }
 
         /// <summary>
-        /// Toggle highlight bookkeeping for an entity.
+        /// Mark or unmark an Entity as highlighted.
+        /// We also poke Updated so downstream systems see a change.
         /// </summary>
         public void HighlightEntity(Entity entity, bool enable)
         {
@@ -51,14 +62,15 @@ namespace ARTZone.Tools
         }
 
         /// <summary>
-        /// Clear all tracked highlights (used on cancel/tool swap).
+        /// Clear all tracked highlights (e.g. when deselecting or swapping tools).
+        /// Every entity we drop from the set gets Updated.
         /// </summary>
         public void ClearAll()
         {
             if (m_Highlighted.Count == 0)
                 return;
 
-            foreach (Entity e in m_Highlighted)
+            foreach (var e in m_Highlighted)
             {
                 if (EntityManager.Exists(e))
                 {

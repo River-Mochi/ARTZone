@@ -23,9 +23,9 @@ namespace ARTZone
     {
         public const string ModID = "ARTZone";
 
-        // Single source of truth for icon path (webpack publicPath = coui://ui-mods/)
-        public const string UiCouiRoot = "coui://ui-mods";
-        public const string MainIconPath = UiCouiRoot + "/images/ico-4square-color.svg";
+        // Single source of truth in C# for game icon path 
+        public const string UiCouiRoot = "coui://ui-mods";      // webpack publicPath = coui://ui-mods/
+        public const string MainIconPath = UiCouiRoot + "/images/ico-4square-color.svg"; // must match in artzone-tool-button.tsx
 
         public const string VersionShort = "1.0.0";
 #if DEBUG
@@ -35,7 +35,7 @@ namespace ARTZone
 #endif
 
         // Rebindable action IDs exposed in Options UI
-        public const string kToggleToolActionName = "ToggleZoneTool"; // Shift+Z
+        public const string kToggleToolActionName = "ToggleZoneTool";   // Shift+Z
 
         public static Setting? s_Settings
         {
@@ -86,8 +86,8 @@ namespace ARTZone
             }
 
             // Systems
-            updateSystem.UpdateAt<ARTPaletteBootstrapSystem>(SystemUpdatePhase.Modification4);
-            updateSystem.UpdateAt<Tools.ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
+            updateSystem.UpdateAt<PaletteBootStrapSystem>(SystemUpdatePhase.Modification4);
+            updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
             updateSystem.UpdateAt<ToolHighlightSystem>(SystemUpdatePhase.ToolUpdate);
             updateSystem.UpdateAt<SyncCreatedRoadsSystem>(SystemUpdatePhase.Modification4);
             updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
@@ -95,11 +95,11 @@ namespace ARTZone
             updateSystem.UpdateAt<KeybindHotkeySystem>(SystemUpdatePhase.ToolUpdate);
 
             // Tool registration (definition only; prefab created after game load)
-            ToolsHelper.Initialize(force: false);
-            ToolsHelper.RegisterTool(
+            PaletteBuilder.Initialize(force: false);
+            PaletteBuilder.RegisterTool(
                 new ToolDefinition(
-                    typeof(Tools.ZoningControllerToolSystem),
-                    Tools.ZoningControllerToolSystem.ToolID,
+                    typeof(ZoningControllerToolSystem),
+                    ZoningControllerToolSystem.ToolID,
                     new ToolDefinition.UI(MainIconPath) // palette + top-left import use same asset name
                 )
             );

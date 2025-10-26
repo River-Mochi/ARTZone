@@ -1,5 +1,7 @@
-// Purpose: Shift+Z toggles the tool (same as the top-left button).
-// Notes:   RMB is handled by ToolBaseSystem.cancelAction in the tool system (not here).
+// Tools/KeybindHotkeySystem.cs
+// Purpose: Shift+Z (or the player's bound hotkey) toggles ARTZone.ZoningTool on/off.
+// Notes:   RMB preview flip is handled inside ZoningControllerToolSystem via cancelAction.
+//          Release-safe - Debug-only helpers live in KeybindHotkeySystem.Debug.cs.
 
 namespace ARTZone.Tools
 {
@@ -7,31 +9,38 @@ namespace ARTZone.Tools
     using Game.Input;
     using Game.Tools;
 
-#if DEBUG
-    using System.Collections;
-    using System.Reflection;
-#endif
-
     public sealed partial class KeybindHotkeySystem : GameSystemBase
     {
+        // Tool instance toggle
         private ZoningControllerToolSystem m_Tool = null!;
-        private ProxyAction? m_Toggle; // Shift+Z (or user binding) to toggle
+
+        // User-bindable hotkey action (default Shift+Z, can be rebound)
+        private ProxyAction? m_Toggle;
 
 #if DEBUG
-        private static void Dbg(string m)
+        private static void Dbg(string message)
         {
             try
             {
                 var log = ARTZoneMod.s_Log;
                 if (log != null)
-                    log.Info("[ART][Hotkeys] " + m);
+                {
+                    log.Info("[ART][Hotkeys] " + message);
+                }
             }
-            catch { }
+            catch
+            {
+                // swallow errors from logger early init
+            }
         }
 #else
-        private static void Dbg(string m) { }
+        private static void Dbg(string message) { }
 #endif
 
+        /// <summary>
+        /// Called by the engine once when the system is created.
+        /// Sets up references and then calls DebugInit(), which only exists in DEBUG builds.
+        /// </summary>
         protected override void OnCreate()
         {
             base.OnCreate();
@@ -39,48 +48,46 @@ namespace ARTZone.Tools
             m_Tool = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
             m_Toggle = ARTZoneMod.m_ToggleToolAction;
 
-#if DEBUG
-            Dbg("Created; hotkeys wired.");
-
-            // Small reflection probe for diagnostics (best-effort).
-            try
-            {
-                var imType = typeof(Game.Input.InputManager);
-                var instanceProp = imType.GetProperty("instance", BindingFlags.Public | BindingFlags.Static);
-                var im = instanceProp?.GetValue(null);
-
-                var actionsField = imType.GetField("m_Actions", BindingFlags.NonPublic | BindingFlags.Instance);
-                var dict = actionsField?.GetValue(im) as IDictionary;
-
-                if (dict != null)
-                {
-                    int shown = 0;
-                    foreach (var key in dict.Keys)
-                    {
-                        if (shown++ > 25)
-                            break;
-                        Dbg($"Action id: {key}");
-                    }
-                }
-            }
-            catch { }
-#endif
+            // In DEBUG builds, this becomes a real method that logs + inspects bindings.
+            // In Release, DebugInit() is compiled out
+            DebugInit();
         }
 
+        /// <summary>
+        /// Called every frame. If the toggle hotkey was pressed this frame,
+        /// enable or disable our zoning tool.
+        /// </summary>
         protected override void OnUpdate()
         {
-            ProxyAction? toggle = m_Toggle;
-            if (toggle != null && toggle.WasPressedThisFrame())
+            var toggle = m_Toggle;
+            if (toggle == null || !toggle.WasPressedThisFrame())
             {
-                var toolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
-                bool willEnable = toolSystem != null && m_Tool != null && toolSystem.activeTool != m_Tool;
+                return;
+            }
+
+            var toolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
+
+            // Decide whether to enable the tool:
+            // true  = activate ARTZone.ZoningTool
+            // false = deactivate (return to vanilla tool)
+            bool willEnable =
+                toolSystem != null &&
+                m_Tool != null &&
+                toolSystem.activeTool != m_Tool;
 
 #if DEBUG
-                Dbg($"Toggle pressed → willEnable={willEnable}");
+            Dbg("Toggle pressed → willEnable=" + willEnable);
 #endif
-                if (m_Tool != null)
-                    m_Tool.SetToolEnabled(willEnable);
+
+            // Guard: m_Tool can theoretically still be null if creation failed.
+            if (m_Tool != null)
+            {
+                m_Tool.SetToolEnabled(willEnable);
             }
         }
+
+        // DEBUG hook. In Release builds this method is removed at compile time
+        // because partial void with no implementation disappears.
+        private partial void DebugInit();
     }
 }
