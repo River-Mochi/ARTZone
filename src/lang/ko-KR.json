@@ -1,0 +1,8 @@
+{
+  "ARTZone.Zone_Controller.ToolName": "ART — 존 제어",
+
+  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "존 측면",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "양쪽 모두에 존을 설정합니다.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "왼쪽만 존을 설정합니다.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "오른쪽만 존을 설정합니다."
+}

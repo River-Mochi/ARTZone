@@ -46,7 +46,7 @@ namespace ARTZone.Tools
             base.OnCreate();
 
             m_Tool = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
-            m_Toggle = ARTZoneMod.m_ToggleToolAction;
+            m_Toggle = ARTZoneMod.ToggleToolAction;
 
             // In DEBUG builds, this becomes a real method that logs + inspects bindings.
             // In Release, DebugInit() is compiled out

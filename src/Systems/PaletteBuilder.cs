@@ -60,7 +60,7 @@ namespace ARTZone.Systems
         private static PrefabBase? s_DonorPrefab;
         private static UIObject? s_DonorUI;
 
-        // Whether we've already created the clones.
+        // Are clones already created?
         private static bool s_Instantiated;
 
         public static bool IsReady => s_Instantiated && s_ToolsLookup.Count > 0;
@@ -148,7 +148,7 @@ namespace ARTZone.Systems
                 return;
             }
 
-            // Find (or reuse cached) donor.
+            // Find (or reuse cached) donor
             if ((s_DonorPrefab == null || s_DonorUI == null) &&
                 !TryResolveDonor(s_PrefabSystem, out s_DonorPrefab, out s_DonorUI))
             {
@@ -277,10 +277,10 @@ namespace ARTZone.Systems
         //   - a prefab, and its UIObject lives in "RoadsServices".
         //
         // Steps:
-        //   1. If there is a cached donor, reuse it.
+        //   1. If there is a cached donor, reuse it - only scan once.
         //   2. Try known donors ("Wide Sidewalk", then "Crosswalk"). If one works, Stop immediately.
-        //   3. If both fail (patch day, names changed), reflection-scan PrefabSystem
-        //      to guess a best match. If fallback needed, then *also* log a Warn in Release to alert game change research needed.
+        //   3. If both fail (patch day, names changed), reflection-scan one time PrefabSystem
+        //      to guess a best match. Release Logs a Warn to alert game change research needed.
         public static bool TryResolveDonor(PrefabSystem prefabSystem, out PrefabBase? donorPrefab, out UIObject? donorUI)
         {
             donorPrefab = null;
@@ -301,7 +301,7 @@ namespace ARTZone.Systems
             // 1 - Locked donor candidates (exact IDs).
             var locked = new (string typeName, string name)[]
             {
-                ("FencePrefab", "Wide Sidewalk"),
+                ("FencePrefab", "Wide Sidewalk"), // chosen for nice position in palette
                 ("FencePrefab", "Crosswalk"),
             };
 
@@ -334,14 +334,16 @@ namespace ARTZone.Systems
 
                 Dbg($"[ART][Palette] Donor OK (locked): {name} group='{groupName}' priority={candidateUI.m_Priority}");
 
+                // This is the donor. Cache it and exit. No reflection scan.
                 s_DonorPrefab = candidate;
                 s_DonorUI = candidateUI;
                 donorPrefab = candidate;
                 donorUI = candidateUI;
-                return true; // we found a donor, stop here (no reflection)
+
+                return true; // Bail now, no reflection
             }
 
-            // 2 - Fallback: reflection scan.
+            // 2 - Fallback: reflection scan in case CO changes names on game updates
             // Log if it ends up here so users can report game patch breaks
             try
             {
@@ -391,7 +393,7 @@ namespace ARTZone.Systems
                 if (bestP != null && bestU != null)
                 {
                     // PATCH-DAY WARNING (this logs in release too)
-                    ARTZoneMod.s_Log.Warn("[ART][Palette] Fallback donor used via reflection. Likely a patch renamed RoadsServices tiles. Please report this!");
+                    ARTZoneMod.s_Log.Warn("[ART][Palette] ==== Fallback donor used via reflection. Likely a patch renamed RoadsServices tiles. we made it work but Please report this!");
 
                     s_DonorPrefab = bestP;
                     s_DonorUI = bestU;
@@ -407,7 +409,7 @@ namespace ARTZone.Systems
                 ARTZoneMod.s_Log.Error("[ART][Palette] Fallback donor scan failed: " + ex);
             }
 
-            // Nothing yet. PaletteBootstrapSystem will retry next frame, up to a cap, then give up and log.
+            // Nothing yet. PaletteBootstrapSystem will retry, then give up and log.
             return false;
         }
 

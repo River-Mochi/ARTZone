@@ -52,7 +52,7 @@ namespace ARTZone.Tools
             m_LogTick++;
             if (count != m_LastCount || (m_LogTick % 30) == 0)
             {
-                ARTZoneMod.s_Log.Info($"[ART][SyncBlock] blocks={count} removeOcc={ARTZoneMod.s_Settings?.RemoveOccupiedCells == true} removeZoned={ARTZoneMod.s_Settings?.RemoveZonedCells == true}");
+                ARTZoneMod.s_Log.Info($"[ART][SyncBlock] blocks={count} removeOcc={ARTZoneMod.Settings?.RemoveOccupiedCells == true} removeZoned={ARTZoneMod.Settings?.RemoveZonedCells == true}");
                 m_LastCount = count;
             }
 #endif
@@ -112,13 +112,13 @@ namespace ARTZone.Tools
                 else
                     return;
 
-                if (ARTZoneMod.s_Settings != null)
+                if (ARTZoneMod.Settings != null)
                 {
-                    if (ARTZoneMod.s_Settings.RemoveOccupiedCells &&
+                    if (ARTZoneMod.Settings.RemoveOccupiedCells &&
                         IsAnyCellOccupied(CellLookup[blockEntity], block, validArea))
                         return;
 
-                    if (ARTZoneMod.s_Settings.RemoveZonedCells &&
+                    if (ARTZoneMod.Settings.RemoveZonedCells &&
                         IsAnyCellZoned(CellLookup[blockEntity], block, validArea))
                         return;
                 }

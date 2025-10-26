@@ -3,8 +3,8 @@
 {
   "ARTZone.Zone_Controller.ToolName": "ART — 分区控制",
 
-  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "道路分区侧",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "两侧均分区。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "仅在左侧分区。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "仅在右侧分区。"
+  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "分区侧",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "两侧都分区。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "只在左侧分区。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "只在右侧分区。"
 }

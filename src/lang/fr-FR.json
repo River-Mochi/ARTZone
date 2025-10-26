@@ -1,0 +1,8 @@
+{
+  "ARTZone.Zone_Controller.ToolName": "ART—Contrôle de zonage",
+
+  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "Côté de zonage",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "Appliquer le zonage des deux côtés.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "Zonage uniquement côté gauche.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "Zonage uniquement côté droit."
+}

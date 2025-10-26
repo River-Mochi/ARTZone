@@ -37,11 +37,11 @@ namespace ARTZone
         // Rebindable action IDs exposed in Options UI
         public const string kToggleToolActionName = "ToggleZoneTool";   // Shift+Z
 
-        public static Setting? s_Settings
+        public static Setting? Settings
         {
             get; private set;
         }
-        public static ProxyAction? m_ToggleToolAction
+        public static ProxyAction? ToggleToolAction
         {
             get; private set;
         }
@@ -58,14 +58,20 @@ namespace ARTZone
 
             // Settings object first
             var settings = new Setting(this);
-            s_Settings = settings;
+            Settings = settings;
 
-            // --- Install locales BEFORE Options UI ---
+            // Register locales BEFORE register Options UI
             AddLocale("en-US", new LocaleEN(settings));
-            AddLocale("zh-HANS", new LocaleZH_CN(settings)); // Simplified Chinese
-            // Future locales: add files then uncomment
-            // AddLocale("fr-FR",   new LocaleFR(settings));
-            // AddLocale("es-ES",   new LocaleES(settings));
+            AddLocale("fr-FR", new LocaleFR(settings));
+            // AddLocale("de-DE", new LocaleDE(settings));
+            AddLocale("es-ES", new LocaleES(settings));
+            // AddLocale("it-IT", new LocaleIT(settings));
+            AddLocale("ja-JP", new LocaleJA(settings));
+            AddLocale("ko-KR", new LocaleKO(settings));
+            // AddLocale("pl-PL", new LocalePL(settings));
+            AddLocale("pt-BR", new LocalePT_BR(settings));
+            AddLocale("zh-HANS", new LocaleZH_CN(settings));    // Simplified Chinese
+            // AddLocale("zh-HANT", new LocaleZH_HANT(settings));
 
             // Load saved settings + register Options UI
             AssetDatabase.global.LoadSettings(ModID, settings, new Setting(this));
@@ -76,9 +82,9 @@ namespace ARTZone
             {
                 settings.RegisterKeyBindings();
 
-                m_ToggleToolAction = settings.GetAction(kToggleToolActionName);
-                if (m_ToggleToolAction != null)
-                    m_ToggleToolAction.shouldBeEnabled = true;
+                ToggleToolAction = settings.GetAction(kToggleToolActionName);
+                if (ToggleToolAction != null)
+                    ToggleToolAction.shouldBeEnabled = true;
             }
             catch (System.Exception ex)
             {
@@ -86,7 +92,7 @@ namespace ARTZone
             }
 
             // Systems
-            updateSystem.UpdateAt<PaletteBootStrapSystem>(SystemUpdatePhase.Modification4);
+            updateSystem.UpdateAt<PaletteBootstrapSystem>(SystemUpdatePhase.Modification4);
             updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
             updateSystem.UpdateAt<ToolHighlightSystem>(SystemUpdatePhase.ToolUpdate);
             updateSystem.UpdateAt<SyncCreatedRoadsSystem>(SystemUpdatePhase.Modification4);
@@ -121,17 +127,17 @@ namespace ARTZone
             if (lm != null)
                 lm.onActiveDictionaryChanged -= OnLocaleChanged;
 
-            if (m_ToggleToolAction != null)
+            if (ToggleToolAction != null)
             {
-                m_ToggleToolAction.shouldBeEnabled = false;
-                m_ToggleToolAction = null;
+                ToggleToolAction.shouldBeEnabled = false;
+                ToggleToolAction = null;
             }
 
-            s_Settings?.UnregisterInOptionsUI();
-            s_Settings = null;
+            Settings?.UnregisterInOptionsUI();
+            Settings = null;
         }
 
-        // ===== Locale helpers =====
+        // ---- Locale helpers -----------------------------------------
 
         private static void AddLocale(string id, IDictionarySource src)
         {
@@ -159,7 +165,7 @@ namespace ARTZone
             {
                 var id = GameManager.instance?.localizationManager?.activeLocaleId ?? "(unknown)";
                 s_Log.Info("[ART] Active locale = " + id);
-                s_Settings?.RegisterInOptionsUI();
+                Settings?.RegisterInOptionsUI();
             }
             finally
             {

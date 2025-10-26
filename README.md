@@ -1,31 +1,30 @@
 ﻿# ART-Zone
 
 - Edit zoning in Cities: Skylines II.
-- **New roads** can inherit your active zoning side/depth choice (so your preference carries forward while building).
-- **Existing roads**: editing is intuitive, fast hover previews of zoning grids, RMB toggles choices and previews, one-click LMB apply, and a vanilla-style tool section.
+- **New roads** inherit your active zoning side/depth choice (your preference applied while building).
+- **Existing roads**: editing is intuitive, hover any road, instantly preview what will zone. Flip sides with Right-click, confirm with one Left-click.
 
 ---
 
 ## What it does
-- **Zoning Side control** for any road: **Left**, **Right**, **Both**, or **None**.
-- **Instant RMB preview toggle:**
-  - If a side is selected (**Left** or **Right**), **Right-Click** flips **Left ↔ Right**.
-  - If **Both/None** is selected, **Right-Click** flips **Both ↔ None**.
-  - Works even when the road already matches the current state (you still get a flip/preview).
-- **One-click apply:** **Left-Click** commits the preview to the hovered/selected road(s).
-- **Vanilla-style UI:** small “Zoning Side” buttons appear in the small tool panel left of the roads tabs.
+- **Zoning control** on roads: **Left**, **Right**, **Both**, or **None**.
+- **Instant Right-click (RMB) preview flips:**
+  - Select a side (**Left** or **Right**), then **Right-Click** swaps **Left ↔ Right**.
+  - Select **Both or None**, then **Right-Click** swaps **Both ↔ None**.
+  - You always get a live preview, even if the road is already zoned (can still flip/preview).
+- **One-click apply:** Left-Click once to commit the preview of the hovered/selected road.
+- **Vanilla-style UI:** “Zoning Side” buttons appear in a small tool panel left of the roads tabs.
 
 ---
 
 ## How to use
-1. Open **Roads** → click the **ART-Zone** tool (four-squares icon). The **Zoning Side** mini-panel appears (Left / Right / Both / None).
-2. **Hover a road** to see the zoning preview for the current mode.
+1. Open **Roads** → click the **ART-Zone** tool (four-squares icon). **Zoning Side** mini-panel appears (Left / Right / Both / None).
+2. **Hover a road** to see a preview of zoning cells.
 3. **Right-Click** to cycle previews:
-   - **Left ↔ Right** when a side is selected.
-   - **Both ↔ None** when Both/None is selected.
-4. **Left-Click** once to **apply** your final choice.
-5. **Esc** closes the panels when you’re done (same as vanilla).
-6. **Optional:** **Shift+Z** can be used as a shortcut to open/close the tool panel (if bound on your setup). It’s not required—Esc and the panel close button also work.
+   - **Left ↔ Right** when any side icon is selected.
+   - **Both ↔ None** when Both or None is selected.
+4. **Left-Click** once to apply.
+5. **Optional:** **Shift+Z** shortcut to open the tool panel (not required).
 
 > Tip: Right-Click multiple times to preview different outcomes, then Left-Click once to commit.
 
@@ -33,14 +32,14 @@
 
 ## Compatibility
 - Safe to remove anytime.
-- This mod does not use Reflection or Harmony; safe/compatible, less likely to break with game updates.
-- Designed to be minimal and conflict-free (extends vanilla UI panels).
-- Uses the game’s input system; RMB sounds and selection feedback mirror vanilla behavior.
+- Does not use Harmony; safe/compatible (less likely to break with game updates).
+- Designed to be minimal and low-conflict (extends vanilla UI panel instead of replacing it)
+- Uses the game’s input system so that RMB sounds and selection feedback mirror vanilla behavior.
 
 ---
 
 ## Notes
-- If a preview doesn’t show, make sure you’re hovering a **road segment** that supports zoning cells.
+- Make sure you’re hovering a **road segment** that supports zoning cells (e.g., not a highway).
 
 ---
 
@@ -52,7 +51,7 @@
 
 ## Credits
 * RiverMochi - mod author
-* inspired by LuxStice's original Advanced Road Tools
+* Thanks to LuxStice sharing the original Advanced Road Tools (obsolete)
 * StarQ for technical support.
 * yenyang for technical support.
 * and the CS2 modding community for pointers and testing.
@@ -67,4 +66,5 @@
 ## Links
 - 📘 [CS2 Zoning Wiki](https://cs2.paradoxwikis.com/Zoning)
 - 🧩 [Paradox Mods](tbd)
+- 💬 [Paradox Forums](https://forum.paradoxplaza.com/forum/threads/art-zone.1864484/)
 - 💻 [GitHub](https://github.com/River-Mochi/ARTZone)

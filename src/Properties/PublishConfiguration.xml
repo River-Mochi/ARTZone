@@ -4,58 +4,91 @@
 	<!--Name of the mod to display to players-->
 	<DisplayName Value="ART-Zone" />
 	<!--Short description of the mod-->
-	<ShortDescription Value="Zone controller that allows custom changes to zoning any side of a road. Affects which way buildings grow." />
+	<ShortDescription Value="Live Zoning Control for roads: allows custom changes to zoning any side of a road; Affects the direction buildings face." />
 	<!--Long description of the mod. Single line or multi line. Supports minimal markdown subset-->
 	<!--LongDescription Value="This is a long description" /-->
 	<LongDescription>
 # ART-Zone
----
-ART is a mod that provides tools to control roads and the behaviour of zoning grid cells.
+		
+Custom zoning for new and existing roads.
 
 ## Features
-Control zoning on roads, with a previewable tool where you can just hover the road and see what you'll get! Right-Click inverts the current zoning configuration
+Control zoning on roads
+- Preview tool: just hover the road to see what you get instantly!
+- Easy and Intuitive: Right-click flips the current zoning preview, Left click confirms.
+- Adds a small “Zoning Side” panel next to the Road tabs and looks/acts like vanilla.
+- New Roads, old Roads - no problem! - remembers your last selection of Both/none/left/right.
+- Options to lock/protect existing buildings and already zoned grids from changing.
+- Three ways to start zoning:
+  - Top left icon (4 square symbol)
+  - Roads Services tab (4 square symbol)
+  - Optional Shift+z keybind
+
+### Multi-Language UI (7)
+* English, Français French, Español Spanish
+* 日本語 Japanese, 한국어 Korean, 简体中文 Simplified Chinese
+* Português Brazilian
 
 
----
-### Supports languages
-* English, Français (French), Español (Spanish)
-* 日本語 (Japanese), 한국어 (Korean), 简体中文 (Simplified Chinese), 繁體中文 (Traditional Chinese)
-* Português (Brasil) (Brazilian Portuguese)
-* Future updates to add more languages.
+## How to use
+1. Open **Roads** → click the **ART-Zone** tool (4-squares icon).
+2. **Zoning Side** mini-panel appears (Left / Right / Both / None).
+3. **Hover a road** to see a preview of zoning cells.
+4. **Right-Click** to cycle previews:
+- **Left ↔ Right** when any side icon is selected.
+- **Both ↔ None** when Both or None is selected.
+5. **Left-Click** once to apply.
+6. **Optional:** **Shift+Z** shortcut to open the tool panel (not required).
 
+Tip: You can Right-Click multiple times to preview different outcomes, then Left-Click once to commit.
+
+## Compatibility
+- Safe to remove any time.
+- This mod not use Harmony; safe/compatible (reduces possibility of breaking with every game update).
+- Mod back-end design for robust, minimal, and low-conflict. Front-end for safe/intuitive UX (extends vanilla UI instead of replacing it).
+- Uses the game’s input system; sounds and selection feedback designed to feel vanilla.
+
+### Support
+* If the mod helps you, give it a Like and let your friends know about it :)
+* Feedback at Cities: Skylines Modding Discord: https://discord.gg/HTav7ARPs2
+
+## Roadmap
+- Planned: more languages
+- Planned: contour/topography toggle in the same mini-panel for terrain-aware zoning.
 
 ## Credits
 * RiverMochi - mod author
-* inspired by LuxStice's original Advanced Road Tools
-* StarQ for technical support.
-* yenyang for technical support.
+* Thanks to LuxStice for the original Advanced Road Tools (obsolete)
+* yenyang for technical help.
+* StarQ for technical help.
+* Necko1996 for testing
 * and the CS2 modding community for pointers and testing.
 
-</LongDescription>
+
+(Zoning, zone, cell, grid, road tool, utility, building direction, layout)
+
+	</LongDescription>
 <!--Thumbnail-->
 	<Thumbnail Value="Properties/Thumbnail.png" />
 	<!--Screenshot, can be set multiple times-->
 	<Screenshot Value="Properties/screenshot-01.jpg" />
-	<Screenshot Value="Properties/screenshot-02.jpg" />
+	<Screenshot Value="" />
 	<!--Tag, can be set multiple times-->
 	<Tag Value="Code Mod" />
 	<!--Link to the forum post where the mod can be discussed-->
-	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/advanced-road-tools.1728786/" />
+	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/art-zone.1864484/" />
 	<!--Version of the mod-->
-	<ModVersion Value="1.0.4.1" />
+	<ModVersion Value="1.0.0" />
 	<!--Recommended version of the base game to use the mod-->
-	<GameVersion Value="1.2.*" />
+	<GameVersion Value="1.3.*" />
 	<!--Dependency for the mod, can be set multiple times-->
 	<Dependency Id="" />
+	<!--Required DLC, can be set multiple times. Supported values are "Landmark Buildings", "San Fransisco Set", "Beach Properties", "Urban Promenades", "Modern Architecture"-->
+	<RequiredDLC Value="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
-<!--	<ChangeLog Value="Created roads are now affected by the zoning configuration" />-->
-<ChangeLog>
-### Translations
-
-### Fixes
-- Implemented my own localization system to avoid l18n dependency
-</ChangeLog>
+<ChangeLog> </ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
-	<ExternalLink Type="github" Url="https://github.com/River-Mochi/ART-Zone" />
-	<ExternalLink Type="discord" Url="https://discord.gg/HTav7ARPs2" />
+<ExternalLink Type="discord" Url="https://discord.gg/HTav7ARPs2" />
+<ExternalLink Type="github" Url="https://github.com/River-Mochi/ART-Zone" />
+
 </Publish>

@@ -7,58 +7,64 @@
 
 namespace ARTZone.Systems
 {
-    using Colossal.Serialization.Entities; // Purpose
-    using Game;                            // GameMode, GameSystemBase
-    using Game.Prefabs;                    // PrefabSystem
+    using Colossal.Serialization.Entities; // Purpose, GameMode
+    using Game;
+    using Game.Prefabs;
     using Unity.Entities;
 
-
-    public sealed partial class PaletteBootStrapSystem : GameSystemBase
+    public sealed partial class PaletteBootstrapSystem : GameSystemBase
     {
+        // --- RETRY TUNING ----------------------------------------------------
+        private const int kMaxTries = 2000;    // Poll up to kMaxTries frames looking for a donor tile.
+        private const int kLogEvery = 50;      // Log every kLogEvery tries in DEBUG.
+
+        // --- State -----------------------------------------------------------
         private PrefabSystem m_Prefabs = null!;
         private bool m_Armed;
         private bool m_Done;
         private int m_Tries;
 
-        private const int kMaxTries = 2000;
-        private const int kLogEvery = 50;
-
 #if DEBUG
-        private static void dbg(string m)
+        private static void Dbg(string msg)
         {
             var log = ARTZoneMod.s_Log;
             if (log != null)
             {
                 try
                 {
-                    log.Info("[ART][Bootstrap] " + m);
+                    log.Info("[ART][Bootstrap] " + msg);
                 }
-                catch { /* swallow */ }
+                catch { }
             }
         }
 #else
-        private static void dbg(string m) { }
+        private static void Dbg(string msg) { }
 #endif
 
         protected override void OnCreate()
         {
             base.OnCreate();
-            m_Prefabs = World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<PrefabSystem>();
+
+            m_Prefabs = World.DefaultGameObjectInjectionWorld
+                .GetOrCreateSystemManaged<PrefabSystem>();
+
             m_Armed = false;
             m_Done = false;
             m_Tries = 0;
 
-            // Stay idle until a real game load finishes.
+            // Stay off until we're actually in a playable map.
             Enabled = false;
         }
 
+        // Called by the engine when a game/save finishes loading.
         protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
         {
             base.OnGameLoadingComplete(purpose, mode);
 
-            // Only arm when actually entering a playable game world.
-            bool realGame = mode == GameMode.Game &&
-                            (purpose == Purpose.LoadGame || purpose == Purpose.NewGame);
+            // Only arm when entering an actual playable city, not main menu, editor, etc.
+            bool realGame =
+                mode == GameMode.Game &&
+                (purpose == Purpose.LoadGame || purpose == Purpose.NewGame);
 
             if (!realGame)
             {
@@ -67,54 +73,64 @@ namespace ARTZone.Systems
                 m_Tries = 0;
                 Enabled = false;
 #if DEBUG
-                dbg($"GameLoadingComplete(mode={mode}, purpose={purpose}) → not gameplay; staying disarmed.");
+                Dbg($"OnGameLoadingComplete(mode={mode}, purpose={purpose}) → not gameplay; staying disarmed.");
 #endif
                 return;
             }
 
+            // Arm and start polling each frame.
             m_Armed = true;
             m_Done = false;
             m_Tries = 0;
             Enabled = true;
 
 #if DEBUG
-            dbg("GameLoadingComplete → armed; will begin polling for RoadsServices anchors…");
+            Dbg("OnGameLoadingComplete → armed; will begin polling for RoadsServices donor …");
 #endif
         }
+
         protected override void OnUpdate()
         {
+            // If we're not armed, or already done, or missing PrefabSystem, nothing to do.
             if (!m_Armed || m_Done || m_Prefabs == null)
                 return;
 
-            // Probe for a donor tile (Wide Sidewalk / Crosswalk) already in group RoadsServices
-            if (PaletteBuilder.TryResolveAnchor(m_Prefabs, out PrefabBase? donor, out UIObject? donorUI))
+            // First: can we resolve a donor?
+            if (PaletteBuilder.TryResolveDonor(m_Prefabs, out PrefabBase? donor, out UIObject? donorUI))
             {
 #if DEBUG
-                // Guard all accesses to prevent analyzer spam
                 if (donorUI != null)
                 {
-                    string groupName = donorUI.m_Group != null ? donorUI.m_Group.name : "(null)";
-                    dbg($"Donor found: '{(donor != null ? donor.name : "(null)")}' Group='{groupName}' Priority={donorUI.m_Priority}");
+                    string groupName = (donorUI.m_Group != null)
+                        ? donorUI.m_Group.name
+                        : "(null)";
+
+                    Dbg($"Donor found: '{(donor != null ? donor.name : "(null)")}' group='{groupName}' priority={donorUI.m_Priority}");
                 }
 #endif
-                PaletteBuilder.InstantiateTools(logIfNoAnchor: true);
+                // We have a donor, now build tiles.
+                PaletteBuilder.InstantiateTools(logIfNoDonor: true);
+
+                // We're done bootstrapping. Turn this system off.
                 m_Done = true;
-                Enabled = false; // no more per-frame updates needed
+                Enabled = false;
                 return;
             }
 
+            // Still waiting for donor.
             m_Tries++;
+
 #if DEBUG
             if ((m_Tries % kLogEvery) == 0)
-                dbg($"Still waiting for RoadsServices anchors… tries={m_Tries}");
+                Dbg($"Still waiting for RoadsServices donor… tries={m_Tries}");
 #endif
 
             if (m_Tries >= kMaxTries)
             {
-                ARTZoneMod.s_Log.Error("[ART][Bootstrap] Giving up; RoadsServices donors never appeared.");
+                ARTZoneMod.s_Log.Error("[ART][Bootstrap] Giving up; RoadsServices donor never appeared.");
                 m_Armed = false;
+                Enabled = false;
             }
         }
-
     }
 }

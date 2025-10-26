@@ -26,43 +26,43 @@ namespace ARTZone.Settings
                 { s_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "关于" },
 
                 // Groups
-                { s_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "分区控制器选项" },
-                { s_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "按键绑定" },
+                { s_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "分区选项" },
+                { s_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "快捷键" },
                 { s_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { s_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
                 // Toggles
-                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "防止已分区网格被移除" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "在预览/应用时不覆盖已分区网格。" },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "不要删除已分区的网格" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "在预览/应用时不要覆盖已经分区的网格。\n <建议启用>" },
 
-                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "防止已占用网格被移除" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "在预览/应用时不覆盖已占用网格。" },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "不要删除已占用的网格" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "在预览/应用时不要覆盖已经被建筑等占用的网格。\n <建议启用>" },
 
-                // Keybind (only one visible)
-                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "切换分区控制面板" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "显示/隐藏 ART 分区控制面板（默认 Shift+Z）。" },
+                // Keybind
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "切换面板 显示/隐藏" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "显示或隐藏 ART-Zone 面板按钮（默认 Shift+Z）。" },
 
-                // Binding title in the keybinding dialog
-                { s_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "切换分区控制面板" },
+                // Binding title
+                { s_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "切换 ART-Zone 面板" },
 
-                // Palette (Road Services tile)
-                { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "分区控制器" },
+                // Palette text
+                { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "分区更改工具" },
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                  "更改分区：两侧、左侧、右侧或无。右键可反转选择。" },
+                  "修改道路的分区：双侧、左侧、右侧或无。右键切换选择，左键确认。" },
 
-                // About tab labels
+                // About tab
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "模组名称" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "此模组的显示名称。" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "该模组在游戏中显示的名称。" },
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "版本" },
                 { s_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "当前模组版本。" },
 #if DEBUG
-                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.InformationalVersionText)), "信息版本" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.InformationalVersionText)),  "版本 + 构建信息" },
+                { s_Settings.GetOptionLabelLocaleID(nameof(Setting.InformationalVersionText)), "详细版本" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.InformationalVersionText)),  "版本号 + 构建信息" },
 #endif
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenMods)),    "Paradox Mods" },
                 { s_Settings.GetOptionDescLocaleID(nameof(Setting.OpenMods)),     "打开 Paradox Mods 页面。" },
                 { s_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
-                { s_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "加入模组 Discord。" },
+                { s_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "加入模组的 Discord 服务器。" },
             };
             return d;
         }

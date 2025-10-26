@@ -1,0 +1,8 @@
+{
+  "ARTZone.Zone_Controller.ToolName": "ART — 区画コントロール",
+
+  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "区画サイド",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "両側に区画を設定します。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "左側だけ区画を設定します。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "右側だけ区画を設定します."
+}

@@ -1,0 +1,10 @@
+// lang/pt-BR.json
+// strings read by TSX via useLocalization() ToolOptions only.
+{
+  "ARTZone.Zone_Controller.ToolName": "ART—Controle de Zona",
+
+  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "Lado de Zoneamento",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "Zonar os dois lados.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "Zonar apenas o lado esquerdo.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "Zonar apenas o lado direito."
+}

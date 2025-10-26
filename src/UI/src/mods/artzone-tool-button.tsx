@@ -16,7 +16,7 @@ function onClickTopLeft() {
 
 export default function ARTZoneToolButton(): JSX.Element {
     const { translate } = useLocalization();
-    const tooltip = translate("ARTZone.Zone_Controller.ToolName", "ART");
+    const tooltip = translate("ARTZone.Zone_Controller.ToolName", "ART-Zone");
     return (
         <Button
             variant="floating"
