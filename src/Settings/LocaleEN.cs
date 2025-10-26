@@ -33,10 +33,12 @@ namespace ARTZone.Settings
 
                 // Toggles
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being removed" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Do not override already zoned cells during preview/apply.\n <Enabled recommended.>" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Do not change already zoned cells during preview/apply.\n" +
+                "<Enabled recommended.>" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Do not override already occupied cells during preview/apply (e.g Buildings).\n <Enabled recommended>" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Do not change already occupied cells during preview/apply (e.g. buildings).\n" +
+                "<Enabled recommended>." },
 
                 // Keybind (only one visible)
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Toggle Panel" },
@@ -48,7 +50,8 @@ namespace ARTZone.Settings
                 // Palette (Road Services tile)
                 { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Zone Changer" },
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                  "Change zoning on roads: both sides, left, right, or none. Right click flips the choice. Left click confirms." },
+                  "Change zoning on roads: both sides, left, right, or none.\n" +
+                  "Right-click flips the choice. Left-click confirms." },
 
                 // About tab labels
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Mod name" },

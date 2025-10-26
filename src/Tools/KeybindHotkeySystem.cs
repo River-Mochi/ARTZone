@@ -34,7 +34,9 @@ namespace ARTZone.Tools
             }
         }
 #else
-        private static void Dbg(string message) { }
+        private static void Dbg(string message)
+        {
+        }
 #endif
 
         /// <summary>
@@ -88,6 +90,6 @@ namespace ARTZone.Tools
 
         // DEBUG hook. In Release builds this method is removed at compile time
         // because partial void with no implementation disappears.
-        private partial void DebugInit();
+        partial void DebugInit();
     }
 }

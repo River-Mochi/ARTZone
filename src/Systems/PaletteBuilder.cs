@@ -40,7 +40,7 @@ namespace ARTZone.Systems
         // --- EASY KNOB --------------------------------------------------------
         // How far after the donor we insert our clone in the RoadsServices group.
         // 1 = right after donor. 0 = same slot (don't do that).
-        private const int kTilePriorityOffset = 1;
+        private const int TilePriorityOffset = 1;
 
         // --- REGISTRATION STATE ----------------------------------------------
         // All registered ARTZone tools. One ToolDefinition = one palette tile.
@@ -185,7 +185,7 @@ namespace ARTZone.Systems
                     cloneUI.m_Group = donorUI.m_Group;  // "RoadsServices"
                     cloneUI.active = donorUI.active;
                     // Priority: donor priority + offset; place custom icon to right of the donor tile
-                    cloneUI.m_Priority = donorUI.m_Priority + kTilePriorityOffset;
+                    cloneUI.m_Priority = donorUI.m_Priority + TilePriorityOffset;
 
                     clonePrefab.AddComponentFrom(cloneUI);
 

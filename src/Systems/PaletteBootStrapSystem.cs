@@ -15,8 +15,8 @@ namespace ARTZone.Systems
     public sealed partial class PaletteBootstrapSystem : GameSystemBase
     {
         // --- RETRY TUNING ----------------------------------------------------
-        private const int kMaxTries = 2000;    // Poll up to kMaxTries frames looking for a donor tile.
-        private const int kLogEvery = 50;      // Log every kLogEvery tries in DEBUG.
+        private const int MaxTries = 2000;    // Poll up to kMaxTries frames looking for a donor tile.
+        private const int LogEvery = 50;      // Log every kLogEvery tries in DEBUG.
 
         // --- State -----------------------------------------------------------
         private PrefabSystem m_Prefabs = null!;
@@ -121,11 +121,11 @@ namespace ARTZone.Systems
             m_Tries++;
 
 #if DEBUG
-            if ((m_Tries % kLogEvery) == 0)
+            if ((m_Tries % LogEvery) == 0)
                 Dbg($"Still waiting for RoadsServices donor… tries={m_Tries}");
 #endif
 
-            if (m_Tries >= kMaxTries)
+            if (m_Tries >= MaxTries)
             {
                 ARTZoneMod.s_Log.Error("[ART][Bootstrap] Giving up; RoadsServices donor never appeared.");
                 m_Armed = false;
