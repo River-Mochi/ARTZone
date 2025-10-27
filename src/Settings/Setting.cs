@@ -63,11 +63,11 @@ namespace ARTZone.Settings
         public string NameText => "ART — Zone";
 
         [SettingsUISection(kAboutTab, kAboutInfoGroup)]
-        public string VersionText => ARTZoneMod.VersionShort;
-
+        public string VersionText =>
 #if DEBUG
-        [SettingsUISection(kAboutTab, kAboutInfoGroup)]
-        public string VersionText => ARTZoneMod.VersionShort;
+    ARTZoneMod.VersionShort + " (DEBUG)";
+#else
+    ARTZoneMod.VersionShort;
 #endif
 
         private const string UrlMods = "TBD";

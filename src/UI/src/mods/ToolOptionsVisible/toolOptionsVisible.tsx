@@ -1,23 +1,19 @@
-﻿// src/UI/mods/ToolOptionsVisible/toolOptionsVisible.tsx
-// DO NOT CHANGE the TOOL_ID below.
-// It MUST match C# ZoningControllerToolSystem.ToolID ("ARTZone.ZoningToolID")
-// or the small Tool Options panel won't stay visible for our tool.
+﻿// File: src/UI/src/mods/ToolOptionsVisible/toolOptionsVisible.tsx
+// Purpose: Keep the small Tool Options panel visible while our tool is active.
+// NOTE: Compares against shared ZONING_TOOL_ID only.
 
 import { ModuleRegistryExtend } from "cs2/modding";
 import { tool } from "cs2/bindings";
-
-// DO NOT CHANGE – must equal C# ZoningControllerToolSystem.ToolID
 import { ZONING_TOOL_ID } from "../../shared/tool-ids";
 
 export const ToolOptionsVisibility: ModuleRegistryExtend = (useToolOptionsVisible: any) => {
     return (...args: any[]) => {
         const vanillaVisible = useToolOptionsVisible?.(...args);
         const activeId = tool.activeTool$.value?.id;
-        const ours = activeId === TOOL_ID;
+        const ours = activeId === ZONING_TOOL_ID;
 
-        // Light breadcrumb (UI.log). Harmless in production.
         try { console.log(`[ART][UI] useToolOptionsVisible: activeId=${activeId} ours=${ours} vanilla=${!!vanillaVisible}`); } catch { }
 
-        return vanillaVisible || activeId === ZONING_TOOL_ID;
+        return vanillaVisible || ours;
     };
 };

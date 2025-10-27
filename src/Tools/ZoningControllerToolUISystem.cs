@@ -1,9 +1,9 @@
 // File: src/Tools/ZoningControllerToolUISystem.cs
 // Purpose:
-//  • Expose bindings the UI reads/writes (ToolZoningMode, RoadZoningMode, IsRoadPrefab).
-//  • Handle triggers (Change/Flip/Toggle).
-//  • NRE guards and DEBUG logs in all event handlers.
-//  • Public helpers SetToolZoningMode(...), FlipToolBothOrNone(), InvertZoningSideOnly().
+//  • Expose UI bindings the React UI reads/writes (ToolZoningMode, RoadZoningMode, IsRoadPrefab).
+//  • Handle triggers (Change/Flip/Toggle) with robust null guards.
+//  • Always show the “Zoning Side” section when our tool is active (Top-left button or Shift+Z).
+//  • Extra DEBUG logs for every mode change (source=Road vs Tool; value=Both/Left/Right/None).
 
 namespace ARTZone.Tools
 {
@@ -15,16 +15,17 @@ namespace ARTZone.Tools
 
     public partial class ZoningControllerToolUISystem : UISystemBase
     {
-        // ----  UI Bindings ----------------------------------------------------
+        // ---- UI Bindings ----------------------------------------------------
         private ValueBinding<int> m_ToolZoningMode = null!;
         private ValueBinding<int> m_RoadZoningMode = null!;
-        private ValueBinding<bool> m_IsRoadPrefab = null!; // treated as "ShouldShowPanel"
+        // NOTE: treated as "ShouldShowPanel"
+        private ValueBinding<bool> m_IsRoadPrefab = null!;
 
-        // ----  Tool Access ----------------------------------------------------
+        // ---- Tool Access ----------------------------------------------------
         private ToolSystem m_MainToolSystem = null!;
         private ZoningControllerToolSystem m_ToolSystem = null!;
 
-        // ----  Public Helpers -------------------------------------------------
+        // ---- Public Helpers -------------------------------------------------
         public ZoningMode ToolZoningMode => (ZoningMode)m_ToolZoningMode.value;
         public ZoningMode RoadZoningMode => (ZoningMode)m_RoadZoningMode.value;
 
@@ -61,7 +62,7 @@ namespace ARTZone.Tools
             }
         }
 
-        // ----  Debug ----------------------------------------------------------
+        // ---- Debug ----------------------------------------------------------
 #if DEBUG
         private static void Dbg(string msg)
         {
@@ -74,11 +75,16 @@ namespace ARTZone.Tools
             }
             catch { }
         }
+        private static string ModeToStr(ZoningMode z) =>
+            z == ZoningMode.Both ? "Both" :
+            z == ZoningMode.Left ? "Left" :
+            z == ZoningMode.Right ? "Right" :
+            "None";
 #else
         private static void Dbg(string msg) { }
 #endif
 
-        // ----  Lifecycle: OnCreate -------------------------------------------
+        // ---- Lifecycle: OnCreate -------------------------------------------
         protected override void OnCreate()
         {
             base.OnCreate();
@@ -86,7 +92,7 @@ namespace ARTZone.Tools
             // Bindings (IDs must match TS)
             AddBinding(m_ToolZoningMode = new ValueBinding<int>(ARTZoneMod.ModID, "ToolZoningMode", (int)ZoningMode.Both));
             AddBinding(m_RoadZoningMode = new ValueBinding<int>(ARTZoneMod.ModID, "RoadZoningMode", (int)ZoningMode.Both));
-            AddBinding(m_IsRoadPrefab = new ValueBinding<bool>(ARTZoneMod.ModID, "IsRoadPrefab", false));
+            AddBinding(m_IsRoadPrefab = new ValueBinding<bool>(ARTZoneMod.ModID, "IsRoadPrefab", false)); // actually "ShouldShowPanel"
 
             // Triggers (from TS)
             AddBinding(new TriggerBinding<int>(ARTZoneMod.ModID, "ChangeRoadZoningMode", ChangeRoadZoningMode));
@@ -95,7 +101,7 @@ namespace ARTZone.Tools
             AddBinding(new TriggerBinding(ARTZoneMod.ModID, "FlipRoadBothMode", FlipRoadBothMode));
             AddBinding(new TriggerBinding(ARTZoneMod.ModID, "ToggleZoneControllerTool", ToggleTool));
 
-            // Observe vanilla tool/prefab to decide when to show the UI section (robust, null-safe)
+            // Observe vanilla tool/prefab
             try
             {
                 m_MainToolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
@@ -109,43 +115,42 @@ namespace ARTZone.Tools
             }
             catch { /* defensive */ }
 
-            // Our tool instance (may be null if creation failed; we guard later)
+            // Our tool (may be null if creation failed)
             try
             {
                 m_ToolSystem = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
             }
-            catch { /* guard in ToggleTool() anyway */ }
+            catch { /* guarded in ToggleTool() */ }
 
             // Initialize visibility once, based on current tool/prefab
             try
             {
-                ToolBaseSystem? activeTool = null;
-                PrefabBase? activePrefab = null;
-
+                ToolBaseSystem activeTool = null!;
+                PrefabBase activePrefab = null!;
                 if (m_MainToolSystem != null)
                 {
                     activeTool = m_MainToolSystem.activeTool;
                     try
                     {
-                        activePrefab = activeTool != null ? activeTool.GetPrefab() : null;
+                        activePrefab = activeTool != null ? activeTool.GetPrefab() : null!;
                     }
-                    catch { activePrefab = null; }
+                    catch { activePrefab = null!; }
                 }
 
-                var show = ShouldShowFor(activeTool, activePrefab);
+                bool show = ShouldShowFor(activeTool, activePrefab);
                 m_IsRoadPrefab.Update(show);
 #if DEBUG
                 Dbg($"Init visibility → show={show}, tool={(activeTool != null ? activeTool.GetType().Name : "(null)")}, prefab={(activePrefab != null ? activePrefab.name : "(null)")}");
 #endif
             }
-            catch { /* keep default false */ }
+            catch { }
 
 #if DEBUG
             Dbg("UISystem created and bindings registered.");
 #endif
         }
 
-        // ----  Lifecycle: OnDestroy ------------------------------------------
+        // ---- Lifecycle: OnDestroy ------------------------------------------
         protected override void OnDestroy()
         {
             try
@@ -160,30 +165,29 @@ namespace ARTZone.Tools
             base.OnDestroy();
         }
 
-        // ----  Lifecycle: OnUpdate -------------------------------------------
+        // ---- Lifecycle: OnUpdate -------------------------------------------
         protected override void OnUpdate()
         {
             // UI bindings only; hotkey toggle is handled elsewhere.
             base.OnUpdate();
         }
 
-        // ----  Event Handlers -------------------------------------------------
+        // ---- Event Handlers -------------------------------------------------
         private void OnToolChanged(ToolBaseSystem tool)
         {
             try
             {
-                // tool may or may not be our tool; prefab may be null
-                PrefabBase? prefab = null;
+                PrefabBase prefab = null!;
                 try
                 {
-                    prefab = tool != null ? tool.GetPrefab() : null;
+                    prefab = tool != null ? tool.GetPrefab() : null!;
                 }
-                catch { prefab = null; }
+                catch { prefab = null!; }
 
                 bool show = ShouldShowFor(tool, prefab);
                 m_IsRoadPrefab.Update(show);
 #if DEBUG
-                Dbg($"OnToolChanged: show={show} activeTool={(tool != null ? tool.GetType().Name : "(null)")}, prefab={(prefab != null ? prefab.name : "(null)")}");
+                Dbg($"OnToolChanged: show={show} activeTool={(tool != null ? tool.GetType().Name : "(null)")} prefab={(prefab != null ? prefab.name : "(null)")}");
 #endif
             }
             catch { }
@@ -193,24 +197,23 @@ namespace ARTZone.Tools
         {
             try
             {
-                // Re-evaluate against current tool to keep logic consistent
-                ToolBaseSystem? tool = null;
+                ToolBaseSystem tool = null!;
                 try
                 {
-                    tool = (m_MainToolSystem != null) ? m_MainToolSystem.activeTool : null;
+                    tool = (m_MainToolSystem != null) ? m_MainToolSystem.activeTool : null!;
                 }
-                catch { tool = null; }
+                catch { tool = null!; }
 
                 bool show = ShouldShowFor(tool, prefab);
                 m_IsRoadPrefab.Update(show);
 #if DEBUG
-                Dbg($"OnPrefabChanged: show={show} prefab={(prefab != null ? prefab.name : "(null)")}, tool={(tool != null ? tool.GetType().Name : "(null)")}");
+                Dbg($"OnPrefabChanged: show={show} prefab={(prefab != null ? prefab.name : "(null)")} tool={(tool != null ? tool.GetType().Name : "(null)")}");
 #endif
             }
             catch { }
         }
 
-        // ----  Triggers from TS -----------------------------------------------------
+        // ---- Triggers from TS ----------------------------------------------
         private void ToggleTool()
         {
             try
@@ -220,8 +223,13 @@ namespace ARTZone.Tools
 
                 bool enable = m_MainToolSystem.activeTool != m_ToolSystem;
                 m_ToolSystem.SetToolEnabled(enable);
+
+                // When enabling our tool via Top-left or Shift+Z, force the section visible.
+                if (enable)
+                    m_IsRoadPrefab.Update(true);
+
 #if DEBUG
-                Dbg($"ToggleTool → enable={enable} active={(m_MainToolSystem?.activeTool != null ? m_MainToolSystem.activeTool.GetType().Name : "(null)")} ");
+                Dbg($"ToggleTool → enable={enable}");
 #endif
             }
             catch { }
@@ -231,9 +239,10 @@ namespace ARTZone.Tools
         {
             try
             {
-                m_ToolZoningMode.Update(ToolZoningMode == ZoningMode.Both ? (int)ZoningMode.None : (int)ZoningMode.Both);
+                var next = (ToolZoningMode == ZoningMode.Both) ? ZoningMode.None : ZoningMode.Both;
+                m_ToolZoningMode.Update((int)next);
 #if DEBUG
-                Dbg($"FlipToolBothMode → now={(ZoningMode)m_ToolZoningMode.value}");
+                Dbg($"FlipToolBothMode → Tool={ModeToStr(next)}");
 #endif
             }
             catch { }
@@ -243,9 +252,10 @@ namespace ARTZone.Tools
         {
             try
             {
-                m_RoadZoningMode.Update(RoadZoningMode == ZoningMode.Both ? (int)ZoningMode.None : (int)ZoningMode.Both);
+                var next = (RoadZoningMode == ZoningMode.Both) ? ZoningMode.None : ZoningMode.Both;
+                m_RoadZoningMode.Update((int)next);
 #if DEBUG
-                Dbg($"FlipRoadBothMode → now={(ZoningMode)m_RoadZoningMode.value}");
+                Dbg($"FlipRoadBothMode → Road={ModeToStr(next)}");
 #endif
             }
             catch { }
@@ -257,7 +267,7 @@ namespace ARTZone.Tools
             {
                 m_ToolZoningMode.Update(value);
 #if DEBUG
-                Dbg($"ChangeToolZoningMode({(ZoningMode)value}) → now={(ZoningMode)m_ToolZoningMode.value}");
+                Dbg($"ChangeToolZoningMode → Tool={ModeToStr((ZoningMode)value)}");
 #endif
             }
             catch { }
@@ -269,20 +279,20 @@ namespace ARTZone.Tools
             {
                 m_RoadZoningMode.Update(value);
 #if DEBUG
-                Dbg($"ChangeRoadZoningMode({(ZoningMode)value}) → now={(ZoningMode)m_RoadZoningMode.value}");
+                Dbg($"ChangeRoadZoningMode → Road={ModeToStr((ZoningMode)value)}");
 #endif
             }
             catch { }
         }
 
-        // ----  Public Helpers for the Tool -----------------------------------------
+        // ---- Public Helpers for the Tool -----------------------------------
         public void SetToolZoningMode(ZoningMode mode)
         {
             try
             {
                 m_ToolZoningMode.Update((int)mode);
 #if DEBUG
-                Dbg($"SetToolZoningMode({mode}) → now={(ZoningMode)m_ToolZoningMode.value}");
+                Dbg($"SetToolZoningMode → Tool={ModeToStr(mode)}");
 #endif
             }
             catch { }
@@ -296,14 +306,14 @@ namespace ARTZone.Tools
                            ToolZoningMode == ZoningMode.None ? ZoningMode.Both : ToolZoningMode;
                 m_ToolZoningMode.Update((int)next);
 #if DEBUG
-                Dbg($"FlipToolBothOrNone → {next} (now={(ZoningMode)m_ToolZoningMode.value})");
+                Dbg($"FlipToolBothOrNone → Tool={ModeToStr(next)}");
 #endif
             }
             catch { }
         }
 
         /// <summary>
-        /// Toggle Left <-> Right. If called while mode is Both/None, set Left (seed the side-only toggle).
+        /// Toggle Left <-> Right. If mode is Both/None, set Left to seed side-only toggle.
         /// </summary>
         public void InvertZoningSideOnly()
         {
@@ -314,9 +324,10 @@ namespace ARTZone.Tools
                     mode == ZoningMode.Left ? ZoningMode.Right :
                     mode == ZoningMode.Right ? ZoningMode.Left :
                     ZoningMode.Left;
+
                 m_ToolZoningMode.Update((int)next);
 #if DEBUG
-                Dbg($"InvertZoningSideOnly → {next} (now={(ZoningMode)m_ToolZoningMode.value})");
+                Dbg($"InvertZoningSideOnly → Tool={ModeToStr(next)}");
 #endif
             }
             catch { }
@@ -327,42 +338,29 @@ namespace ARTZone.Tools
         {
             try
             {
-#if DEBUG
-                Dbg($"RmbPreviewToggle (pre) ToolZoningMode={ToolZoningMode}");
-#endif
                 if (ToolZoningMode == ZoningMode.Left || ToolZoningMode == ZoningMode.Right)
                     InvertZoningSideOnly();      // strict Left↔Right
                 else
                     FlipToolBothOrNone();        // strict Both↔None
-#if DEBUG
-                Dbg($"RmbPreviewToggle (post) ToolZoningMode={ToolZoningMode}");
-#endif
             }
             catch { }
         }
 
-        // ----  Visibility Logic (Null-Safe) ----------------------------------
+        // ---- Visibility Logic ----------------------------------
         // Show our section if:
-        //  • our tool is the active tool, OR
-        //  • the active prefab is a RoadPrefab (vanilla road-building UI context).
-        private static bool ShouldShowFor(ToolBaseSystem? tool, PrefabBase? prefab)
+        //  • our tool is active (Top-left button or Shift+Z), OR
+        //  • active prefab is a RoadPrefab (vanilla road-building)
+        private static bool ShouldShowFor(ToolBaseSystem? tool, PrefabBase? prefab) // null-safe
         {
             try
             {
                 if (tool is ZoningControllerToolSystem)
                     return true;
-
                 if (prefab is RoadPrefab)
                     return true;
-
-                // Fallback: if tool is null, try its prefab via null-guard (already done above),
-                // but keep it strictly false otherwise to avoid surprises.
                 return false;
             }
-            catch
-            {
-                return false;
-            }
+            catch { return false; }
         }
     }
 }
