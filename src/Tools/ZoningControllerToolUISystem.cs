@@ -1,9 +1,10 @@
 // File: src/Tools/ZoningControllerToolUISystem.cs
 // Purpose:
 //  • Expose UI bindings the React UI reads/writes (ToolZoningMode, RoadZoningMode, IsRoadPrefab).
-//  • Handle triggers (Change/Flip/Toggle) with robust null guards.
-//  • Always show the “Zoning Side” section when our tool is active (Top-left button or Shift+Z).
-//  • Extra DEBUG logs for every mode change (source=Road vs Tool; value=Both/Left/Right/None).
+//  • Handle triggers (Change/Flip/Toggle) with null guards.
+//  • Decides when button section appears
+//     - always show the “Zoning Side” section when our tool is active (Top-left button or Shift+Z).
+//  • Extra DEBUG logs mode change (source=Road vs Tool; value=Both/Left/Right/None).
 
 namespace ARTZone.Tools
 {

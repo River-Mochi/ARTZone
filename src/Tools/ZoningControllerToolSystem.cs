@@ -23,8 +23,8 @@ namespace ARTZone.Tools
     public partial class ZoningControllerToolSystem : ToolBaseSystem
     {
         // DO NOT CHANGE ToolID string. It must match every UI/TS reference
-        public const string ToolID = "ARTZone.ZoningToolID";      // if this changes, MUST change also in TS.
-        public override string toolID => ToolID;
+        public const string ToolID = "ARTZone.ZoningTool";      // if this changes, MUST change also in TS.
+        public override string toolID => ToolID;    // required
 
         private ToolOutputBarrier m_ToolOutputBarrier = null!;
         private ZoningControllerToolUISystem m_UISystem = null!;
@@ -287,11 +287,15 @@ namespace ARTZone.Tools
         public override bool TrySetPrefab(PrefabBase prefab)
         {
             if (prefab == null || prefab.name != toolID)
+            {
+#if DEBUG
+                ARTZoneMod.s_Log.Warn($"[ART][Tool] TrySetPrefab rejected: prefab='{prefab?.name}', expected='{ToolID}'");
+#endif
                 return false;
+            }
             m_ToolPrefab = prefab;
 #if DEBUG
             Dbg($"TrySetPrefab: accepted prefab='{prefab.name}'");
-            ARTZoneMod.s_Log.Warn($"[ART][Tool] TrySetPrefab rejected: prefab='{prefab?.name}', expected='{ToolID}'");
 #endif
             return true;
         }

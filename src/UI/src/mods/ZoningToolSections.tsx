@@ -34,19 +34,15 @@ const isRoadPrefab$ = bindValue<boolean>(mod.id, "IsRoadPrefab");
 
 function setToolZoningMode(value: ZoningMode) {
     trigger(mod.id, "ChangeToolZoningMode", value);
-    try { console.log("[ART][UI] setToolZoningMode →", value); } catch { }
 }
 function setRoadZoningMode(value: ZoningMode) {
     trigger(mod.id, "ChangeRoadZoningMode", value);
-    try { console.log("[ART][UI] setRoadZoningMode →", value); } catch { }
 }
 function flipRoadBothMode() {
     trigger(mod.id, "FlipRoadBothMode");
-    try { console.log("[ART][UI] flipRoadBothMode"); } catch { }
 }
 function flipToolBothMode() {
     trigger(mod.id, "FlipToolBothMode");
-    try { console.log("[ART][UI] flipToolBothMode"); } catch { }
 }
 
 export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
@@ -61,32 +57,19 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
         const roadMode = useValue(RoadZoningMode$) as ZoningMode;
 
         const { translate } = useLocalization();
-        const title =
-            translate("ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]") || "Zoning Side";
-        const tipBoth =
-            translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]") ||
-            "Toggle Both/None.";
-        const tipLeft =
-            translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]") ||
-            "Zone only the left side.";
-        const tipRight =
-            translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]") ||
-            "Zone only the right side.";
+        const title = translate("ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]") || "Zoning Side";
+        const tipBoth = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]") || "Toggle Both/None.";
+        const tipLeft = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]") || "Zone only the left side.";
+        const tipRight = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]") || "Zone only the right side.";
 
         // Show under vanilla road placement OR under our tool
         if (isRoadPrefab || zoningToolActive) {
             const usingRoadState = isRoadPrefab;
             const selected = usingRoadState ? roadMode : toolMode;
 
-            const onLeft = () => usingRoadState
-                ? setRoadZoningMode(ZoningMode.Left)
-                : setToolZoningMode(ZoningMode.Left);
-
-            const onRight = () => usingRoadState
-                ? setRoadZoningMode(ZoningMode.Right)
-                : setToolZoningMode(ZoningMode.Right);
-
-            const onBoth = () => usingRoadState ? flipRoadBothMode() : flipToolBothMode();
+            const onLeft = () => (usingRoadState ? setRoadZoningMode(ZoningMode.Left) : setToolZoningMode(ZoningMode.Left));
+            const onRight = () => (usingRoadState ? setRoadZoningMode(ZoningMode.Right) : setToolZoningMode(ZoningMode.Right));
+            const onBoth = () => (usingRoadState ? flipRoadBothMode() : flipToolBothMode());
 
             result.props.children?.push(
                 <VanillaComponentResolver.instance.Section title={title}>
