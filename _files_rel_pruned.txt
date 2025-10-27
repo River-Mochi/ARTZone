@@ -29,8 +29,8 @@
 .\src\Settings\LocalePT_BR.cs
 .\src\Settings\LocaleZH_CN.cs
 .\src\Settings\Setting.cs
-.\src\Systems\PaletteBootStrapSystem.cs
-.\src\Systems\PaletteBuilder.cs
+.\src\Systems\PanelBootStrapSystem.cs
+.\src\Systems\PanelBuilder.cs
 .\src\Tools\KeybindHotkeySystem.cs
 .\src\Tools\KeybindHotkeySystem.Debug.cs
 .\src\Tools\SyncBlockSystem.cs

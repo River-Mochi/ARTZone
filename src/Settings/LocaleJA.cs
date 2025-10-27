@@ -55,10 +55,7 @@ namespace ARTZone.Settings
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "この Mod の表示名。" },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "バージョン" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "現在の Mod バージョン。" },
-#if DEBUG
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.InformationalVersionText)), "詳細バージョン" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.InformationalVersionText)),  "バージョン + ビルド情報" },
-#endif
+
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenMods)),    "Paradox Mods" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenMods)),     "Paradox Mods のページを開きます。" },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },

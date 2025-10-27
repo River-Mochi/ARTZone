@@ -1,8 +1,8 @@
 // Tools/ToolDefinition.cs
 // Purpose:
-//   Describes one ARTZone tool so PaletteBuilder can create a clickable tile in RoadsServices.
-//   PaletteBuilder reads this struct to make One ToolDefinition
-//      = one palette tile (clone donor, set custom icon/ID, hook to ToolBaseSystem,
+//   Describes one ARTZone tool so PanelBuilder can create a clickable tile in RoadsServices.
+//   PanelBuilder reads this struct to make One ToolDefinition
+//      = one Panel tile (clone donor, set custom icon/ID, hook to ToolBaseSystem,
 //        apply placement flags (underground, etc.).
 
 namespace ARTZone.Tools

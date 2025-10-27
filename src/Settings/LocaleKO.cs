@@ -55,10 +55,7 @@ namespace ARTZone.Settings
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "이 모드의 표시 이름." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "버전" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "현재 모드 버전." },
-#if DEBUG
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.InformationalVersionText)), "상세 버전" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.InformationalVersionText)),  "버전 + 빌드 정보" },
-#endif
+
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenMods)),    "Paradox Mods" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenMods)),     "Paradox Mods 페이지 열기." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },

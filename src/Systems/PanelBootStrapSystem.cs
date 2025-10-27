@@ -1,9 +1,9 @@
-// File: src/Systems/ARTPaletteBootstrapSystem.cs
+// File: src/Systems/ARTPanelBootstrapSystem.cs
 // Purpose:
-//      Only Job: wait until a RoadsServices donor/anchor prefab exists, then call builder's PaletteBuilder.InstantiateTools()
+//      Only Job: wait until a RoadsServices donor/anchor prefab exists, then call builder's PanelBuilder.InstantiateTools()
 //      Arms only after a real game load, and turn off after calling builder.
 //         BootstrapSystem = waiter (when is it safe?)
-//         PaletteBuilder  = worker (do the cloning now)
+//         PanelBuilder  = worker (do the cloning now)
 
 namespace ARTZone.Systems
 {
@@ -12,7 +12,7 @@ namespace ARTZone.Systems
     using Game.Prefabs;
     using Unity.Entities;
 
-    public sealed partial class PaletteBootstrapSystem : GameSystemBase
+    public sealed partial class PanelBootStrapSystem : GameSystemBase
     {
         // --- RETRY TUNING ----------------------------------------------------
         private const int MaxTries = 2000;    // Poll up to kMaxTries frames looking for a donor tile.
@@ -98,7 +98,7 @@ namespace ARTZone.Systems
                 return;
 
             // First: can we resolve a donor?
-            if (PaletteBuilder.TryResolveDonor(m_Prefabs, out PrefabBase? donor, out UIObject? donorUI))
+            if (PanelBuilder.TryResolveDonor(m_Prefabs, out PrefabBase? donor, out UIObject? donorUI))
             {
 #if DEBUG
                 if (donorUI != null)
@@ -111,7 +111,7 @@ namespace ARTZone.Systems
                 }
 #endif
                 // We have a donor, now build tiles.
-                PaletteBuilder.InstantiateTools(logIfNoDonor: true);
+                PanelBuilder.InstantiateTools(logIfNoDonor: true);
 
                 // We're done bootstrapping. Turn this system off.
                 m_Done = true;

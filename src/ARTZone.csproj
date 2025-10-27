@@ -18,16 +18,6 @@
     <FailUIBuild Condition="'$(Configuration)'!='Release'">false</FailUIBuild>
   </PropertyGroup>
 
-	<!-- Informational Version in DEBUG -->
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
-    <DefineConstants>TRACE;DEBUG;ART_DIAGNOSTICS</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup>
 
 	<!-- Helper to point to game Managed folder -->
 	<PropertyGroup>

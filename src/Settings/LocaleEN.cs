@@ -58,10 +58,7 @@ namespace ARTZone.Settings
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Display name of this mod." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "Version" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "Current mod version." },
-#if DEBUG
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.InformationalVersionText)), "Informational version" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.InformationalVersionText)),  "Version + build info" },
-#endif
+
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenMods)),    "Paradox Mods" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenMods)),     "Open the Paradox Mods page." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },

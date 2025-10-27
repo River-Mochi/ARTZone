@@ -1,6 +1,6 @@
-// File: src/Systems/PaletteBuilder.cs
+// File: src/Systems/PanelBuilder.cs
 //
-//   Build/Register the clickable ARTZone tools in RoadsServices palette:
+//   Build/Register the clickable ARTZone tools in RoadsServices Panel:
 //     - Find a "donor" tile in RoadsServices (ex: Wide Sidewalk / Crosswalk).
 //     - Clone donor once per ToolDefinition.
 //     - Give clone our icon, ID, and bumped priority (+1) so it shows up next to Wide Sidewalk.
@@ -17,7 +17,7 @@
 // Notes:
 //   - No Harmony. Only read PrefabSystem via reflection to find a 3rd fallback donor.
 //   - Never modify the donor prefab itself; always DuplicatePrefab()
-//   - PaletteBootstrapSystem controls WHEN this runs; PaletteBuilder just DOES the build.
+//   - PanelBootstrapSystem controls WHEN this runs; PanelBuilder just DOES the build.
 
 namespace ARTZone.Systems
 {
@@ -35,7 +35,7 @@ namespace ARTZone.Systems
     using Unity.Entities;
     using UnityEngine;
 
-    public static class PaletteBuilder
+    public static class PanelBuilder
     {
         // --- EASY KNOB --------------------------------------------------------
         // How far after the donor we insert our clone in the RoadsServices group.
@@ -43,7 +43,7 @@ namespace ARTZone.Systems
         private const int TilePriorityOffset = 1;
 
         // --- REGISTRATION STATE ----------------------------------------------
-        // All registered ARTZone tools. One ToolDefinition = one palette tile.
+        // All registered ARTZone tools. One ToolDefinition = one Panel tile.
         public static List<ToolDefinition> ToolDefinitions { get; private set; } = new(4);
 
         public static bool HasTool(ToolDefinition tool) => ToolDefinitions.Contains(tool);
@@ -99,30 +99,30 @@ namespace ARTZone.Systems
                 : null;
         }
 
-        // Register a tool so it can get a palette tile
+        // Register a tool so it can get a Panel tile
         // Safe to call multiple times; rejects invalid/duplicate entries.
         public static void RegisterTool(ToolDefinition def)
         {
             // Guard: type must actually be a ToolBaseSystem to activate it when clicked
             if (def.Type == null || !typeof(ToolBaseSystem).IsAssignableFrom(def.Type))
             {
-                ARTZoneMod.s_Log.Error("[ART][Palette] RegisterTool: Type must inherit ToolBaseSystem.");
+                ARTZoneMod.s_Log.Error("[ART][Panel] RegisterTool: Type must inherit ToolBaseSystem.");
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(def.ToolID))
             {
-                ARTZoneMod.s_Log.Error("[ART][Palette] RegisterTool: ToolID must be non-empty.");
+                ARTZoneMod.s_Log.Error("[ART][Panel] RegisterTool: ToolID must be non-empty.");
                 return;
             }
 
             if (HasTool(def) || HasTool(def.ToolID))
             {
-                ARTZoneMod.s_Log.Error($"[ART][Palette] RegisterTool: \"{def.ToolID}\" already registered.");
+                ARTZoneMod.s_Log.Error($"[ART][Panel] RegisterTool: \"{def.ToolID}\" already registered.");
                 return;
             }
 
-            Dbg($"[ART][Palette] Register \"{def.ToolID}\" for {def.Type.Name}");
+            Dbg($"[ART][Panel] Register \"{def.ToolID}\" for {def.Type.Name}");
             ToolDefinitions.Add(def);
         }
 
@@ -131,7 +131,7 @@ namespace ARTZone.Systems
         //   - clone donor, set icon - priority - group
         //   - add NetUpgrade (so it's treated like a vanilla upgrade tool button)
         //   - hook the clone to the correct ToolBaseSystem
-        // PaletteBootstrapSystem calls this once the game world is initialized
+        // PanelBootstrapSystem calls this once the game world is initialized
         public static void InstantiateTools(bool logIfNoDonor = true)
         {
             if (s_Instantiated)
@@ -144,7 +144,7 @@ namespace ARTZone.Systems
 
             if (s_PrefabSystem == null)
             {
-                ARTZoneMod.s_Log.Error("[ART][Palette] PrefabSystem not available.");
+                ARTZoneMod.s_Log.Error("[ART][Panel] PrefabSystem not available.");
                 return;
             }
 
@@ -154,15 +154,15 @@ namespace ARTZone.Systems
             {
                 if (logIfNoDonor)
                 {
-                    ARTZoneMod.s_Log.Error("[ART][Palette] Could not find RoadsServices donor. Will retry next frame.");
+                    ARTZoneMod.s_Log.Error("[ART][Panel] Could not find RoadsServices donor. Will retry next frame.");
                 }
-                return; // PaletteBootstrapSystem will call again until it gives up
+                return; // PanelBootstrapSystem will call again until it gives up
             }
 
             var donorPrefab = s_DonorPrefab!;
             var donorUI = s_DonorUI!;
 
-            Dbg($"[ART][Palette] Creating tiles. Count={ToolDefinitions.Count}");
+            Dbg($"[ART][Panel] Creating tiles. Count={ToolDefinitions.Count}");
 
             foreach (var def in ToolDefinitions)
             {
@@ -201,16 +201,16 @@ namespace ARTZone.Systems
                     var toolSystem = s_World!.GetOrCreateSystemManaged(def.Type) as ToolBaseSystem;
                     if (toolSystem == null || !toolSystem.TrySetPrefab(clonePrefab))
                     {
-                        ARTZoneMod.s_Log.Error($"[ART][Palette] Failed to attach prefab for \"{def.ToolID}\".");
+                        ARTZoneMod.s_Log.Error($"[ART][Panel] Failed to attach prefab for \"{def.ToolID}\".");
                         continue;
                     }
 
                     s_ToolsLookup[def] = (clonePrefab, cloneUI);
-                    Dbg($"[ART][Palette] Tile created for {def.ToolID}");
+                    Dbg($"[ART][Panel] Tile created for {def.ToolID}");
                 }
                 catch (Exception ex)
                 {
-                    ARTZoneMod.s_Log.Error($"[ART][Palette] Could not create tile for {def.ToolID}: {ex}");
+                    ARTZoneMod.s_Log.Error($"[ART][Panel] Could not create tile for {def.ToolID}: {ex}");
                 }
             }
 
@@ -232,7 +232,7 @@ namespace ARTZone.Systems
         {
             if (s_PrefabSystem == null || s_DonorPrefab == null)
             {
-                ARTZoneMod.s_Log.Error("[ART][Palette] ApplyPlacementDataAfterLoad: missing PrefabSystem or donor.");
+                ARTZoneMod.s_Log.Error("[ART][Panel] ApplyPlacementDataAfterLoad: missing PrefabSystem or donor.");
                 return;
             }
 
@@ -262,11 +262,11 @@ namespace ARTZone.Systems
                         s_PrefabSystem.RemoveComponent<PlaceableNetData>(clonePair.Prefab);
 
                     s_PrefabSystem.AddComponentData(clonePair.Prefab, baseData);
-                    Dbg($"[ART][Palette] Applied PlaceableNetData to {def.ToolID}");
+                    Dbg($"[ART][Panel] Applied PlaceableNetData to {def.ToolID}");
                 }
                 catch (Exception ex)
                 {
-                    ARTZoneMod.s_Log.Error($"[ART][Palette] Could not apply PlaceableNetData for {def.ToolID}: {ex}");
+                    ARTZoneMod.s_Log.Error($"[ART][Panel] Could not apply PlaceableNetData for {def.ToolID}: {ex}");
                 }
             }
         }
@@ -292,7 +292,7 @@ namespace ARTZone.Systems
             // 0 - Cached donor - cheap fast path
             if (s_DonorPrefab != null && s_DonorUI != null)
             {
-                Dbg($"[ART][Palette] Cached donor: {s_DonorPrefab.name} group='{(s_DonorUI.m_Group != null ? s_DonorUI.m_Group.name : "(null)")}'");
+                Dbg($"[ART][Panel] Cached donor: {s_DonorPrefab.name} group='{(s_DonorUI.m_Group != null ? s_DonorUI.m_Group.name : "(null)")}'");
                 donorPrefab = s_DonorPrefab;
                 donorUI = s_DonorUI;
                 return true;
@@ -301,7 +301,7 @@ namespace ARTZone.Systems
             // 1 - Locked donor candidates (exact IDs).
             var locked = new (string typeName, string name)[]
             {
-                ("FencePrefab", "Wide Sidewalk"), // chosen for nice position in palette
+                ("FencePrefab", "Wide Sidewalk"), // chosen for nice position in Panel
                 ("FencePrefab", "Crosswalk"),
             };
 
@@ -312,7 +312,7 @@ namespace ARTZone.Systems
 
                 PrefabBase? candidate;
                 bool found = prefabSystem.TryGetPrefab(id, out candidate) && candidate != null;
-                Dbg($"[ART][Palette] Probe {typeName}:{name}: {(found ? "FOUND" : "missing")}");
+                Dbg($"[ART][Panel] Probe {typeName}:{name}: {(found ? "FOUND" : "missing")}");
 
                 if (!found)
                     continue;
@@ -332,7 +332,7 @@ namespace ARTZone.Systems
                     continue;
                 }
 
-                Dbg($"[ART][Palette] Donor OK (locked): {name} group='{groupName}' priority={candidateUI.m_Priority}");
+                Dbg($"[ART][Panel] Donor OK (locked): {name} group='{groupName}' priority={candidateUI.m_Priority}");
 
                 // This is the donor. Cache it and exit. No reflection scan.
                 s_DonorPrefab = candidate;
@@ -380,7 +380,7 @@ namespace ARTZone.Systems
                     score += uComp.m_Priority;
 
                     bool hasPlaceable = prefabSystem.TryGetComponentData(p, out PlaceableNetData _);
-                    Dbg($"[ART][Palette] Scan {p.GetType().Name}:{n} score={score} group='{groupName}' hasPlaceable={hasPlaceable} priority={uComp.m_Priority}");
+                    Dbg($"[ART][Panel] Scan {p.GetType().Name}:{n} score={score} group='{groupName}' hasPlaceable={hasPlaceable} priority={uComp.m_Priority}");
 
                     if (score > bestScore)
                     {
@@ -393,23 +393,23 @@ namespace ARTZone.Systems
                 if (bestP != null && bestU != null)
                 {
                     // PATCH-DAY WARNING (this logs in release too)
-                    ARTZoneMod.s_Log.Warn("[ART][Palette] ==== Fallback donor used via reflection. Likely a patch renamed RoadsServices tiles. we made it work but Please report this!");
+                    ARTZoneMod.s_Log.Warn("[ART][Panel] ==== Fallback donor used via reflection. Likely a patch renamed RoadsServices tiles. we made it work but Please report this!");
 
                     s_DonorPrefab = bestP;
                     s_DonorUI = bestU;
                     donorPrefab = bestP;
                     donorUI = bestU;
 
-                    Dbg($"[ART][Palette] Donor OK (scan): {bestP.name} group='{(bestU.m_Group != null ? bestU.m_Group.name : "(null)")}'' priority={bestU.m_Priority}");
+                    Dbg($"[ART][Panel] Donor OK (scan): {bestP.name} group='{(bestU.m_Group != null ? bestU.m_Group.name : "(null)")}'' priority={bestU.m_Priority}");
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                ARTZoneMod.s_Log.Error("[ART][Palette] Fallback donor scan failed: " + ex);
+                ARTZoneMod.s_Log.Error("[ART][Panel] Fallback donor scan failed: " + ex);
             }
 
-            // Nothing yet. PaletteBootstrapSystem will retry, then give up and log.
+            // Nothing yet. PanelBootstrapSystem will retry, then give up and log.
             return false;
         }
 

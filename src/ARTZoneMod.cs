@@ -3,7 +3,7 @@
 // Notes:
 //   • Locales are installed BEFORE Options UI (so labels render correctly).
 //   • RMB flip uses vanilla ToolBaseSystem.cancelAction → no custom binding here.
-//   • Top-left button & palette tile use the same icon path (single source of truth).
+//   • Top-left button & Panel tile use the same icon path (single source of truth).
 
 namespace ARTZone
 {
@@ -27,12 +27,7 @@ namespace ARTZone
         public const string UiCouiRoot = "coui://ui-mods";      // webpack publicPath = coui://ui-mods/
         public const string MainIconPath = UiCouiRoot + "/images/ico-4square-color.svg"; // must match in artzone-tool-button.tsx
 
-        public const string VersionShort = "1.0.0";
-#if DEBUG
-        public const string InformationalVersion = VersionShort + " (DEBUG)";
-#else
-        public const string InformationalVersion = VersionShort;
-#endif
+        public const string VersionShort = "1.0.1";
 
         // Rebindable action IDs exposed in Options UI
         public const string kToggleToolActionName = "ToggleZoneTool";   // Shift+Z
@@ -92,7 +87,7 @@ namespace ARTZone
             }
 
             // Systems
-            updateSystem.UpdateAt<PaletteBootstrapSystem>(SystemUpdatePhase.Modification4);
+            updateSystem.UpdateAt<PanelBootStrapSystem>(SystemUpdatePhase.Modification4);
             updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
             updateSystem.UpdateAt<ToolHighlightSystem>(SystemUpdatePhase.ToolUpdate);
             updateSystem.UpdateAt<SyncCreatedRoadsSystem>(SystemUpdatePhase.Modification4);
@@ -101,12 +96,12 @@ namespace ARTZone
             updateSystem.UpdateAt<KeybindHotkeySystem>(SystemUpdatePhase.ToolUpdate);
 
             // Tool registration (definition only; prefab created after game load)
-            PaletteBuilder.Initialize(force: false);
-            PaletteBuilder.RegisterTool(
+            PanelBuilder.Initialize(force: false);
+            PanelBuilder.RegisterTool(
                 new ToolDefinition(
                     typeof(ZoningControllerToolSystem),
                     ZoningControllerToolSystem.ToolID,
-                    new ToolDefinition.UI(MainIconPath) // palette + top-left import use same asset name
+                    new ToolDefinition.UI(MainIconPath) // Panel + top-left import use same asset name
                 )
             );
 
