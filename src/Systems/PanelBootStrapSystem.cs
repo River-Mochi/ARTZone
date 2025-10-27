@@ -1,9 +1,7 @@
 // File: src/Systems/ARTPanelBootstrapSystem.cs
 // Purpose:
-//      Only Job: wait until a RoadsServices donor/anchor prefab exists, then call builder's PanelBuilder.InstantiateTools()
-//      Arms only after a real game load, and turn off after calling builder.
-//         BootstrapSystem = waiter (when is it safe?)
-//         PanelBuilder  = worker (do the cloning now)
+//   Wait until a RoadsServices donor/anchor exists, then call PanelBuilder.InstantiateTools().
+//   Arms only after a game load, then turns itself off
 
 namespace ARTZone.Systems
 {
@@ -38,18 +36,14 @@ namespace ARTZone.Systems
             }
         }
 #else
-        private static void Dbg(string msg)
-        {
-        }
+        private static void Dbg(string msg) { }
 #endif
 
         protected override void OnCreate()
         {
             base.OnCreate();
 
-            m_Prefabs = World.DefaultGameObjectInjectionWorld
-                .GetOrCreateSystemManaged<PrefabSystem>();
-
+            m_Prefabs = World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<PrefabSystem>();
             m_Armed = false;
             m_Done = false;
             m_Tries = 0;
@@ -58,12 +52,10 @@ namespace ARTZone.Systems
             Enabled = false;
         }
 
-        // Called by the engine when a game/save finishes loading.
         protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
         {
             base.OnGameLoadingComplete(purpose, mode);
 
-            // Only arm when entering an actual playable city, not main menu, editor, etc.
             bool realGame =
                 mode == GameMode.Game &&
                 (purpose == Purpose.LoadGame || purpose == Purpose.NewGame);
@@ -80,7 +72,6 @@ namespace ARTZone.Systems
                 return;
             }
 
-            // Arm and start polling each frame.
             m_Armed = true;
             m_Done = false;
             m_Tries = 0;
@@ -93,27 +84,20 @@ namespace ARTZone.Systems
 
         protected override void OnUpdate()
         {
-            // If we're not armed, or already done, or missing PrefabSystem, nothing to do.
             if (!m_Armed || m_Done || m_Prefabs == null)
                 return;
 
-            // First: can we resolve a donor?
             if (PanelBuilder.TryResolveDonor(m_Prefabs, out PrefabBase? donor, out UIObject? donorUI))
             {
 #if DEBUG
                 if (donorUI != null)
                 {
-                    string groupName = (donorUI.m_Group != null)
-                        ? donorUI.m_Group.name
-                        : "(null)";
-
+                    string groupName = (donorUI.m_Group != null) ? donorUI.m_Group.name : "(null)";
                     Dbg($"Donor found: '{(donor != null ? donor.name : "(null)")}' group='{groupName}' priority={donorUI.m_Priority}");
                 }
 #endif
-                // We have a donor, now build tiles.
                 PanelBuilder.InstantiateTools(logIfNoDonor: true);
 
-                // We're done bootstrapping. Turn this system off.
                 m_Done = true;
                 Enabled = false;
                 return;

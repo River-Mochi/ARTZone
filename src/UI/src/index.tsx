@@ -13,7 +13,8 @@ import { ZoningToolController } from "./mods/ZoningToolSections";
 import { ToolOptionsVisibility } from "./mods/ToolOptionsVisible/toolOptionsVisible";
 
 // Ensure the icon is emitted to coui://ui-mods/images/ico-4square-color.svg
-import "../images/ico-4square-color.svg";
+import "../images/ico-4square-color.svg";   // TopLeft FAB
+import "../images/ico-4square-blk.svg";     // Roads tool panel
 
 // Single source of truth for vanilla modules/exports we touch
 const VANILLA = {

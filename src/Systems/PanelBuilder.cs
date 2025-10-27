@@ -1,23 +1,21 @@
 // File: src/Systems/PanelBuilder.cs
 //
 //   Build/Register the clickable ARTZone tools in RoadsServices Panel:
-//     - Find a "donor" tile in RoadsServices (ex: Wide Sidewalk / Crosswalk).
+//     - Find a donor button in RoadsServices (ex: Wide Sidewalk / Crosswalk).
 //     - Clone donor once per ToolDefinition.
 //     - Give clone our icon, ID, and bumped priority (+1) so it shows up next to Wide Sidewalk.
 //     - Attach NetUpgrade so the clone acts like a vanilla tool button.
 //     - Hook the clone to the correct ToolBaseSystem so clicking it activates our tool.
 //     - After the map finishes loading, copy the donor's PlaceableNetData and apply flags
-//        from the ToolDefinition (underground allowed, etc.).
+//       from the ToolDefinition (underground allowed, etc.).
 //
-// Donor selection logic:
-//   - Try hard-coded donors first ("Wide Sidewalk", then "Crosswalk").
-//   - If both are missing (e.g., patch day), reflection-scan PrefabSystem for the closest RoadsServices match.
-//   - We log when we have to do the fallback so release builds report breakage.
+// Donor selection logic (FINAL):
+//   - In RELEASE builds: try “Wide Sidewalk”, then “Crosswalk”. No reflection fallback.
+//   - In DEBUG builds: same as release, then reflection scan as a last resort (dev aid).
 //
 // Notes:
-//   - No Harmony. Only read PrefabSystem via reflection to find a 3rd fallback donor.
-//   - Never modify the donor prefab itself; always DuplicatePrefab()
-//   - PanelBootstrapSystem controls WHEN this runs; PanelBuilder just DOES the build.
+//   - Never modify the donor prefab itself; always DuplicatePrefab().
+//   - PanelBootStrapSystem controls WHEN this runs; PanelBuilder just DOES the build.
 
 namespace ARTZone.Systems
 {
@@ -37,13 +35,11 @@ namespace ARTZone.Systems
 
     public static class PanelBuilder
     {
-        // --- EASY KNOB --------------------------------------------------------
-        // How far after the donor we insert our clone in the RoadsServices group.
-        // 1 = right after donor. 0 = same slot (don't do that).
+        // --- KNOBS ------------------------------------------------------------
+        // Insert our clone to the right of the donor.
         private const int TilePriorityOffset = 1;
 
         // --- REGISTRATION STATE ----------------------------------------------
-        // All registered ARTZone tools. One ToolDefinition = one Panel tile.
         public static List<ToolDefinition> ToolDefinitions { get; private set; } = new(4);
 
         public static bool HasTool(ToolDefinition tool) => ToolDefinitions.Contains(tool);
@@ -56,7 +52,7 @@ namespace ARTZone.Systems
         private static World? s_World;
         private static PrefabSystem? s_PrefabSystem;
 
-        // Cached donor (the RoadsServices tile we clone)
+        // Cached donor (the RoadsServices button we clone)
         private static PrefabBase? s_DonorPrefab;
         private static UIObject? s_DonorUI;
 
@@ -80,7 +76,7 @@ namespace ARTZone.Systems
         }
 
         // --- Init -------------------------------------------------------------
-        // Called from ARTZoneMod.OnLoad(). Clears caches so hot reload works
+        // Called from ARTZoneMod.OnLoad(). Clears caches so hot reload works.
         public static void Initialize(bool force = false)
         {
             if (!force && s_World != null)
@@ -99,11 +95,9 @@ namespace ARTZone.Systems
                 : null;
         }
 
-        // Register a tool so it can get a Panel tile
-        // Safe to call multiple times; rejects invalid/duplicate entries.
+        // Register a tool so it can get a Panel button
         public static void RegisterTool(ToolDefinition def)
         {
-            // Guard: type must actually be a ToolBaseSystem to activate it when clicked
             if (def.Type == null || !typeof(ToolBaseSystem).IsAssignableFrom(def.Type))
             {
                 ARTZoneMod.s_Log.Error("[ART][Panel] RegisterTool: Type must inherit ToolBaseSystem.");
@@ -127,11 +121,6 @@ namespace ARTZone.Systems
         }
 
         // --- Build Clones -----------------------------------------------------
-        // Build the actual clickable tiles:
-        //   - clone donor, set icon - priority - group
-        //   - add NetUpgrade (so it's treated like a vanilla upgrade tool button)
-        //   - hook the clone to the correct ToolBaseSystem
-        // PanelBootstrapSystem calls this once the game world is initialized
         public static void InstantiateTools(bool logIfNoDonor = true)
         {
             if (s_Instantiated)
@@ -153,22 +142,20 @@ namespace ARTZone.Systems
                 !TryResolveDonor(s_PrefabSystem, out s_DonorPrefab, out s_DonorUI))
             {
                 if (logIfNoDonor)
-                {
                     ARTZoneMod.s_Log.Error("[ART][Panel] Could not find RoadsServices donor. Will retry next frame.");
-                }
-                return; // PanelBootstrapSystem will call again until it gives up
+                return; // PanelBootStrapSystem will call again
             }
 
             var donorPrefab = s_DonorPrefab!;
             var donorUI = s_DonorUI!;
 
-            Dbg($"[ART][Panel] Creating tiles. Count={ToolDefinitions.Count}");
+            Dbg($"[ART][Panel] Creating buttons. Count={ToolDefinitions.Count}");
 
             foreach (var def in ToolDefinitions)
             {
                 try
                 {
-                    // 1 - Clone donor. This becomes our clickable tile.
+                    // 1 - Clone donor. This becomes our clickable button.
                     var clonePrefab = s_PrefabSystem.DuplicatePrefab(donorPrefab, def.ToolID);
 
                     // 2 - Remove donor-only parts not needed
@@ -180,46 +167,42 @@ namespace ARTZone.Systems
                     // 3 - Make a fresh UIObject for the clone
                     var cloneUI = ScriptableObject.CreateInstance<UIObject>();
                     cloneUI.name = def.ToolID;
-                    cloneUI.m_Icon = def.Ui.ImagePath;  // icon path in coui://ui-mods
+                    cloneUI.m_Icon = def.Ui.ImagePath;             // icon path in coui://ui-mods
                     cloneUI.m_IsDebugObject = donorUI.m_IsDebugObject;
-                    cloneUI.m_Group = donorUI.m_Group;  // "RoadsServices"
+                    cloneUI.m_Group = donorUI.m_Group;              // "RoadsServices"
                     cloneUI.active = donorUI.active;
-                    // Priority: donor priority + offset; place custom icon to right of the donor tile
                     cloneUI.m_Priority = donorUI.m_Priority + TilePriorityOffset;
 
                     clonePrefab.AddComponentFrom(cloneUI);
 
-                    // 4 - NetUpgrade marks this clone as a "tool selector"
-                    //     Needed so the game treats it like a vanilla upgrade tool button
+                    // 4 - NetUpgrade marks this clone as a "tool selector" like vanilla buttons
                     var netUpgrade = ScriptableObject.CreateInstance<NetUpgrade>();
                     clonePrefab.AddComponentFrom(netUpgrade);
 
-                    // 5 - Tell PrefabSystem the clone’s components changed
+                    // 5 - Let PrefabSystem re-index the clone’s components
                     s_PrefabSystem.UpdatePrefab(clonePrefab);
 
-                    // 6 - Hook clone to our ToolBaseSystem so clicking the button activates our tool
+                    // 6 - Connect the clone to our ToolBaseSystem so clicking activates our tool
                     var toolSystem = s_World!.GetOrCreateSystemManaged(def.Type) as ToolBaseSystem;
                     bool attached = toolSystem != null && toolSystem.TrySetPrefab(clonePrefab);
 
                     if (!attached)
                     {
-                        var toolName = toolSystem != null ? toolSystem.GetType().Name : "(null)";
-                        ARTZoneMod.s_Log.Error($"[ART][Panel] Failed to attach prefab for \"{def.ToolID}\" (toolSystem={toolName})");
+                        ARTZoneMod.s_Log.Error(
+                            $"[ART][Panel] Failed to attach prefab for \"{def.ToolID}\" (toolSystem={(toolSystem?.GetType().Name ?? "null")})");
                         continue;
                     }
-                    // Past this point toolSystem is non-null because attached==true
-                    Dbg($"[ART][Panel] Tile created and attached: {def.ToolID} → {toolSystem!.GetType().Name}");
-                    s_ToolsLookup[def] = (clonePrefab, cloneUI);
 
+                    Dbg($"[ART][Panel] Button created and attached: {def.ToolID} → {toolSystem!.GetType().Name}");
+                    s_ToolsLookup[def] = (clonePrefab, cloneUI);
                 }
                 catch (Exception ex)
                 {
-                    ARTZoneMod.s_Log.Error($"[ART][Panel] Could not create tile for {def.ToolID}: {ex}");
+                    ARTZoneMod.s_Log.Error($"[ART][Panel] Could not create button for {def.ToolID}: {ex}");
                 }
             }
 
             // After the map is fully loaded, finalize placement data for any clone
-            // This wires up flags like UndergroundUpgrade, set/unset flags, etc.
             if (GameManager.instance != null)
             {
                 GameManager.instance.onGameLoadingComplete -= ApplyPlacementDataAfterLoad;
@@ -230,8 +213,6 @@ namespace ARTZone.Systems
         }
 
         // --- Placement Data ---------------------------------------------------
-        // After the save loads, copy donor PlaceableNetData onto any clone,
-        // then tweak it using data from each ToolDefinition
         private static void ApplyPlacementDataAfterLoad(Purpose purpose, GameMode mode)
         {
             if (s_PrefabSystem == null || s_DonorPrefab == null)
@@ -276,15 +257,7 @@ namespace ARTZone.Systems
         }
 
         // --- DONOR RESOLUTION -------------------------------------------------
-        // Try to locate a donor in RoadsServices.
-        // Returns true if we find BOTH:
-        //   - a prefab, and its UIObject lives in "RoadsServices".
-        //
-        // Steps:
-        //   1. If there is a cached donor, reuse it - only scan once.
-        //   2. Try known donors ("Wide Sidewalk", then "Crosswalk"). If one works, Stop immediately.
-        //   3. If both fail (patch day, names changed), reflection-scan one time PrefabSystem
-        //      to guess a best match. Release Logs a Warn to alert game change research needed.
+        // RELEASE: try exact donors only. DEBUG: try donors then reflection scan.
         public static bool TryResolveDonor(PrefabSystem prefabSystem, out PrefabBase? donorPrefab, out UIObject? donorUI)
         {
             donorPrefab = null;
@@ -293,7 +266,7 @@ namespace ARTZone.Systems
             if (prefabSystem == null)
                 return false;
 
-            // 0 - Cached donor - cheap fast path
+            // Cached donor?
             if (s_DonorPrefab != null && s_DonorUI != null)
             {
                 Dbg($"[ART][Panel] Cached donor: {s_DonorPrefab.name} group='{(s_DonorUI.m_Group != null ? s_DonorUI.m_Group.name : "(null)")}'");
@@ -302,61 +275,85 @@ namespace ARTZone.Systems
                 return true;
             }
 
-            // 1 - Locked donor candidates (exact IDs).
-            var locked = new (string typeName, string name)[]
+            // 1) Hard-coded donors first (stable behavior in Release)
+            if (TryGetExactDonor(prefabSystem, "FencePrefab", "Wide Sidewalk", out donorPrefab, out donorUI))
             {
-                ("FencePrefab", "Wide Sidewalk"), // chosen for nice position in Panel
-                ("FencePrefab", "Crosswalk"),
-            };
-
-            for (int i = 0; i < locked.Length; i++)
+                CacheDonor(donorPrefab!, donorUI!);
+                return true;
+            }
+            if (TryGetExactDonor(prefabSystem, "FencePrefab", "Crosswalk", out donorPrefab, out donorUI))
             {
-                var (typeName, name) = locked[i];
-                var id = new PrefabID(typeName, name);
-
-                PrefabBase? candidate;
-                bool found = prefabSystem.TryGetPrefab(id, out candidate) && candidate != null;
-                Dbg($"[ART][Panel] Probe {typeName}:{name}: {(found ? "FOUND" : "missing")}");
-
-                if (!found)
-                    continue;
-
-                UIObject? candidateUI;
-                bool hasUI = candidate!.TryGet(out candidateUI) && candidateUI != null;
-                if (!hasUI)
-                {
-                    Dbg("  …found prefab but it has no UIObject → skip");
-                    continue;
-                }
-
-                string groupName = candidateUI!.m_Group != null ? candidateUI.m_Group.name : "(null)";
-                if (!string.Equals(groupName, "RoadsServices", StringComparison.OrdinalIgnoreCase))
-                {
-                    Dbg($"  …UIObject group is '{groupName}', not 'RoadsServices' → skip");
-                    continue;
-                }
-
-                Dbg($"[ART][Panel] Donor OK (locked): {name} group='{groupName}' priority={candidateUI.m_Priority}");
-
-                // This is the donor. Cache it and exit. No reflection scan.
-                s_DonorPrefab = candidate;
-                s_DonorUI = candidateUI;
-                donorPrefab = candidate;
-                donorUI = candidateUI;
-
-                return true; // Bail now, no reflection
+                CacheDonor(donorPrefab!, donorUI!);
+                return true;
             }
 
-            // 2 - Fallback: reflection scan in case CO changes names on game updates
-            // Log if it ends up here so users can report game patch breaks
+#if DEBUG
+            // 2) DEBUG ONLY — reflection scan (dev aid)
+            if (TryReflectionDonor(prefabSystem, out donorPrefab, out donorUI))
+            {
+                ARTZoneMod.s_Log.Warn("[ART][Panel] Fallback donor used via reflection (DEBUG).");
+                CacheDonor(donorPrefab!, donorUI!);
+                return true;
+            }
+#endif
+            return false;
+        }
+
+        private static void CacheDonor(PrefabBase p, UIObject u)
+        {
+            s_DonorPrefab = p;
+            s_DonorUI = u;
+            Dbg($"[ART][Panel] Donor selected: {p.name} (group='{(u.m_Group != null ? u.m_Group.name : "(null)")}', prio={u.m_Priority})");
+        }
+
+        private static bool TryGetExactDonor(PrefabSystem ps, string typeName, string name, out PrefabBase? donor, out UIObject? donorUI)
+        {
+            donor = null;
+            donorUI = null;
+
+            var id = new PrefabID(typeName, name);
+            PrefabBase? candidate;
+            bool found = ps.TryGetPrefab(id, out candidate) && candidate != null;
+            Dbg($"[ART][Panel] Probe {typeName}:{name}: {(found ? "FOUND" : "missing")}");
+
+            if (!found)
+                return false;
+
+            UIObject? ui;
+            bool hasUI = candidate!.TryGet(out ui) && ui != null;
+            if (!hasUI)
+            {
+                Dbg("  …found prefab but it has no UIObject → skip");
+                return false;
+            }
+
+            string groupName = ui!.m_Group != null ? ui.m_Group.name : "(null)";
+            if (!string.Equals(groupName, "RoadsServices", StringComparison.OrdinalIgnoreCase))
+            {
+                Dbg($"  …UIObject group is '{groupName}', not 'RoadsServices' → skip");
+                return false;
+            }
+
+            donor = candidate;
+            donorUI = ui;
+            return true;
+        }
+
+#if DEBUG
+        // DEBUG-only: scan RoadsServices buttons to guess a reasonable donor.
+        private static bool TryReflectionDonor(PrefabSystem ps, out PrefabBase? donor, out UIObject? donorUI)
+        {
+            donor = null;
+            donorUI = null;
+
             try
             {
-                var allPrefabs = GetAllPrefabsUnsafe(prefabSystem);
+                var all = GetAllPrefabsUnsafe(ps);
                 PrefabBase? bestP = null;
                 UIObject? bestU = null;
                 int bestScore = int.MinValue;
 
-                foreach (var p in allPrefabs)
+                foreach (var p in all)
                 {
                     if (p == null)
                         continue;
@@ -372,7 +369,6 @@ namespace ARTZone.Systems
                     int score = 0;
                     string n = p.name ?? string.Empty;
 
-                    // Prefer tiles that *look* like vanilla road service upgrades.
                     if (n.IndexOf("Wide Sidewalk", StringComparison.OrdinalIgnoreCase) >= 0)
                         score += 1000;
                     else if (n.IndexOf("Crosswalk", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -380,11 +376,9 @@ namespace ARTZone.Systems
                     else if (n.IndexOf("Grass", StringComparison.OrdinalIgnoreCase) >= 0)
                         score += 800;
 
-                    // Bias vanilla priority so high-priority tiles win ties.
                     score += uComp.m_Priority;
 
-                    bool hasPlaceable = prefabSystem.TryGetComponentData(p, out PlaceableNetData _);
-                    Dbg($"[ART][Panel] Scan {p.GetType().Name}:{n} score={score} group='{groupName}' hasPlaceable={hasPlaceable} priority={uComp.m_Priority}");
+                    Dbg($"[ART][Panel] Scan {p.GetType().Name}:{n} score={score} group='{groupName}' priority={uComp.m_Priority}");
 
                     if (score > bestScore)
                     {
@@ -396,37 +390,24 @@ namespace ARTZone.Systems
 
                 if (bestP != null && bestU != null)
                 {
-                    // PATCH-DAY WARNING (this logs in release too)
-                    ARTZoneMod.s_Log.Warn("[ART][Panel] ==== Fallback donor used via reflection. Likely a patch renamed RoadsServices tiles. we made it work but Please report this!");
-
-                    s_DonorPrefab = bestP;
-                    s_DonorUI = bestU;
-                    donorPrefab = bestP;
+                    donor = bestP;
                     donorUI = bestU;
-
-                    Dbg($"[ART][Panel] Donor OK (scan): {bestP.name} group='{(bestU.m_Group != null ? bestU.m_Group.name : "(null)")}'' priority={bestU.m_Priority}");
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                ARTZoneMod.s_Log.Error("[ART][Panel] Fallback donor scan failed: " + ex);
+                ARTZoneMod.s_Log.Warn("[ART][Panel] Reflection donor scan failed (DEBUG): " + ex.Message);
             }
-
-            // Nothing yet. PanelBootstrapSystem will retry, then give up and log.
             return false;
         }
 
-        // --- Fallback only: reflection scan --------------------------------------------------
-        // Read PrefabSystem's private prefab list. Read-only and safe in release.
+        // Reflection helper: get PrefabSystem's internal list (read-only).
         private static List<PrefabBase> GetAllPrefabsUnsafe(PrefabSystem ps)
         {
-            // Preferred path: private property "prefabs".
             try
             {
-                var prop = typeof(PrefabSystem).GetProperty(
-                    "prefabs",
-                    BindingFlags.NonPublic | BindingFlags.Instance);
+                var prop = typeof(PrefabSystem).GetProperty("prefabs", BindingFlags.NonPublic | BindingFlags.Instance);
                 if (prop != null)
                 {
                     var enumerable = prop.GetValue(ps) as IEnumerable<PrefabBase>;
@@ -434,26 +415,19 @@ namespace ARTZone.Systems
                         return new List<PrefabBase>(enumerable);
                 }
             }
-            catch { /* ignore and fall through */ }
+            catch { /* ignore */ }
 
-            // Fallback path: known private field "m_Prefabs".
             try
             {
-                var fi = typeof(PrefabSystem).GetField(
-                    "m_Prefabs",
-                    BindingFlags.NonPublic | BindingFlags.Instance);
-                var list = fi != null
-                    ? fi.GetValue(ps) as List<PrefabBase>
-                    : null;
-
-                return list != null
-                    ? new List<PrefabBase>(list)
-                    : new List<PrefabBase>(0);
+                var fi = typeof(PrefabSystem).GetField("m_Prefabs", BindingFlags.NonPublic | BindingFlags.Instance);
+                var list = fi != null ? fi.GetValue(ps) as List<PrefabBase> : null;
+                return list != null ? new List<PrefabBase>(list) : new List<PrefabBase>(0);
             }
             catch
             {
                 return new List<PrefabBase>(0);
             }
         }
+#endif
     }
 }
