@@ -1,5 +1,5 @@
 // File: src/Settings/LocaleJA.cs
-// Japanese (ja-JP) strings for Options UI + palette text.
+// Japanese (ja-JP) strings for Options UI + Panel text.
 
 namespace ARTZone.Settings
 {
@@ -45,7 +45,7 @@ namespace ARTZone.Settings
                 // Binding title
                 { m_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "ART-Zone パネルの表示 / 非表示" },
 
-                // Palette text
+                // Panel text
                 { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "ゾーン変更ツール" },
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
                   "道路のゾーニングを変更します：両側、左側、右側、またはなし。右クリックで選択を切り替え、左クリックで確定します。" },

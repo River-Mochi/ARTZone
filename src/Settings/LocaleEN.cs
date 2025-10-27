@@ -1,5 +1,5 @@
 // File: src/Settings/LocaleEN.cs
-// English (en-US) strings for Options UI + palette text.
+// English (en-US) strings for Options UI + Panel text.
 
 namespace ARTZone.Settings
 {
@@ -47,7 +47,7 @@ namespace ARTZone.Settings
                 // Binding title in the keybinding dialog
                 { m_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "Toggle Zone Button Panel" },
 
-                // Palette (Road Services tile)
+                // Panel (Road Services tile)
                 { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Zone Changer" },
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
                   "Change zoning on roads: both sides, left, right, or none.\n" +

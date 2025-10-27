@@ -197,16 +197,16 @@ namespace ARTZone.Systems
                     // 5 - Tell PrefabSystem the clone’s components changed
                     s_PrefabSystem.UpdatePrefab(clonePrefab);
 
-                    // 6 - Hook clone to the actual ToolBaseSystem so clicking the tile activates our tool
+                    // 6 - Hook clone to our ToolBaseSystem so clicking the button activates our tool
                     var toolSystem = s_World!.GetOrCreateSystemManaged(def.Type) as ToolBaseSystem;
-                    if (toolSystem == null || !toolSystem.TrySetPrefab(clonePrefab))
+                    bool attached = toolSystem != null && toolSystem.TrySetPrefab(clonePrefab);
+                    if (!attached)
                     {
-                        ARTZoneMod.s_Log.Error($"[ART][Panel] Failed to attach prefab for \"{def.ToolID}\".");
+                        ARTZoneMod.s_Log.Error($"[ART][Panel] Failed to attach prefab for \"{def.ToolID}\" (toolSystem={(toolSystem == null ? "null" : toolSystem.GetType().Name)})");
                         continue;
                     }
+                    Dbg($"[ART][Panel] Tile created and attached: {def.ToolID} → {toolSystem.GetType().Name}");
 
-                    s_ToolsLookup[def] = (clonePrefab, cloneUI);
-                    Dbg($"[ART][Panel] Tile created for {def.ToolID}");
                 }
                 catch (Exception ex)
                 {

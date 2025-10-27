@@ -22,7 +22,8 @@ namespace ARTZone.Tools
 
     public partial class ZoningControllerToolSystem : ToolBaseSystem
     {
-        public const string ToolID = "ARTZone.ZoningTool";
+        // DO NOT CHANGE ToolID string. It must match every UI/TS reference
+        public const string ToolID = "ARTZone.ZoningTool";      // if this changes, MUST change also in TS.
         public override string toolID => ToolID;
 
         private ToolOutputBarrier m_ToolOutputBarrier = null!;
@@ -93,6 +94,7 @@ namespace ARTZone.Tools
             base.OnDestroy();
         }
 
+        // ----  Lifecycle ------------------------------------------------------------
         protected override void OnStartRunning()
         {
             base.OnStartRunning();
@@ -101,6 +103,9 @@ namespace ARTZone.Tools
             requireZones = true;
             requireNet = Layer.Road;
             allowUnderground = true;
+#if DEBUG
+            Dbg("OnStartRunning: tool ACTIVE");
+#endif
         }
 
         protected override void OnStopRunning()
@@ -111,7 +116,11 @@ namespace ARTZone.Tools
             requireZones = false;
             requireNet = Layer.None;
             allowUnderground = false;
+#if DEBUG
+            Dbg("OnStopRunning: tool INACTIVE");
+#endif
         }
+
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
@@ -273,16 +282,18 @@ namespace ARTZone.Tools
 
         public override PrefabBase GetPrefab() => m_ToolPrefab;
 
+
+        // ----  Prefab ownership (called by PanelBuilder) --------------------------
         public override bool TrySetPrefab(PrefabBase prefab)
         {
-            if (prefab == null || prefab.name != ToolID)
-#if DEBUG
-                ARTZoneMod.s_Log.Warn($"[ART][Tool] TrySetPrefab rejected: prefab='{prefab?.name}', expected='{ToolID}'");
-#endif
-            return false;
+            if (prefab == null || prefab.name != toolID)
+                return false;
             m_ToolPrefab = prefab;
+#if DEBUG
+            Dbg($"TrySetPrefab: accepted prefab='{prefab.name}'");
+            ARTZoneMod.s_Log.Warn($"[ART][Tool] TrySetPrefab rejected: prefab='{prefab?.name}', expected='{ToolID}'");
+#endif
             return true;
-
         }
 
         public override void InitializeRaycast()
@@ -292,15 +303,26 @@ namespace ARTZone.Tools
             m_ToolRaycastSystem.netLayerMask = Layer.Road;
         }
 
+        // ----  Toggle from UI/Hotkey -----------------------------------------------
         public void SetToolEnabled(bool isEnabled)
         {
             if (m_ToolSystem == null)
                 return;
 
             if (isEnabled && m_ToolSystem.activeTool != this)
+            {
+#if DEBUG
+                Dbg("SetToolEnabled(true): Activating our tool");
+#endif
                 m_ToolSystem.ActivatePrefabTool(GetPrefab());
+            }
             else if (!isEnabled && m_ToolSystem.activeTool == this)
+            {
+#if DEBUG
+                Dbg("SetToolEnabled(false): Deactivating our tool");
+#endif
                 m_ToolSystem.ActivatePrefabTool(null);
+            }
         }
 
         public struct SyncTempJob : IJobParallelFor

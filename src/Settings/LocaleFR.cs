@@ -1,5 +1,5 @@
 // File: src/Settings/LocaleFR.cs
-// French (fr-FR) strings for Options UI + palette text.
+// French (fr-FR) strings for Options UI + Panel text.
 
 namespace ARTZone.Settings
 {
@@ -45,7 +45,7 @@ namespace ARTZone.Settings
                 // Binding title in the keybinding dialog
                 { m_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "Afficher / masquer le panneau ART-Zone" },
 
-                // Palette (Road Services tile)
+                // Panel (Road Services tile)
                 { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Modificateur de zonage" },
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
                   "Modifier le zonage des routes : les deux côtés, gauche, droite ou aucun. Clic droit inverse le choix. Clic gauche confirme." },

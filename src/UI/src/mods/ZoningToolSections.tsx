@@ -1,6 +1,6 @@
 ﻿// File: src/UI/src/mods/ZoningToolSections.tsx
 // Purpose: MouseToolOptions section - draws the triple buttons (Both/Left/Right),
-//          reads state via bindValue, and sends changes via trigger.
+//          reads state via bindValue, and talks to C# via bindings triggers.
 //
 // Behavior:
 //  • When a vanilla road prefab is active -> operate RoadZoningMode (NEW road placement).
@@ -9,6 +9,9 @@
 //  • LMB on Both toggles Both <-> None (so “Both” highlights all three; “None” highlights none).
 //  • RMB flipping on roads (Left <-> Right or Both<->None until LMB confirms) is implemented in C#
 //    ZoningControllerToolSystem; this file mirrors the chosen mode and updates on LMB only.
+
+// ----  Zoning Tool Sections (MouseToolOptions) ------------------------------
+// DO NOT CHANGE ZONING_TOOL_ID – must match C# ZoningControllerToolSystem.ToolID.
 
 import { ModuleRegistryExtend } from "cs2/modding";
 import { bindValue, trigger, useValue } from "cs2/api";
@@ -33,69 +36,58 @@ const RoadZoningMode$ = bindValue<number>(mod.id, "RoadZoningMode");
 const ToolZoningMode$ = bindValue<number>(mod.id, "ToolZoningMode");
 const isRoadPrefab$ = bindValue<boolean>(mod.id, "IsRoadPrefab");
 
+
+const ZONING_TOOL_ID = "ARTZone.ZoningTool";    // DO NOT CHANGE – must equal C# ZoningControllerToolSystem.ToolID
+
 function setToolZoningMode(value: ZoningMode) {
+    try { console.log(`[ART][UI] TS click: ChangeToolZoningMode(${ZoningMode[value]}=${value})`); } catch { }
     trigger(mod.id, "ChangeToolZoningMode", value);
 }
 function setRoadZoningMode(value: ZoningMode) {
+    try { console.log(`[ART][UI] TS click: ChangeRoadZoningMode(${ZoningMode[value]}=${value})`); } catch { }
     trigger(mod.id, "ChangeRoadZoningMode", value);
 }
-// LMB on the Both button toggles Both <-> None.
 function flipRoadBothMode() {
+    try { console.log("[ART][UI] TS click: FlipRoadBothMode()"); } catch { }
     trigger(mod.id, "FlipRoadBothMode");
 }
 function flipToolBothMode() {
+    try { console.log("[ART][UI] TS click: FlipToolBothMode()"); } catch { }
     trigger(mod.id, "FlipToolBothMode");
 }
-const ZONING_TOOL_ID = "ARTZone.ZoningTool";        // ToolID from ZoningContollerToolSystem
 
 export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
     return (props) => {
         const result = Component(props);
 
-        const activeTool = useValue(tool.activeTool$).id;
-        const isRoadPrefab = useValue(isRoadPrefab$);
-        const zoningToolActive = activeTool === ZONING_TOOL_ID;     // must be same as C# Side or 3 icons do not appear  
+        const active = useValue(tool.activeTool$);
+        const activeToolId = active?.id ?? "";
+        const isRoadPrefab = !!useValue(isRoadPrefab$);
+        const zoningToolActive = activeToolId === ZONING_TOOL_ID;
 
-        const toolMode = useValue(ToolZoningMode$) as ZoningMode;
-        const roadMode = useValue(RoadZoningMode$) as ZoningMode;
+        const toolMode = (useValue(ToolZoningMode$) ?? ZoningMode.Both) as ZoningMode;
+        const roadMode = (useValue(RoadZoningMode$) ?? ZoningMode.Both) as ZoningMode;
+
+        try { console.log(`[ART][UI] render: activeToolId=${activeToolId} isRoadPrefab=${isRoadPrefab} zoningToolActive=${zoningToolActive} toolMode=${toolMode} roadMode=${roadMode}`); } catch { }
 
         const { translate } = useLocalization();
-        const title =
-            translate("ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]") ||
-            "Zoning Side";
-        const tipBoth =
-            translate(
-                "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]"
-            ) || "Toggle Both/None (Both highlights all three).";
-        const tipLeft =
-            translate(
-                "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]"
-            ) || "Zone only the left side.";
-        const tipRight =
-            translate(
-                "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]"
-            ) || "Zone only the right side.";
+        const title = translate("ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]") || "Zoning Side";
+        const tipBoth = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]") || "Toggle Both/None (Both highlights all three).";
+        const tipLeft = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]") || "Zone only left side.";
+        const tipRight = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]") || "Zone only right side.";
 
-        // Show under vanilla road placement OR under our tool
         if (isRoadPrefab || zoningToolActive) {
             const usingRoadState = isRoadPrefab;
             const selected = usingRoadState ? roadMode : toolMode;
 
-            // LMB handlers:
-            //  • Left/Right set exact side
-            //  • Both flips Both <-> None (so “None” is reachable for new roads)
-            const onLeft = () =>
-                usingRoadState ? setRoadZoningMode(ZoningMode.Left) : setToolZoningMode(ZoningMode.Left);
-            const onRight = () =>
-                usingRoadState ? setRoadZoningMode(ZoningMode.Right) : setToolZoningMode(ZoningMode.Right);
-            const onBoth = () =>
-                usingRoadState ? flipRoadBothMode() : flipToolBothMode();
+            const onLeft = () => usingRoadState ? setRoadZoningMode(ZoningMode.Left) : setToolZoningMode(ZoningMode.Left);
+            const onRight = () => usingRoadState ? setRoadZoningMode(ZoningMode.Right) : setToolZoningMode(ZoningMode.Right);
+            const onBoth = () => usingRoadState ? flipRoadBothMode() : flipToolBothMode();
 
             result.props.children?.push(
                 <VanillaComponentResolver.instance.Section title={title}>
                     <>
                         <VanillaComponentResolver.instance.ToolButton
-                            // “Both” shows selected when *both* bits are set
                             selected={(selected & ZoningMode.Both) === ZoningMode.Both}
                             tooltip={tipBoth}
                             onSelect={onBoth}
@@ -107,7 +99,6 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
                         </VanillaComponentResolver.instance.ToolButton>
 
                         <VanillaComponentResolver.instance.ToolButton
-                            // Left shows selected whenever its bit is set (so Both highlights this too)
                             selected={(selected & ZoningMode.Left) === ZoningMode.Left}
                             tooltip={tipLeft}
                             onSelect={onLeft}
@@ -119,7 +110,6 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
                         </VanillaComponentResolver.instance.ToolButton>
 
                         <VanillaComponentResolver.instance.ToolButton
-                            // Right shows selected whenever its bit is set (so Both highlights this too)
                             selected={(selected & ZoningMode.Right) === ZoningMode.Right}
                             tooltip={tipRight}
                             onSelect={onRight}

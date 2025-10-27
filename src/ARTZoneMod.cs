@@ -95,13 +95,15 @@ namespace ARTZone
             updateSystem.UpdateAt<ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<KeybindHotkeySystem>(SystemUpdatePhase.ToolUpdate);
 
-            // Tool registration (definition only; prefab created after game load)
+            // definition only; prefab created after game load
             PanelBuilder.Initialize(force: false);
+
+            // Tool registration uses the same ToolID string. DO NOT CHANGE.
             PanelBuilder.RegisterTool(
                 new ToolDefinition(
                     typeof(ZoningControllerToolSystem),
                     ZoningControllerToolSystem.ToolID,
-                    new ToolDefinition.UI(MainIconPath) // Panel + top-left import use same asset name
+                    new ToolDefinition.UI(MainIconPath)        // Panel + top-left import use same asset name
                 )
             );
 

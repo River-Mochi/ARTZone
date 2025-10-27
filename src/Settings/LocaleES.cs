@@ -1,5 +1,5 @@
 // File: src/Settings/LocaleES.cs
-// Spanish (es-ES) strings for Options UI + palette text.
+// Spanish (es-ES) strings for Options UI + Panel text.
 
 namespace ARTZone.Settings
 {
@@ -45,7 +45,7 @@ namespace ARTZone.Settings
                 // Binding title
                 { m_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "Mostrar / ocultar panel ART-Zone" },
 
-                // Palette text
+                // Panel text
                 { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Editor de zona" },
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
                   "Cambia la zonificación de las carreteras: ambos lados, izquierda, derecha o ninguno. Clic derecho alterna la opción. Clic izquierdo confirma." },

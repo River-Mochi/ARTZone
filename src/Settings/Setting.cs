@@ -33,7 +33,7 @@ namespace ARTZone.Settings
         public const string kAboutTab = "About";
 
         // Groups
-        public const string kToggleGroup = "Zone Controller Tool";
+        public const string kToggleGroup = "Zoning Tools";
         public const string kKeybindingGroup = "Key bindings";
         public const string kAboutInfoGroup = "Info";
         public const string kAboutLinksGroup = "Links";

@@ -1,5 +1,5 @@
 ﻿// File: src/Settings/LocaleZH_CN.cs
-// Simplified Chinese (zh-HANS) strings for Options UI + palette text.
+// Simplified Chinese (zh-HANS) strings for Options UI + Panel text.
 
 namespace ARTZone.Settings
 {
@@ -45,7 +45,7 @@ namespace ARTZone.Settings
                 // Binding title
                 { m_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "切换 ART-Zone 面板" },
 
-                // Palette text
+                // Panel text
                 { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "分区更改工具" },
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
                   "修改道路的分区：双侧、左侧、右侧或无。右键切换选择，左键确认。" },

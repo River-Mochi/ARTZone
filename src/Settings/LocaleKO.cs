@@ -1,5 +1,5 @@
 // File: src/Settings/LocaleKO.cs
-// Korean (ko-KR) strings for Options UI + palette text.
+// Korean (ko-KR) strings for Options UI + Panel text.
 
 namespace ARTZone.Settings
 {
@@ -45,7 +45,7 @@ namespace ARTZone.Settings
                 // Binding title
                 { m_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "ART-Zone 패널 표시 / 숨기기" },
 
-                // Palette text
+                // Panel text
                 { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "존 변경 도구" },
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
                   "도로의 존을 변경합니다: 양쪽, 왼쪽, 오른쪽 또는 없음. 마우스 오른쪽 버튼으로 선택을 전환하고 왼쪽 버튼으로 확정합니다." },
