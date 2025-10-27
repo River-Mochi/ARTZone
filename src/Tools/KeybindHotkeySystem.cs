@@ -1,5 +1,5 @@
 // Tools/KeybindHotkeySystem.cs
-// Purpose: Shift+Z (or the player's bound hotkey) toggles ARTZone.ZoningTool on/off.
+// Purpose: Shift+Z (or the player's bound hotkey) toggles ARTZone.ZoningToolID on/off.
 // Notes:   RMB preview flip is handled inside ZoningControllerToolSystem via cancelAction.
 //          Release-safe - Debug-only helpers live in KeybindHotkeySystem.Debug.cs.
 
@@ -70,7 +70,7 @@ namespace ARTZone.Tools
             var toolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
 
             // Decide whether to enable the tool:
-            // true  = activate ARTZone.ZoningTool
+            // true  = activate ARTZone.ZoningToolID
             // false = deactivate (return to vanilla tool)
             bool willEnable =
                 toolSystem != null &&

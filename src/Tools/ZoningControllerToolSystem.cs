@@ -23,7 +23,7 @@ namespace ARTZone.Tools
     public partial class ZoningControllerToolSystem : ToolBaseSystem
     {
         // DO NOT CHANGE ToolID string. It must match every UI/TS reference
-        public const string ToolID = "ARTZone.ZoningTool";      // if this changes, MUST change also in TS.
+        public const string ToolID = "ARTZone.ZoningToolID";      // if this changes, MUST change also in TS.
         public override string toolID => ToolID;
 
         private ToolOutputBarrier m_ToolOutputBarrier = null!;

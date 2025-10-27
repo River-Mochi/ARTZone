@@ -37,7 +37,7 @@ const ToolZoningMode$ = bindValue<number>(mod.id, "ToolZoningMode");
 const isRoadPrefab$ = bindValue<boolean>(mod.id, "IsRoadPrefab");
 
 
-const ZONING_TOOL_ID = "ARTZone.ZoningTool";    // DO NOT CHANGE – must equal C# ZoningControllerToolSystem.ToolID
+const ZONING_TOOL_ID = "ARTZone.ZoningToolID";    // DO NOT CHANGE – must equal C# ZoningControllerToolSystem.ToolID
 
 function setToolZoningMode(value: ZoningMode) {
     try { console.log(`[ART][UI] TS click: ChangeToolZoningMode(${ZoningMode[value]}=${value})`); } catch { }
