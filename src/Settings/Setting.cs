@@ -67,7 +67,7 @@ namespace ARTZone.Settings
 
 #if DEBUG
         [SettingsUISection(kAboutTab, kAboutInfoGroup)]
-        public string InformationalVersionText => ARTZoneMod.InformationalVersion;
+        public string VersionText => ARTZoneMod.VersionShort;
 #endif
 
         private const string UrlMods = "TBD";

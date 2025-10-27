@@ -49,7 +49,7 @@ namespace ARTZone
 
         public void OnLoad(UpdateSystem updateSystem)
         {
-            s_Log.Info($"[ART] OnLoad v{InformationalVersion}");
+            s_Log.Info($"[ART] OnLoad v{VersionShort}");
 
             // Settings object first
             var settings = new Setting(this);
