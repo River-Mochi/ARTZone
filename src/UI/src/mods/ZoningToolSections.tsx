@@ -30,19 +30,23 @@ export enum ZoningMode {
 
 const RoadZoningMode$ = bindValue<number>(mod.id, "RoadZoningMode");
 const ToolZoningMode$ = bindValue<number>(mod.id, "ToolZoningMode");
-const isRoadPrefab$ = bindValue<boolean>(mod.id, "IsRoadPrefab");
+const isRoadPrefab$ = bindValue<boolean>(mod.id, "IsRoadPrefab"); // actually: “should show section”
 
 function setToolZoningMode(value: ZoningMode) {
     trigger(mod.id, "ChangeToolZoningMode", value);
+    try { console.log("[ART][UI] setToolZoningMode →", value); } catch { }
 }
 function setRoadZoningMode(value: ZoningMode) {
     trigger(mod.id, "ChangeRoadZoningMode", value);
+    try { console.log("[ART][UI] setRoadZoningMode →", value); } catch { }
 }
 function flipRoadBothMode() {
     trigger(mod.id, "FlipRoadBothMode");
+    try { console.log("[ART][UI] flipRoadBothMode"); } catch { }
 }
 function flipToolBothMode() {
     trigger(mod.id, "FlipToolBothMode");
+    try { console.log("[ART][UI] flipToolBothMode"); } catch { }
 }
 
 export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
@@ -50,8 +54,8 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
         const result = Component(props);
 
         const activeTool = useValue(tool.activeTool$)?.id;
-        const isRoadPrefab = useValue(isRoadPrefab$);
-        const zoningToolActive = activeTool === ZONING_TOOL_ID;
+        const showSection = useValue(isRoadPrefab$); // true when our tool active OR road prefab active
+        const zoningToolOn = activeTool === ZONING_TOOL_ID;
 
         const toolMode = useValue(ToolZoningMode$) as ZoningMode;
         const roadMode = useValue(RoadZoningMode$) as ZoningMode;
@@ -62,13 +66,20 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
         const tipLeft = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]") || "Zone only the left side.";
         const tipRight = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]") || "Zone only the right side.";
 
-        // Show under vanilla road placement OR under our tool
-        if (isRoadPrefab || zoningToolActive) {
-            const usingRoadState = isRoadPrefab;
+        // Show section if either a road prefab is active OR our tool is active.
+        if (showSection) {
+            // IMPORTANT: we only use roadMode when a road prefab is active AND our tool is NOT active.
+            const usingRoadState = !zoningToolOn && showSection;
             const selected = usingRoadState ? roadMode : toolMode;
 
-            const onLeft = () => (usingRoadState ? setRoadZoningMode(ZoningMode.Left) : setToolZoningMode(ZoningMode.Left));
-            const onRight = () => (usingRoadState ? setRoadZoningMode(ZoningMode.Right) : setToolZoningMode(ZoningMode.Right));
+            const onLeft = () => (usingRoadState
+                ? setRoadZoningMode(ZoningMode.Left)
+                : setToolZoningMode(ZoningMode.Left));
+
+            const onRight = () => (usingRoadState
+                ? setRoadZoningMode(ZoningMode.Right)
+                : setToolZoningMode(ZoningMode.Right));
+
             const onBoth = () => (usingRoadState ? flipRoadBothMode() : flipToolBothMode());
 
             result.props.children?.push(

@@ -3,7 +3,7 @@
 // Notes:
 //   • Locales are installed BEFORE Options UI (so labels render correctly).
 //   • RMB flip uses vanilla ToolBaseSystem.cancelAction → no custom binding here.
-//   • Top-left button & Panel tile use the same icon path (single source of truth).
+//   • Top-left button & Panel tile use the SAME filename family, but different SVGs.
 
 namespace ARTZone
 {
@@ -23,9 +23,14 @@ namespace ARTZone
     {
         public const string ModID = "ARTZone";
 
-        // Single source of truth in C# for game icon path 
-        public const string UiCouiRoot = "coui://ui-mods";      // webpack publicPath = coui://ui-mods/
-        public const string MainIconPath = UiCouiRoot + "/images/ico-4square-color.svg"; // must match in artzone-tool-button.tsx
+        // COUI base
+        public const string UiCouiRoot = "coui://ui-mods";
+
+        // Top-left floating action button (color)
+        public const string MainIconPath = UiCouiRoot + "/images/ico-4square-color.svg";
+
+        // Road Services panel button (original ART)
+        public const string PanelIconPath = UiCouiRoot + "/images/tool-icon.svg";
 
         public const string VersionShort = "1.0.1";
 
@@ -41,9 +46,8 @@ namespace ARTZone
             get; private set;
         }
 
-        public static readonly ILog s_Log = LogManager.GetLogger(ModID).SetShowsErrorsInUI(false);
+        public static readonly ILog s_Log = LogManager.getLogger(ModID).SetShowsErrorsInUI(false);
 
-        // Locale management guard (avoid double-install on reload)
         private static readonly HashSet<string> s_InstalledLocales = new();
         private static bool s_ReapplyingLocale;
 
@@ -51,32 +55,25 @@ namespace ARTZone
         {
             s_Log.Info($"[ART] OnLoad v{VersionShort}");
 
-            // Settings object first
             var settings = new Setting(this);
             Settings = settings;
 
-            // Register locales BEFORE register Options UI
+            // Locales first
             AddLocale("en-US", new LocaleEN(settings));
             AddLocale("fr-FR", new LocaleFR(settings));
-            // AddLocale("de-DE", new LocaleDE(settings));
             AddLocale("es-ES", new LocaleES(settings));
-            // AddLocale("it-IT", new LocaleIT(settings));
             AddLocale("ja-JP", new LocaleJA(settings));
             AddLocale("ko-KR", new LocaleKO(settings));
-            // AddLocale("pl-PL", new LocalePL(settings));
             AddLocale("pt-BR", new LocalePT_BR(settings));
-            AddLocale("zh-HANS", new LocaleZH_CN(settings));    // Simplified Chinese
-            // AddLocale("zh-HANT", new LocaleZH_HANT(settings));
+            AddLocale("zh-HANS", new LocaleZH_CN(settings));
 
-            // Load saved settings + register Options UI
             AssetDatabase.global.LoadSettings(ModID, settings, new Setting(this));
             settings.RegisterInOptionsUI();
 
-            // Key bindings (only Shift+Z)
+            // Key binding
             try
             {
                 settings.RegisterKeyBindings();
-
                 ToggleToolAction = settings.GetAction(kToggleToolActionName);
                 if (ToggleToolAction != null)
                     ToggleToolAction.shouldBeEnabled = true;
@@ -98,16 +95,15 @@ namespace ARTZone
             // definition only; prefab created after game load
             PanelBuilder.Initialize(force: false);
 
-            // Tool registration uses the same ToolID string. DO NOT CHANGE.
+            // Register our panel button with BLACK icon
             PanelBuilder.RegisterTool(
                 new ToolDefinition(
                     typeof(ZoningControllerToolSystem),
                     ZoningControllerToolSystem.ToolID,
-                    new ToolDefinition.UI(MainIconPath)        // Panel + top-left import use same asset name
+                    new ToolDefinition.UI(PanelIconPath) // use black icon for Road Services panel button
                 )
             );
 
-            // Keep strings updated when game language changes
             var lm = GameManager.instance?.localizationManager;
             if (lm != null)
             {
@@ -129,12 +125,9 @@ namespace ARTZone
                 ToggleToolAction.shouldBeEnabled = false;
                 ToggleToolAction = null;
             }
-
             Settings?.UnregisterInOptionsUI();
             Settings = null;
         }
-
-        // ---- Locale helpers -----------------------------------------
 
         private static void AddLocale(string id, IDictionarySource src)
         {
@@ -144,10 +137,8 @@ namespace ARTZone
                 s_Log.Warn($"[ART] No LocalizationManager; cannot add locale {id}");
                 return;
             }
-
             if (!s_InstalledLocales.Add(id))
                 return;
-
             lm.AddSource(id, src);
             s_Log.Info($"[ART] Locale installed: {id}");
         }
@@ -156,7 +147,6 @@ namespace ARTZone
         {
             if (s_ReapplyingLocale)
                 return;
-
             s_ReapplyingLocale = true;
             try
             {
@@ -164,10 +154,7 @@ namespace ARTZone
                 s_Log.Info("[ART] Active locale = " + id);
                 Settings?.RegisterInOptionsUI();
             }
-            finally
-            {
-                s_ReapplyingLocale = false;
-            }
+            finally { s_ReapplyingLocale = false; }
         }
     }
 }

@@ -12,9 +12,9 @@ import ARTZoneToolButton from "./mods/artzone-tool-button";
 import { ZoningToolController } from "./mods/ZoningToolSections";
 import { ToolOptionsVisibility } from "./mods/ToolOptionsVisible/toolOptionsVisible";
 
-// Ensure the icon is emitted to coui://ui-mods/images/ico-4square-color.svg
+// Ensure icon emitted to coui://ui-mods/images/
 import "../images/ico-4square-color.svg";   // TopLeft FAB
-import "../images/ico-4square-blk.svg";     // Roads tool panel
+import "../images/tool-icon.svg";           // RoadsServices tool panel
 
 // Single source of truth for vanilla modules/exports we touch
 const VANILLA = {
