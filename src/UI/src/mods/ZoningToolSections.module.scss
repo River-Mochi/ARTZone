@@ -1,11 +1,11 @@
-﻿// src/UI/src/mods/ZoningToolSections.module.scss
+﻿/*  src/UI/src/mods/ZoningToolSections.module.scss */
+/* Button wrapper: keep styles simple, Cohtml-safe, no space-evenly, transforms, or custom props. */
+
 .centeredContentButton {
-    position: absolute;
-    width: 24rem;
-    height: 24rem;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 18rem;
-    color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* stable on Cohtml */
+    width: 100%;
+    height: 100%;
+    /* the icon is comes from the ToolButton's 'src' prop; this just centers the slot */
 }

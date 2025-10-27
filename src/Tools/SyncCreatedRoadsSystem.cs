@@ -1,5 +1,5 @@
 // File: src/Tools/SyncCreatedRoadsSystem.cs
-// Purpose: adds ZoningDepth component to New created roads using the current RoadDepths from UI.
+// Purpose: adds ZoningDepth component to NEW created roads using the current RoadDepths from UI.
 // Without this, freshly drawn roads won’t inherit the chosen zoning side depths.
 
 namespace ARTZone.Tools
@@ -14,11 +14,28 @@ namespace ARTZone.Tools
     using Unity.Entities;
     using Unity.Jobs;
     using Unity.Mathematics;
+
     public partial class SyncCreatedRoadsSystem : GameSystemBase
     {
         private EntityQuery m_NewCreatedRoadsQuery;
         private ModificationBarrier4 m_ModificationBarrier = null!;   // set in OnCreate
         private ZoningControllerToolUISystem m_UISystem = null!;      // set in OnCreate
+
+#if DEBUG
+        private static void Dbg(string msg)
+        {
+            var log = ARTZoneMod.s_Log;
+            if (log == null)
+                return;
+            try
+            {
+                log.Info("[ART][SyncCreated] " + msg);
+            }
+            catch { /* never crash on logging */ }
+        }
+#else
+        private static void Dbg(string msg) { }
+#endif
 
         protected override void OnCreate()
         {
@@ -49,7 +66,7 @@ namespace ARTZone.Tools
             NativeArray<Entity> entities = m_NewCreatedRoadsQuery.ToEntityArray(Allocator.TempJob);
 
 #if DEBUG
-            ARTZoneMod.s_Log.Info($"[ART][SyncCreated] newRoads={entities.Length} depths=({depths.x},{depths.y})");
+            Dbg($"newRoads={entities.Length} depths=({depths.x},{depths.y})");
 #endif
 
             JobHandle job = new AddZoningDepthToCreatedRoadsJob
