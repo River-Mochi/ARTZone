@@ -29,7 +29,6 @@ namespace ARTZone.Tools
         private ZoningControllerToolUISystem m_UISystem = null!;
         private ToolHighlightSystem m_Highlight = null!;
 
-        private ComponentLookup<ZoningDepthComponent> m_ZoningDepthLookup;
         private BufferLookup<SubBlock> m_SubBlockLookup;
 
         private EntityQuery m_ZoningPreviewQuery;
@@ -61,7 +60,9 @@ namespace ARTZone.Tools
             catch { }
         }
 #else
-        private static void Dbg(string msg) { }
+        private static void Dbg(string msg)
+        {
+        }
 #endif
 
         protected override void OnCreate()
@@ -80,7 +81,6 @@ namespace ARTZone.Tools
                 .WithAll<ToolUXSoundSettingsData>()
                 .Build(this);
 
-            m_ZoningDepthLookup = GetComponentLookup<ZoningDepthComponent>(true);
             m_SubBlockLookup = GetBufferLookup<SubBlock>(true);
 
             m_SelectedEntities = new NativeList<Entity>(Allocator.Persistent);
@@ -115,7 +115,6 @@ namespace ARTZone.Tools
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            m_ZoningDepthLookup.Update(this);
             m_SubBlockLookup.Update(this);
             inputDeps = Dependency;
 
@@ -276,10 +275,14 @@ namespace ARTZone.Tools
 
         public override bool TrySetPrefab(PrefabBase prefab)
         {
-            if (prefab == null || prefab.name != toolID)
-                return false;
+            if (prefab == null || prefab.name != ToolID)
+#if DEBUG
+                ARTZoneMod.s_Log.Warn($"[ART][Tool] TrySetPrefab rejected: prefab='{prefab?.name}', expected='{ToolID}'");
+#endif
+            return false;
             m_ToolPrefab = prefab;
             return true;
+
         }
 
         public override void InitializeRaycast()

@@ -17,7 +17,7 @@ namespace ARTZone.Tools
         /// Logs that hotkeys were wired and dumps a sample of input actions.
         /// In Release builds this method does not exist.
         /// </summary>
-        private partial void DebugInit()
+        partial void DebugInit()
         {
             Dbg("Created; hotkeys wired (DEBUG build).");
             DumpInputActions();

@@ -441,6 +441,3 @@ MemoryCaptures/
 # --- Project-specific ignores ---
 # keep docs local only
 docs/
-nul
-
-nul

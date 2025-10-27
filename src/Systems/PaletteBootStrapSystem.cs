@@ -38,7 +38,9 @@ namespace ARTZone.Systems
             }
         }
 #else
-        private static void Dbg(string msg) { }
+        private static void Dbg(string msg)
+        {
+        }
 #endif
 
         protected override void OnCreate()

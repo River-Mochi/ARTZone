@@ -31,6 +31,7 @@
 ---
 
 ## Compatibility
+- 
 - Safe to remove anytime.
 - Does not use Harmony; safe/compatible (less likely to break with game updates).
 - Designed to be minimal and low-conflict (extends vanilla UI panel instead of replacing it)
@@ -55,7 +56,8 @@
 * StarQ for technical support.
 * yenyang for technical support.
 * and the CS2 modding community for pointers and testing.
-* tested by Necko1996
+* Necko1996 for testing/feedback
+* 
 
 ### Supports languages
 * English, Français (French), Español (Spanish)

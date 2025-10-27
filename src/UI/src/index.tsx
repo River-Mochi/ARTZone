@@ -13,7 +13,7 @@ import { ZoningToolController } from "./mods/ZoningToolSections";
 import { ToolOptionsVisibility } from "./mods/ToolOptionsVisible/toolOptionsVisible";
 
 // Ensure the icon is emitted to coui://ui-mods/images/ico-4square-color.svg
-// import "../images/ico-4square-color.svg";  already emitted in artzone-tool-button.tsx
+import "../images/ico-4square-color.svg";
 
 // Single source of truth for vanilla modules/exports we touch
 const VANILLA = {
@@ -47,7 +47,7 @@ const register: ModRegistrar = (moduleRegistry) => {
     VanillaComponentResolver.setRegistry(moduleRegistry);
 
     // One-time diagnostic to help locate vanilla Topography / Contours control.
-    // You’ll see this in UI.log (short and easy to read).
+    // results in UI.log
     try {
         const candidates = moduleRegistry.find(/topograph|contour|terrain|overlay|elev|height/i);
         if (Array.isArray(candidates) && candidates.length) {
