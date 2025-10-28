@@ -1,8 +1,10 @@
+// File: lang/es-ES.json
+// Spanish 
 {
-  "ARTZone.Zone_Controller.ToolName": "ART—Control de zona",
+  "EasyZoning.Zone_Controller.ToolName": "Zonificación Fácil",
 
-  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "Lado de zonificación",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "Zonar ambos lados.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "Zonar solo el lado izquierdo.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "Zonar solo el lado derecho."
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Lado de Zonificación",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Alternar Ambos/Ninguno.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Zonar solo el lado izquierdo.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Zonar solo el lado derecho."
 }

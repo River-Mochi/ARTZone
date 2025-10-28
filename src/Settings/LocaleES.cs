@@ -1,11 +1,11 @@
 // File: src/Settings/LocaleES.cs
-// Spanish (es-ES) strings for Options UI + Panel text.
+// Purpose: Spanish (es-ES) strings for Options UI + Panel text.
 
-namespace ARTZone.Settings
+namespace EasyZoning.Settings
 {
     using System.Collections.Generic;
-    using ARTZone.Tools;
     using Colossal;
+    using EasyZoning.Tools;
 
     public sealed class LocaleES : IDictionarySource
     {
@@ -19,7 +19,7 @@ namespace ARTZone.Settings
             var d = new Dictionary<string, string>
             {
                 // Settings title
-                { m_Settings.GetSettingsLocaleID(), "ART — Zonas" },
+                { m_Settings.GetSettingsLocaleID(), "Easy Zoning [EZ]" },
 
                 // Tabs
                 { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "Acciones" },
@@ -32,32 +32,32 @@ namespace ARTZone.Settings
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
                 // Toggles
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "No eliminar celdas ya zonificadas" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "No sobrescribe celdas ya zonificadas durante la vista previa o la aplicación.\n <Se recomienda activarlo.>" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Evitar que se eliminen celdas zonificadas" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "No cambiar celdas ya zonificadas durante la vista previa/aplicación.\n<Se recomienda habilitar.>" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "No eliminar celdas ocupadas" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "No sobrescribe celdas ya ocupadas durante la vista previa o la aplicación (por ejemplo, con edificios).\n <Se recomienda activarlo.>" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Evitar que se eliminen celdas ocupadas" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "No cambiar celdas ocupadas durante la vista previa/aplicación (p. ej., edificios).\n<Se recomienda habilitar.>" },
 
-                // Keybind
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Mostrar / ocultar panel" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Muestra/oculta el panel de ART-Zone (por defecto Shift+Z)." },
+                // Keybind (only one visible)
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Alternar panel" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Mostrar el botón del panel de Easy Zoning (por defecto Shift+Z)." },
 
-                // Binding title
-                { m_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "Mostrar / ocultar panel ART-Zone" },
+                // Binding title in the keybinding dialog
+                { m_Settings.GetBindingKeyLocaleID(EasyZoningMod.kToggleToolActionName), "Alternar panel de Easy Zoning" },
 
-                // Panel text
-                { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Editor de zona" },
+                // Panel (Road Services tile)
+                { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Easy Zoning" },
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                  "Cambia la zonificación de las carreteras: ambos lados, izquierda, derecha o ninguno. Clic derecho alterna la opción. Clic izquierdo confirma." },
+                  "Elige la zonificación de las carreteras: ambos, izquierda, derecha o ninguna.\nClic derecho alterna; clic izquierdo aplica." },
 
-                // About tab
+                // About tab labels
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Nombre del mod" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Nombre mostrado de este mod." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Nombre visible de este mod." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "Versión" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "Versión actual del mod." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenMods)),    "Paradox Mods" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenMods)),     "Abrir la página en Paradox Mods." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenMods)),     "Abrir la página de Paradox Mods." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Unirse al Discord del mod." },
             };

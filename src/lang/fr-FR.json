@@ -1,8 +1,10 @@
+// File: lang/fr-FR.json
+// French
 {
-  "ARTZone.Zone_Controller.ToolName": "ART—Contrôle de zonage",
+  "EasyZoning.Zone_Controller.ToolName": "Zonage Facile",
 
-  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "Côté de zonage",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "Appliquer le zonage des deux côtés.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "Zonage uniquement côté gauche.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "Zonage uniquement côté droit."
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Côté de Zonage",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Basculer Les Deux/Aucun.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Zoner uniquement le côté gauche.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Zoner uniquement le côté droit."
 }

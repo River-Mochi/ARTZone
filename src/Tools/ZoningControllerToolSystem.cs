@@ -1,13 +1,14 @@
 ﻿// File: src/Tools/ZoningControllerToolSystem.cs
 // Purpose:
 //   Runtime tool. RMB toggles preview over valid roads (Left<->Right or Both<->None).
-//   LMB confirms. ESC is not handled here (left to vanilla UI to close panels).
+//   LMB confirms. ESC is left to vanilla UI.
 //   Preview always reflects the current mode for the hovered segment.
+//
+// FULL DROP-IN
 
-namespace ARTZone.Tools
+namespace EasyZoning.Tools
 {
     using System;
-    using ARTZone.Components;
     using Game.Audio;
     using Game.Common;
     using Game.Net;
@@ -22,9 +23,9 @@ namespace ARTZone.Tools
 
     public partial class ZoningControllerToolSystem : ToolBaseSystem
     {
-        // DO NOT CHANGE ToolID string. It must match every UI/TS reference
-        public const string ToolID = "ARTZone.ZoningTool";      // if this changes, MUST change also in TS.
-        public override string toolID => ToolID;    // required
+        // ToolID must match UI/TS reference
+        public const string ToolID = "EasyZoning.ZoningTool";
+        public override string toolID => ToolID;
 
         private ToolOutputBarrier m_ToolOutputBarrier = null!;
         private ZoningControllerToolUISystem m_UISystem = null!;
@@ -51,12 +52,12 @@ namespace ARTZone.Tools
 #if DEBUG
         private static void Dbg(string msg)
         {
-            var log = ARTZoneMod.s_Log;
+            var log = EasyZoningMod.s_Log;
             if (log == null)
                 return;
             try
             {
-                log.Info("[ART][Tool] " + msg);
+                log.Info("[EZ][Tool] " + msg);
             }
             catch { }
         }
@@ -94,7 +95,6 @@ namespace ARTZone.Tools
             base.OnDestroy();
         }
 
-        // ----  Lifecycle ------------------------------------------------------------
         protected override void OnStartRunning()
         {
             base.OnStartRunning();
@@ -121,7 +121,6 @@ namespace ARTZone.Tools
 #endif
         }
 
-
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             m_SubBlockLookup.Update(this);
@@ -142,7 +141,7 @@ namespace ARTZone.Tools
             if (haveSoundbank)
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
-            // RMB toggling (raw). ESC is NOT handled here so vanilla can close panels.
+            // RMB toggling (raw). ESC not handled here.
             bool rmbPressed = Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame;
 
             if (rmbPressed && hasRoad)
@@ -185,7 +184,7 @@ namespace ARTZone.Tools
                 m_Mode = Mode.Preview;
             }
 
-            EntityCommandBuffer ecb = m_ToolOutputBarrier.CreateCommandBuffer();
+            var ecb = m_ToolOutputBarrier.CreateCommandBuffer();
 
             switch (m_Mode)
             {
@@ -266,31 +265,28 @@ namespace ARTZone.Tools
             return inputDeps;
         }
 
-        // Helper - returns true if the cursor is over a zonable road entity.
         // Roads without SubBlocks (e.g., highways) are ignored.
         private bool TryGetRoadUnderCursor(out Entity entity, out RaycastHit hit)
         {
             if (!GetRaycastResult(out entity, out hit))
                 return false;
-            // filter gate only accepts roads that expose zone SubBlocks
+
             if (!m_SubBlockLookup.TryGetBuffer(entity, out _))
             {
                 entity = Entity.Null;
                 return false;
             }
-            return true;        // zonable road entitires pass to preview/apply
+            return true;
         }
 
         public override PrefabBase GetPrefab() => m_ToolPrefab;
 
-
-        // ----  Prefab ownership (called by PanelBuilder) --------------------------
         public override bool TrySetPrefab(PrefabBase prefab)
         {
             if (prefab == null || prefab.name != toolID)
             {
 #if DEBUG
-                ARTZoneMod.s_Log.Warn($"[ART][Tool] TrySetPrefab rejected: prefab='{prefab?.name}', expected='{ToolID}'");
+                EasyZoningMod.s_Log.Warn($"[EZ][Tool] TrySetPrefab rejected: prefab='{prefab?.name}', expected='{ToolID}'");
 #endif
                 return false;
             }
@@ -308,7 +304,6 @@ namespace ARTZone.Tools
             m_ToolRaycastSystem.netLayerMask = Layer.Road;
         }
 
-        // ----  Toggle from UI/Hotkey -----------------------------------------------
         public void SetToolEnabled(bool isEnabled)
         {
             if (m_ToolSystem == null)
@@ -337,7 +332,6 @@ namespace ARTZone.Tools
             public NativeArray<Entity>.ReadOnly SelectedEntities;
             public int2 Depths;
 
-            // Avoid redundant AddComponent when preview depths unchanged
             public void Execute(int index)
             {
                 Entity e = SelectedEntities[index];
@@ -348,7 +342,6 @@ namespace ARTZone.Tools
                     {
                         ECB.SetComponent(index, e, new ZoningPreviewComponent { Depths = Depths });
                     }
-                    // else: already matches; no-op
                 }
                 else
                 {
@@ -357,7 +350,6 @@ namespace ARTZone.Tools
 
                 ECB.AddComponent<Updated>(index, e);
             }
-
         }
 
         public struct CleanupTempJob : IJobParallelFor

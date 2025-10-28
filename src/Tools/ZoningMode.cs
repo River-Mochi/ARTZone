@@ -1,7 +1,8 @@
-// src/Tools/ZoningMode.cs
-// Bitmask used by UI and tool systems for left/right/both zoning toggles.
+// File: src/Tools/ZoningMode.cs
+// Purpose: Bitmask used by UI and tool systems for left/right/both zoning toggles.
+// FULL DROP-IN
 
-namespace ARTZone.Tools
+namespace EasyZoning.Tools
 {
     using System;
 

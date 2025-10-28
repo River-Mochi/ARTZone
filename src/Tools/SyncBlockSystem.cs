@@ -1,11 +1,12 @@
-// src/Tools/SyncBlockSystem.cs
+// File: src/Tools/SyncBlockSystem.cs
 // Purpose: applies the preview/committed zoning depth to actual zone blocks
 // respecting settings (RemoveZonedCells / RemoveOccupiedCells). Tool won’t function without it.
+//
+// FULL DROP-IN
 
-namespace ARTZone.Tools
+namespace EasyZoning.Tools
 {
     using System;
-    using ARTZone.Components;
     using Game;
     using Game.Common;
     using Game.Zones;
@@ -47,12 +48,12 @@ namespace ARTZone.Tools
                 return;
 
 #if DEBUG
-            // Throttle noisy logs: once per ~30 frames or when count changes
             int count = m_UpdatedBlocksQuery.CalculateEntityCount();
             m_LogTick++;
             if (count != m_LastCount || (m_LogTick % 30) == 0)
             {
-                ARTZoneMod.s_Log.Info($"[ART][SyncBlock] blocks={count} removeOcc={ARTZoneMod.Settings?.RemoveOccupiedCells == true} removeZoned={ARTZoneMod.Settings?.RemoveZonedCells == true}");
+                EasyZoningMod.s_Log.Info(
+                    $"[EZ][SyncBlock] blocks={count} removeOcc={EasyZoningMod.Settings?.RemoveOccupiedCells == true} removeZoned={EasyZoningMod.Settings?.RemoveZonedCells == true}");
                 m_LastCount = count;
             }
 #endif
@@ -93,7 +94,6 @@ namespace ARTZone.Tools
             {
                 Entity blockEntity = Entities[index];
 
-                // These indexers will throw if the component is missing; the query guarantees they exist.
                 Block block = BlockLookup[blockEntity];
                 ValidArea validArea = ValidAreaLookup[blockEntity];
 
@@ -112,13 +112,14 @@ namespace ARTZone.Tools
                 else
                     return;
 
-                if (ARTZoneMod.Settings != null)
+                // Respect settings
+                if (EasyZoningMod.Settings != null)
                 {
-                    if (ARTZoneMod.Settings.RemoveOccupiedCells &&
+                    if (EasyZoningMod.Settings.RemoveOccupiedCells &&
                         IsAnyCellOccupied(CellLookup[blockEntity], block, validArea))
                         return;
 
-                    if (ARTZoneMod.Settings.RemoveZonedCells &&
+                    if (EasyZoningMod.Settings.RemoveZonedCells &&
                         IsAnyCellZoned(CellLookup[blockEntity], block, validArea))
                         return;
                 }
@@ -130,7 +131,6 @@ namespace ARTZone.Tools
                 ECB.SetComponent(index, blockEntity, validArea);
             }
 
-            // Remove 'in' on non-readonly structs to silence RCS1242.
             private bool IsAnyCellOccupied(DynamicBuffer<Cell> cells, Block block, ValidArea validArea)
             {
                 if (validArea.m_Area.y * validArea.m_Area.w == 0)

@@ -1,9 +1,11 @@
-// File: src/Systems/ARTPanelBootstrapSystem.cs
+// File: src/Systems/PanelBootStrapSystem.cs
 // Purpose:
 //   Wait until a RoadsServices donor/anchor exists, then call PanelBuilder.InstantiateTools().
-//   Arms only after a game load, then turns itself off
+//   Arms only after a game load, then turns itself off.
+//
+// FULL DROP-IN
 
-namespace ARTZone.Systems
+namespace EasyZoning.Systems
 {
     using Colossal.Serialization.Entities; // Purpose, GameMode
     using Game;
@@ -25,18 +27,20 @@ namespace ARTZone.Systems
 #if DEBUG
         private static void Dbg(string msg)
         {
-            var log = ARTZoneMod.s_Log;
+            var log = EasyZoningMod.s_Log;
             if (log != null)
             {
                 try
                 {
-                    log.Info("[ART][Bootstrap] " + msg);
+                    log.Info("[EZ][Bootstrap] " + msg);
                 }
                 catch { }
             }
         }
 #else
-        private static void Dbg(string msg) { }
+        private static void Dbg(string msg)
+        {
+        }
 #endif
 
         protected override void OnCreate()
@@ -48,8 +52,7 @@ namespace ARTZone.Systems
             m_Done = false;
             m_Tries = 0;
 
-            // Stay off until we're actually in a playable map.
-            Enabled = false;
+            Enabled = false; // stay off until we’re in a playable map
         }
 
         protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
@@ -67,7 +70,7 @@ namespace ARTZone.Systems
                 m_Tries = 0;
                 Enabled = false;
 #if DEBUG
-                Dbg($"OnGameLoadingComplete(mode={mode}, purpose={purpose}) → not gameplay; staying disarmed.");
+                Dbg($"OnGameLoadingComplete(mode={mode}, purpose={purpose}) → not gameplay; disarmed.");
 #endif
                 return;
             }
@@ -113,7 +116,7 @@ namespace ARTZone.Systems
 
             if (m_Tries >= MaxTries)
             {
-                ARTZoneMod.s_Log.Error("[ART][Bootstrap] Giving up; RoadsServices donor never appeared.");
+                EasyZoningMod.s_Log.Error("[EZ][Bootstrap] Giving up; RoadsServices donor never appeared.");
                 m_Armed = false;
                 Enabled = false;
             }

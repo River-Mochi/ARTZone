@@ -1,11 +1,11 @@
 // File: src/Settings/LocaleEN.cs
-// English (en-US) strings for Options UI + Panel text.
+// Purpose: English (en-US) strings for Options UI + Panel text.
 
-namespace ARTZone.Settings
+namespace EasyZoning.Settings
 {
     using System.Collections.Generic;
-    using ARTZone.Tools;
     using Colossal;
+    using EasyZoning.Tools;
 
     public sealed class LocaleEN : IDictionarySource
     {
@@ -19,7 +19,7 @@ namespace ARTZone.Settings
             var d = new Dictionary<string, string>
             {
                 // Settings title
-                { m_Settings.GetSettingsLocaleID(), "ART — Zoning" },
+                { m_Settings.GetSettingsLocaleID(), "Easy Zoning [EZ]" },
 
                 // Tabs
                 { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "Actions" },
@@ -33,25 +33,22 @@ namespace ARTZone.Settings
 
                 // Toggles
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Prevent zoned cells from being removed" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Do not change already zoned cells during preview/apply.\n" +
-                "<Enabled recommended.>" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Do not change already zoned cells during preview/apply.\n<Enabled recommended.>" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Do not change already occupied cells during preview/apply (e.g. buildings).\n" +
-                "<Enabled recommended>." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Do not change occupied cells during preview/apply (e.g., buildings).\n<Enabled recommended.>" },
 
                 // Keybind (only one visible)
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Toggle Panel" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Show the ART-Zone panel button (default Shift+Z)." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Show the Easy Zoning panel button (default Shift+Z)." },
 
                 // Binding title in the keybinding dialog
-                { m_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "Toggle Zone Button Panel" },
+                { m_Settings.GetBindingKeyLocaleID(EasyZoningMod.kToggleToolActionName), "Toggle Easy Zoning Button Panel" },
 
                 // Panel (Road Services tile)
-                { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Zone Changer" },
+                { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Easy Zoning" },
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                  "Change zoning on roads: both sides, left, right, or none.\n" +
-                  "Right-click flips the choice. Left-click confirms." },
+                  "Choose zoning for roads: both, left, right, or none.\nRight-click flips; left-click applies." },
 
                 // About tab labels
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Mod name" },

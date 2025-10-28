@@ -1,10 +1,10 @@
-// lang/zh-HANS.json
-// strings read by TSX via useLocalization() ToolOptions only.
+// File: lang/zh-HANS.json
+// Simplified Chinese
 {
-  "ARTZone.Zone_Controller.ToolName": "ART — 分区控制",
+  "EasyZoning.Zone_Controller.ToolName": "简易分区",
 
-  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "分区侧",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "两侧都分区。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "只在左侧分区。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "只在右侧分区。"
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "分区方向",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "切换 双侧/无。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "仅分区左侧。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "仅分区右侧。"
 }

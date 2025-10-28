@@ -1,10 +1,10 @@
 // File: src/Tools/SyncCreatedRoadsSystem.cs
-// Purpose: adds ZoningDepth component to NEW created roads using the current RoadDepths from UI.
+// Purpose: adds ZoningDepth component to NEW created roads using current UI depths.
 // Without this, freshly drawn roads won’t inherit the chosen zoning side depths.
 
-namespace ARTZone.Tools
+
+namespace EasyZoning.Tools
 {
-    using ARTZone.Components;
     using Game;
     using Game.Common;
     using Game.Net;
@@ -18,23 +18,25 @@ namespace ARTZone.Tools
     public partial class SyncCreatedRoadsSystem : GameSystemBase
     {
         private EntityQuery m_NewCreatedRoadsQuery;
-        private ModificationBarrier4 m_ModificationBarrier = null!;   // set in OnCreate
-        private ZoningControllerToolUISystem m_UISystem = null!;      // set in OnCreate
+        private ModificationBarrier4 m_ModificationBarrier = null!;
+        private ZoningControllerToolUISystem m_UISystem = null!;
 
 #if DEBUG
         private static void Dbg(string msg)
         {
-            var log = ARTZoneMod.s_Log;
+            var log = EasyZoningMod.s_Log;
             if (log == null)
                 return;
             try
             {
-                log.Info("[ART][SyncCreated] " + msg);
+                log.Info("[EZ][SyncCreated] " + msg);
             }
-            catch { /* never crash on logging */ }
+            catch { }
         }
 #else
-        private static void Dbg(string msg) { }
+        private static void Dbg(string msg)
+        {
+        }
 #endif
 
         protected override void OnCreate()
@@ -52,13 +54,12 @@ namespace ARTZone.Tools
 
         protected override void OnUpdate()
         {
-            // UISystem is created in OnCreate, but be defensive.
             if (m_UISystem == null)
                 return;
 
             int2 depths = m_UISystem.RoadDepths;
 
-            // Only act when there are brand new roads AND the chosen depth is not the vanilla default (6,6).
+            // Only act when there are brand new roads AND the chosen depth is not vanilla default (6,6).
             if (m_NewCreatedRoadsQuery.IsEmpty || !math.any(depths != new int2(6)))
                 return;
 
@@ -95,9 +96,8 @@ namespace ARTZone.Tools
             {
                 Entity entity = Entities[index];
 
-                // If Temp was removed mid-frame, skip quietly.
                 if (!TempLookup.HasComponent(entity))
-                    return;
+                    return; // Temp removed mid-frame
 
                 Temp temp = TempLookup[entity];
 

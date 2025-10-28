@@ -1,8 +1,10 @@
+// File: lang/ko-KR.json
+// Korean
 {
-  "ARTZone.Zone_Controller.ToolName": "ART — 존 제어",
+  "EasyZoning.Zone_Controller.ToolName": "이지 조닝",
 
-  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "존 측면",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "양쪽 모두에 존을 설정합니다.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "왼쪽만 존을 설정합니다.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "오른쪽만 존을 설정합니다."
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "조닝 방향",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "양쪽/없음 전환.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "왼쪽만 조닝.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "오른쪽만 조닝."
 }

@@ -1,94 +1,71 @@
-﻿<Publish>
-	<!--Id must be set in order to update existed mod. it is not required for publishing mod for the first time-->
+﻿// File: Properties/ParadoxPublish.xml
+
+
+<Publish>
+	<!-- If updating an existing mod on Paradox Mods, set this to the assigned numeric/string ID -->
 	<ModId Value="" />
-	<!--Name of the mod to display to players-->
-	<DisplayName Value="ART-Zone" />
-	<!--Short description of the mod-->
-	<ShortDescription Value="Live Zoning Control for roads: allows custom changes to zoning any side of a road; Affects the direction buildings face." />
-	<!--Long description of the mod. Single line or multi line. Supports minimal markdown subset-->
-	<!--LongDescription Value="This is a long description" /-->
+
+	<!-- Display name -->
+	<DisplayName Value="Easy Zoning [EZ]" />
+
+	<!-- Short one-liner -->
+	<ShortDescription Value="Live zoning control for roads: Left/Right/Both/None. Flip with RMB, apply with LMB." />
+
+	<!-- Long description (minimal markdown supported) -->
 	<LongDescription>
-# ART-Zone
-		
-Custom zoning for new and existing roads.
+		# Easy Zoning [EZ]
 
-## Features
-Control zoning on roads
-- Preview tool: just hover the road to see what you get instantly!
-- Easy and Intuitive: Right-click flips the current zoning preview, Left click confirms.
-- Adds a small “Zoning Side” panel next to the Road tabs and looks/acts like vanilla.
-- New Roads, old Roads - no problem! - remembers your last selection of Both/none/left/right.
-- Options to lock/protect existing buildings and already zoned grids from changing.
-- Three ways to start zoning:
-  - Top left icon (4 square symbol)
-  - Roads Services tab (4 square symbol)
-  - Optional Shift+z keybind
+		Custom zoning for new and existing roads.
 
-### Multi-Language UI (7)
-* English, Français French, Español Spanish
-* 日本語 Japanese, 한국어 Korean, 简体中文 Simplified Chinese
-* Português Brazilian
+		## Features
+		- Hover to preview instantly
+		- **Right-Click** flips preview (Left↔Right or Both↔None)
+		- Small vanilla-style “Zoning Side” panel beside Roads
+		- Remembers your last selection
+		- Options to protect existing buildings and already-zoned grids
+		- Launch via:
+		- Top-left icon (four-squares)
+		- Roads Services tile
+		- Optional **Shift+Z** hotkey
 
+		## How to use
+		1. Open **Roads** → click **Easy Zoning**.
+		2. Hover a road to preview.
+		3. **Right-Click** to flip; **Left-Click** to apply.
 
-## How to use
-1. Open **Roads** → click the **ART-Zone** tool (4-squares icon).
-2. **Zoning Side** mini-panel appears (Left / Right / Both / None).
-3. **Hover a road** to see a preview of zoning cells.
-4. **Right-Click** to cycle previews:
-- **Left ↔ Right** when any side icon is selected.
-- **Both ↔ None** when Both or None is selected.
-5. **Left-Click** once to apply.
-6. **Optional:** **Shift+Z** shortcut to open the tool panel (not required).
+		## Compatibility
+		- No Harmony
+		- Low-conflict, extends vanilla UI
+		- Uses native input and sounds
 
-Tip: You can Right-Click multiple times to preview different outcomes, then Left-Click once to commit.
-
-## Compatibility
-- Safe to remove any time.
-- This mod not use Harmony; safe/compatible (reduces possibility of breaking with every game update).
-- Mod back-end design for robust, minimal, and low-conflict. Front-end for safe/intuitive UX (extends vanilla UI instead of replacing it).
-- Uses the game’s input system; sounds and selection feedback designed to feel vanilla.
-
-### Support
-* If the mod helps you, give it a Like and let your friends know about it :)
-* Feedback at Cities: Skylines Modding Discord: https://discord.gg/HTav7ARPs2
-
-## Roadmap
-- Planned: more languages
-- Planned: contour/topography toggle in the same mini-panel for terrain-aware zoning.
-
-## Credits
-* RiverMochi - mod author
-* Thanks to LuxStice for the original Advanced Road Tools (obsolete)
-* yenyang for technical help.
-* StarQ for technical help.
-* Necko1996 for testing
-* and the CS2 modding community for pointers and testing.
-
-
-(Zoning, zone, cell, grid, road tool, utility, building direction, layout)
-
+		## Links
+		- Discord: https://discord.gg/HTav7ARPs2
+		- GitHub: https://github.com/River-Mochi/EasyZoning
 	</LongDescription>
-<!--Thumbnail-->
+
+	<!-- Assets -->
 	<Thumbnail Value="Properties/Thumbnail.png" />
-	<!--Screenshot, can be set multiple times-->
 	<Screenshot Value="Properties/screenshot-01.jpg" />
 	<Screenshot Value="" />
-	<!--Tag, can be set multiple times-->
-	<Tag Value="Code Mod" />
-	<!--Link to the forum post where the mod can be discussed-->
-	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/art-zone.1864484/" />
-	<!--Version of the mod-->
-	<ModVersion Value="1.0.1" />
-	<!--Recommended version of the base game to use the mod-->
-	<GameVersion Value="1.3.*" />
-	<!--Dependency for the mod, can be set multiple times-->
-	<Dependency Id="" />
-	<!--Required DLC, can be set multiple times. Supported values are "Landmark Buildings", "San Fransisco Set", "Beach Properties", "Urban Promenades", "Modern Architecture"-->
-	<RequiredDLC Value="" />
-	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
-<ChangeLog> </ChangeLog>
-	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab-->
-<ExternalLink Type="discord" Url="https://discord.gg/HTav7ARPs2" />
-<ExternalLink Type="github" Url="https://github.com/River-Mochi/ART-Zone" />
 
+	<!-- Tags -->
+	<Tag Value="Code Mod" />
+
+	<!-- Official discussion thread (set when you have it) -->
+	<ForumLink Value="" />
+
+	<!-- Versioning -->
+	<ModVersion Value="1.0.1" />
+	<GameVersion Value="1.3.*" />
+
+	<!-- Dependencies / DLC (optional) -->
+	<Dependency Id="" />
+	<RequiredDLC Value="" />
+
+	<!-- Changelog -->
+	<ChangeLog>Initial Easy Zoning release.</ChangeLog>
+
+	<!-- External links -->
+	<ExternalLink Type="discord" Url="https://discord.gg/HTav7ARPs2" />
+	<ExternalLink Type="github"  Url="https://github.com/River-Mochi/EasyZoning" />
 </Publish>

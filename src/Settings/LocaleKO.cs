@@ -1,11 +1,11 @@
 // File: src/Settings/LocaleKO.cs
-// Korean (ko-KR) strings for Options UI + Panel text.
+// Purpose: Korean (ko-KR) strings for Options UI + Panel text.
 
-namespace ARTZone.Settings
+namespace EasyZoning.Settings
 {
     using System.Collections.Generic;
-    using ARTZone.Tools;
     using Colossal;
+    using EasyZoning.Tools;
 
     public sealed class LocaleKO : IDictionarySource
     {
@@ -19,38 +19,38 @@ namespace ARTZone.Settings
             var d = new Dictionary<string, string>
             {
                 // Settings title
-                { m_Settings.GetSettingsLocaleID(), "ART — 존 설정" },
+                { m_Settings.GetSettingsLocaleID(), "Easy Zoning [EZ]" },
 
                 // Tabs
                 { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "동작" },
                 { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "정보" },
 
                 // Groups
-                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "존 옵션" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "키 설정" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "조닝 옵션" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "키 바인딩" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
                 // Toggles
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "이미 지정된 존 셀 삭제 안 함" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "미리보기/적용 중 이미 존이 지정된 셀을 덮어쓰지 않습니다.\n <사용 권장>" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "존이 지정된 칸 보호" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "미리보기/적용 중 이미 존이 지정된 칸을 변경하지 않습니다.\n<사용 권장>" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "이미 사용 중인 셀 삭제 안 함" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "미리보기/적용 중 건물이 있는 등 이미 점유된 셀을 덮어쓰지 않습니다.\n <사용 권장>" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "점유된 칸 보호" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "미리보기/적용 중 점유된 칸(예: 건물)을 변경하지 않습니다.\n<사용 권장>" },
 
-                // Keybind
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "패널 표시 / 숨기기" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "ART-Zone 패널을 표시/숨깁니다 (기본 Shift+Z)." },
+                // Keybind (only one visible)
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "패널 토글" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Easy Zoning 패널 버튼 표시(기본 Shift+Z)." },
 
-                // Binding title
-                { m_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "ART-Zone 패널 표시 / 숨기기" },
+                // Binding title in the keybinding dialog
+                { m_Settings.GetBindingKeyLocaleID(EasyZoningMod.kToggleToolActionName), "Easy Zoning 패널 토글" },
 
-                // Panel text
-                { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "존 변경 도구" },
+                // Panel (Road Services tile)
+                { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Easy Zoning" },
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                  "도로의 존을 변경합니다: 양쪽, 왼쪽, 오른쪽 또는 없음. 마우스 오른쪽 버튼으로 선택을 전환하고 왼쪽 버튼으로 확정합니다." },
+                  "도로 조닝 선택: 양쪽, 왼쪽, 오른쪽 또는 없음.\n우클릭 전환, 좌클릭 적용." },
 
-                // About tab
+                // About tab labels
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "모드 이름" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "이 모드의 표시 이름." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "버전" },
@@ -59,7 +59,7 @@ namespace ARTZone.Settings
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenMods)),    "Paradox Mods" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenMods)),     "Paradox Mods 페이지 열기." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "모드 Discord에 참가합니다." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "모드 Discord 참여." },
             };
             return d;
         }

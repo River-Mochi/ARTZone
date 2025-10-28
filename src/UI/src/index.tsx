@@ -1,28 +1,24 @@
 // File: src/UI/src/index.tsx
-// Purpose: Registrar — wire React bits into vanilla UI.
-//   • Floating button at GameTopLeft
-//   • “Zoning Side” section in MouseToolOptions
-//   • Keep Tool Options panel visible for our tool
-//   • Optional: DIAG_TOPO to scan modules in UI.log
-//
-// Also ensures our images are emitted to coui://ui-mods/images/.
+
+// Purpose: Hook our UI into vanilla, register top-left button + Tool Options section,
+// and keep the options panel visible when our tool is active.
 
 import type { ModRegistrar, ModuleRegistry } from "cs2/modding";
 import { VanillaComponentResolver } from "./YenYang/VanillaComponentResolver";
-import ARTZoneToolButton from "./mods/artzone-tool-button";
+import EasyZoningToolButton from "./mods/easyzoning-tool-button";
 import { ZoningToolController } from "./mods/ZoningToolSections";
 import { ToolOptionsVisibility } from "./mods/ToolOptionsVisible/toolOptionsVisible";
 
 // Ensure assets are emitted to coui://ui-mods/images/
-import "../images/ico-zones-color02.svg";            // Top-left FAB icon (matches C# MainIconPath)
-import "../images/MapGrid.svg";                  // Road Services panel tile (NEW)
+import "../images/ico-zones-color02.svg";  // Top-left FAB icon
+import "../images/MapGrid.svg";            // Road Services panel tile
 
 // Mode icons used in the Tool Options section
 import "../images/icons/mode-icon-both.svg";
 import "../images/icons/mode-icon-left.svg";
 import "../images/icons/mode-icon-right.svg";
 
-const DIAG_TOPO = false; // False for Release. Flip to true to scan modules in UI.log.
+const DIAG_TOPO = false;
 
 const VANILLA = {
     MouseToolOptions: {
@@ -35,20 +31,11 @@ const VANILLA = {
     },
 };
 
-function extendSafe(
-    registry: ModuleRegistry,
-    modulePath: string,
-    exportId: string,
-    extension: any
-) {
+function extendSafe(registry: ModuleRegistry, modulePath: string, exportId: string, extension: any) {
     try {
         registry.extend(modulePath, exportId, extension);
     } catch (err) {
-        try {
-            console.error(`[ART][UI] extend failed for ${modulePath}#${exportId}`, err);
-        } catch {
-            /* ignore */
-        }
+        try { console.error(`[EZ][UI] extend failed for ${modulePath}#${exportId}`, err); } catch { }
     }
 }
 
@@ -61,32 +48,19 @@ const register: ModRegistrar = (moduleRegistry) => {
             if (Array.isArray(candidates) && candidates.length) {
                 for (const [path, ...exports] of candidates ?? []) {
                     if (/tool-options|topograph|contour/i.test(path)) {
-                        console.log(`[ART][diag] candidate: ${path}  ->  ${exports.join(",")}`);
+                        console.log(`[EZ][diag] candidate: ${path}  ->  ${exports.join(",")}`);
                     }
                 }
             } else {
-                console.log("[ART][diag] no topo/contour candidates found");
+                console.log("[EZ][diag] no topo/contour candidates found");
             }
-        } catch {
-            /* silent */
-        }
+        } catch { /* silent */ }
     }
 
-    moduleRegistry.append("GameTopLeft", ARTZoneToolButton);
+    moduleRegistry.append("GameTopLeft", EasyZoningToolButton);
 
-    extendSafe(
-        moduleRegistry,
-        VANILLA.MouseToolOptions.path,
-        VANILLA.MouseToolOptions.exportId,
-        ZoningToolController
-    );
-
-    extendSafe(
-        moduleRegistry,
-        VANILLA.ToolOptionsPanelVisible.path,
-        VANILLA.ToolOptionsPanelVisible.exportId,
-        ToolOptionsVisibility
-    );
+    extendSafe(moduleRegistry, VANILLA.MouseToolOptions.path, VANILLA.MouseToolOptions.exportId, ZoningToolController);
+    extendSafe(moduleRegistry, VANILLA.ToolOptionsPanelVisible.path, VANILLA.ToolOptionsPanelVisible.exportId, ToolOptionsVisibility);
 };
 
 export default register;

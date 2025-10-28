@@ -1,10 +1,10 @@
-﻿// lang/en-US.json
-// strings read by TSX via useLocalization() ToolOptions. UI test for React panel
-{
-  "ARTZone.Zone_Controller.ToolName": "ART—Zone Control", // tooltip for floating top-left button
+﻿// File: lang/en-US.json
 
-  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "Zoning Side", // mini-panel header text
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "Zone both sides.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "Zone only left side.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "Zone only right side."
+{
+  "EasyZoning.Zone_Controller.ToolName": "Easy Zoning",
+
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Zoning Side",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Toggle Both/None.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Zone only the left side.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Zone only the right side."
 }

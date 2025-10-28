@@ -1,30 +1,25 @@
 // File: src/Systems/PanelBuilder.cs
-//
-//   Build/Register the clickable ARTZone tools in RoadsServices Panel:
+// Purpose:
+//   Build/Register the clickable EasyZoning tools in RoadsServices Panel:
 //     - Find a donor button in RoadsServices (ex: Wide Sidewalk / Crosswalk).
 //     - Clone donor once per ToolDefinition.
-//     - Give clone our icon, ID, and bumped priority (+1) so it shows up next to Wide Sidewalk.
+//     - Give clone our icon, ID, and bumped priority (+1) so it shows next to the donor.
 //     - Attach NetUpgrade so the clone acts like a vanilla tool button.
-//     - Hook the clone to the correct ToolBaseSystem so clicking it activates our tool.
-//     - After the map finishes loading, copy the donor's PlaceableNetData and apply flags
-//       from the ToolDefinition (underground allowed, etc.).
+//     - Hook the clone to the correct ToolBaseSystem so clicking activates our tool.
+//     - After the map finishes loading, copy donor’s PlaceableNetData and apply flags.
 //
 // Donor selection logic (FINAL):
 //   - In RELEASE builds: try “Wide Sidewalk”, then “Crosswalk”. No reflection fallback.
-//   - In DEBUG builds: same as release, then reflection scan as a last resort (dev aid).
-//
-// Notes:
-//   - Never modify the donor prefab itself; always DuplicatePrefab().
-//   - PanelBootStrapSystem controls WHEN this runs; PanelBuilder just DOES the build.
+//   - In DEBUG builds: same as release, then reflection scan as a last resort.
 
-namespace ARTZone.Systems
+namespace EasyZoning.Systems
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Reflection;
-    using ARTZone.Tools;
+    using System.Reflection; // for DEBUG reflection donor scan
     using Colossal.Serialization.Entities;
+    using EasyZoning.Tools;
     using Game;
     using Game.Net;
     using Game.Prefabs;
@@ -36,7 +31,6 @@ namespace ARTZone.Systems
     public static class PanelBuilder
     {
         // --- KNOBS ------------------------------------------------------------
-        // Insert our clone to the right of the donor.
         private const int TilePriorityOffset = 1;
 
         // --- REGISTRATION STATE ----------------------------------------------
@@ -45,18 +39,14 @@ namespace ARTZone.Systems
         public static bool HasTool(ToolDefinition tool) => ToolDefinitions.Contains(tool);
         public static bool HasTool(string toolId) => ToolDefinitions.Exists(t => t.ToolID == toolId);
 
-        // Map from ToolDefinition to its clone prefab + UIObject.
         private static readonly Dictionary<ToolDefinition, (PrefabBase Prefab, UIObject UI)> s_ToolsLookup = new(4);
 
-        // Cached systems.
         private static World? s_World;
         private static PrefabSystem? s_PrefabSystem;
 
-        // Cached donor (the RoadsServices button we clone)
         private static PrefabBase? s_DonorPrefab;
         private static UIObject? s_DonorUI;
 
-        // Are clones already created?
         private static bool s_Instantiated;
 
         public static bool IsReady => s_Instantiated && s_ToolsLookup.Count > 0;
@@ -65,7 +55,7 @@ namespace ARTZone.Systems
         [Conditional("DEBUG")]
         private static void Dbg(string message)
         {
-            var log = ARTZoneMod.s_Log;
+            var log = EasyZoningMod.s_Log;
             if (log == null)
                 return;
             try
@@ -76,7 +66,7 @@ namespace ARTZone.Systems
         }
 
         // --- Init -------------------------------------------------------------
-        // Called from ARTZoneMod.OnLoad(). Clears caches so hot reload works.
+        // Called from EasyZoningMod.OnLoad(). Clears caches so hot reload works.
         public static void Initialize(bool force = false)
         {
             if (!force && s_World != null)
@@ -90,9 +80,7 @@ namespace ARTZone.Systems
             s_DonorUI = null;
 
             s_World = World.DefaultGameObjectInjectionWorld;
-            s_PrefabSystem = s_World != null
-                ? s_World.GetExistingSystemManaged<PrefabSystem>()
-                : null;
+            s_PrefabSystem = s_World != null ? s_World.GetExistingSystemManaged<PrefabSystem>() : null;
         }
 
         // Register a tool so it can get a Panel button
@@ -100,23 +88,23 @@ namespace ARTZone.Systems
         {
             if (def.Type == null || !typeof(ToolBaseSystem).IsAssignableFrom(def.Type))
             {
-                ARTZoneMod.s_Log.Error("[ART][Panel] RegisterTool: Type must inherit ToolBaseSystem.");
+                EasyZoningMod.s_Log.Error("[EZ][Panel] RegisterTool: Type must inherit ToolBaseSystem.");
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(def.ToolID))
             {
-                ARTZoneMod.s_Log.Error("[ART][Panel] RegisterTool: ToolID must be non-empty.");
+                EasyZoningMod.s_Log.Error("[EZ][Panel] RegisterTool: ToolID must be non-empty.");
                 return;
             }
 
             if (HasTool(def) || HasTool(def.ToolID))
             {
-                ARTZoneMod.s_Log.Error($"[ART][Panel] RegisterTool: \"{def.ToolID}\" already registered.");
+                EasyZoningMod.s_Log.Error($"[EZ][Panel] RegisterTool: \"{def.ToolID}\" already registered.");
                 return;
             }
 
-            Dbg($"[ART][Panel] Register \"{def.ToolID}\" for {def.Type.Name}");
+            Dbg($"[EZ][Panel] Register \"{def.ToolID}\" for {def.Type.Name}");
             ToolDefinitions.Add(def);
         }
 
@@ -127,13 +115,11 @@ namespace ARTZone.Systems
                 return;
 
             s_World ??= World.DefaultGameObjectInjectionWorld;
-            s_PrefabSystem ??= s_World != null
-                ? s_World.GetExistingSystemManaged<PrefabSystem>()
-                : null;
+            s_PrefabSystem ??= s_World != null ? s_World.GetExistingSystemManaged<PrefabSystem>() : null;
 
             if (s_PrefabSystem == null)
             {
-                ARTZoneMod.s_Log.Error("[ART][Panel] PrefabSystem not available.");
+                EasyZoningMod.s_Log.Error("[EZ][Panel] PrefabSystem not available.");
                 return;
             }
 
@@ -142,14 +128,14 @@ namespace ARTZone.Systems
                 !TryResolveDonor(s_PrefabSystem, out s_DonorPrefab, out s_DonorUI))
             {
                 if (logIfNoDonor)
-                    ARTZoneMod.s_Log.Error("[ART][Panel] Could not find RoadsServices donor. Will retry next frame.");
-                return; // PanelBootStrapSystem will call again
+                    EasyZoningMod.s_Log.Error("[EZ][Panel] Could not find RoadsServices donor. Will retry next frame.");
+                return;
             }
 
             var donorPrefab = s_DonorPrefab!;
             var donorUI = s_DonorUI!;
 
-            Dbg($"[ART][Panel] Creating buttons. Count={ToolDefinitions.Count}");
+            Dbg($"[EZ][Panel] Creating buttons. Count={ToolDefinitions.Count}");
 
             foreach (var def in ToolDefinitions)
             {
@@ -167,7 +153,7 @@ namespace ARTZone.Systems
                     // 3. Make a fresh UIObject for the clone
                     var cloneUI = ScriptableObject.CreateInstance<UIObject>();
                     cloneUI.name = def.ToolID;
-                    cloneUI.m_Icon = def.Ui.ImagePath;             // icon path in coui://ui-mods
+                    cloneUI.m_Icon = def.Ui.ImagePath;
                     cloneUI.m_IsDebugObject = donorUI.m_IsDebugObject;
                     cloneUI.m_Group = donorUI.m_Group;              // "RoadsServices"
                     cloneUI.active = donorUI.active;
@@ -179,26 +165,25 @@ namespace ARTZone.Systems
                     var netUpgrade = ScriptableObject.CreateInstance<NetUpgrade>();
                     clonePrefab.AddComponentFrom(netUpgrade);
 
-                    // 5. Let PrefabSystem re-index the clone’s components
+                    // 5. Re-index
                     s_PrefabSystem.UpdatePrefab(clonePrefab);
 
-                    // 6. Connect the clone to our ToolBaseSystem so clicking activates our tool
+                    // 6. Connect clone → Tool system
                     var toolSystem = s_World!.GetOrCreateSystemManaged(def.Type) as ToolBaseSystem;
                     bool attached = toolSystem != null && toolSystem.TrySetPrefab(clonePrefab);
-
                     if (!attached)
                     {
-                        ARTZoneMod.s_Log.Error(
-                            $"[ART][Panel] Failed to attach prefab for \"{def.ToolID}\" (toolSystem={(toolSystem?.GetType().Name ?? "null")})");
+                        EasyZoningMod.s_Log.Error(
+                            $"[EZ][Panel] Failed to attach prefab for \"{def.ToolID}\" (toolSystem={(toolSystem?.GetType().Name ?? "null")})");
                         continue;
                     }
 
-                    Dbg($"[ART][Panel] Button created and attached: {def.ToolID} → {toolSystem!.GetType().Name}");
+                    Dbg($"[EZ][Panel] Button created and attached: {def.ToolID} → {toolSystem!.GetType().Name}");
                     s_ToolsLookup[def] = (clonePrefab, cloneUI);
                 }
                 catch (Exception ex)
                 {
-                    ARTZoneMod.s_Log.Error($"[ART][Panel] Could not create button for {def.ToolID}: {ex}");
+                    EasyZoningMod.s_Log.Error($"[EZ][Panel] Could not create button for {def.ToolID}: {ex}");
                 }
             }
 
@@ -217,7 +202,7 @@ namespace ARTZone.Systems
         {
             if (s_PrefabSystem == null || s_DonorPrefab == null)
             {
-                ARTZoneMod.s_Log.Error("[ART][Panel] ApplyPlacementDataAfterLoad: missing PrefabSystem or donor.");
+                EasyZoningMod.s_Log.Error("[EZ][Panel] ApplyPlacementDataAfterLoad: missing PrefabSystem or donor.");
                 return;
             }
 
@@ -247,17 +232,16 @@ namespace ARTZone.Systems
                         s_PrefabSystem.RemoveComponent<PlaceableNetData>(clonePair.Prefab);
 
                     s_PrefabSystem.AddComponentData(clonePair.Prefab, baseData);
-                    Dbg($"[ART][Panel] Applied PlaceableNetData to {def.ToolID}");
+                    Dbg($"[EZ][Panel] Applied PlaceableNetData to {def.ToolID}");
                 }
                 catch (Exception ex)
                 {
-                    ARTZoneMod.s_Log.Error($"[ART][Panel] Could not apply PlaceableNetData for {def.ToolID}: {ex}");
+                    EasyZoningMod.s_Log.Error($"[EZ][Panel] Could not apply PlaceableNetData for {def.ToolID}: {ex}");
                 }
             }
         }
 
         // --- DONOR RESOLUTION -------------------------------------------------
-        // RELEASE: try exact donors only. DEBUG: try donors then reflection scan.
         public static bool TryResolveDonor(PrefabSystem prefabSystem, out PrefabBase? donorPrefab, out UIObject? donorUI)
         {
             donorPrefab = null;
@@ -269,29 +253,29 @@ namespace ARTZone.Systems
             // Cached donor?
             if (s_DonorPrefab != null && s_DonorUI != null)
             {
-                Dbg($"[ART][Panel] Cached donor: {s_DonorPrefab.name} group='{(s_DonorUI.m_Group != null ? s_DonorUI.m_Group.name : "(null)")}'");
+                Dbg($"[EZ][Panel] Cached donor: {s_DonorPrefab.name} group='{(s_DonorUI.m_Group != null ? s_DonorUI.m_Group.name : "(null)")}'");
                 donorPrefab = s_DonorPrefab;
                 donorUI = s_DonorUI;
                 return true;
             }
 
-            // 1. Try Hard-coded donors first (stable behavior in Release)
-            if (TryGetExactDonor(prefabSystem, "FencePrefab", "Wide Sidewalk", out donorPrefab, out donorUI)) // known location in panel
+            // 1) Hard-coded donors (stable behavior)
+            if (TryGetExactDonor(prefabSystem, "FencePrefab", "Wide Sidewalk", out donorPrefab, out donorUI))
             {
                 CacheDonor(donorPrefab!, donorUI!);
                 return true;
             }
-            if (TryGetExactDonor(prefabSystem, "FencePrefab", "Crosswalk", out donorPrefab, out donorUI))   // fallback spot
+            if (TryGetExactDonor(prefabSystem, "FencePrefab", "Crosswalk", out donorPrefab, out donorUI))
             {
                 CacheDonor(donorPrefab!, donorUI!);
                 return true;
             }
 
 #if DEBUG
-            // 2) DEBUG ONLY — reflection scan (dev aid)
+            // 2) DEBUG ONLY — reflection scan
             if (TryReflectionDonor(prefabSystem, out donorPrefab, out donorUI))
             {
-                ARTZoneMod.s_Log.Warn("[ART][Panel] Fallback donor used via reflection (DEBUG).");
+                EasyZoningMod.s_Log.Warn("[EZ][Panel] Fallback donor used via reflection (DEBUG).");
                 CacheDonor(donorPrefab!, donorUI!);
                 return true;
             }
@@ -303,7 +287,7 @@ namespace ARTZone.Systems
         {
             s_DonorPrefab = p;
             s_DonorUI = u;
-            Dbg($"[ART][Panel] Donor selected: {p.name} (group='{(u.m_Group != null ? u.m_Group.name : "(null)")}', prio={u.m_Priority})");
+            Dbg($"[EZ][Panel] Donor selected: {p.name} (group='{(u.m_Group != null ? u.m_Group.name : "(null)")}', prio={u.m_Priority})");
         }
 
         private static bool TryGetExactDonor(PrefabSystem ps, string typeName, string name, out PrefabBase? donor, out UIObject? donorUI)
@@ -314,7 +298,7 @@ namespace ARTZone.Systems
             var id = new PrefabID(typeName, name);
             PrefabBase? candidate;
             bool found = ps.TryGetPrefab(id, out candidate) && candidate != null;
-            Dbg($"[ART][Panel] Probe {typeName}:{name}: {(found ? "FOUND" : "missing")}");
+            Dbg($"[EZ][Panel] Probe {typeName}:{name}: {(found ? "FOUND" : "missing")}");
 
             if (!found)
                 return false;
@@ -378,7 +362,7 @@ namespace ARTZone.Systems
 
                     score += uComp.m_Priority;
 
-                    Dbg($"[ART][Panel] Scan {p.GetType().Name}:{n} score={score} group='{groupName}' priority={uComp.m_Priority}");
+                    Dbg($"[EZ][Panel] Scan {p.GetType().Name}:{n} score={score} group='{groupName}' priority={uComp.m_Priority}");
 
                     if (score > bestScore)
                     {
@@ -397,12 +381,11 @@ namespace ARTZone.Systems
             }
             catch (Exception ex)
             {
-                ARTZoneMod.s_Log.Warn("[ART][Panel] Reflection donor scan failed (DEBUG): " + ex.Message);
+                EasyZoningMod.s_Log.Warn("[EZ][Panel] Reflection donor scan failed (DEBUG): " + ex.Message);
             }
             return false;
         }
 
-        // Reflection helper: get PrefabSystem's internal list (read-only).
         private static List<PrefabBase> GetAllPrefabsUnsafe(PrefabSystem ps)
         {
             try
@@ -415,7 +398,7 @@ namespace ARTZone.Systems
                         return new List<PrefabBase>(enumerable);
                 }
             }
-            catch { /* ignore */ }
+            catch { }
 
             try
             {

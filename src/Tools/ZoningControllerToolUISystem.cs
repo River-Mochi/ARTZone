@@ -2,11 +2,10 @@
 // Purpose:
 //  • Expose UI bindings the React UI reads/writes (ToolZoningMode, RoadZoningMode, IsRoadPrefab).
 //  • Handle triggers (Change/Flip/Toggle) with null guards.
-//  • Decide when the “Zoning Side” section appears:
-//       - show when our tool is active (Top-left / Shift+Z) OR a RoadPrefab is active.
-//  • In DEBUG, log mode changes and visibility decisions.
+//  • Show the “Zoning Side” section when our tool is active OR a RoadPrefab is active.
+// FULL DROP-IN
 
-namespace ARTZone.Tools
+namespace EasyZoning.Tools
 {
     using Colossal.UI.Binding;
     using Game.Prefabs;
@@ -18,11 +17,9 @@ namespace ARTZone.Tools
     {
         private ValueBinding<int> m_ToolZoningMode = null!;
         private ValueBinding<int> m_RoadZoningMode = null!;
-        // NOTE: This means “should show section” when true; it is true if (tool is ours) OR (prefab is RoadPrefab)
-        private ValueBinding<bool> m_IsRoadPrefab = null!;
+        private ValueBinding<bool> m_IsRoadPrefab = null!; // “should show section”
 
         private ToolSystem m_MainToolSystem = null!;
-        //  private ZoningControllerToolSystem m_ToolSystem = null!; // (keep actual type name here)
         private ZoningControllerToolSystem m_ZoningTool = null!;
 
         public ZoningMode ToolZoningMode => (ZoningMode)m_ToolZoningMode.value;
@@ -63,34 +60,36 @@ namespace ARTZone.Tools
 #if DEBUG
         private static void Dbg(string msg)
         {
-            var log = ARTZoneMod.s_Log;
+            var log = EasyZoningMod.s_Log;
             if (log == null)
                 return;
             try
             {
-                log.Info("[ART][UI] " + msg);
+                log.Info("[EZ][UI] " + msg);
             }
             catch { }
         }
         private static string ModeToStr(ZoningMode z) =>
             z == ZoningMode.Both ? "Both" : z == ZoningMode.Left ? "Left" : z == ZoningMode.Right ? "Right" : "None";
 #else
-        private static void Dbg(string msg) { }
+        private static void Dbg(string msg)
+        {
+        }
 #endif
 
         protected override void OnCreate()
         {
             base.OnCreate();
 
-            AddBinding(m_ToolZoningMode = new ValueBinding<int>(ARTZoneMod.ModID, "ToolZoningMode", (int)ZoningMode.Both));
-            AddBinding(m_RoadZoningMode = new ValueBinding<int>(ARTZoneMod.ModID, "RoadZoningMode", (int)ZoningMode.Both));
-            AddBinding(m_IsRoadPrefab = new ValueBinding<bool>(ARTZoneMod.ModID, "IsRoadPrefab", false)); // “should show section”
+            AddBinding(m_ToolZoningMode = new ValueBinding<int>(EasyZoningMod.ModID, "ToolZoningMode", (int)ZoningMode.Both));
+            AddBinding(m_RoadZoningMode = new ValueBinding<int>(EasyZoningMod.ModID, "RoadZoningMode", (int)ZoningMode.Both));
+            AddBinding(m_IsRoadPrefab = new ValueBinding<bool>(EasyZoningMod.ModID, "IsRoadPrefab", false)); // “should show section”
 
-            AddBinding(new TriggerBinding<int>(ARTZoneMod.ModID, "ChangeRoadZoningMode", ChangeRoadZoningMode));
-            AddBinding(new TriggerBinding<int>(ARTZoneMod.ModID, "ChangeToolZoningMode", ChangeToolZoningMode));
-            AddBinding(new TriggerBinding(ARTZoneMod.ModID, "FlipToolBothMode", FlipToolBothMode));
-            AddBinding(new TriggerBinding(ARTZoneMod.ModID, "FlipRoadBothMode", FlipRoadBothMode));
-            AddBinding(new TriggerBinding(ARTZoneMod.ModID, "ToggleZoneControllerTool", ToggleTool));
+            AddBinding(new TriggerBinding<int>(EasyZoningMod.ModID, "ChangeRoadZoningMode", ChangeRoadZoningMode));
+            AddBinding(new TriggerBinding<int>(EasyZoningMod.ModID, "ChangeToolZoningMode", ChangeToolZoningMode));
+            AddBinding(new TriggerBinding(EasyZoningMod.ModID, "FlipToolBothMode", FlipToolBothMode));
+            AddBinding(new TriggerBinding(EasyZoningMod.ModID, "FlipRoadBothMode", FlipRoadBothMode));
+            AddBinding(new TriggerBinding(EasyZoningMod.ModID, "ToggleZoneControllerTool", ToggleTool));
 
             try
             {
@@ -203,8 +202,6 @@ namespace ARTZone.Tools
 
                 bool enable = m_MainToolSystem.activeTool != m_ZoningTool;
                 m_ZoningTool.SetToolEnabled(enable);
-
-                // DO NOT touch m_IsRoadPrefab here; visibility is handled by OnToolChanged/OnPrefabChanged via ShouldShowFor.
 #if DEBUG
                 Dbg($"ToggleTool → enable={enable}");
 #endif
@@ -317,7 +314,6 @@ namespace ARTZone.Tools
             catch { }
         }
 
-        // Show section if our tool is active OR active prefab is a RoadPrefab
         private static bool ShouldShowFor(ToolBaseSystem? tool, Game.Prefabs.PrefabBase? prefab)
         {
             try

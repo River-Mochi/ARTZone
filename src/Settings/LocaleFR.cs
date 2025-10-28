@@ -1,11 +1,11 @@
 // File: src/Settings/LocaleFR.cs
-// French (fr-FR) strings for Options UI + Panel text.
+// Purpose: French (fr-FR) strings for Options UI + Panel text.
 
-namespace ARTZone.Settings
+namespace EasyZoning.Settings
 {
     using System.Collections.Generic;
-    using ARTZone.Tools;
     using Colossal;
+    using EasyZoning.Tools;
 
     public sealed class LocaleFR : IDictionarySource
     {
@@ -19,7 +19,7 @@ namespace ARTZone.Settings
             var d = new Dictionary<string, string>
             {
                 // Settings title
-                { m_Settings.GetSettingsLocaleID(), "ART — Zonage" },
+                { m_Settings.GetSettingsLocaleID(), "Easy Zoning [EZ]" },
 
                 // Tabs
                 { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "Actions" },
@@ -32,23 +32,23 @@ namespace ARTZone.Settings
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
                 // Toggles
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Ne pas supprimer les cellules déjà zonées" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "N'écrase pas les cellules déjà zonées pendant l’aperçu ou l’application.\n <Activation recommandée.>" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Empêcher la suppression des cellules zonées" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Ne pas modifier les cellules déjà zonées lors de l’aperçu/l’application.\n<Activation recommandée.>" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Ne pas supprimer les cellules occupées" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "N'écrase pas les cellules déjà occupées pendant l’aperçu ou l’application (ex. bâtiments).\n <Activation recommandée.>" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Empêcher la suppression des cellules occupées" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Ne pas modifier les cellules occupées lors de l’aperçu/l’application (p. ex. bâtiments).\n<Activation recommandée.>" },
 
-                // Keybind
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Afficher / masquer le panneau" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Affiche le panneau ART-Zone (par défaut Shift+Z)." },
+                // Keybind (only one visible)
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Basculer le panneau" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Afficher le bouton du panneau Easy Zoning (Maj+Z par défaut)." },
 
                 // Binding title in the keybinding dialog
-                { m_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "Afficher / masquer le panneau ART-Zone" },
+                { m_Settings.GetBindingKeyLocaleID(EasyZoningMod.kToggleToolActionName), "Basculer le panneau Easy Zoning" },
 
                 // Panel (Road Services tile)
-                { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Modificateur de zonage" },
+                { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Easy Zoning" },
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                  "Modifier le zonage des routes : les deux côtés, gauche, droite ou aucun. Clic droit inverse le choix. Clic gauche confirme." },
+                  "Choisissez le zonage des routes : les deux côtés, gauche, droite ou aucun.\nClic droit bascule ; clic gauche applique." },
 
                 // About tab labels
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Nom du mod" },

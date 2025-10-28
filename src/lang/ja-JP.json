@@ -1,8 +1,10 @@
+// File: lang/ja-JP.json
+// Japanese
 {
-  "ARTZone.Zone_Controller.ToolName": "ART — 区画コントロール",
+  "EasyZoning.Zone_Controller.ToolName": "イージーゾーニング",
 
-  "ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]": "区画サイド",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]": "両側に区画を設定します。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]": "左側だけ区画を設定します。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]": "右側だけ区画を設定します."
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "ゾーニング側",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "両方／なし を切り替え。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "左側だけをゾーン。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "右側だけをゾーン。"
 }

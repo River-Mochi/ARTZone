@@ -1,13 +1,8 @@
 // File: src/Settings/Setting.cs
-// Purpose: Options UI + keybinding definition (CO API).
-// Shows ONE rebindable entry in Actions → Key bindings:
-//   • Toggle Zone Control panel → default Shift+Z
-//
-// RMB (right-click) keybind is NOT exposed here on purpose — the tool uses the
-// vanilla ToolBaseSystem 'cancelAction' for flipping, so RMB remains the
-// intuitive default and cannot be broken by user remapping inside this mod.
+// Purpose: Options UI + keybinding definition (CO API). One rebindable entry.
+// RMB stays vanilla cancelAction, we do NOT expose it in Options.
 
-namespace ARTZone.Settings
+namespace EasyZoning.Settings
 {
     using System;
     using Colossal.IO.AssetDatabase;
@@ -16,16 +11,16 @@ namespace ARTZone.Settings
     using Game.Settings;
     using UnityEngine;
 
-    // Persisted settings location
-    [FileLocation("ModsSettings/ARTZone/ARTZone")]
+    // Persisted settings location (rebranded)
+    [FileLocation("ModsSettings/EasyZoning/EasyZoning")]
 
     // Tabs & groups
     [SettingsUITabOrder(kActionsTab, kAboutTab)]
     [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup, kAboutInfoGroup, kAboutLinksGroup)]
     [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup)]
 
-    // Declare ONLY the keyboard action (Shift+Z). RMB is handled by vanilla cancelAction.
-    [SettingsUIKeyboardAction(ARTZoneMod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
+    // Declare ONLY the keyboard action (Shift+Z). RMB is vanilla cancelAction.
+    [SettingsUIKeyboardAction(EasyZoningMod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
     public sealed class Setting : ModSetting
     {
         // Tabs
@@ -48,26 +43,26 @@ namespace ARTZone.Settings
         [SettingsUISection(kActionsTab, kToggleGroup)]
         public bool RemoveOccupiedCells { get; set; } = true;
 
-        // --- Key bindings (only Shift+Z is exposed) ---
+        // --- Key bindings (only Shift+Z exposed) ---
 
-        [SettingsUIKeyboardBinding(BindingKeyboard.Z, ARTZoneMod.kToggleToolActionName, shift: true)]
+        [SettingsUIKeyboardBinding(BindingKeyboard.Z, EasyZoningMod.kToggleToolActionName, shift: true)]
         [SettingsUISection(kActionsTab, kKeybindingGroup)]
         public ProxyBinding ToggleZoneTool
         {
             get; set;
         }
 
-        // --- About (read-only labels/buttons) ---
+        // --- About (read-only) ---
 
         [SettingsUISection(kAboutTab, kAboutInfoGroup)]
-        public string NameText => "ART — Zone";
+        public string NameText => "Easy Zoning";
 
         [SettingsUISection(kAboutTab, kAboutInfoGroup)]
         public string VersionText =>
 #if DEBUG
-    ARTZoneMod.VersionShort + " (DEBUG)";
+            EasyZoningMod.VersionShort + " (DEBUG)";
 #else
-    ARTZoneMod.VersionShort;
+            EasyZoningMod.VersionShort;
 #endif
 
         private const string UrlMods = "TBD";

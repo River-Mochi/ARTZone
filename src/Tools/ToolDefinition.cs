@@ -1,11 +1,11 @@
-// Tools/ToolDefinition.cs
+// File: src/Tools/ToolDefinition.cs
 // Purpose:
-//   Describes one ARTZone tool so PanelBuilder can create a clickable tile in RoadsServices.
+//   Describes one EasyZoning tool so PanelBuilder can create a clickable tile in RoadsServices.
 //   PanelBuilder reads this struct to make One ToolDefinition
 //      = one Panel tile (clone donor, set custom icon/ID, hook to ToolBaseSystem,
 //        apply placement flags (underground, etc.).
 
-namespace ARTZone.Tools
+namespace EasyZoning.Tools
 {
     using System;
     using Game.Net;

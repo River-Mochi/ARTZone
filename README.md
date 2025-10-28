@@ -1,72 +1,52 @@
-﻿# ART-Zone
+﻿# Easy Zoning [EZ]
 
-- Edit zoning in Cities: Skylines II.
-- **New roads** inherit your active zoning side/depth choice (your preference applied while building).
-- **Existing roads**: editing is intuitive, hover any road, instantly preview what will zone. Flip sides with Right-click, confirm with one Left-click.
+- Edit zoning in Cities: Skylines II — fast and vanilla-friendly.
+- **New roads** inherit your active zoning choice (Left/Right/Both/None).
+- **Existing roads**: hover to preview, **Right-Click** to flip, **Left-Click** to apply.
 
 ---
 
 ## What it does
-- **Zoning control** on roads: **Left**, **Right**, **Both**, or **None**.
-- **Instant Right-click (RMB) preview flips:**
-  - Select a side (**Left** or **Right**), then **Right-Click** swaps **Left ↔ Right**.
-  - Select **Both or None**, then **Right-Click** swaps **Both ↔ None**.
-  - You always get a live preview, even if the road is already zoned (can still flip/preview).
-- **One-click apply:** Left-Click once to commit the preview of the hovered/selected road.
-- **Vanilla-style UI:** “Zoning Side” buttons appear in a small tool panel left of the roads tabs.
-
----
+- Zoning control on roads: **Left**, **Right**, **Both**, **None**.
+- **RMB preview flips**:
+  - If a side is selected: **Left ↔ Right**
+  - If Both/None is selected: **Both ↔ None**
+- **One-click apply** with LMB.
+- **Vanilla UI integration**: a compact “Zoning Side” section beside Roads tabs.
+- [EZ] minimal design: no Harmony, low conflict, native input & sounds.
 
 ## How to use
-1. Open **Roads** → click the **ART-Zone** tool (four-squares icon). **Zoning Side** mini-panel appears (Left / Right / Both / None).
-2. **Hover a road** to see a preview of zoning cells.
-3. **Right-Click** to cycle previews:
-   - **Left ↔ Right** when any side icon is selected.
-   - **Both ↔ None** when Both or None is selected.
-4. **Left-Click** once to apply.
-5. **Optional:** **Shift+Z** shortcut to open the tool panel (not required).
+1. Open **Roads** → click the **Easy Zoning** tool (four-squares icon).
+2. Hover a road to preview zoning cells.
+3. **Right-Click** to flip the preview (Left/Right or Both/None).
+4. **Left-Click** once to commit.
+5. Optional: **Shift+Z** toggles the tool panel.
 
 > Tip: Right-Click multiple times to preview different outcomes, then Left-Click once to commit.
 
----
-
 ## Compatibility
-- 
-- Safe to remove anytime.
-- Does not use Harmony; safe/compatible (less likely to break with game updates).
-- Designed to be minimal and low-conflict (extends vanilla UI panel instead of replacing it)
-- Uses the game’s input system so that RMB sounds and selection feedback mirror vanilla behavior.
-
----
+- Safe to add/remove anytime.
+- No Harmony; extends vanilla UI rather than replacing it.
+- Uses the game’s input system so RMB/LMB feedback feels native.
 
 ## Notes
-- Make sure you’re hovering a **road segment** that supports zoning cells (e.g., not a highway).
+- Hover a **zonable road segment** (not e.g., certain highways without zone blocks).
 
----
-
-## Roadmap / Future
-- **Topography (Contour Lines) support tool** in the same mini-panel (vanilla icon/tooltip).  
-  Goal: toggle contour lines next to the ART-Zone controls for easier terrain-aware zoning.
-
----
+## Roadmap
+- Optional topography/contour toggle in the same mini-panel.
+- More languages.
 
 ## Credits
-* RiverMochi - mod author
-* Thanks to LuxStice sharing the original Advanced Road Tools (obsolete)
-* StarQ for technical support.
-* yenyang for technical support.
-* and the CS2 modding community for pointers and testing.
-* Necko1996 for testing/feedback
-* 
+- RiverMochi — author
+- Thanks to LuxStice (historical ART, now obsolete), yenyang, StarQ
+- Necko1996 and the CS2 modding community for testing & feedback
 
-### Supports languages
-* English, Français (French), Español (Spanish)
-* 日本語 (Japanese), 한국어 (Korean), 简体中文 (Simplified Chinese), 繁體中文 (Traditional Chinese)
-* Português (Brasil) (Brazilian Portuguese)
-* Future updates to add more languages.
+### Languages
+- English (+ planned: FR, ES, JA, KO, ZH-Hans, ZH-Hant, PT-BR)
 
 ## Links
-- 📘 [CS2 Zoning Wiki](https://cs2.paradoxwikis.com/Zoning)
-- 🧩 [Paradox Mods](tbd)
-- 💬 [Paradox Forums](https://forum.paradoxplaza.com/forum/threads/art-zone.1864484/)
-- 💻 [GitHub](https://github.com/River-Mochi/ARTZone)
+- 📘 CS2 Zoning Wiki: https://cs2.paradoxwikis.com/Zoning
+- 💬 Discord: https://discord.gg/HTav7ARPs2
+- 💻 GitHub: https://github.com/River-Mochi/EasyZoning
+- 🧩 Paradox Mods: (TBD)
+- 🗣️ Forums thread: (TBD)

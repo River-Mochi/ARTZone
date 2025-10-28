@@ -1,11 +1,11 @@
 // File: src/Settings/LocalePT_BR.cs
-// Portuguese (pt-BR) strings for Options UI + Panel text.
+// Purpose: Portuguese (Brazil) (pt-BR) strings for Options UI + Panel text.
 
-namespace ARTZone.Settings
+namespace EasyZoning.Settings
 {
     using System.Collections.Generic;
-    using ARTZone.Tools;
     using Colossal;
+    using EasyZoning.Tools;
 
     public sealed class LocalePT_BR : IDictionarySource
     {
@@ -19,45 +19,45 @@ namespace ARTZone.Settings
             var d = new Dictionary<string, string>
             {
                 // Settings title
-                { m_Settings.GetSettingsLocaleID(), "ART — Zoneamento" },
+                { m_Settings.GetSettingsLocaleID(), "Easy Zoning [EZ]" },
 
                 // Tabs
                 { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "Ações" },
                 { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "Sobre" },
 
                 // Groups
-                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Opções de Zona" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Teclas de atalho" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Opções de zoneamento" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Atalhos de teclado" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
                 // Toggles
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Impedir que células zoneadas sejam removidas" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Não substituir células já zoneadas durante a pré-visualização/aplicação.\n <Recomendado ativar.>" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Evitar remover células zoneadas" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Não alterar células já zoneadas durante a prévia/aplicação.\n<Ativar recomendado.>" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Impedir que células ocupadas sejam removidas" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Não substituir células já ocupadas durante a pré-visualização/aplicação (ex.: edifícios).\n <Recomendado ativar>" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Evitar remover células ocupadas" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),  "Não alterar células ocupadas durante a prévia/aplicação (ex.: edifícios).\n<Ativar recomendado.>" },
 
                 // Keybind (only one visible)
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Mostrar painel" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Mostrar o botão do painel ART-Zone (padrão Shift+Z)." },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Alternar painel" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Mostrar o botão do painel do Easy Zoning (padrão Shift+Z)." },
 
                 // Binding title in the keybinding dialog
-                { m_Settings.GetBindingKeyLocaleID(ARTZoneMod.kToggleToolActionName), "Alternar painel do botão de zona" },
+                { m_Settings.GetBindingKeyLocaleID(EasyZoningMod.kToggleToolActionName), "Alternar painel do Easy Zoning" },
 
                 // Panel (Road Services tile)
-                { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Alterar Zoneamento" },
+                { $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Easy Zoning" },
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                  "Altere o zoneamento nas vias: ambos os lados, esquerdo, direito ou nenhum. Botão direito alterna a escolha. Botão esquerdo confirma." },
+                  "Escolha o zoneamento das vias: ambos, esquerda, direita ou nenhum.\nClique direito alterna; clique esquerdo aplica." },
 
                 // About tab labels
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Nome do mod" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Nome que aparece para este mod." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Nome exibido deste mod." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "Versão" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "Versão atual do mod." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenMods)),    "Paradox Mods" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenMods)),     "Abrir a página do mod no Paradox Mods." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenMods)),     "Abrir a página do Paradox Mods." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Entrar no Discord do mod." },
             };

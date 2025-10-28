@@ -1,4 +1,6 @@
 // File: src/UI/webpack.config.js
+
+
 const path = require("path");
 const MOD = require("./mod.json");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -10,7 +12,7 @@ const CSII_USERDATAPATH = process.env.CSII_USERDATAPATH;
 if (!CSII_USERDATAPATH) {
     throw "CSII_USERDATAPATH environment variable is not set, ensure the CSII Modding Toolchain is installed correctly";
 }
-const OUTPUT_DIR = `${CSII_USERDATAPATH}\\Mods\\${MOD.id}`;
+const OUTPUT_DIR = `${CSII_USERDATAPATH}\\Mods\\${MOD.id}`;     // Mods/EasyZoning
 
 const banner = `
  * Cities: Skylines II UI Module
@@ -22,7 +24,7 @@ const banner = `
 `;
 
 module.exports = {
-    bail: true,         // if webpack error, stop and exit 1
+    bail: true,
     mode: "production",
     stats: "none",
     entry: {
@@ -67,18 +69,14 @@ module.exports = {
                     },
                     {
                         loader: "sass-loader",
-                        options: {
-                            implementation: require("sass-embedded")
-                        }
+                        options: { implementation: require("sass-embedded") }
                     }
                 ]
             },
             {
                 test: /\.(png|jpe?g|gif|svg)$/i,
                 type: "asset/resource",
-                generator: {
-                    filename: "images/[name][ext][query]"
-                }
+                generator: { filename: "images/[name][ext][query]" }
             }
         ]
     },
@@ -96,11 +94,7 @@ module.exports = {
     },
     optimization: {
         minimize: true,
-        minimizer: [
-            new TerserPlugin({
-                extractComments: { banner: () => banner }
-            })
-        ]
+        minimizer: [new TerserPlugin({ extractComments: { banner: () => banner } })]
     },
     experiments: { outputModule: true },
     plugins: [
