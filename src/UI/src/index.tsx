@@ -3,7 +3,9 @@
 //   • Floating button at GameTopLeft
 //   • “Zoning Side” section in MouseToolOptions
 //   • Keep Tool Options panel visible for our tool
-//   • Optional: flip DIAG_TOPO=true locally to log Topography/Contour candidates
+//   • Optional: DIAG_TOPO to scan modules in UI.log
+//
+// Also ensures our images are emitted to coui://ui-mods/images/.
 
 import type { ModRegistrar, ModuleRegistry } from "cs2/modding";
 import { VanillaComponentResolver } from "./YenYang/VanillaComponentResolver";
@@ -11,12 +13,16 @@ import ARTZoneToolButton from "./mods/artzone-tool-button";
 import { ZoningToolController } from "./mods/ZoningToolSections";
 import { ToolOptionsVisibility } from "./mods/ToolOptionsVisible/toolOptionsVisible";
 
-// Ensure icons emitted to coui://ui-mods/images/
-// import "../images/ico-4square-color.svg";   // TopLeft FAB
-import "../images/ico-zones-color02.svg";   // TopLeft FAB
-import "../images/tool-icon01.png";           // RoadsServices tool panel
+// Ensure assets are emitted to coui://ui-mods/images/
+import "../images/menu-top-icon.svg";            // Top-left FAB icon (matches C# MainIconPath)
+import "../images/MapGrid.svg";                  // Road Services panel tile (NEW)
 
-const DIAG_TOPO = false; // False for Release. flip to true to scan modules, check UI.log
+// Mode icons used in the Tool Options section
+import "../images/icons/mode-icon-both.svg";
+import "../images/icons/mode-icon-left.svg";
+import "../images/icons/mode-icon-right.svg";
+
+const DIAG_TOPO = false; // False for Release. Flip to true to scan modules in UI.log.
 
 const VANILLA = {
     MouseToolOptions: {
@@ -38,7 +44,11 @@ function extendSafe(
     try {
         registry.extend(modulePath, exportId, extension);
     } catch (err) {
-        try { console.error(`[ART][UI] extend failed for ${modulePath}#${exportId}`, err); } catch { /* ignore */ }
+        try {
+            console.error(`[ART][UI] extend failed for ${modulePath}#${exportId}`, err);
+        } catch {
+            /* ignore */
+        }
     }
 }
 
@@ -57,7 +67,9 @@ const register: ModRegistrar = (moduleRegistry) => {
             } else {
                 console.log("[ART][diag] no topo/contour candidates found");
             }
-        } catch { /* silent */ }
+        } catch {
+            /* silent */
+        }
     }
 
     moduleRegistry.append("GameTopLeft", ARTZoneToolButton);

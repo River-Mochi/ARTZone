@@ -8,7 +8,7 @@ import { trigger } from "cs2/api";
 import mod from "../../mod.json";
 
 // Keep the identifier name aligned with C#: MainIconPath (TS side uses a URL string)
-import MainIconPath from "../../images/ico-zones-color02.svg";     // TopLeft button
+import MainIconPath from "../../images/menu-top-icon.svg";     // TopLeft button
 
 function onClickTopLeft() {
     trigger(mod.id, "ToggleZoneControllerTool");
@@ -20,7 +20,8 @@ export default function ARTZoneToolButton(): JSX.Element {
     return (
         <Button
             variant="floating"
-            src={MainIconPath} // resolves to coui://ui-mods/images/ico-*.svg  - image put in MainIconPath
+            // resolves to coui://ui-mods/images/*.svg  - image put in MainIconPath
+            src={MainIconPath} 
             onClick={onClickTopLeft}
             tooltipLabel={tooltip}
         />
