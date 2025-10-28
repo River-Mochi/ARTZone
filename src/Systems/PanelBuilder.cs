@@ -155,16 +155,16 @@ namespace ARTZone.Systems
             {
                 try
                 {
-                    // 1 - Clone donor. This becomes our clickable button.
+                    // 1. Clone donor. This becomes our clickable button.
                     var clonePrefab = s_PrefabSystem.DuplicatePrefab(donorPrefab, def.ToolID);
 
-                    // 2 - Remove donor-only parts not needed
+                    // 2. Remove donor-only parts not needed
                     if (clonePrefab.Has<Unlockable>())
                         clonePrefab.Remove<Unlockable>();
                     if (clonePrefab.Has<NetSubObjects>())
                         clonePrefab.Remove<NetSubObjects>();
 
-                    // 3 - Make a fresh UIObject for the clone
+                    // 3. Make a fresh UIObject for the clone
                     var cloneUI = ScriptableObject.CreateInstance<UIObject>();
                     cloneUI.name = def.ToolID;
                     cloneUI.m_Icon = def.Ui.ImagePath;             // icon path in coui://ui-mods
@@ -175,14 +175,14 @@ namespace ARTZone.Systems
 
                     clonePrefab.AddComponentFrom(cloneUI);
 
-                    // 4 - NetUpgrade marks this clone as a "tool selector" like vanilla buttons
+                    // 4. NetUpgrade marks this clone as a "tool selector" like vanilla buttons
                     var netUpgrade = ScriptableObject.CreateInstance<NetUpgrade>();
                     clonePrefab.AddComponentFrom(netUpgrade);
 
-                    // 5 - Let PrefabSystem re-index the clone’s components
+                    // 5. Let PrefabSystem re-index the clone’s components
                     s_PrefabSystem.UpdatePrefab(clonePrefab);
 
-                    // 6 - Connect the clone to our ToolBaseSystem so clicking activates our tool
+                    // 6. Connect the clone to our ToolBaseSystem so clicking activates our tool
                     var toolSystem = s_World!.GetOrCreateSystemManaged(def.Type) as ToolBaseSystem;
                     bool attached = toolSystem != null && toolSystem.TrySetPrefab(clonePrefab);
 
@@ -275,13 +275,13 @@ namespace ARTZone.Systems
                 return true;
             }
 
-            // 1) Hard-coded donors first (stable behavior in Release)
-            if (TryGetExactDonor(prefabSystem, "FencePrefab", "Wide Sidewalk", out donorPrefab, out donorUI))
+            // 1. Try Hard-coded donors first (stable behavior in Release)
+            if (TryGetExactDonor(prefabSystem, "FencePrefab", "Wide Sidewalk", out donorPrefab, out donorUI)) // known location in panel
             {
                 CacheDonor(donorPrefab!, donorUI!);
                 return true;
             }
-            if (TryGetExactDonor(prefabSystem, "FencePrefab", "Crosswalk", out donorPrefab, out donorUI))
+            if (TryGetExactDonor(prefabSystem, "FencePrefab", "Crosswalk", out donorPrefab, out donorUI))   // fallback spot
             {
                 CacheDonor(donorPrefab!, donorUI!);
                 return true;

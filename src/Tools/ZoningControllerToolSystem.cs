@@ -136,7 +136,7 @@ namespace ARTZone.Tools
             }
             catch { hasRoad = false; hitEntity = Entity.Null; }
 
-            // UI sounds
+            // UI vanilla sounds
             var haveSoundbank = m_SoundbankQuery.CalculateEntityCount() > 0;
             ToolUXSoundSettingsData soundbank = default;
             if (haveSoundbank)
@@ -266,18 +266,19 @@ namespace ARTZone.Tools
             return inputDeps;
         }
 
-        // Helper — Returns true if the cursor is over an operable road entity
+        // Helper - returns true if the cursor is over a zonable road entity.
+        // Roads without SubBlocks (e.g., highways) are ignored.
         private bool TryGetRoadUnderCursor(out Entity entity, out RaycastHit hit)
         {
-            if (!base.GetRaycastResult(out entity, out hit))
+            if (!GetRaycastResult(out entity, out hit))
                 return false;
-
+            // filter gate only accepts roads that expose zone SubBlocks
             if (!m_SubBlockLookup.TryGetBuffer(entity, out _))
             {
                 entity = Entity.Null;
                 return false;
             }
-            return true;
+            return true;        // zonable road entitires pass to preview/apply
         }
 
         public override PrefabBase GetPrefab() => m_ToolPrefab;
@@ -336,17 +337,27 @@ namespace ARTZone.Tools
             public NativeArray<Entity>.ReadOnly SelectedEntities;
             public int2 Depths;
 
+            // Avoid redundant AddComponent when preview depths unchanged
             public void Execute(int index)
             {
                 Entity e = SelectedEntities[index];
 
-                if (ZoningPreviewLookup.TryGetComponent(e, out ZoningPreviewComponent data) && math.any(data.Depths != Depths))
-                    ECB.SetComponent(index, e, new ZoningPreviewComponent { Depths = Depths });
+                if (ZoningPreviewLookup.TryGetComponent(e, out ZoningPreviewComponent data))
+                {
+                    if (!math.all(data.Depths == Depths))
+                    {
+                        ECB.SetComponent(index, e, new ZoningPreviewComponent { Depths = Depths });
+                    }
+                    // else: already matches; no-op
+                }
                 else
+                {
                     ECB.AddComponent(index, e, new ZoningPreviewComponent { Depths = Depths });
+                }
 
                 ECB.AddComponent<Updated>(index, e);
             }
+
         }
 
         public struct CleanupTempJob : IJobParallelFor

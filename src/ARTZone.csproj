@@ -1,100 +1,139 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <!-- File: src/ARTZone.csproj -->
+	<!-- File: src/ARTZone.csproj -->
 
-  <PropertyGroup>
-    <Configurations>Debug;Release</Configurations>
-    <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
+	<PropertyGroup>
+		<Configurations>Debug;Release</Configurations>
+		<PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
 
-	  <AssemblyTitle>ARTZone</AssemblyTitle>
-	  <AssemblyName>ARTZone</AssemblyName>
-	  <RootNamespace>ARTZone</RootNamespace>
+		<AssemblyTitle>ARTZone</AssemblyTitle>
+		<AssemblyName>ARTZone</AssemblyName>
+		<RootNamespace>ARTZone</RootNamespace>
 
-    <Nullable>enable</Nullable>
+		<Nullable>enable</Nullable>
 
-    <!-- Node/NPM runner + UI build strictness -->
-    <NpmCmd>npm</NpmCmd>
-    <!-- In Debug: soft-fail; In Release: hard-fail if true -->
-    <FailUIBuild Condition="'$(Configuration)'=='Release'">false</FailUIBuild>
-    <FailUIBuild Condition="'$(Configuration)'!='Release'">false</FailUIBuild>
-  </PropertyGroup>
-
+		<!-- NPM runner + UI build strictness -->
+		<NpmCmd>npm</NpmCmd>
+		<!-- Keep soft-fail so C# continues even if UI hiccups -->
+		<FailUIBuild>false</FailUIBuild>
+	</PropertyGroup>
 
 	<!-- Helper to point to game Managed folder -->
 	<PropertyGroup>
 		<GameAssemblies>C:\Program Files (x86)\Steam\steamapps\common\Cities Skylines II\Cities2_Data\Managed</GameAssemblies>
 	</PropertyGroup>
 
-  <!-- CS2 toolchain (sets net48, refs, analyzers, etc.) -->
-  <Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.props" />
-  <Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.targets" />
+	<!-- CS2 toolchain (sets net48, refs, analyzers, etc.) -->
+	<Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.props" />
+	<Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.targets" />
 
-  <ItemGroup>
-    <Reference Include="Game"><Private>false</Private></Reference>
-    <Reference Include="Colossal.Core"><Private>false</Private></Reference>
-    <Reference Include="Colossal.Logging"><Private>false</Private></Reference>
-    <Reference Include="Colossal.IO.AssetDatabase"><Private>false</Private></Reference>
-    <Reference Include="Colossal.Localization"><Private>false</Private></Reference>
-    <Reference Include="Colossal.UI"><Private>false</Private></Reference>
-    <Reference Include="Colossal.UI.Binding"><Private>false</Private></Reference>
-	  
-	 <Reference Include="UnityEngine.CoreModule"><Private>false</Private></Reference>
-    <Reference Include="UnityEngine.AudioModule"><Private>false</Private></Reference>
-    <Reference Include="Unity.Burst"><Private>false</Private></Reference>
-    <Reference Include="Unity.Collections"><Private>false</Private></Reference>
-    <Reference Include="Unity.Entities"><Private>false</Private></Reference>
-    <Reference Include="Unity.Mathematics"><Private>false</Private></Reference>
-    <Reference Include="Colossal.Mathematics"><Private>false</Private></Reference>
-	  <!-- Required by Colossal.SettingsUIKeyboardBindingAttribute to compile; safe even if unused -->
-	  <Reference Include="Unity.InputSystem"><Private>false</Private></Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<Reference Include="Game">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.Core">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.Logging">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.IO.AssetDatabase">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.Localization">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.UI">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.UI.Binding">
+			<Private>false</Private>
+		</Reference>
 
-  <!-- Convenience: make common toolchain files viewable in Properties/ -->
-  <ItemGroup>
-    <None Include="$(ModPropsFile)" Link="Properties\Mod.props" />
-    <None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
-  </ItemGroup>
+		<Reference Include="UnityEngine.CoreModule">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="UnityEngine.AudioModule">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Unity.Burst">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Unity.Collections">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Unity.Entities">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Unity.Mathematics">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.Mathematics">
+			<Private>false</Private>
+		</Reference>
+		<!-- Required by Colossal.SettingsUIKeyboardBindingAttribute to compile; safe even if unused -->
+		<Reference Include="Unity.InputSystem">
+			<Private>false</Private>
+		</Reference>
+	</ItemGroup>
 
-  <!-- Copy UI assets so COUI can find them via coui://ARTZone/... -->
-  <ItemGroup>
-    <Content Include="UI\mod.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="UI\images\**\*.*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <!-- Copy the built bundle if present -->
-    <Content Include="UI\dist\**\*.*" Condition="Exists('UI\dist')">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+	<!-- Convenience: make common toolchain files viewable in Properties/ -->
+	<ItemGroup>
+		<None Include="$(ModPropsFile)" Link="Properties\Mod.props" />
+		<None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
+	</ItemGroup>
 
-  <!-- 1) Install npm deps once (both configs) BEFORE build -->
-  <Target Name="NpmInstallIfNeeded" BeforeTargets="Build" Condition="Exists('$(ProjectDir)UI\package.json') AND !Exists('$(ProjectDir)UI\node_modules')">
-    <Message Text="ART UI: npm ci (first-time install)..." Importance="high" />
-    <Exec Command="$(NpmCmd) ci" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true">
-      <Output TaskParameter="ExitCode" PropertyName="NpmCiExit" />
-    </Exec>
-    <Error Condition="'$(FailUIBuild)'=='true' AND '$(NpmCiExit)' != '0'" Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). See Output window for details." />
-    <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmCiExit)' != '0'" Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). Continuing C# build." />
-  </Target>
+	<!-- Copy ONLY in-game localization files -->
+	<ItemGroup>
+		<Content Include="lang\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
-  <!-- 2) Build the UI AFTER the C# build (both configs) -->
-  <Target Name="BuildUI" AfterTargets="Build" Condition="Exists('$(ProjectDir)UI\package.json')">
-    <Message Text="ART UI: npm run build ($(Configuration))..." Importance="high" />
-    <Exec Command="$(NpmCmd) run build" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true">
-      <Output TaskParameter="ExitCode" PropertyName="NpmBuildExit" />
-    </Exec>
-    <Error Condition="'$(FailUIBuild)'=='true' AND '$(NpmBuildExit)' != '0'" Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit))." />
-    <Warning Condition="'$(FailUIBuild)'!='true' AND '$(NpmBuildExit)' != '0'" Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit)). Continuing C# build." />
-  </Target>
+	<!-- Show Utilities/ in Solution Explorer but do NOT copy it -->
+	<ItemGroup>
+		<None Include="Utilities\**\*.*">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<Folder Include="Utilities\" />
+	</ItemGroup>
 
-  <!-- Keep lang/** copied (in-game localization files) -->
-  <ItemGroup>
-    <Content Include="lang\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Utilities\" />
-  </ItemGroup>
+	<!-- Run npm ci AFTER C# build, only when needed:
+       - first time (node_modules missing), OR
+       - package-lock.json changed since last run (tracked by .stamp) -->
+	<Target Name="NpmInstallIfNeeded"
+			AfterTargets="Build"
+			Condition="Exists('$(ProjectDir)UI\package.json')"
+			Inputs="$(ProjectDir)UI\package-lock.json"
+			Outputs="$(ProjectDir)UI\node_modules\.stamp">
+		<Message Text="ART UI: npm ci (first-time or lockfile changed)..." Importance="high" />
+		<Exec Command="$(NpmCmd) ci"
+			  WorkingDirectory="$(ProjectDir)UI"
+			  IgnoreExitCode="true">
+			<Output TaskParameter="ExitCode" PropertyName="NpmCiExit" />
+		</Exec>
+		<!-- Soft-fail (warn instead of error) -->
+		<Warning Condition="'$(NpmCiExit)' != '0'"
+				 Text="ART UI: 'npm ci' failed (exit $(NpmCiExit)). Continuing C# build." />
+		<!-- On success, write/update the stamp -->
+		<WriteLinesToFile Condition="'$(NpmCiExit)' == '0'"
+						  File="$(ProjectDir)UI\node_modules\.stamp"
+						  Lines="ok"
+						  Overwrite="true" />
+	</Target>
+
+	<!-- Always run the UI bundle AFTER C# build; ensure it runs *after* NpmInstallIfNeeded -->
+	<Target Name="BuildUI"
+			AfterTargets="Build"
+			DependsOnTargets="NpmInstallIfNeeded"
+			Condition="Exists('$(ProjectDir)UI\package.json')">
+		<Message Text="ART UI: npm run build ($(Configuration))..." Importance="high" />
+		<Exec Command="$(NpmCmd) run build"
+			  WorkingDirectory="$(ProjectDir)UI"
+			  IgnoreExitCode="true">
+			<Output TaskParameter="ExitCode" PropertyName="NpmBuildExit" />
+		</Exec>
+		<!-- Soft-fail (warn instead of error) -->
+		<Warning Condition="'$(NpmBuildExit)' != '0'"
+				 Text="ART UI: 'npm run build' failed (exit $(NpmBuildExit)). Continuing C# build." />
+	</Target>
 </Project>

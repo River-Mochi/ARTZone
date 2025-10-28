@@ -22,7 +22,7 @@ namespace ARTZone.Tools
         private ValueBinding<bool> m_IsRoadPrefab = null!;
 
         private ToolSystem m_MainToolSystem = null!;
-        private ZoningController m_ToolSystem = null!; // (keep your actual type name here)
+        //  private ZoningControllerToolSystem m_ToolSystem = null!; // (keep your actual type name here)
         private ZoningControllerToolSystem m_ZoningTool = null!;
 
         public ZoningMode ToolZoningMode => (ZoningMode)m_ToolZoningMode.value;

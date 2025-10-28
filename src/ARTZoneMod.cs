@@ -46,7 +46,7 @@ namespace ARTZone
             get; private set;
         }
 
-        public static readonly ILog s_Log = LogManager.getLogger(ModID).SetShowsErrorsInUI(false);
+        public static readonly ILog s_Log = LogManager.GetLogger(ModID).SetShowsErrorsInUI(false);
 
         private static readonly HashSet<string> s_InstalledLocales = new();
         private static bool s_ReapplyingLocale;
@@ -95,12 +95,12 @@ namespace ARTZone
             // definition only; prefab created after game load
             PanelBuilder.Initialize(force: false);
 
-            // Register our panel button with BLACK icon
+            // Register our panel button with original icon
             PanelBuilder.RegisterTool(
                 new ToolDefinition(
                     typeof(ZoningControllerToolSystem),
                     ZoningControllerToolSystem.ToolID,
-                    new ToolDefinition.UI(PanelIconPath) // use black icon for Road Services panel button
+                    new ToolDefinition.UI(PanelIconPath) // use original icon for Road Services panel button
                 )
             );
 
