@@ -14,7 +14,7 @@ import { ZoningToolController } from "./mods/ZoningToolSections";
 import { ToolOptionsVisibility } from "./mods/ToolOptionsVisible/toolOptionsVisible";
 
 // Ensure assets are emitted to coui://ui-mods/images/
-import "../images/menu-top-icon.svg";            // Top-left FAB icon (matches C# MainIconPath)
+import "../images/ico-zones-color02.svg";            // Top-left FAB icon (matches C# MainIconPath)
 import "../images/MapGrid.svg";                  // Road Services panel tile (NEW)
 
 // Mode icons used in the Tool Options section

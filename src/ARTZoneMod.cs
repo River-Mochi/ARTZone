@@ -27,7 +27,7 @@ namespace ARTZone
         public const string UiCouiRoot = "coui://ui-mods";
 
         // Top-left floating action button (color)
-        public const string MainIconPath = UiCouiRoot + "/images/menu-top-icon.svg";
+        public const string MainIconPath = UiCouiRoot + "/images/ico-zones-color02.svg";
 
         // Road Services panel button (now MapGrid.svg under UI/images)
         public const string PanelIconPath = UiCouiRoot + "/images/MapGrid.svg";

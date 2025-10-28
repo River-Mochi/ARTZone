@@ -8,7 +8,7 @@ import { trigger } from "cs2/api";
 import mod from "../../mod.json";
 
 // Keep the identifier name aligned with C#: MainIconPath (TS side uses a URL string)
-import MainIconPath from "../../images/menu-top-icon.svg";     // TopLeft button
+import MainIconPath from "../../images/ico-zones-color02.svg";     // TopLeft button
 
 function onClickTopLeft() {
     trigger(mod.id, "ToggleZoneControllerTool");
