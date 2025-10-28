@@ -22,6 +22,7 @@ const banner = `
 `;
 
 module.exports = {
+    bail: true,         // if webpack error, stop and exit 1
     mode: "production",
     stats: "none",
     entry: {

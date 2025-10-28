@@ -13,10 +13,12 @@ import { tool } from "cs2/bindings";
 import { useLocalization } from "cs2/l10n";
 import mod from "../../mod.json";
 import { VanillaComponentResolver } from "../YenYang/VanillaComponentResolver";
-import styles from "./ZoningToolSections.module.scss";
+// NOTE: No custom SCSS import — we let vanilla ToolButton center its own icon.
 
+// Tool id shared with C# side
 import { ZONING_TOOL_ID } from "../shared/tool-ids";
 
+// Icon assets (emitted by webpack to coui://ui-mods/images/)
 import all_icon from "../../images/Toolbar/all/ico-all.svg";
 import left_icon from "../../images/Toolbar/left/ico-left.svg";
 import right_icon from "../../images/Toolbar/right/ico-right.svg";
@@ -30,7 +32,7 @@ export enum ZoningMode {
 
 const RoadZoningMode$ = bindValue<number>(mod.id, "RoadZoningMode");
 const ToolZoningMode$ = bindValue<number>(mod.id, "ToolZoningMode");
-const isRoadPrefab$ = bindValue<boolean>(mod.id, "IsRoadPrefab"); // actually: “should show section”
+const isRoadPrefab$ = bindValue<boolean>(mod.id, "IsRoadPrefab"); // “should show section” flag
 
 function setToolZoningMode(value: ZoningMode) {
     trigger(mod.id, "ChangeToolZoningMode", value);
@@ -54,21 +56,21 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
         const result = Component(props);
 
         const activeTool = useValue(tool.activeTool$)?.id;
-        const showSection = useValue(isRoadPrefab$); // true when our tool active OR road prefab active
+        const showSection = useValue(isRoadPrefab$);      // show when our tool OR a road prefab is active
         const zoningToolOn = activeTool === ZONING_TOOL_ID;
 
         const toolMode = useValue(ToolZoningMode$) as ZoningMode;
         const roadMode = useValue(RoadZoningMode$) as ZoningMode;
 
         const { translate } = useLocalization();
-        const title = translate("ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]") || "Zoning Side";
-        const tipBoth = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]") || "Toggle Both/None.";
-        const tipLeft = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]") || "Zone only the left side.";
-        const tipRight = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]") || "Zone only the right side.";
+        const title = translate("ToolOptions.SECTION[ARTZone.Zone_Controller.SectionTitle]", "Zoning Side");  // use json first, if none - use this fallback
+        const tipBoth = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeBothDescription]", "Toggle Both/None.");
+        const tipLeft = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeLeftDescription]", "Zone only the left side.");
+        const tipRight = translate("ToolOptions.TOOLTIP_DESCRIPTION[ARTZone.Zone_Controller.ZoningModeRightDescription]", "Zone only the right side.");
 
         // Show section if either a road prefab is active OR our tool is active.
         if (showSection) {
-            // IMPORTANT: we only use roadMode when a road prefab is active AND our tool is NOT active.
+            // IMPORTANT: use roadMode when a road prefab is active AND our tool is NOT active.
             const usingRoadState = !zoningToolOn && showSection;
             const selected = usingRoadState ? roadMode : toolMode;
 
@@ -82,6 +84,7 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
 
             const onBoth = () => (usingRoadState ? flipRoadBothMode() : flipToolBothMode());
 
+            // Push our section + three buttons to the vanilla MouseToolOptions panel
             result.props.children?.push(
                 <VanillaComponentResolver.instance.Section title={title}>
                     <>
@@ -92,9 +95,7 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
                             src={all_icon}
                             focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
                             className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}
-                        >
-                            <label className={styles.centeredContentButton}></label>
-                        </VanillaComponentResolver.instance.ToolButton>
+                        />
 
                         <VanillaComponentResolver.instance.ToolButton
                             selected={(selected & ZoningMode.Left) === ZoningMode.Left}
@@ -103,9 +104,7 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
                             src={left_icon}
                             focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
                             className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}
-                        >
-                            <label className={styles.centeredContentButton}></label>
-                        </VanillaComponentResolver.instance.ToolButton>
+                        />
 
                         <VanillaComponentResolver.instance.ToolButton
                             selected={(selected & ZoningMode.Right) === ZoningMode.Right}
@@ -114,9 +113,7 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
                             src={right_icon}
                             focusKey={VanillaComponentResolver.instance.FOCUS_DISABLED}
                             className={VanillaComponentResolver.instance.toolButtonTheme.ToolButton}
-                        >
-                            <label className={styles.centeredContentButton}></label>
-                        </VanillaComponentResolver.instance.ToolButton>
+                        />
                     </>
                 </VanillaComponentResolver.instance.Section>
             );

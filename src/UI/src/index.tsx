@@ -12,10 +12,11 @@ import { ZoningToolController } from "./mods/ZoningToolSections";
 import { ToolOptionsVisibility } from "./mods/ToolOptionsVisible/toolOptionsVisible";
 
 // Ensure icons emitted to coui://ui-mods/images/
-import "../images/ico-4square-color.svg";   // TopLeft FAB
-import "../images/tool-icon.svg";           // RoadsServices tool panel
+// import "../images/ico-4square-color.svg";   // TopLeft FAB
+import "../images/ico-zones-color02.svg";   // TopLeft FAB
+import "../images/tool-icon01.png";           // RoadsServices tool panel
 
-const DIAG_TOPO = false; // flip to true locally when you want to scan modules
+const DIAG_TOPO = false; // False for Release. flip to true to scan modules, check UI.log
 
 const VANILLA = {
     MouseToolOptions: {

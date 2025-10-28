@@ -61,7 +61,7 @@ namespace ARTZone.Tools
         // ---- Nested UI descriptor ---------------------------------------------
         public readonly struct UI
         {
-            public readonly string ImagePath; // e.g., "coui://ui-mods/images/tool-icon.svg"
+            public readonly string ImagePath; // e.g., "coui://ui-mods/images/tool-icon01.png"
 
             public UI(string imagePath)
             {
