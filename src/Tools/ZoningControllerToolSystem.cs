@@ -4,7 +4,6 @@
 //   LMB confirms. ESC is left to vanilla UI.
 //   Preview always reflects the current mode for the hovered segment.
 //
-// FULL DROP-IN
 
 namespace EasyZoning.Tools
 {

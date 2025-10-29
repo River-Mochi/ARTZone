@@ -1,7 +1,7 @@
 ﻿// File: src/Tools/KeybindHotkeySystem.Debug.cs
 // Purpose: Dev-only diagnostics for KeybindHotkeySystem.
 //          Adds DebugInit() and reflection-based inspection of InputManager.
-// FULL DROP-IN
+
 
 #if DEBUG
 namespace EasyZoning.Tools

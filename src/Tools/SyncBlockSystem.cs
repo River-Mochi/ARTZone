@@ -2,7 +2,6 @@
 // Purpose: applies the preview/committed zoning depth to actual zone blocks
 // respecting settings (RemoveZonedCells / RemoveOccupiedCells). Tool won’t function without it.
 //
-// FULL DROP-IN
 
 namespace EasyZoning.Tools
 {

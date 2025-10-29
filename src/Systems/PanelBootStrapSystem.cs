@@ -2,8 +2,7 @@
 // Purpose:
 //   Wait until a RoadsServices donor/anchor exists, then call PanelBuilder.InstantiateTools().
 //   Arms only after a game load, then turns itself off.
-//
-// FULL DROP-IN
+
 
 namespace EasyZoning.Systems
 {
