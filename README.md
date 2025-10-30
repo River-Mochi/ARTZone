@@ -48,5 +48,5 @@
 - 📘 CS2 Zoning Wiki: https://cs2.paradoxwikis.com/Zoning
 - 💬 Discord: https://discord.gg/HTav7ARPs2
 - 💻 GitHub: https://github.com/River-Mochi/EasyZoning
-- 🧩 Paradox Mods: (TBD)
+- 🧩 [Paradox Mods](https://mods.paradoxplaza.com/authors/kimosabe1?orderBy=desc&sortBy=best&time=alltime)
 - 🗣️ Forums thread: (TBD)
