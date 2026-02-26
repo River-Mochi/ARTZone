@@ -1,4 +1,4 @@
-// File: src/Tools/ZoningControllerToolSystem.cs
+﻿// File: src/Tools/ZoningControllerToolSystem.cs
 // Purpose:
 //   Runtime tool. LMB toggles/applies zoning modes over valid roads.
 //   RMB cycles the current mode: Left → Right → Both → Left (mode only; LMB still applies/toggles).
@@ -122,7 +122,7 @@ namespace EasyZoning.Tools
             requireNet = Layer.Road;
 
             // Must be true so UndergroundViewSystem + UndergroundPass can render contour lines.
-            allowUnderground = true;
+            allowUnderground = false;
 
             // Initial contour state follows the UI binding (default is false).
             bool contourOn = m_UISystem != null && m_UISystem.ContourEnabled;
