@@ -1,4 +1,4 @@
-﻿// File: src/UI/src/mods/ez-zoneToolSections.tsx
+// File: src/UI/src/mods/ez-zoneToolSections.tsx
 // Purpose:
 //   Injects Easy Zoning controls into the Tool Options panel.
 //   When active on roads, replaces the vanilla sections so the snap
@@ -93,15 +93,15 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
 
         const tipBoth = translate(
             "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]",
-            "Toggle zoning on BOTH sides."
+            "Toggle zoning on both sides."
         );
         const tipLeft = translate(
             "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]",
-            "Zone LEFT side."
+            "Zone only the left side."
         );
         const tipRight = translate(
             "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]",
-            "Zone RIGHT side."
+            "Zone only the right side."
         );
         const tipContour = translate(
             "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]",

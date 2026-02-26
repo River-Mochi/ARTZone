@@ -1,4 +1,4 @@
-﻿// File: src/UI/src/mods/ez-zone-tool-button.tsx
+// File: src/UI/src/mods/ez-zone-tool-button.tsx
 // Purpose: Floating GameTopLeft launcher button (icon + tooltip).
 //          Triggers ToggleZoneControllerTool on the C# side.
 

@@ -1,7 +1,7 @@
 // File: src/Systems/PanelBootStrapSystem.cs
 // NOT USED by Easy Zoning anymore.
 // NOTE: PanelBuilder is not used in Phase 1 of Easy Zoning.
-// All calls are commented out in Mod.OnLoad; RoadServices button is disabled.
+// All calls are commented out in Mod.OnLoad; RoadsServices button is disabled.
 // Keep this file for possible Phase 3 re-enable.
 
 // Purpose:

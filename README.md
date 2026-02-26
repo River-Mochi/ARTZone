@@ -1,4 +1,4 @@
-﻿# Easy Zoning [EZ]
+# Easy Zoning [EZ]
 
 - Edit zoning in Cities: Skylines II — fast and vanilla-friendly.
 - **New roads** inherit your active zoning choice (Left/Right/Both/None).

@@ -1,4 +1,4 @@
-﻿// File: src/Mod.cs
+// File: src/Mod.cs
 // Purpose: Mod entrypoint; locales + settings + keybindings + tool registration (no Harmony).
 // Notes:
 //   • Locales install BEFORE Options UI so labels render correctly.

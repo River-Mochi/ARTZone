@@ -1,4 +1,4 @@
-﻿// File: src/Settings/LocaleZH_CN.cs
+// File: src/Settings/LocaleZH_CN.cs
 // Purpose: Simplified Chinese (zh-HANS) strings for Options UI + Panel text.
 
 namespace EasyZoning.Settings

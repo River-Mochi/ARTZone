@@ -1,4 +1,4 @@
-﻿// File: src/UI/src/components/VanillaBridge.tsx
+// File: src/UI/src/components/VanillaBridge.tsx
 // Purpose:
 //   Generic one-shot bridge from ModuleRegistry → plain objects that hold
 //   vanilla components, themes, and focus helpers.

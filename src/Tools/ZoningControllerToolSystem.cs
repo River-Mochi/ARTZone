@@ -1,4 +1,4 @@
-﻿// File: src/Tools/ZoningControllerToolSystem.cs
+// File: src/Tools/ZoningControllerToolSystem.cs
 // Purpose:
 //   Runtime tool. LMB toggles/applies zoning modes over valid roads.
 //   RMB cycles the current mode: Left → Right → Both → Left (mode only; LMB still applies/toggles).

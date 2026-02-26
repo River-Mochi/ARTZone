@@ -1,4 +1,4 @@
-﻿// File: src/Settings/LocaleEN.cs
+// File: src/Settings/LocaleEN.cs
 // Purpose: English (en-US) strings for Options UI + Panel text.
 
 namespace EasyZoning.Settings

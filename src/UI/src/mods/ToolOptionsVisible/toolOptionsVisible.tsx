@@ -1,4 +1,4 @@
-﻿// File: src/UI/src/mods/ToolOptionsVisible/toolOptionsVisible.tsx
+// File: src/UI/src/mods/ToolOptionsVisible/toolOptionsVisible.tsx
 // Purpose:
 //   Keep the Tool Options panel visible while the Easy Zoning tool is active.
 //   Photo Mode: do not force panel visibility.

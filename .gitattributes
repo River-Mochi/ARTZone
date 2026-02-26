@@ -1,4 +1,4 @@
-﻿* text=auto
+* text=auto
 
 # Windows-style line endings for VS project files and C#
 *.sln      text eol=crlf
@@ -6,9 +6,12 @@
 *.props    text eol=crlf
 *.targets  text eol=crlf
 *.cs       text eol=crlf
+*.xml     text eol=crlf
+
 # optional: LF renders nicer on GitHub
 *.md       text eol=lf
 *.json text eol=lf
+
 
 # Scripts
 *.sh       text eol=lf
