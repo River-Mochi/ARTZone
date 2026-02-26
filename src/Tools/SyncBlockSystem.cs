@@ -1,18 +1,19 @@
-// File: src/Tools/SyncBlockSystem.cs
+﻿// File: src/Tools/SyncBlockSystem.cs
 // Purpose: applies the preview/committed zoning depth to zone blocks
 // respecting settings (RemoveZonedCells / RemoveOccupiedCells). Tool won’t function without it.
 
 namespace EasyZoning.Tools
 {
-    using System;
     using EasyZoning.Components;
     using Game;
     using Game.Common;
     using Game.Zones;
+    using System;
     using Unity.Collections;
     using Unity.Entities;
     using Unity.Jobs;
     using Unity.Mathematics;
+    using static Unity.Collections.AllocatorManager;
 
     public partial class SyncBlockSystem : GameSystemBase
     {
@@ -24,7 +25,7 @@ namespace EasyZoning.Tools
         private int m_LastCount;
 #endif
 
-        protected override void OnCreate()
+        protected override void OnCreate( )
         {
             base.OnCreate();
 
@@ -41,7 +42,7 @@ namespace EasyZoning.Tools
 #endif
         }
 
-        protected override void OnUpdate()
+        protected override void OnUpdate( )
         {
             if (m_UpdatedBlocksQuery.IsEmpty)
                 return;
@@ -89,6 +90,7 @@ namespace EasyZoning.Tools
             [ReadOnly] public ComponentLookup<ZoningDepthComponent> ZoningDepthLookup;
             [ReadOnly] public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
 
+
             public void Execute(int index)
             {
                 Entity blockEntity = Entities[index];
@@ -105,79 +107,113 @@ namespace EasyZoning.Tools
                 // tool/UI uses int2 where x=LEFT and y=RIGHT (engine convention).
                 // The zone Block side detection here was effectively inverted for this mod,
                 // so Left-only and Right-only got swapped. Fix = swap the chosen depth.
-                bool left = (math.dot(1, block.m_Direction) < 0);
 
-                int depth;
+                // bool left = (math.dot(1, block.m_Direction) < 0);
+
+                private static bool IsLeftSide(DynamicBuffer<Cell> cells, Block block, ValidArea validArea)
+            {
+                // Use the first valid depth row, not hard-coded 0, to be safe
+                int z = validArea.m_Area.z;
+
+                for (int x = validArea.m_Area.x; x < validArea.m_Area.y; x++)
+                {
+                    int idx = z * block.m_Size.x + x;
+                    Cell cell = cells[idx];
+
+                    if ((cell.m_State & CellFlags.RoadLeft) != 0)
+                    {
+                        return true;    // road is “left” relative to this block
+                    }
+
+                    if ((cell.m_State & CellFlags.RoadRight) != 0)
+                    {
+                        return false;   // road is “right”
+                    }
+                }
+
+                // Fallback: if for some reason no directional flags are present
+                // keep the old heuristic so behavior does not silently break.
+                return math.dot(block.m_Direction, new float2(1f, 0f)) < 0f;
+            }
+
+
+            bool left = IsLeftSide(CellLookup[blockEntity], block, validArea);
+
+
+
+
+
+            int depth;
                 if (ZoningPreviewLookup.TryGetComponent(roadEntity, out ZoningPreviewComponent zoningPreview))
                 {
                     // Mod convention: Depths.x = LEFT, Depths.y = RIGHT.
-                    depth = left ? zoningPreview.Depths.x : zoningPreview.Depths.y;
-                }
+                    depth = left? zoningPreview.Depths.x : zoningPreview.Depths.y;
+        }
                 else if (ZoningDepthLookup.TryGetComponent(roadEntity, out ZoningDepthComponent data))
                 {
                     // Mod convention: Depths.x = LEFT, Depths.y = RIGHT.
-                    depth = left ? data.Depths.x : data.Depths.y;
-                }
+                    depth = left? data.Depths.x : data.Depths.y;
+    }
                 else
                 {
                     return;
                 }
 
 
-                // Respect settings
-                if (Mod.Settings != null)
-                {
-                    if (Mod.Settings.RemoveOccupiedCells &&
-                        IsAnyCellOccupied(CellLookup[blockEntity], block, validArea))
-                        return;
+// Respect settings
+if (Mod.Settings != null)
+{
+    if (Mod.Settings.RemoveOccupiedCells &&
+        IsAnyCellOccupied(CellLookup[blockEntity], block, validArea))
+        return;
 
-                    if (Mod.Settings.RemoveZonedCells &&
-                        IsAnyCellZoned(CellLookup[blockEntity], block, validArea))
-                        return;
-                }
+    if (Mod.Settings.RemoveZonedCells &&
+        IsAnyCellZoned(CellLookup[blockEntity], block, validArea))
+        return;
+}
 
-                block.m_Size.y = depth;
-                ECB.SetComponent(index, blockEntity, block);
+block.m_Size.y = depth;
+ECB.SetComponent(index, blockEntity, block);
 
-                validArea.m_Area.w = depth;
-                ECB.SetComponent(index, blockEntity, validArea);
+validArea.m_Area.w = depth;
+ECB.SetComponent(index, blockEntity, validArea);
             }
 
             private readonly bool IsAnyCellOccupied(DynamicBuffer<Cell> cells, Block block, ValidArea validArea)
-            {
-                if (validArea.m_Area.y * validArea.m_Area.w == 0)
-                    return false;
+{
+    if (validArea.m_Area.y * validArea.m_Area.w == 0)
+        return false;
 
-                for (int z = validArea.m_Area.z; z < validArea.m_Area.w; z++)
-                {
-                    for (int x = validArea.m_Area.x; x < validArea.m_Area.y; x++)
-                    {
-                        int idx = z * block.m_Size.x + x;
-                        Cell cell = cells[idx];
-                        if ((cell.m_State & CellFlags.Occupied) != 0)
-                            return true;
-                    }
-                }
-                return false;
-            }
+    for (int z = validArea.m_Area.z; z < validArea.m_Area.w; z++)
+    {
+        for (int x = validArea.m_Area.x; x < validArea.m_Area.y; x++)
+        {
+            int idx = z * block.m_Size.x + x;
+            Cell cell = cells[idx];
+            if ((cell.m_State & CellFlags.Occupied) != 0)
+                return true;
+        }
+    }
+    return false;
+}
 
-            private readonly bool IsAnyCellZoned(DynamicBuffer<Cell> cells, Block block, ValidArea validArea)
-            {
-                if (validArea.m_Area.y * validArea.m_Area.w == 0)
-                    return false;
+private readonly bool IsAnyCellZoned(DynamicBuffer<Cell> cells, Block block, ValidArea validArea)
+{
+    if (validArea.m_Area.y * validArea.m_Area.w == 0)
+        return false;
 
-                for (int z = validArea.m_Area.z; z < validArea.m_Area.w; z++)
-                {
-                    for (int x = validArea.m_Area.x; x < validArea.m_Area.y; x++)
-                    {
-                        int idx = z * block.m_Size.x + x;
-                        Cell cell = cells[idx];
-                        if (cell.m_Zone.m_Index != ZoneType.None.m_Index)
-                            return true;
-                    }
-                }
-                return false;
-            }
+    for (int z = validArea.m_Area.z; z < validArea.m_Area.w; z++)
+    {
+        for (int x = validArea.m_Area.x; x < validArea.m_Area.y; x++)
+        {
+            int idx = z * block.m_Size.x + x;
+            Cell cell = cells[idx];
+            if (cell.m_Zone.m_Index != ZoneType.None.m_Index)
+                return true;
+        }
+    }
+    return false;
+}
         }
     }
 }

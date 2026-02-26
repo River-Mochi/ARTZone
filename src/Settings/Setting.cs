@@ -1,14 +1,14 @@
-// File: src/Settings/Setting.cs
-// Purpose: Options UI + One rebindable entry (Shift+Z).
-// Note: RMB is *not* declared here; the Game�s own RMB/cancel bindings remain vanilla.
+﻿// File: src/Settings/Setting.cs
+// Purpose: Options UI + One rebindable entry (Ctrl+Z).
+// Note: RMB is *not* declared here; the Game’s own RMB/cancel bindings remain vanilla.
 // Later in the tool, the RMB is read for preview flip.
 namespace EasyZoning.Settings
 {
-    using System;
     using Colossal.IO.AssetDatabase;
     using Game.Input;
     using Game.Modding;
     using Game.Settings;
+    using System;
     using UnityEngine;
 
     // Persisted settings location (rebranded)
@@ -19,7 +19,7 @@ namespace EasyZoning.Settings
     [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup, kAboutInfoGroup, kAboutLinksGroup)]
     [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup)]
 
-    // Declare ONLY the keyboard action (Shift+Z). RMB is vanilla cancelAction.
+    // Declare ONLY the keyboard action (Ctrl+Z). RMB is vanilla cancelAction.
     [SettingsUIKeyboardAction(Mod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
     public sealed class Setting : ModSetting
     {
@@ -33,19 +33,26 @@ namespace EasyZoning.Settings
         public const string kAboutInfoGroup = "Info";
         public const string kAboutLinksGroup = "Links";
 
-        public Setting(IMod mod) : base(mod) { }
+        public Setting(IMod mod) : base(mod)
+        {
+        }
 
         // --- Toggles ---
 
         [SettingsUISection(kActionsTab, kToggleGroup)]
-        public bool RemoveZonedCells { get; set; } = true;
+        public bool RemoveZonedCells
+        {
+            get; set;
+        } = true;
 
         [SettingsUISection(kActionsTab, kToggleGroup)]
-        public bool RemoveOccupiedCells { get; set; } = true;
+        public bool RemoveOccupiedCells
+        {
+            get; set;
+        } = true;
 
-        // --- Key bindings (only Shift+Z exposed) ---
-
-        [SettingsUIKeyboardBinding(BindingKeyboard.Z, Mod.kToggleToolActionName, shift: true)]
+        // --- Key bindings (only Ctrl+Z exposed) ---
+        [SettingsUIKeyboardBinding(BindingKeyboard.Z, Mod.kToggleToolActionName, ctrl: true)]
         [SettingsUISection(kActionsTab, kKeybindingGroup)]
         public ProxyBinding ToggleZoneTool
         {
@@ -79,7 +86,9 @@ namespace EasyZoning.Settings
                 {
                     Application.OpenURL(UrlParadox);
                 }
-                catch (Exception) { }
+                catch (Exception)
+                {
+                }
             }
         }
 
@@ -94,11 +103,13 @@ namespace EasyZoning.Settings
                 {
                     Application.OpenURL(UrlDiscord);
                 }
-                catch (Exception) { }
+                catch (Exception)
+                {
+                }
             }
         }
 
-        public override void SetDefaults()
+        public override void SetDefaults( )
         {
             RemoveZonedCells = true;
             RemoveOccupiedCells = true;
