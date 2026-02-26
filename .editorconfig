@@ -14,7 +14,9 @@ indent_size = 4
 
 [*.{ts,tsx,js,mjs,css,scss,html,json,md,yml,yaml}]
 charset = utf-8
+end_of_line = lf
 insert_final_newline = true
+
 
 # ---- General style ----
 dotnet_style_qualification_for_field = false:suggestion
