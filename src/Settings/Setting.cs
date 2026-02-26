@@ -72,7 +72,8 @@ namespace EasyZoning.Settings
             Mod.ModVersion;
 #endif
 
-        private const string UrlParadox = "https://mods.paradoxplaza.com/authors/kimosabe1/cities_skylines_2?games=cities_skylines_2&orderBy=desc&sortBy=best&time=alltime";
+        private const string UrlParadox =
+            "https://mods.paradoxplaza.com/authors/River-mochi/cities_skylines_2?games=cities_skylines_2&orderBy=desc&sortBy=best&time=alltime";
         private const string UrlDiscord = "https://discord.gg/HTav7ARPs2";
 
         [SettingsUIButtonGroup(kAboutLinksGroup)]
