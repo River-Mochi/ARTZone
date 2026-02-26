@@ -1,8 +1,8 @@
-// File: src/UI/src/mods/ez-zoneToolSections.tsx
+﻿// File: src/UI/src/mods/ez-zoneToolSections.tsx
 // Purpose:
 //   Injects Easy Zoning controls into the Tool Options panel.
-//   When active on roads, replaces the vanilla sections so the snap
-//   and Underground rows are hidden and only the EZ controls are shown.
+//   When relevant, appends EZ sections after vanilla sections so
+//   snap/underground rows and other vanilla rows remain visible.
 
 import { ModuleRegistryExtend } from "cs2/modding";
 import { bindValue, trigger, useValue } from "cs2/api";
@@ -111,13 +111,11 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
         const shouldShowZoneSection = roadPrefabActive || zoningToolOn;
 
         // When no road prefab is active and the EZ tool is not active,
-        // vanilla content should remain unchanged.
+        // vanilla content remains unchanged.
         if (!shouldShowZoneSection && !zoningToolOn) {
             return result;
         }
 
-        // Build new section list. This replaces the vanilla children while
-        // the EZ controls are relevant so underground and snap rows are hidden.
         const sections: any[] = [];
 
         // Contour row: only when EZ tool is active (update-existing mode).
@@ -157,9 +155,7 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
                 usingRoadState ? flipRoadBothMode() : flipToolBothMode();
 
             sections.push(
-                // Empty title keeps the panel compact; icons and tooltips
-                // provide the necessary context.
-                <Section title="">
+                <Section title={titleZone}>
                     <div className={rowClass}>
                         <ToolButton
                             selected={(selectedMode & ZoningMode.Both) === ZoningMode.Both}
@@ -191,7 +187,18 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
         }
 
         if (sections.length > 0) {
-            result.props.children = sections;
+            const existing = result.props.children;
+
+            if (existing == null) {
+                // No vanilla children; only EZ sections remain visible.
+                result.props.children = sections;
+            } else if (Array.isArray(existing)) {
+                // Append EZ sections after vanilla sections.
+                result.props.children = [...existing, ...sections];
+            } else {
+                // Single child: wrap in array and append.
+                result.props.children = [existing, ...sections];
+            }
         }
 
         return result;
