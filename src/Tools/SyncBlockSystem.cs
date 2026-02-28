@@ -165,33 +165,11 @@ namespace EasyZoning.Tools
 
             private static bool IsLeftSide(DynamicBuffer<Cell> cells, Block block, ValidArea validArea)
             {
-                // If valid area is empty, fall back to direction heuristic.
-                if (validArea.m_Area.y * validArea.m_Area.w == 0)
-                {
-                    return math.dot(block.m_Direction, new float2(1f, 0f)) < 0f;
-                }
-
-                int z = validArea.m_Area.z;
-
-                for (int x = validArea.m_Area.x; x < validArea.m_Area.y; x++)
-                {
-                    int idx = z * block.m_Size.x + x;
-                    Cell cell = cells[idx];
-
-                    if ((cell.m_State & CellFlags.RoadLeft) != 0)
-                    {
-                        return true;
-                    }
-
-                    if ((cell.m_State & CellFlags.RoadRight) != 0)
-                    {
-                        return false;
-                    }
-                }
-
-                // Fallback: no directional flags found, keep old heuristic.
-                return math.dot(block.m_Direction, new float2(1f, 0f)) < 0f;
+                // ART behavior: use block direction sign as the left/right discriminator.
+                // (float2(1,1) matches ART's implicit math.dot(1, dir) usage.)
+                return math.dot(new float2(1f, 1f), block.m_Direction) < 0f;
             }
+
 
             private static bool IsAnyCellOccupied(DynamicBuffer<Cell> cells, Block block, ValidArea validArea)
             {
