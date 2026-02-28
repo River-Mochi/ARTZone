@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 RE_DICT_START = re.compile(
-    r"return\s+new\s+Dictionary<string,\s*string>\s*\{",
+    r"(?:return\s+)?new\s+Dictionary<string,\s*string>\s*\{",
     re.IGNORECASE,
 )
 
