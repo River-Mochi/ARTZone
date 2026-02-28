@@ -1,4 +1,4 @@
-﻿// File: src/UI/src/mods/ez-zoneToolSections.tsx
+// File: src/UI/src/mods/ez-zoneToolSections.tsx
 // Purpose:
 //   Injects Easy Zoning controls into the Tool Options panel.
 //   When relevant, appends EZ sections after vanilla sections so
@@ -9,7 +9,7 @@ import { bindValue, trigger, useValue } from "cs2/api";
 import { tool } from "cs2/bindings";
 import { useLocalization } from "cs2/l10n";
 
-import mod from "../../mod.json";
+import mod from "mod.json";
 import { ZONING_TOOL_ID } from "../shared/tool-ids";
 import { VanillaComponentResolver } from "../components/VanillaComponentResolver";
 

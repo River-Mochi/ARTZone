@@ -1,65 +1,160 @@
 // File: src/Tools/ToolHighlightSystem.cs
-// Purpose:
-//   Track which road entities are "highlighted" by the zoning tool (hover / multi-select).
-//   Adds Updated when highlight state changes so the game can react if it wants.
+// Purpose: Applies vanilla road highlight (blue outline) by toggling Highlighted on net entities.
 
 namespace EasyZoning.Tools
 {
-    using System.Collections.Generic;
     using Game;
     using Game.Common;
+    using Game.Net;
+    using Game.Tools;
+    using Unity.Collections;
     using Unity.Entities;
+    using Unity.Jobs;
 
-    public sealed partial class ToolHighlightSystem : GameSystemBase
+    public partial class ToolHighlightSystem : GameSystemBase
     {
-        private HashSet<Entity> m_Highlighted = null!;
+        private ToolOutputBarrier m_ToolOutputBarrier = null!;
 
-        protected override void OnCreate()
+        private ComponentLookup<Edge> m_EdgeLookup;
+        private ComponentLookup<Highlighted> m_HighlightedLookup;
+
+        private NativeList<Entity> m_ToHighlight;
+        private NativeList<Entity> m_ToUnhighlight;
+
+        protected override void OnCreate( )
         {
             base.OnCreate();
-            m_Highlighted = new HashSet<Entity>();
+
+            m_ToolOutputBarrier = World.GetOrCreateSystemManaged<ToolOutputBarrier>();
+
+            m_EdgeLookup = GetComponentLookup<Edge>(isReadOnly: true);
+            m_HighlightedLookup = GetComponentLookup<Highlighted>(isReadOnly: true);
+
+            m_ToHighlight = new NativeList<Entity>(Allocator.Persistent);
+            m_ToUnhighlight = new NativeList<Entity>(Allocator.Persistent);
         }
 
-        protected override void OnDestroy()
+        protected override void OnDestroy( )
         {
-            ClearAll();
+            if (m_ToHighlight.IsCreated)
+                m_ToHighlight.Dispose();
+            if (m_ToUnhighlight.IsCreated)
+                m_ToUnhighlight.Dispose();
+
             base.OnDestroy();
         }
 
-        protected override void OnUpdate()
+        protected override void OnUpdate( )
         {
-            // No per-frame work; state is driven by explicit calls.
+            var ecb = m_ToolOutputBarrier.CreateCommandBuffer();
+
+            m_EdgeLookup.Update(this);
+            m_HighlightedLookup.Update(this);
+
+            JobHandle deps = Dependency;
+
+            if (!m_ToHighlight.IsEmpty)
+            {
+                var job = new HighlightJob
+                {
+                    Entities = m_ToHighlight.AsReadOnly(),
+                    HighlightedLookup = m_HighlightedLookup,
+                    EdgeLookup = m_EdgeLookup,
+                    ECB = ecb.AsParallelWriter(),
+                }.Schedule(m_ToHighlight.Length, 32, deps);
+
+                deps = JobHandle.CombineDependencies(deps, job);
+            }
+
+            if (!m_ToUnhighlight.IsEmpty)
+            {
+                var job = new UnhighlightJob
+                {
+                    Entities = m_ToUnhighlight.AsReadOnly(),
+                    HighlightedLookup = m_HighlightedLookup,
+                    EdgeLookup = m_EdgeLookup,
+                    ECB = ecb.AsParallelWriter(),
+                }.Schedule(m_ToUnhighlight.Length, 32, deps);
+
+                deps = JobHandle.CombineDependencies(deps, job);
+            }
+
+            Dependency = deps;
+            m_ToolOutputBarrier.AddJobHandleForProducer(Dependency);
+
+            m_ToHighlight.Clear();
+            m_ToUnhighlight.Clear();
         }
 
-        public void HighlightEntity(Entity entity, bool enable)
+        public void HighlightEntity(Entity entity, bool value)
         {
-            if (!EntityManager.Exists(entity))
+            if (entity == Entity.Null)
                 return;
 
-            if (enable)
+            if (value)
             {
-                if (m_Highlighted.Add(entity))
-                    EntityManager.AddComponent<Updated>(entity);
+                if (!m_ToHighlight.Contains(entity))
+                    m_ToHighlight.Add(entity);
             }
             else
             {
-                if (m_Highlighted.Remove(entity))
-                    EntityManager.AddComponent<Updated>(entity);
+                if (!m_ToUnhighlight.Contains(entity))
+                    m_ToUnhighlight.Add(entity);
             }
         }
 
-        public void ClearAll()
+        private struct HighlightJob : IJobParallelFor
         {
-            if (m_Highlighted.Count == 0)
-                return;
+            [ReadOnly] public ComponentLookup<Edge> EdgeLookup;
+            [ReadOnly] public ComponentLookup<Highlighted> HighlightedLookup;
+            public NativeArray<Entity>.ReadOnly Entities;
+            public EntityCommandBuffer.ParallelWriter ECB;
 
-            foreach (var e in m_Highlighted)
+            public void Execute(int index)
             {
-                if (EntityManager.Exists(e))
-                    EntityManager.AddComponent<Updated>(e);
-            }
+                var entity = Entities[index];
+                if (entity == Entity.Null)
+                    return;
 
-            m_Highlighted.Clear();
+                if (!HighlightedLookup.HasComponent(entity))
+                {
+                    ECB.AddComponent<Highlighted>(index, entity);
+                    ECB.AddComponent<BatchesUpdated>(index, entity);
+                }
+
+                if (EdgeLookup.TryGetComponent(entity, out var edge))
+                {
+                    ECB.AddComponent<Updated>(index, edge.m_Start);
+                    ECB.AddComponent<Updated>(index, edge.m_End);
+                }
+            }
+        }
+
+        private struct UnhighlightJob : IJobParallelFor
+        {
+            [ReadOnly] public ComponentLookup<Edge> EdgeLookup;
+            [ReadOnly] public ComponentLookup<Highlighted> HighlightedLookup;
+            public NativeArray<Entity>.ReadOnly Entities;
+            public EntityCommandBuffer.ParallelWriter ECB;
+
+            public void Execute(int index)
+            {
+                var entity = Entities[index];
+                if (entity == Entity.Null)
+                    return;
+
+                if (HighlightedLookup.HasComponent(entity))
+                {
+                    ECB.RemoveComponent<Highlighted>(index, entity);
+                    ECB.AddComponent<BatchesUpdated>(index, entity);
+                }
+
+                if (EdgeLookup.TryGetComponent(entity, out var edge))
+                {
+                    ECB.AddComponent<Updated>(index, edge.m_Start);
+                    ECB.AddComponent<Updated>(index, edge.m_End);
+                }
+            }
         }
     }
 }

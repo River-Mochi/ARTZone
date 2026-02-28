@@ -1,11 +1,11 @@
-// File: src/Components/ZoningComponents.cs
+﻿// File: src/Components/ZoningComponents.cs
 // Purpose: Holds temporary preview depths (left/right) while hovering / previewing.
 // Preview = temporary overlay, Depth = real stored setting.
 
 namespace EasyZoning.Components
 {
-    using System;
     using Colossal.Serialization.Entities;
+    using System;
     using Unity.Entities;
     using Unity.Mathematics;
 
@@ -19,7 +19,7 @@ namespace EasyZoning.Components
     }
 
     /// <summary>
-    /// Committed/desired zoning depths for a road entity.
+    /// Committed/desired zoning depths for this road entity (per road, per side).
     /// Depths.x = left, Depths.y = right (cells).
     /// </summary>
     public struct ZoningDepthComponent :

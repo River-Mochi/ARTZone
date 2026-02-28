@@ -1,4 +1,4 @@
-// File: src/UI/src/components/VanillaComponentResolver.tsx
+﻿// File: src/UI/src/components/VanillaComponentResolver.tsx
 // Purpose:
 //   Helper wrapper around CS2 ModuleRegistry for a small set of vanilla UI
 //   components and themes used by this mod.
@@ -91,6 +91,7 @@ export class VanillaComponentResolver {
 
     private readonly registryData: ModuleRegistry;
 
+    // lazy cache: don't look things up until needed; once looked up, cache and reuse that value.
     private readonly cachedData: Partial<Record<keyof typeof registryIndex, any>> = {};
 
     private constructor(in_registry: ModuleRegistry) {

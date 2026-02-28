@@ -1,4 +1,4 @@
-// File: src/UI/src/index.tsx
+﻿// File: src/UI/src/index.tsx
 // Purpose: Hook the UI into vanilla, register top-left button + Tool Options
 // section, and keep the options panel visible when the zoning tool is active.
 
@@ -48,7 +48,7 @@ function extendSafe(
 }
 
 const register: ModRegistrar = (moduleRegistry) => {
-    // Inject ModuleRegistry into the resolver singleton.
+    // Inject ModuleRegistry into the resolver singleton. setRegistry must come before use of VanillaComponentResolver.
     VanillaComponentResolver.setRegistry(moduleRegistry);
 
     // Floating button in GameTopLeft that toggles the zoning controller tool.

@@ -1,4 +1,4 @@
-﻿// File: src/Tools/SyncBlockSystem.cs
+// File: src/Tools/SyncBlockSystem.cs
 // Purpose: Applies the preview/committed zoning depth to zone blocks
 // respecting settings (RemoveZonedCells / RemoveOccupiedCells). Tool will not function without it.
 
@@ -48,22 +48,23 @@ namespace EasyZoning.Tools
                 return;
             }
 
+            // Read settings once per update.
+            bool removeOccupied = Mod.Settings != null && Mod.Settings.RemoveOccupiedCells;
+            bool removeZoned = Mod.Settings != null && Mod.Settings.RemoveZonedCells;
+
 #if DEBUG
             int count = m_UpdatedBlocksQuery.CalculateEntityCount();
             m_LogTick++;
-            if (count != m_LastCount || (m_LogTick % 30) == 0)
+            if (count != m_LastCount || (m_LogTick % 60) == 0)
             {
                 Mod.s_Log.Info(
-                    $"[EZ][SyncBlock] blocks={count} removeOcc={Mod.Settings?.RemoveOccupiedCells == true} removeZoned={Mod.Settings?.RemoveZonedCells == true}");
+                    $"[EZ][SyncBlock] blocks={count} removeOcc={removeOccupied} removeZoned={removeZoned}");
                 m_LastCount = count;
             }
 #endif
 
             var ecb = m_ModificationBarrier.CreateCommandBuffer();
             var updatedBlocks = m_UpdatedBlocksQuery.ToEntityArray(Allocator.TempJob);
-
-            bool removeOccupied = Mod.Settings?.RemoveOccupiedCells == true;
-            bool removeZoned = Mod.Settings?.RemoveZonedCells == true;
 
             var syncBlockJob = new SyncBlockJob
             {
@@ -83,6 +84,9 @@ namespace EasyZoning.Tools
             this.Dependency = JobHandle.CombineDependencies(this.Dependency, syncBlockJob);
             m_ModificationBarrier.AddJobHandleForProducer(this.Dependency);
         }
+
+
+
 
         public struct SyncBlockJob : IJobParallelFor
         {

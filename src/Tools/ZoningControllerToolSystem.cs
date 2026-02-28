@@ -1,20 +1,21 @@
-﻿// File: src/Tools/ZoningControllerToolSystem.cs
+// File: src/Tools/ZoningControllerToolSystem.cs
 // Purpose:
-//   Runtime tool. LMB toggles/applies zoning modes over valid roads.
-//   RMB cycles the current mode: Left → Right → Both → Left (mode only; LMB still applies/toggles).
-//   ESC is left to vanilla UI.
-//   Preview reflects the current mode for the hovered segment.
+//   Runtime tool. LMB selects and applies zoning depths to existing roads.
+//   RMB cycles current tool mode (Left/Right/Both/None) without applying.
+//   Preview reflects current tool mode for hovered segments.
 
 namespace EasyZoning.Tools
 {
-    using System;
+    using Colossal.Serialization.Entities;
     using EasyZoning.Components;
+    using Game;
     using Game.Audio;
     using Game.Common;
     using Game.Net;
     using Game.Prefabs;
     using Game.Tools;
     using Game.Zones;
+    using System;
     using Unity.Collections;
     using Unity.Entities;
     using Unity.Jobs;
@@ -23,15 +24,17 @@ namespace EasyZoning.Tools
 
     public partial class ZoningControllerToolSystem : ToolBaseSystem
     {
-        // ToolID must match UI/TS reference
         public const string ToolID = "EasyZoning.ZoningTool";
         public override string toolID => ToolID;
+
+        private static readonly int2 kVanillaDepths = new int2(6, 6);
 
         private ToolOutputBarrier m_ToolOutputBarrier = null!;
         private ZoningControllerToolUISystem m_UISystem = null!;
         private ToolHighlightSystem m_Highlight = null!;
 
         private BufferLookup<SubBlock> m_SubBlockLookup;
+        private ComponentLookup<ZoningDepthComponent> m_ZoningDepthLookup;
 
         private EntityQuery m_ZoningPreviewQuery;
         private EntityQuery m_SoundbankQuery;
@@ -39,10 +42,6 @@ namespace EasyZoning.Tools
         private PrefabBase m_ToolPrefab = null!;
 
         private NativeList<Entity> m_SelectedEntities;
-
-        // Remember what tool was active before switching to this tool,
-        // so the toggle can restore it cleanly.
-        private ToolBaseSystem? m_PreviousTool;
 
         private enum Mode
         {
@@ -55,24 +54,17 @@ namespace EasyZoning.Tools
         private Mode m_Mode;
         private Entity m_PreviewEntity;
 
+        // Intersection stability: require same candidate for N frames before switching preview.
+        private Entity m_PendingPreviewEntity;
+        private int m_PendingPreviewFrames;
+        private const int StableSwitchFrames = 2;
+
         private int2 Depths => m_UISystem.ToolDepths;
 
 #if DEBUG
         private static void Dbg(string msg)
         {
-            var log = Mod.s_Log;
-            if (log == null)
-            {
-                return;
-            }
-
-            try
-            {
-                log.Info("[EZ][Tool] " + msg);
-            }
-            catch
-            {
-            }
+            try { Mod.s_Log?.Info("[EZ][Tool] " + msg); } catch { }
         }
 #else
         private static void Dbg(string msg) { }
@@ -94,7 +86,8 @@ namespace EasyZoning.Tools
                 .WithAll<ToolUXSoundSettingsData>()
                 .Build(this);
 
-            m_SubBlockLookup = GetBufferLookup<SubBlock>(true);
+            m_SubBlockLookup = GetBufferLookup<SubBlock>(isReadOnly: true);
+            m_ZoningDepthLookup = GetComponentLookup<ZoningDepthComponent>(isReadOnly: true);
 
             m_SelectedEntities = new NativeList<Entity>(Allocator.Persistent);
         }
@@ -102,9 +95,7 @@ namespace EasyZoning.Tools
         protected override void OnDestroy()
         {
             if (m_SelectedEntities.IsCreated)
-            {
                 m_SelectedEntities.Dispose();
-            }
 
             base.OnDestroy();
         }
@@ -113,23 +104,17 @@ namespace EasyZoning.Tools
         {
             base.OnStartRunning();
 
-            // Enable LMB tool action; keep Cancel disabled so ESC stays with vanilla.
             applyAction.shouldBeEnabled = true;
             cancelAction.shouldBeEnabled = false;
 
-            // Tool requirements
             requireZones = true;
             requireNet = Layer.Road;
-
-            // Must be true so UndergroundViewSystem + UndergroundPass can render contour lines.
             allowUnderground = false;
 
-            // Initial contour state follows the UI binding (default is false).
             bool contourOn = m_UISystem != null && m_UISystem.ContourEnabled;
             selectedSnap = contourOn
                 ? (Snap.All | Snap.ContourLines)
                 : (Snap.All & ~Snap.ContourLines);
-
 
 #if DEBUG
             Dbg("OnStartRunning: tool ACTIVE");
@@ -138,7 +123,6 @@ namespace EasyZoning.Tools
 
         protected override void OnStopRunning()
         {
-            // Disable actions when tool stops
             applyAction.shouldBeEnabled = false;
             cancelAction.shouldBeEnabled = false;
 
@@ -147,17 +131,12 @@ namespace EasyZoning.Tools
             allowUnderground = false;
 
             base.OnStopRunning();
+
 #if DEBUG
             Dbg("OnStopRunning: tool INACTIVE");
 #endif
         }
 
-        /// <summary>
-        /// Allow contour lines to be controlled by selectedSnap (UI toggle).
-        /// The base implementation forces ContourLines OFF for most tools;
-        /// clearing it from offMask makes the bit available.
-        /// </summary>
-        // Keep contour lines controlled by our UI toggle without spamming logs.
         public override void GetAvailableSnapMask(out Snap onMask, out Snap offMask)
         {
             base.GetAvailableSnapMask(out onMask, out offMask);
@@ -166,129 +145,61 @@ namespace EasyZoning.Tools
 
             if (contourOn)
             {
-                // Force contour lines ON while this tool is active.
                 onMask |= Snap.ContourLines;
                 offMask &= ~Snap.ContourLines;
             }
             else
             {
-                // Force contour lines OFF while this tool is active.
                 onMask &= ~Snap.ContourLines;
                 offMask |= Snap.ContourLines;
             }
-
-            // NOTE: DO NOT log here. This method is called every frame and will flood the log.
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            m_SubBlockLookup.Update(this);
             inputDeps = Dependency;
 
-            bool hasRoad;
-            Entity hitEntity;
-            RaycastHit hit;
-            try
-            {
-                hasRoad = TryGetRoadUnderCursor(out hitEntity, out hit);
-            }
-            catch
-            {
-                hasRoad = false;
-                hitEntity = Entity.Null;
-            }
+            m_SubBlockLookup.Update(this);
+            m_ZoningDepthLookup.Update(this);
+
+            bool hasRoad = TryGetRoadUnderCursor(out Entity hitEntity, out RaycastHit hit);
 
             // UI vanilla sounds
-            var haveSoundbank = m_SoundbankQuery.CalculateEntityCount() > 0;
+            bool haveSoundbank = m_SoundbankQuery.CalculateEntityCount() > 0;
             ToolUXSoundSettingsData soundbank = default;
             if (haveSoundbank)
-            {
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
-            }
 
-            // RMB: cycle mode for the current tool side (Left → Right → Both → Left).
             bool rmbPressed = false;
             try
             {
                 var mouse = Mouse.current;
                 if (mouse != null && mouse.rightButton.wasPressedThisFrame)
-                {
                     rmbPressed = true;
-                }
             }
-            catch
+            catch { }
+
+            // RMB: cycle tool mode even without a hit; preview/selection still depends on hit.
+            if (rmbPressed)
             {
-                rmbPressed = false;
-            }
-
-            if (rmbPressed && hasRoad)
-            {
-                // Keep hovered entity highlighted while cycling
-                if (m_PreviewEntity != hitEntity)
-                {
-                    if (m_PreviewEntity != Entity.Null)
-                    {
-                        m_Highlight.HighlightEntity(m_PreviewEntity, false);
-                    }
-
-                    m_SelectedEntities.Clear();
-                    m_PreviewEntity = Entity.Null;
-
-                    m_Highlight.HighlightEntity(hitEntity, true);
-                    m_SelectedEntities.Add(hitEntity);
-                    m_PreviewEntity = hitEntity;
-                }
-                else if (!m_SelectedEntities.Contains(hitEntity))
-                {
-                    m_SelectedEntities.Add(hitEntity);
-                    m_Highlight.HighlightEntity(hitEntity, true);
-                }
-
                 m_UISystem.CycleToolSideMode();
-
                 if (haveSoundbank)
-                {
                     AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
-                }
+            }
 
-                m_Mode = Mode.Preview;
-            }
-            else if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
-            {
+            if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
                 m_Mode = Mode.Select;
-            }
             else if (applyAction.WasReleasedThisFrame() && hasRoad)
-            {
                 m_Mode = Mode.Apply;
-            }
             else
-            {
                 m_Mode = Mode.Preview;
-            }
 
             var ecb = m_ToolOutputBarrier.CreateCommandBuffer();
 
             switch (m_Mode)
             {
                 case Mode.Preview:
-                    if (m_PreviewEntity != hitEntity)
-                    {
-                        if (m_PreviewEntity != Entity.Null)
-                        {
-                            m_Highlight.HighlightEntity(m_PreviewEntity, false);
-                        }
-
-                        m_SelectedEntities.Clear();
-                        m_PreviewEntity = Entity.Null;
-
-                        if (hasRoad)
-                        {
-                            m_Highlight.HighlightEntity(hitEntity, true);
-                            m_SelectedEntities.Add(hitEntity);
-                            m_PreviewEntity = hitEntity;
-                        }
-                    }
-
+                    UpdatePreviewSelection(hasRoad, hitEntity);
                     break;
 
                 case Mode.Select when hasRoad:
@@ -297,18 +208,14 @@ namespace EasyZoning.Tools
                         m_SelectedEntities.Add(hitEntity);
                         m_Highlight.HighlightEntity(hitEntity, true);
                         if (haveSoundbank)
-                        {
                             AudioManager.instance.PlayUISound(soundbank.m_SelectEntitySound);
-                        }
                     }
-
                     break;
 
-                // LMB applies selected icon cells or clears that side.
                 case Mode.Apply:
                     {
-                        var previewLookup = GetComponentLookup<ZoningPreviewComponent>(true);
-                        var depthLookup = GetComponentLookup<ZoningDepthComponent>(false);
+                        var previewLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true);
+                        var depthLookup = GetComponentLookup<ZoningDepthComponent>(isReadOnly: false);
 
 #if DEBUG
                         var d = Depths;
@@ -326,24 +233,21 @@ namespace EasyZoning.Tools
 
                         inputDeps = JobHandle.CombineDependencies(inputDeps, setJob);
 
-                        for (var i = 0; i < m_SelectedEntities.Length; i++)
-                        {
+                        for (int i = 0; i < m_SelectedEntities.Length; i++)
                             m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
-                        }
 
                         m_SelectedEntities.Clear();
 
                         if (haveSoundbank)
-                        {
                             AudioManager.instance.PlayUISound(soundbank.m_NetBuildSound);
-                        }
 
                         break;
                     }
             }
 
-            var tempLookup = GetComponentLookup<ZoningPreviewComponent>(true);
-            var depthLookupForPreview = GetComponentLookup<ZoningDepthComponent>(true);
+            // Temp preview sync + cleanup (same pattern as ART).
+            var tempLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true);
+            var depthLookupForPreview = GetComponentLookup<ZoningDepthComponent>(isReadOnly: true);
 
             JobHandle syncTempJob = new SyncTempJob
             {
@@ -372,15 +276,70 @@ namespace EasyZoning.Tools
             return inputDeps;
         }
 
-        // Roads without SubBlocks (for example, highways) are ignored.
+        private void UpdatePreviewSelection(bool hasRoad, Entity hitEntity)
+        {
+            if (!hasRoad)
+            {
+                // No hit: clear preview state cleanly.
+                if (m_PreviewEntity != Entity.Null)
+                    m_Highlight.HighlightEntity(m_PreviewEntity, false);
+
+                m_SelectedEntities.Clear();
+                m_PreviewEntity = Entity.Null;
+                m_PendingPreviewEntity = Entity.Null;
+                m_PendingPreviewFrames = 0;
+                return;
+            }
+
+            if (hitEntity == m_PreviewEntity)
+            {
+                m_PendingPreviewEntity = Entity.Null;
+                m_PendingPreviewFrames = 0;
+                return;
+            }
+
+            // Stability filter: require same candidate for N frames.
+            if (hitEntity == m_PendingPreviewEntity)
+            {
+                m_PendingPreviewFrames++;
+            }
+            else
+            {
+                m_PendingPreviewEntity = hitEntity;
+                m_PendingPreviewFrames = 1;
+            }
+
+            if (m_PendingPreviewFrames < StableSwitchFrames)
+                return;
+
+            if (m_PreviewEntity != Entity.Null)
+                m_Highlight.HighlightEntity(m_PreviewEntity, false);
+
+            m_SelectedEntities.Clear();
+            m_PreviewEntity = Entity.Null;
+
+            m_Highlight.HighlightEntity(hitEntity, true);
+            m_SelectedEntities.Add(hitEntity);
+            m_PreviewEntity = hitEntity;
+
+            m_PendingPreviewEntity = Entity.Null;
+            m_PendingPreviewFrames = 0;
+        }
+
+        // Filtered raycast: only returns a road segment when a change would occur.
         private bool TryGetRoadUnderCursor(out Entity entity, out RaycastHit hit)
         {
-            if (!GetRaycastResult(out entity, out hit))
+            if (!base.GetRaycastResult(out entity, out hit))
+                return false;
+
+            if (!m_SubBlockLookup.TryGetBuffer(entity, out _))
             {
+                entity = Entity.Null;
                 return false;
             }
 
-            if (!m_SubBlockLookup.TryGetBuffer(entity, out _))
+            // If tool would not change this entity, treat as "no hit" (ART behavior).
+            if (!WouldChange(entity))
             {
                 entity = Entity.Null;
                 return false;
@@ -389,22 +348,27 @@ namespace EasyZoning.Tools
             return true;
         }
 
+        private bool WouldChange(Entity entity)
+        {
+            int2 desired = Depths;
+
+            int2 current;
+            if (m_ZoningDepthLookup.TryGetComponent(entity, out var depth))
+                current = depth.Depths;
+            else
+                current = kVanillaDepths;
+
+            return math.any(desired != current);
+        }
+
         public override PrefabBase GetPrefab() => m_ToolPrefab;
 
         public override bool TrySetPrefab(PrefabBase prefab)
         {
             if (prefab == null || prefab.name != toolID)
-            {
-#if DEBUG
-                Mod.s_Log?.Warn($"[EZ][Tool] TrySetPrefab rejected: prefab='{prefab?.name}', expected='{ToolID}'");
-#endif
                 return false;
-            }
 
             m_ToolPrefab = prefab;
-#if DEBUG
-            Dbg($"TrySetPrefab: accepted prefab='{prefab.name}'");
-#endif
             return true;
         }
 
@@ -415,49 +379,21 @@ namespace EasyZoning.Tools
             m_ToolRaycastSystem.netLayerMask = Layer.Road;
         }
 
-        // When enabling: remember previous active tool and switch to this tool.
-        // When disabling: restore previous tool, or DefaultToolSystem if unknown.
+        // Called by UI toggle/hotkey.
         public void SetToolEnabled(bool isEnabled)
         {
             if (m_ToolSystem == null)
-            {
                 return;
-            }
 
             if (isEnabled)
             {
                 if (m_ToolSystem.activeTool != this)
-                {
-                    m_PreviousTool = m_ToolSystem.activeTool;
-#if DEBUG
-                    Dbg(
-                        $"SetToolEnabled(true): Activating tool; previous={(m_PreviousTool != null ? m_PreviousTool.GetType().Name : "(null)")}");
-#endif
                     m_ToolSystem.activeTool = this;
-                }
             }
             else
             {
                 if (m_ToolSystem.activeTool == this)
-                {
-                    var target = m_PreviousTool;
-                    if (target == null || target == this)
-                    {
-                        // Fallback to vanilla default tool if nothing sane is stored.
-                        target = World.GetOrCreateSystemManaged<DefaultToolSystem>();
-                    }
-
-#if DEBUG
-                    Dbg(
-                        $"SetToolEnabled(false): Restoring tool → {(target != null ? target.GetType().Name : "(null)")}");
-#endif
-                    if (target != null)
-                    {
-                        m_ToolSystem.activeTool = target;
-                    }
-
-                    m_PreviousTool = null;
-                }
+                    m_ToolSystem.activeTool = World.GetOrCreateSystemManaged<DefaultToolSystem>();
             }
         }
 
@@ -472,32 +408,23 @@ namespace EasyZoning.Tools
             public void Execute(int index)
             {
                 Entity e = SelectedEntities[index];
-
-                // Preview depths are taken directly from current tool side mode.
                 int2 preview = ToolDepths;
 
                 if (ZoningPreviewLookup.TryGetComponent(e, out ZoningPreviewComponent data))
                 {
                     if (!math.all(data.Depths == preview))
                     {
-                        ECB.SetComponent(index, e, new ZoningPreviewComponent
-                        {
-                            Depths = preview
-                        });
+                        ECB.SetComponent(index, e, new ZoningPreviewComponent { Depths = preview });
                     }
                 }
                 else
                 {
-                    ECB.AddComponent(index, e, new ZoningPreviewComponent
-                    {
-                        Depths = preview
-                    });
+                    ECB.AddComponent(index, e, new ZoningPreviewComponent { Depths = preview });
                 }
 
                 ECB.AddComponent<Updated>(index, e);
             }
         }
-
 
         public struct CleanupTempJob : IJobParallelFor
         {
@@ -509,9 +436,7 @@ namespace EasyZoning.Tools
             {
                 Entity e = Entities[index];
                 if (SelectedEntities.Contains(e))
-                {
                     return;
-                }
 
                 ECB.RemoveComponent<ZoningPreviewComponent>(index, e);
                 ECB.AddComponent<Updated>(index, e);
@@ -523,44 +448,24 @@ namespace EasyZoning.Tools
             public NativeArray<Entity>.ReadOnly Entities;
             public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
             public ComponentLookup<ZoningDepthComponent> DepthLookup;
-            public int2 ToolDepths; // x = left depth, y = right depth
+            public int2 ToolDepths;
             public EntityCommandBuffer ECB;
 
             public void Execute()
             {
                 foreach (Entity e in Entities)
                 {
-                    // Remove any preview left on the entity.
                     if (ZoningPreviewLookup.HasComponent(e))
-                    {
                         ECB.RemoveComponent<ZoningPreviewComponent>(e);
-                    }
-
-                    int2 newDepths = ToolDepths;
 
                     if (DepthLookup.HasComponent(e))
-                    {
-                        ECB.SetComponent(e, new ZoningDepthComponent
-                        {
-                            Depths = newDepths
-                        });
-                    }
+                        ECB.SetComponent(e, new ZoningDepthComponent { Depths = ToolDepths });
                     else
-                    {
-                        ECB.AddComponent(e, new ZoningDepthComponent
-                        {
-                            Depths = newDepths
-                        });
-                    }
+                        ECB.AddComponent(e, new ZoningDepthComponent { Depths = ToolDepths });
 
                     ECB.AddComponent<Updated>(e);
                 }
             }
         }
-
-
-
-
-
     }
 }
