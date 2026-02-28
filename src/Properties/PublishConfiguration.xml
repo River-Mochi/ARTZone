@@ -12,9 +12,9 @@
 
 	<!-- Long description (minimal markdown supported) -->
 	<LongDescription>
-# Easy Zoning [EZ]
+# Easy Zoning [EZ] Beta
 
-Custom zoning for new and existing roads and includes Contour on/off toggle.
+Custom zoning for new and existing roads; includes Contour on/off toggle.
 
 ## Features
 - Includes Contour Topography toggle (on/off)
@@ -33,20 +33,27 @@ Custom zoning for new and existing roads and includes Contour on/off toggle.
 2. Select the Zone icon (see image) > Hover a road to preview.
 3. **Right-Click** to switch sides; **Left-Click** to apply.
 4. Bonus: moving the mouse a little to the left or right of the road will also flip the side.
-5. NEW: toggle display of Contour terrain lines on as needed.
+5. Show Contour terrain lines even if you do not need to update zoning.
 
 ## Compatibility
 - No Harmony, extends vanilla UI
 - Uses native input and sounds
 
 ## Support and feedback
-- If mod helps you, give it a Like, it's free.
+- If mod helps you, give it a Like, it's free to do.
 - Feedback to GitHub, Discord, or forum links on this page.
 
 ## Tech notes
 
 - For newly drawn roads, the zoning side **←|→** is relative to the road segment’s internal orientation. 
 At certain diagonal angles, one-sided zoning (↖||↗) may be assigned to the other side (just swap it).
+
+## Credits
+
+- River-mochi - author
+- thanks to Kemorno for original ART mod (retired) and zeeshanabid 94 for zoning toolkit (retired)
+- yenyang - technical support and encouragement
+- Rouchesta - testing
 
 </LongDescription>
 	
@@ -81,5 +88,5 @@ At certain diagonal angles, one-sided zoning (↖||↗) may be assigned to the o
 	<ExternalLink Type="github"  Url="https://github.com/River-Mochi/EasyZoning" />
 
 	<!--Supported values Public, Private, Unlisted-->
-	<AccessLevel Value="Unlisted" />
+	<AccessLevel Value="Public" />
 </Publish>
