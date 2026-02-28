@@ -1,4 +1,4 @@
-# File: tools/check_locales.py
+# File: src/Scripts/check_locales.py
 # Purpose: Generic checker for C# Locale*.cs dictionary files:
 # - Duplicate keys (runtime crash risk)
 # - Missing/extra keys vs baseline (default: LocaleEN.cs)
@@ -13,6 +13,7 @@
 # Exit codes:
 # - 0 = no problems
 # - 1 = problems found (duplicates/missing/extra/marker/placeholder/parse errors)
+# - 2 = configuration / filesystem error
 
 import argparse
 import re
@@ -28,6 +29,23 @@ RE_DICT_START = re.compile(
 
 def norm_ws(s: str) -> str:
     return re.sub(r"\s+", "", s)
+
+
+def find_repo_root(start: Path) -> Optional[Path]:
+    """
+    Walk upward to find repo root.
+    Heuristics: .git directory OR .gitattributes file OR a 'src' folder at root.
+    """
+    p = start.resolve()
+    for parent in [p] + list(p.parents):
+        if (parent / ".git").exists():
+            return parent
+        if (parent / ".gitattributes").exists():
+            return parent
+        if (parent / "src").exists() and (parent / "src").is_dir():
+            # still requires some confidence this is root; accept it
+            return parent
+    return None
 
 
 def strip_comments_preserve_strings(text: str) -> str:
@@ -363,11 +381,7 @@ def _is_numberish(ch: str) -> bool:
 
 def count_markup_angle_brackets(s: str) -> Tuple[int, int]:
     """
-    Count '<' and '>' intended as CS2 markup markers, ignoring numeric comparators like:
-      - < 0.75
-      - 1 < 2
-      - 1.25 < some words
-      - speed > 1.0
+    Count '<' and '>' intended as CS2 markup markers, ignoring numeric comparators.
     Rule: if a '<' or '>' has a number immediately to its left or right (ignoring whitespace),
     treat it as a comparator and ignore it for markup balancing checks.
     """
@@ -452,10 +466,26 @@ def load_locale(path: Path) -> Tuple[Dict[str, str], List[str], Dict[str, str]]:
         keys_raw.append(k_norm)
         if k_norm not in pretty:
             pretty[k_norm] = key_expr.strip()
-        # last write wins; duplicates are separately reported
         values[k_norm] = extract_string_literals(val_expr)
 
     return values, keys_raw, pretty
+
+
+def resolve_loc_dir(repo_root: Path, baseline: str, loc_dir_arg: str) -> Optional[Path]:
+    if loc_dir_arg.lower() != "auto":
+        return repo_root / loc_dir_arg
+
+    candidates = [
+        repo_root / "src" / "Localization",
+        repo_root / "Localization",
+        repo_root / "src" / "Settings",  # legacy
+    ]
+
+    for c in candidates:
+        if c.exists() and (c / baseline).exists():
+            return c
+
+    return None
 
 
 def _print_problem_report(
@@ -509,17 +539,25 @@ def _print_problem_report(
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--loc-dir", default="Localization", help="Localization directory (default: Localization)")
-    ap.add_argument("--baseline", default="LocaleEN.cs", help="Baseline file inside loc-dir (default: LocaleEN.cs)")
+    ap.add_argument("--loc-dir", default="auto", help='Localization directory relative to repo root, or "auto" (default: auto)')
+    ap.add_argument("--baseline", default="LocaleEN.cs", help="Baseline file name (default: LocaleEN.cs)")
     ap.add_argument("--pattern", default="Locale*.cs", help="Glob pattern inside loc-dir (default: Locale*.cs)")
     ap.add_argument("--verbose", action="store_true", help="Print every locale result even if clean")
     args = ap.parse_args()
 
-    repo_root = Path(__file__).resolve().parents[1]
-    loc_dir = repo_root / args.loc_dir
+    repo_root = find_repo_root(Path(__file__).resolve())
+    if repo_root is None:
+        print("ERROR: Repo root not found (failed to locate .git/.gitattributes/src).")
+        return 2
 
-    if not loc_dir.exists():
-        print(f"ERROR: Localization dir not found: {loc_dir}")
+    loc_dir = resolve_loc_dir(repo_root, args.baseline, args.loc_dir)
+    if loc_dir is None or not loc_dir.exists():
+        print("ERROR: Localization dir not found (auto search failed).")
+        print("Searched:")
+        print(f"  - {repo_root / 'src' / 'Localization'}")
+        print(f"  - {repo_root / 'Localization'}")
+        print(f"  - {repo_root / 'src' / 'Settings'}")
+        print('Override with: --loc-dir "src/Localization" (or the correct folder).')
         return 2
 
     base_path = loc_dir / args.baseline
@@ -530,6 +568,8 @@ def main() -> int:
     base_map, base_keys_raw, base_pretty = load_locale(base_path)
     base_keys = set(base_map.keys())
 
+    print(f"Repo root: {repo_root}")
+    print(f"Localization dir: {loc_dir}")
     print(f"Baseline: {args.baseline}")
     print(f"Baseline keys: {len(base_keys)}")
 
@@ -573,7 +613,6 @@ def main() -> int:
         if has_problem:
             any_problem = True
 
-        # Quiet mode: skip printing clean files unless --verbose
         if (not args.verbose) and (not has_problem):
             continue
 

@@ -1,9 +1,9 @@
 // File: src/Mod.cs
 // Purpose: Mod entrypoint; registers settings, localization, ECS systems, keybindings, and locale-change hooks.
 // Notes:
-//   • Locales install BEFORE Options UI so labels render correctly.
+//   • Locales install before Options UI so labels render correctly.
 //   • RMB flip stays vanilla (ToolBaseSystem.cancelAction) — no custom binding.
-//   • Top-left button & Panel tile point at coui://ui-mods/images/* assets.
+//   • Top-left button points at coui://ui-mods/images/* assets.
 
 namespace EasyZoning
 {
@@ -12,7 +12,6 @@ namespace EasyZoning
     using Colossal.Localization;     // LocalizationManager
     using Colossal.Logging;          // ILog, LogManager
     using CS2HonuShared;             // LogUtils
-    using EasyZoning.Settings;       // Setting
     using EasyZoning.Tools;          // ECS systems
     using Game;                      // UpdateSystem, SystemUpdatePhase
     using Game.Input;                // ProxyAction
@@ -20,6 +19,7 @@ namespace EasyZoning
     using Game.SceneFlow;            // GameManager
     using System;                    // Exception, Func<T>, StringComparison
     using System.Reflection;         // Assembly
+    using static Game.UI.Menu.AssetUploadPanelUISystem;
 
     public sealed class Mod : IMod
     {
@@ -83,32 +83,43 @@ namespace EasyZoning
 
         private static bool s_BannerLogged;
         private static bool s_ReapplyingLocale;
+
+#if DEBUG
         private static string? s_LastLocaleId;
+#endif
 
         // ---- IMod IMPLEMENTATION ----
 
         public void OnLoad(UpdateSystem updateSystem)
         {
-            // One-time banner.
             if (!s_BannerLogged)
             {
                 s_BannerLogged = true;
                 LogSafe(( ) => $"{ModName} {ModTag} v{ModVersion} OnLoad {BuildTag}");
             }
 
-            // Guard against strange load timing.
             if (GameManager.instance == null)
             {
                 WarnSafe(( ) => "GameManager.instance is null in Mod.OnLoad.");
                 return;
             }
 
-            var setting = new Setting(this);
+            Setting setting = new Setting(this);
             Settings = setting;
 
             // Localization sources (best-effort, never crash mod load).
+            // Comment out missing locales.
             AddLocaleSource("en-US", new LocaleEN(setting));
-            // Additional locales can be registered here later (FR/DE/etc).
+            AddLocaleSource("fr-FR", new LocaleFR(setting));
+            AddLocaleSource("es-ES", new LocaleES(setting));
+            //  AddLocaleSource("de-DE", new LocaleDE(setting));
+            //  AddLocaleSource("it-IT", new LocaleIT(setting));
+            AddLocaleSource("ja-JP", new LocaleJA(setting));
+            AddLocaleSource("ko-KR", new LocaleKO(setting));
+            //   AddLocaleSource("pl-PL", new LocalePL(setting));
+            AddLocaleSource("pt-BR", new LocalePT_BR(setting));
+            AddLocaleSource("zh-HANS", new LocaleZH_CN(setting));    // Simplified Chinese
+            //  AddLocaleSource("zh-HANT", new LocaleZH_HANT(setting));  Traditional Chinese
 
             // Settings + Options UI
             try
@@ -168,7 +179,7 @@ namespace EasyZoning
             }
 
             // Locale-change hook: re-register Options UI when active dictionary changes.
-            var lm = GameManager.instance.localizationManager;
+            LocalizationManager? lm = GameManager.instance.localizationManager;
             if (lm != null)
             {
                 lm.onActiveDictionaryChanged -= OnLocaleChanged;
@@ -180,7 +191,7 @@ namespace EasyZoning
         {
             LogSafe(( ) => "OnDispose");
 
-            var lm = GameManager.instance?.localizationManager;
+            LocalizationManager? lm = GameManager.instance?.localizationManager;
             if (lm != null)
             {
                 lm.onActiveDictionaryChanged -= OnLocaleChanged;
@@ -212,9 +223,7 @@ namespace EasyZoning
         private static void OnLocaleChanged( )
         {
             if (s_ReapplyingLocale)
-            {
                 return;
-            }
 
             s_ReapplyingLocale = true;
             try
@@ -223,10 +232,9 @@ namespace EasyZoning
                 string id = lm?.activeLocaleId ?? "(unknown)";
 
 #if DEBUG
-                // Only log when the locale ID actually changes to avoid spam.
                 if (!string.Equals(id, s_LastLocaleId, StringComparison.Ordinal))
                 {
-                    LogSafe(( ) => "[EZ] Active locale = " + id);
+                    LogSafe(() => "[EZ] Active locale = " + id);
                     s_LastLocaleId = id;
                 }
 #endif
@@ -242,9 +250,7 @@ namespace EasyZoning
         private static void AddLocaleSource(string localeId, IDictionarySource source)
         {
             if (string.IsNullOrEmpty(localeId))
-            {
                 return;
-            }
 
             LocalizationManager? lm = GameManager.instance?.localizationManager;
             if (lm == null)

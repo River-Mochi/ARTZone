@@ -1,8 +1,9 @@
-﻿// File: src/Settings/Setting.cs
+// File: src/Settings/Setting.cs
 // Purpose: Options UI + One rebindable entry (Ctrl+Z).
 // Note: RMB is *not* declared here; the Game’s own RMB/cancel bindings remain vanilla.
 // Later in the tool, the RMB is read for preview flip.
-namespace EasyZoning.Settings
+
+namespace EasyZoning
 {
     using Colossal.IO.AssetDatabase;
     using Game.Input;

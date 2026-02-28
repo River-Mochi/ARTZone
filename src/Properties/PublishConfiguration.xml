@@ -2,58 +2,69 @@
 	<!--This PublishConfiguration.xml file is required to publish a mod on Paradox website and is part of the CSII toolchain-->
 	
 	<!-- Id must be set in order to update existing mod; not required for publishing mod for the first time -->
-	<ModId Value="" />
+	<ModId Value="136261" />
 
 	<!-- Display name -->
 	<DisplayName Value="Easy Zoning [EZ]" />
 
 	<!-- Short one-liner -->
-	<ShortDescription Value="Live zoning for roads: Left/Right/Both/None. Flip with RMB, apply with LMB." />
+	<ShortDescription Value="Change zoning on the sides of roads: Left/Right/Both/None. Flip with RMB, apply with LMB." />
 
 	<!-- Long description (minimal markdown supported) -->
 	<LongDescription>
 # Easy Zoning [EZ]
 
-Custom zoning for new and existing roads.
+Custom zoning for new and existing roads and includes Contour on/off toggle.
 
 ## Features
-- Hover to preview instantly
+- Includes Contour Topography toggle (on/off)
 - **Right-Click** flips preview (Left↔Right or Both↔None)
 - Small vanilla-style “Zone Change” panel beside Roads
-- Remembers your last selection
+- Hover to Preview and remembers your last selection
 - Options to protect existing buildings and already-zoned grids
-- Launch via:
-- Top-left icon or **Shift+Z** hotkey
+- Launch: Top-left icon or **Ctrl + Z** hotkey
 
 ## How to use
-1. Open **Roads** → click **Easy Zoning**.
-2. Hover a road to preview.
-3. **Right-Click** to flip; **Left-Click** to apply.
+
+**New Road:** open game **Roads** panel → select the **Zoning** icon desired, draw roads as usual.
+
+**Existing Road:**
+1. Open EZ panel > use Top Left icon or Ctrl+Z keybind.
+2. Select the Zone icon (see image) > Hover a road to preview.
+3. **Right-Click** to switch sides; **Left-Click** to apply.
+4. Bonus: moving the mouse a little to the left or right of the road will also flip the side.
+5. NEW: toggle display of Contour terrain lines on as needed.
 
 ## Compatibility
-- No Harmony, Low-conflict, extends vanilla UI
+- No Harmony, extends vanilla UI
 - Uses native input and sounds
 
-## Links
-- GitHub: https://github.com/River-Mochi/EasyZoning
-- Discord: https://discord.gg/HTav7ARPs2
+## Support and feedback
+- If mod helps you, give it a Like, it's free.
+- Feedback to GitHub, Discord, or forum links on this page.
 
-	</LongDescription>
+## Tech notes
+
+- For newly drawn roads, the zoning side **←|→** is relative to the road segment’s internal orientation. 
+At certain diagonal angles, one-sided zoning (↖||↗) may be assigned to the other side (just swap it).
+
+</LongDescription>
 	
 	<!-- Assets -->
 	  <!--Thumbnail-->
-	<Thumbnail Value="Properties/Thumbnail.png" />
-	<Screenshot Value="Properties/screenshot-01.jpg" />
-	<Screenshot Value="" />
+	<Thumbnail Value="Properties/urbanPlanning01.jpg" />
+	<Screenshot Value="Properties/imageEZ-20.jpg" />
+	<Screenshot Value="Properties/imageEZ-25.jpg" />
+
 
 	<!--Tag, can be set multiple times-->
 	<Tag Value="Code Mod" />
 
 	<!--Link to the forum post where the mod can be discussed-->
-	<ForumLink Value="" />
+	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/easy-zoning.1905089/" />
 
 	<!-- Versioning of mod and base game-->
-	<ModVersion Value="1.0.1" />
+	<ModVersion Value="1.0.2" />
 	<GameVersion Value="1.5.*" />
 
 	<!-- Dependencies / DLC (optional) -->
@@ -61,7 +72,9 @@ Custom zoning for new and existing roads.
 	<RequiredDLC Value="" />
 
 	<!-- Changelog -->
-	<ChangeLog></ChangeLog>
+	<ChangeLog>
+	- update locale files	
+	</ChangeLog>
 
 	<!-- External links -->
 	<ExternalLink Type="discord" Url="https://discord.gg/HTav7ARPs2" />

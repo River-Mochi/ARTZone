@@ -1,5 +1,5 @@
 // File: src/Tools/KeybindHotkeySystem.cs
-// Purpose: Shift+Z (or rebound) toggles EasyZoning.ZoningTool on/off.
+// Purpose: Ctrl+Z (or rebound) toggles EasyZoning.ZoningTool on/off.
 // Notes:   RMB preview flip is handled inside ZoningControllerToolSystem via cancelAction.
 //          Debug-only helpers live in KeybindHotkeySystem.Debug.cs.
 
@@ -32,7 +32,7 @@ namespace EasyZoning.Tools
         }
 #endif
 
-        protected override void OnCreate()
+        protected override void OnCreate( )
         {
             base.OnCreate();
 
@@ -42,7 +42,7 @@ namespace EasyZoning.Tools
             DebugInit(); // becomes a no-op in Release
         }
 
-        protected override void OnUpdate()
+        protected override void OnUpdate( )
         {
             var toggle = m_Toggle;
             if (toggle == null || !toggle.WasPressedThisFrame())
@@ -63,6 +63,6 @@ namespace EasyZoning.Tools
         }
 
         // DEBUG hook. Partial method erased in Release.
-        partial void DebugInit();
+        partial void DebugInit( );
     }
 }

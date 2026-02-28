@@ -1,11 +1,11 @@
-// File: src/Settings/LocaleEN.cs
+// File: src/Localization/LocaleEN.cs
 // Purpose: English (en-US) strings for Options UI + Panel text.
 
-namespace EasyZoning.Settings
+namespace EasyZoning
 {
-    using System.Collections.Generic;
     using Colossal;
     using EasyZoning.Tools;
+    using System.Collections.Generic;
 
     public sealed class LocaleEN : IDictionarySource
     {
@@ -33,28 +33,28 @@ namespace EasyZoning.Settings
 
                 // Toggles
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Do not reset existing zoned squares" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Do not reset already zoned cells (RCIO) during preview/apply.\n\n" +
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Do not reset already zoned cells during preview/apply.\n\n" +
                 "**[ ✓ ] Enabled recommended.**" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent occupied cells from being removed" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent buildings from being removed" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
-                    "Do not change **occupied** cells during preview/apply or they might become condemned buildings.\n\n" +
+                    "**Buildings = occupied cells**. Prevents preview/apply of new zones from turning existing buildings into condemned.\n\n" +
                 "**[ ✓ ] Enabled recommended.**" },
 
                 // Keybind (only one visible)
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Toggle Panel" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Show the Easy Zoning panel button (default Shift+Z)." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Show the Easy Zoning panel button (default Ctrl+Z)." },
 
                 // Binding title in the keybinding dialog
                 { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Toggle Easy Zoning Button Panel" },
 
-                // Panel (Road Services tile)
+                // Legacy Panel (Road Services tile)
                 //{ $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Easy Zoning" },
                 //{ $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
                 //  "Choose zoning for roads: both, left, right, or none.\nRight-click flips; left-click applies." },
 
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                    "Change zoning for roads: both, left, right, or none.\n" +
+                    "Change zoning: both sides, left<->right, or none.\n" +
                     "Left-click applies. Drag along a road to update multiple segments." },
 
                 // About tab labels
@@ -64,14 +64,14 @@ namespace EasyZoning.Settings
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "Current mod version." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadox)),    "Paradox Mods" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),     "Open the Paradox Mods page." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),     "Open the author's Paradox Mods page." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Join the mod Discord." },
             };
             return d;
         }
 
-        public void Unload()
+        public void Unload( )
         {
         }
     }

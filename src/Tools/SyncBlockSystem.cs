@@ -123,7 +123,11 @@ namespace EasyZoning.Tools
 
                 if (!OwnerLookup.TryGetComponent(blockEntity, out Owner owner))
                 {
-                    throw new NullReferenceException($"Block {blockEntity} has no owner assigned.");
+#if DEBUG
+    throw new NullReferenceException($"Block {blockEntity} has no owner assigned.");
+#else
+                    return;
+#endif
                 }
 
                 Entity roadEntity = owner.m_Owner;
