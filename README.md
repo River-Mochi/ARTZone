@@ -57,7 +57,7 @@ Edit zoning in Cities: Skylines II — fast, vanilla-friendly, and low-conflict.
 ## Credits
 - RiverMochi — author
 - Thanks to LuxStice (original ART, now obsolete), yenyang, StarQ
-- Necko1996 and the CS2 modding community for testing & feedback
+- CS2 modding community for testing & feedback
 
 ### Languages
 - English (+ planned: FR, ES, JA, KO, ZH-Hans, ZH-Hant, PT-BR)

@@ -1,4 +1,4 @@
-// File: src/Mod.cs
+﻿// File: src/Mod.cs
 // Purpose: Mod entrypoint; registers settings, localization, ECS systems, keybindings, and locale-change hooks.
 // Notes:
 //   • Locales install before Options UI so labels render correctly.
@@ -107,19 +107,18 @@ namespace EasyZoning
             Setting setting = new Setting(this);
             Settings = setting;
 
-            // Localization sources (best-effort, never crash mod load).
-            // Comment out missing locales.
+            // Localization sources
             AddLocaleSource("en-US", new LocaleEN(setting));
             AddLocaleSource("fr-FR", new LocaleFR(setting));
             AddLocaleSource("es-ES", new LocaleES(setting));
-            //  AddLocaleSource("de-DE", new LocaleDE(setting));
-            //  AddLocaleSource("it-IT", new LocaleIT(setting));
+            AddLocaleSource("de-DE", new LocaleDE(setting));
+            AddLocaleSource("it-IT", new LocaleIT(setting));
             AddLocaleSource("ja-JP", new LocaleJA(setting));
             AddLocaleSource("ko-KR", new LocaleKO(setting));
-            //   AddLocaleSource("pl-PL", new LocalePL(setting));
+            AddLocaleSource("pl-PL", new LocalePL(setting));
             AddLocaleSource("pt-BR", new LocalePT_BR(setting));
             AddLocaleSource("zh-HANS", new LocaleZH_CN(setting));    // Simplified Chinese
-            //  AddLocaleSource("zh-HANT", new LocaleZH_HANT(setting));  Traditional Chinese
+            AddLocaleSource("zh-HANT", new LocaleZH_HANT(setting));  // Traditional Chinese
 
             // Settings + Options UI
             try

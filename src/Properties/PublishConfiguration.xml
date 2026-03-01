@@ -1,4 +1,4 @@
-<Publish>
+﻿<Publish>
 	<!--This PublishConfiguration.xml file is required to publish a mod on Paradox website and is part of the CSII toolchain-->
 	
 	<!-- Id must be set in order to update existing mod; not required for publishing mod for the first time -->
@@ -17,9 +17,9 @@
 Custom zoning for new and existing roads; includes Contour on/off toggle.
 
 ## Features
-- Includes Contour Topography toggle (on/off)
 - **Right-Click** flips preview (Left↔Right or Both↔None)
 - Small vanilla-style “Zone Change” panel beside Roads
+- Show Contour Topography toggle (on/off)
 - Hover to Preview and remembers your last selection
 - Options to protect existing buildings and already-zoned grids
 - Launch: Top-left icon or **Ctrl + Z** hotkey
@@ -36,11 +36,11 @@ Custom zoning for new and existing roads; includes Contour on/off toggle.
 5. Show Contour terrain lines even if you do not need to update zoning.
 
 ## Compatibility
-- No Harmony, extends vanilla UI
-- Uses native input and sounds
+- No Harmony, extends vanilla UI (helps it be more stable on game patch days and increases compatibility).
+- Uses native game inputs and sounds.
 
 ## Support and feedback
-- If mod helps you, give it a Like, it's free to do.
+- If mod helps you, give it a Like, it's free + easy :)
 - Feedback to GitHub, Discord, or forum links on this page.
 
 ## Tech notes
@@ -51,17 +51,19 @@ At certain diagonal angles, one-sided zoning (↖||↗) may be assigned to the o
 ## Credits
 
 - River-mochi - author
-- thanks to Kemorno for original ART mod (retired) and zeeshanabid 94 for zoning toolkit (retired)
+- thanks to Kemorno (original ART mod, retired) and zeeshanabid 94 (zoning toolkit, retired)
 - yenyang - technical support and encouragement
 - Rouchesta - testing
+- CS2 modding community for testing, feedback
+
 
 </LongDescription>
 	
 	<!-- Assets -->
 	  <!--Thumbnail-->
 	<Thumbnail Value="Properties/urbanPlanning01.jpg" />
+	<Screenshot Value="Properties/imageEZ-10.jpg" />
 	<Screenshot Value="Properties/imageEZ-20.jpg" />
-	<Screenshot Value="Properties/imageEZ-25.jpg" />
 
 
 	<!--Tag, can be set multiple times-->
@@ -71,7 +73,7 @@ At certain diagonal angles, one-sided zoning (↖||↗) may be assigned to the o
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/easy-zoning.1905089/" />
 
 	<!-- Versioning of mod and base game-->
-	<ModVersion Value="1.0.2" />
+	<ModVersion Value="1.0.3" />
 	<GameVersion Value="1.5.*" />
 
 	<!-- Dependencies / DLC (optional) -->
@@ -80,7 +82,8 @@ At certain diagonal angles, one-sided zoning (↖||↗) may be assigned to the o
 
 	<!-- Changelog -->
 	<ChangeLog>
-	- update locale files	
+- First public release
+- update locale files	
 	</ChangeLog>
 
 	<!-- External links -->

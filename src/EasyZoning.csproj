@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<!-- File: src/EasyZoning.csproj -->
 
 	<PropertyGroup>
@@ -6,7 +6,7 @@
 		<PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
 
 		<!-- Single source of truth for version number -->
-		<Version>1.0.2</Version>
+		<Version>1.0.3</Version>
 		<AssemblyVersion>$(Version).0</AssemblyVersion>
 		<FileVersion>$(Version).0</FileVersion>
 
@@ -16,10 +16,6 @@
 		<RootNamespace>EasyZoning</RootNamespace>
 
 		<Nullable>enable</Nullable>
-
-		<!-- NPM runner + UI build strictness -->
-		<!-- On Windows, `npm` resolves npm.cmd, could also use npm.cmd-->
-		<NpmCmd>npm</NpmCmd>
 
 		<!-- Keep soft-fail so C# continues even if UI hiccups -->
 		<FailUIBuild>false</FailUIBuild>
@@ -36,49 +32,21 @@
 
 	<!-- Explicit refs (toolchain typically handles these; leaving here is fine) -->
 	<ItemGroup>
-		<Reference Include="Game">
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Colossal.Core">
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Colossal.Logging">
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Colossal.IO.AssetDatabase">
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Colossal.Localization">
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Colossal.UI">
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Colossal.UI.Binding">
-			<Private>false</Private>
-		</Reference>
+		<Reference Include="Game"><Private>false</Private></Reference>
+		<Reference Include="Colossal.Core"><Private>false</Private></Reference>
+		<Reference Include="Colossal.Logging"><Private>false</Private></Reference>
+		<Reference Include="Colossal.IO.AssetDatabase"><Private>false</Private></Reference>
+		<Reference Include="Colossal.Localization"><Private>false</Private></Reference>
+		<Reference Include="Colossal.UI"><Private>false</Private></Reference>
+		<Reference Include="Colossal.UI.Binding"><Private>false</Private></Reference>
 
-		<Reference Include="UnityEngine.CoreModule">
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="UnityEngine.AudioModule">
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Unity.Burst">
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Unity.Collections">
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Unity.Entities">
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Unity.Mathematics">
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Colossal.Mathematics">
-			<Private>false</Private>
-		</Reference>
+		<Reference Include="UnityEngine.CoreModule"><Private>false</Private></Reference>
+		<Reference Include="UnityEngine.AudioModule"><Private>false</Private></Reference>
+		<Reference Include="Unity.Burst">	<Private>false</Private></Reference>
+		<Reference Include="Unity.Collections"><Private>false</Private></Reference>
+		<Reference Include="Unity.Entities"><Private>false</Private></Reference>
+		<Reference Include="Unity.Mathematics"><Private>false</Private></Reference>
+		<Reference Include="Colossal.Mathematics"><Private>false</Private></Reference>
 
 		<!-- Required by SettingsUIKeyboardBinding attribute; safe even if unused -->
 		<Reference Include="Unity.InputSystem">
@@ -86,7 +54,7 @@
 		</Reference>
 	</ItemGroup>
 
-	<!-- Convenience: make common toolchain files viewable in Properties/ (don’t fail if props are undefined) -->
+	<!-- Convenience: make common toolchain files viewable in Properties/ -->
 	<ItemGroup>
 		<None Include="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.props" Link="Properties\Mod.props" />
 		<None Include="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.targets" Link="Properties\Mod.targets" />
@@ -106,23 +74,40 @@
 		</None>
 		<Folder Include="Utilities\" />
 	</ItemGroup>
+
 	<ItemGroup>
 		<None Include="..\research\**\*.*">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>
 		<Folder Include="..\research\" />
 	</ItemGroup>
+
 	<ItemGroup>
 		<Compile Remove="Legacy\**\*.cs" />
 		<None Include="Legacy\**\*.cs" />
 	</ItemGroup>
 
+	<!-- AUTO UPDATE PublishConfiguration ModVersion using CSPROJ Version number
+			remove bom, make EOL=CRLF, and left-align text -->
+	<Target Name="UpdatePublishConfigVersion"
+	        BeforeTargets="Build"
+	        Condition="'$(Configuration)' == 'Release'
+	                  AND Exists('$(MSBuildProjectDirectory)\tools\Update-PublishConfig.ps1')
+	                  AND Exists('$(MSBuildProjectDirectory)\$(PublishConfigurationPath)')">
+
+		<Exec Command="&quot;$(SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\tools\Update-PublishConfig.ps1&quot; -Path &quot;$(MSBuildProjectDirectory)\$(PublishConfigurationPath)&quot; -Version &quot;$(Version)&quot; -Eol crlf -LeftAlignBlocks" />
+	</Target>
+
 	<!-- Run npm ci AFTER C# build, only when needed:
        - first time (node_modules missing), OR
        - package-lock.json changed since last run (tracked by .stamp) -->
-	<Target Name="NpmInstallIfNeeded" AfterTargets="Build" Condition="Exists('$(ProjectDir)UI\package.json')" Inputs="$(ProjectDir)UI\package-lock.json" Outputs="$(ProjectDir)UI\node_modules\.stamp">
+	<Target Name="NpmInstallIfNeeded"
+	        AfterTargets="Build"
+	        Condition="Exists('$(ProjectDir)UI\package.json')"
+	        Inputs="$(ProjectDir)UI\package-lock.json"
+	        Outputs="$(ProjectDir)UI\node_modules\.stamp">
 		<Message Text="EZ UI: npm ci (first-time or lockfile changed)..." Importance="high" />
-		<Exec Command="$(NpmCmd) ci" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true">
+		<Exec Command="npm ci" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true">
 			<Output TaskParameter="ExitCode" PropertyName="NpmCiExit" />
 		</Exec>
 		<!-- Soft-fail (warn instead of error) -->
@@ -132,9 +117,12 @@
 	</Target>
 
 	<!-- Always run the UI bundle AFTER C# build; ensure it runs *after* NpmInstallIfNeeded -->
-	<Target Name="BuildUI" AfterTargets="Build" DependsOnTargets="NpmInstallIfNeeded" Condition="Exists('$(ProjectDir)UI\package.json')">
+	<Target Name="BuildUI"
+	        AfterTargets="Build"
+	        DependsOnTargets="NpmInstallIfNeeded"
+	        Condition="Exists('$(ProjectDir)UI\package.json')">
 		<Message Text="EZ UI: npm run build ($(Configuration))..." Importance="high" />
-		<Exec Command="$(NpmCmd) run build" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true">
+		<Exec Command="npm run build" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true">
 			<Output TaskParameter="ExitCode" PropertyName="NpmBuildExit" />
 		</Exec>
 		<!-- Soft-fail (warn instead of error) -->
