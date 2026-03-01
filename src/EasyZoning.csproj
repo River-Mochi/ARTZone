@@ -102,13 +102,17 @@
 	<!-- AUTO UPDATE PublishConfiguration ModVersion using CSPROJ Version number
 		 remove bom, make EOL=CRLF, and left-align text -->
 	<Target Name="UpdatePublishConfigVersion"
-	        BeforeTargets="Build"
-	        Condition="'$(Configuration)' == 'Release'
-	                  AND Exists('$(MSBuildProjectDirectory)\tools\Update-PublishConfig.ps1')
-	                  AND Exists('$(MSBuildProjectDirectory)\$(PublishConfigurationPath)')">
+			BeforeTargets="Build"
+			Condition="'$(Configuration)' == 'Release'
+                  AND Exists('$(MSBuildProjectDirectory)\Scripts\Update-PublishConfig.ps1')
+                  AND Exists('$(MSBuildProjectDirectory)\$(PublishConfigurationPath)')">
 
-		<Exec Command="&quot;$(SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\tools\Update-PublishConfig.ps1&quot; -Path &quot;$(MSBuildProjectDirectory)\$(PublishConfigurationPath)&quot; -Version &quot;$(Version)&quot; -Eol crlf -LeftAlignBlocks" />
+		<Message Text="EZ PublishConfig: syncing ModVersion + normalizing EOL/BOM + left-align blocks..." Importance="high" />
+
+		<Exec Command="&quot;$(SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\Scripts\Update-PublishConfig.ps1&quot; -Path &quot;$(MSBuildProjectDirectory)\$(PublishConfigurationPath)&quot; -Version &quot;$(Version)&quot; -Eol crlf -LeftAlignBlocks" />
 	</Target>
+
+
 
 	<!-- Run npm ci AFTER C# build, only when needed (stamp-based) -->
 	<Target Name="NpmInstallIfNeeded"
