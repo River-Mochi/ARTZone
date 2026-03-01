@@ -17,8 +17,12 @@
 
 		<Nullable>enable</Nullable>
 
-		<!-- Keep soft-fail so C# continues even if UI hiccups -->
-		<FailUIBuild>false</FailUIBuild>
+		<!-- Master switch for ALL UI steps (npm ci + npm run build) -->
+		<RunEZUIBuild Condition="'$(RunEZUIBuild)'==''">true</RunEZUIBuild>
+
+		<!-- Optional timeouts (ms). Exec default is infinite; timeouts prevent "looks stuck forever". -->
+		<EZNpmCiTimeoutMs Condition="'$(EZNpmCiTimeoutMs)'==''">450000</EZNpmCiTimeoutMs>
+		<EZNpmBuildTimeoutMs Condition="'$(EZNpmBuildTimeoutMs)'==''">300000</EZNpmBuildTimeoutMs>
 	</PropertyGroup>
 
 	<!-- Helper to point to game Managed folder (used by toolchain when resolving refs) -->
@@ -32,25 +36,38 @@
 
 	<!-- Explicit refs (toolchain typically handles these; leaving here is fine) -->
 	<ItemGroup>
-		<Reference Include="Game"><Private>false</Private></Reference>
-		<Reference Include="Colossal.Core"><Private>false</Private></Reference>
-		<Reference Include="Colossal.Logging"><Private>false</Private></Reference>
-		<Reference Include="Colossal.IO.AssetDatabase"><Private>false</Private></Reference>
-		<Reference Include="Colossal.Localization"><Private>false</Private></Reference>
-		<Reference Include="Colossal.UI"><Private>false</Private></Reference>
-		<Reference Include="Colossal.UI.Binding"><Private>false</Private></Reference>
+		<Reference Include="Game"><Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.Core"><Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.Logging"><Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.IO.AssetDatabase"><Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.Localization"><Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.UI"><Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.UI.Binding"><Private>false</Private>
+		</Reference>
 
-		<Reference Include="UnityEngine.CoreModule"><Private>false</Private></Reference>
-		<Reference Include="UnityEngine.AudioModule"><Private>false</Private></Reference>
-		<Reference Include="Unity.Burst">	<Private>false</Private></Reference>
-		<Reference Include="Unity.Collections"><Private>false</Private></Reference>
-		<Reference Include="Unity.Entities"><Private>false</Private></Reference>
-		<Reference Include="Unity.Mathematics"><Private>false</Private></Reference>
-		<Reference Include="Colossal.Mathematics"><Private>false</Private></Reference>
+		<Reference Include="UnityEngine.CoreModule"><Private>false</Private>
+		</Reference>
+		<Reference Include="UnityEngine.AudioModule"><Private>false</Private>
+		</Reference>
+		<Reference Include="Unity.Burst"><Private>false</Private>
+		</Reference>
+		<Reference Include="Unity.Collections"><Private>false</Private>
+		</Reference>
+		<Reference Include="Unity.Entities"><Private>false</Private>
+		</Reference>
+		<Reference Include="Unity.Mathematics"><Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.Mathematics"><Private>false</Private>
+		</Reference>
 
 		<!-- Required by SettingsUIKeyboardBinding attribute; safe even if unused -->
-		<Reference Include="Unity.InputSystem">
-			<Private>false</Private>
+		<Reference Include="Unity.InputSystem"><Private>false</Private>
 		</Reference>
 	</ItemGroup>
 
@@ -88,7 +105,7 @@
 	</ItemGroup>
 
 	<!-- AUTO UPDATE PublishConfiguration ModVersion using CSPROJ Version number
-			remove bom, make EOL=CRLF, and left-align text -->
+		 remove bom, make EOL=CRLF, and left-align text -->
 	<Target Name="UpdatePublishConfigVersion"
 	        BeforeTargets="Build"
 	        Condition="'$(Configuration)' == 'Release'
@@ -98,34 +115,56 @@
 		<Exec Command="&quot;$(SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\tools\Update-PublishConfig.ps1&quot; -Path &quot;$(MSBuildProjectDirectory)\$(PublishConfigurationPath)&quot; -Version &quot;$(Version)&quot; -Eol crlf -LeftAlignBlocks" />
 	</Target>
 
-	<!-- Run npm ci AFTER C# build, only when needed:
-       - first time (node_modules missing), OR
-       - package-lock.json changed since last run (tracked by .stamp) -->
+	<!-- Run npm ci AFTER C# build, only when needed (stamp-based) -->
 	<Target Name="NpmInstallIfNeeded"
 	        AfterTargets="Build"
-	        Condition="Exists('$(ProjectDir)UI\package.json')"
+	        Condition="'$(RunEZUIBuild)'=='true'
+	                  AND Exists('$(ProjectDir)UI\package.json')
+	                  AND Exists('$(ProjectDir)UI\package-lock.json')"
 	        Inputs="$(ProjectDir)UI\package-lock.json"
 	        Outputs="$(ProjectDir)UI\node_modules\.stamp">
+
 		<Message Text="EZ UI: npm ci (first-time or lockfile changed)..." Importance="high" />
-		<Exec Command="npm ci" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true">
+
+		<Exec Command="npm ci"
+		      WorkingDirectory="$(ProjectDir)UI"
+		      IgnoreExitCode="true"
+		      Timeout="$(EZNpmCiTimeoutMs)">
 			<Output TaskParameter="ExitCode" PropertyName="NpmCiExit" />
 		</Exec>
-		<!-- Soft-fail (warn instead of error) -->
-		<Warning Condition="'$(NpmCiExit)' != '0'" Text="EZ UI: 'npm ci' failed (exit $(NpmCiExit)). Continuing C# build." />
-		<!-- On success, write/update the stamp -->
-		<WriteLinesToFile Condition="'$(NpmCiExit)' == '0'" File="$(ProjectDir)UI\node_modules\.stamp" Lines="ok" Overwrite="true" />
+
+		<!-- Release: fail hard. Debug: warn only. -->
+		<Error Condition="'$(Configuration)'=='Release' AND '$(NpmCiExit)'!='0'"
+		       Text="EZ UI: 'npm ci' failed (exit $(NpmCiExit)). Release build aborted." />
+		<Warning Condition="'$(Configuration)'=='Debug' AND '$(NpmCiExit)'!='0'"
+		         Text="EZ UI: 'npm ci' failed (exit $(NpmCiExit)). Continuing (Debug)." />
+
+		<!-- Stamp written only on success; skip npm ci until lockfile changes again -->
+		<WriteLinesToFile Condition="'$(NpmCiExit)' == '0'"
+		                  File="$(ProjectDir)UI\node_modules\.stamp"
+		                  Lines="ok"
+		                  Overwrite="true" />
 	</Target>
 
-	<!-- Always run the UI bundle AFTER C# build; ensure it runs *after* NpmInstallIfNeeded -->
+	<!-- Always run the UI bundle AFTER C# build; runs after NpmInstallIfNeeded -->
 	<Target Name="BuildUI"
 	        AfterTargets="Build"
 	        DependsOnTargets="NpmInstallIfNeeded"
-	        Condition="Exists('$(ProjectDir)UI\package.json')">
+	        Condition="'$(RunEZUIBuild)'=='true' AND Exists('$(ProjectDir)UI\package.json')">
+
 		<Message Text="EZ UI: npm run build ($(Configuration))..." Importance="high" />
-		<Exec Command="npm run build" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true">
+
+		<Exec Command="npm run build"
+		      WorkingDirectory="$(ProjectDir)UI"
+		      IgnoreExitCode="true"
+		      Timeout="$(EZNpmBuildTimeoutMs)">
 			<Output TaskParameter="ExitCode" PropertyName="NpmBuildExit" />
 		</Exec>
-		<!-- Soft-fail (warn instead of error) -->
-		<Warning Condition="'$(NpmBuildExit)' != '0'" Text="EZ UI: 'npm run build' failed (exit $(NpmBuildExit)). Continuing C# build." />
+
+		<!-- Release: fail hard. Debug: warn only. -->
+		<Error Condition="'$(Configuration)'=='Release' AND '$(NpmBuildExit)'!='0'"
+		       Text="EZ UI: 'npm run build' failed (exit $(NpmBuildExit)). Release build aborted." />
+		<Warning Condition="'$(Configuration)'=='Debug' AND '$(NpmBuildExit)'!='0'"
+		         Text="EZ UI: 'npm run build' failed (exit $(NpmBuildExit)). Continuing (Debug)." />
 	</Target>
 </Project>
