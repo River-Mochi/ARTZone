@@ -25,11 +25,6 @@
 		<EZNpmBuildTimeoutMs Condition="'$(EZNpmBuildTimeoutMs)'==''">300000</EZNpmBuildTimeoutMs>
 	</PropertyGroup>
 
-	<!-- Helper to point to game Managed folder (used by toolchain when resolving refs) -->
-	<PropertyGroup>
-		<GameAssemblies>C:\Program Files (x86)\Steam\steamapps\common\Cities Skylines II\Cities2_Data\Managed</GameAssemblies>
-	</PropertyGroup>
-
 	<!-- CS2 toolchain (sets net48, refs, analyzers, etc.) -->
 	<Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.props" />
 	<Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.targets" />
