@@ -83,8 +83,7 @@ At certain diagonal angles, one-sided zoning (↖||↗) may be assigned to the o
 
 	<!-- Changelog -->
 	<ChangeLog>
-- First public release
-- update locale files	
+- fix blue highlight lingers even if mouse moves off the road.	
 </ChangeLog>
 
 	<!-- External links -->
