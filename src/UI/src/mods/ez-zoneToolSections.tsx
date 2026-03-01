@@ -31,7 +31,7 @@ export enum ZoningMode {
 
 const RoadZoningMode$ = bindValue<number>(mod.id, "RoadZoningMode");
 const ToolZoningMode$ = bindValue<number>(mod.id, "ToolZoningMode");
-const IsRoadPrefab$ = bindValue<boolean>(mod.id, "IsRoadPrefab");
+const IsZonableRoadPrefab$ = bindValue<boolean>(mod.id, "IsZonableRoadPrefab");
 const ContourEnabled$ = bindValue<boolean>(mod.id, "ContourEnabled");
 
 function setToolZoningMode(value: ZoningMode) {
@@ -68,7 +68,7 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
         const rowClass = styles.row ?? undefined;
 
         const activeToolId = useValue(tool.activeTool$)?.id;
-        const roadPrefabActive = useValue(IsRoadPrefab$) === true;
+        const roadPrefabActive = useValue(IsZonableRoadPrefab$) === true;
         const zoningToolOn = activeToolId === ZONING_TOOL_ID;
 
         const toolMode = useValue(ToolZoningMode$) as ZoningMode;

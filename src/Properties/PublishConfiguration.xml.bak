@@ -18,10 +18,10 @@ Custom zoning for new and existing roads; includes Contour on/off toggle.
 
 ## Features
 
-  - **Right-Click** flips preview (Left↔Right or Both↔None)
+- **Right-Click** flips preview (Left↔Right or Both↔None)
 - Small vanilla-style “Zone Change” panel beside Roads
 - Show Contour Topography toggle (on/off)
-  - Hover to Preview and remembers your last selection
+- Hover to Preview and remembers your last selection
 - Options to protect existing buildings and already-zoned grids
 - Launch: Top-left icon or **Ctrl + Z** hotkey
 
@@ -74,7 +74,7 @@ At certain diagonal angles, one-sided zoning (↖||↗) may be assigned to the o
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/easy-zoning.1905089/" />
 
 	<!-- Versioning of mod and base game-->
-	<ModVersion Value="1.10" />
+	<ModVersion Value="1.0.3" />
 	<GameVersion Value="1.5.*" />
 
 	<!-- Dependencies / DLC (optional) -->
@@ -83,8 +83,7 @@ At certain diagonal angles, one-sided zoning (↖||↗) may be assigned to the o
 
 	<!-- Changelog -->
 	<ChangeLog>
-- First public release
-- update locale files	
+- fix blue highlight lingers even if mouse moves off the road.	
 </ChangeLog>
 
 	<!-- External links -->

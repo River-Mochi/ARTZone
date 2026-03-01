@@ -1,7 +1,7 @@
 // File: src/Tools/ZoningControllerToolUISystem.cs
 // Purpose:
 //  • Expose UI bindings the React UI reads/writes
-//    (ToolZoningMode, RoadZoningMode, IsRoadPrefab, IsPhotoMode, ContourEnabled).
+//    (ToolZoningMode, RoadZoningMode, IsZonableRoadPrefab, IsPhotoMode, ContourEnabled).
 //  • Handle triggers (Change/Flip/Toggle) with null guards.
 //  • Show the “Zone Change” section when this tool is active OR a RoadPrefab is active.
 //  • Provide a Contour toggle when the EasyZoning tool is active.
@@ -19,7 +19,7 @@ namespace EasyZoning.Tools
     {
         private ValueBinding<int> m_ToolZoningMode = null!;
         private ValueBinding<int> m_RoadZoningMode = null!;
-        private ValueBinding<bool> m_IsRoadPrefab = null!;   // section visibility flag
+        private ValueBinding<bool> m_IsZonableRoadPrefab = null!;   // section visibility flag
         private ValueBinding<bool> m_ContourEnabled = null!; // contour toggle in update panel
 
         private ToolSystem m_MainToolSystem = null!;
@@ -118,8 +118,8 @@ namespace EasyZoning.Tools
                 new ValueBinding<int>(Mod.ModID, "ToolZoningMode", (int) ZoningMode.Both));
             AddBinding(m_RoadZoningMode =
                 new ValueBinding<int>(Mod.ModID, "RoadZoningMode", (int) ZoningMode.Both));
-            AddBinding(m_IsRoadPrefab =
-                new ValueBinding<bool>(Mod.ModID, "IsRoadPrefab", false));
+            AddBinding(m_IsZonableRoadPrefab =
+                new ValueBinding<bool>(Mod.ModID, "IsZonableRoadPrefab", false));
             AddBinding(m_ContourEnabled =
                 new ValueBinding<bool>(Mod.ModID, "ContourEnabled", false));
 
@@ -171,7 +171,7 @@ namespace EasyZoning.Tools
                     catch { activePrefab = null!; }
                 }
                 bool show = ShouldShowFor(activeTool, activePrefab);
-                m_IsRoadPrefab.Update(show);
+                m_IsZonableRoadPrefab.Update(show);
 #if DEBUG
                 Dbg(
                     $"Init visibility → show={show}, tool={(activeTool != null ? activeTool.GetType().Name : "(null)")}, prefab={(activePrefab != null ? activePrefab.name : "(null)")}");
@@ -215,7 +215,7 @@ namespace EasyZoning.Tools
                 }
                 catch { prefab = null!; }
                 bool show = ShouldShowFor(tool, prefab);
-                m_IsRoadPrefab.Update(show);
+                m_IsZonableRoadPrefab.Update(show);
 #if DEBUG
                 Dbg(
                     $"OnToolChanged: show={show} activeTool={(tool != null ? tool.GetType().Name : "(null)")} prefab={(prefab != null ? prefab.name : "(null)")}");
@@ -236,7 +236,7 @@ namespace EasyZoning.Tools
                 }
                 catch { tool = null!; }
                 bool show = ShouldShowFor(tool, prefab);
-                m_IsRoadPrefab.Update(show);
+                m_IsZonableRoadPrefab.Update(show);
 #if DEBUG
                 Dbg(
                     $"OnPrefabChanged: show={show} prefab={(prefab != null ? prefab.name : "(null)")} tool={(tool != null ? tool.GetType().Name : "(null)")}");

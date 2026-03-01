@@ -321,18 +321,24 @@ namespace EasyZoning.Tools
 
         private void UpdatePreviewSelection(bool hasRoad, Entity hitEntity)
         {
+
             if (!hasRoad)
             {
-                // No hit: clear preview state cleanly.
+                // No hit: clear preview/selection state cleanly.
+                for (int i = 0; i < m_SelectedEntities.Length; i++)
+                    m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
+
+                m_SelectedEntities.Clear();
+
                 if (m_PreviewEntity != Entity.Null)
                     m_Highlight.HighlightEntity(m_PreviewEntity, false);
 
-                m_SelectedEntities.Clear();
                 m_PreviewEntity = Entity.Null;
                 m_PendingPreviewEntity = Entity.Null;
                 m_PendingPreviewFrames = 0;
                 return;
             }
+
 
             if (hitEntity == m_PreviewEntity)
             {
@@ -355,11 +361,12 @@ namespace EasyZoning.Tools
             if (m_PendingPreviewFrames < StableSwitchFrames)
                 return;
 
-            if (m_PreviewEntity != Entity.Null)
-                m_Highlight.HighlightEntity(m_PreviewEntity, false);
+            for (int i = 0; i < m_SelectedEntities.Length; i++)
+                m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
 
             m_SelectedEntities.Clear();
             m_PreviewEntity = Entity.Null;
+
 
             m_Highlight.HighlightEntity(hitEntity, true);
             m_SelectedEntities.Add(hitEntity);
