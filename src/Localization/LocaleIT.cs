@@ -1,4 +1,4 @@
-﻿// File: src/Localization/LocaleIT.cs
+// File: src/Localization/LocaleIT.cs
 // Purpose: Italian (it-IT) strings for Options UI + Panel text.
 
 namespace EasyZoning

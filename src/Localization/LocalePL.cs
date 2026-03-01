@@ -1,4 +1,4 @@
-﻿// File: src/Localization/LocalePL.cs
+// File: src/Localization/LocalePL.cs
 // Purpose: Polish (pl-PL) strings for Options UI + Panel text.
 
 namespace EasyZoning

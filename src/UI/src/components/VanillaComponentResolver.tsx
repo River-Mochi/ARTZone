@@ -1,4 +1,4 @@
-﻿// File: src/UI/src/components/VanillaComponentResolver.tsx
+// File: src/UI/src/components/VanillaComponentResolver.tsx
 // Purpose:
 //   Helper wrapper around CS2 ModuleRegistry for a small set of vanilla UI
 //   components and themes used by this mod.

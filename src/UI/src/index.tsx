@@ -1,4 +1,4 @@
-﻿// File: src/UI/src/index.tsx
+// File: src/UI/src/index.tsx
 // Purpose: Hook the UI into vanilla, register top-left button + Tool Options
 // section, and keep the options panel visible when the zoning tool is active.
 

@@ -1,4 +1,4 @@
-﻿// File: src/Mod.cs
+// File: src/Mod.cs
 // Purpose: Mod entrypoint; registers settings, localization, ECS systems, keybindings, and locale-change hooks.
 // Notes:
 //   • Locales install before Options UI so labels render correctly.

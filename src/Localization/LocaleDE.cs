@@ -1,4 +1,4 @@
-﻿// File: src/Localization/LocaleDE.cs
+// File: src/Localization/LocaleDE.cs
 // Purpose: German (de-DE) strings for Options UI + Panel text.
 
 namespace EasyZoning

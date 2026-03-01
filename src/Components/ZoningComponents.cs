@@ -1,4 +1,4 @@
-﻿// File: src/Components/ZoningComponents.cs
+// File: src/Components/ZoningComponents.cs
 // Purpose: Holds temporary preview depths (left/right) while hovering / previewing.
 // Preview = temporary overlay, Depth = real stored setting.
 

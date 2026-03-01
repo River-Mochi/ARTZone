@@ -1,4 +1,4 @@
-﻿// File: src/Localization/LocaleZH_HANT.cs
+// File: src/Localization/LocaleZH_HANT.cs
 // Purpose: Traditional Chinese (zh-Hant) strings for Options UI + Panel text.
 
 namespace EasyZoning
