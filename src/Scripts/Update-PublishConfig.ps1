@@ -1,4 +1,4 @@
-﻿# File: tools/Update-PublishConfig.ps1
+# File: src/Scripts/Update-PublishConfig.ps1
 # Purpose:
 #   - Sync <ModVersion Value="..."/> in PublishConfiguration.xml to csproj <Version>.
 #   - Enforce consistent line endings (CRLF or LF) to prevent VS "MIXED" + popup.
