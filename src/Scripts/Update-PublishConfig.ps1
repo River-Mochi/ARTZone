@@ -31,6 +31,11 @@ if (-not (Test-Path -LiteralPath $Path)) {
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 $original  = [System.IO.File]::ReadAllText($Path, $utf8NoBom)
 
+# Strip Unicode BOM character if present (prevents EF BB BF from being written back out)
+if ($original.Length -gt 0 -and $original[0] -eq [char]0xFEFF) {
+  $original = $original.Substring(1)
+}
+
 # Guard: refuse to touch an empty file (prevents catastrophic wipes)
 if ([string]::IsNullOrWhiteSpace($original)) {
   throw "Refusing to update because file is empty: $Path (restore it first)"
