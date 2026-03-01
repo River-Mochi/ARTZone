@@ -8,7 +8,6 @@ namespace EasyZoning.Tools
     using Game;
     using Game.Common;
     using Game.Zones;
-    using System;
     using Unity.Collections;
     using Unity.Entities;
     using Unity.Jobs;

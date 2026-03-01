@@ -6,7 +6,6 @@
 
 namespace EasyZoning.Tools
 {
-    using Colossal.Serialization.Entities;
     using EasyZoning.Components;
     using Game;
     using Game.Audio;
@@ -48,6 +47,7 @@ namespace EasyZoning.Tools
             None,
             Select,
             Apply,
+            Cancel,
             Preview
         }
 
@@ -67,10 +67,12 @@ namespace EasyZoning.Tools
             try { Mod.s_Log?.Info("[EZ][Tool] " + msg); } catch { }
         }
 #else
-        private static void Dbg(string msg) { }
+        private static void Dbg(string msg)
+        {
+        }
 #endif
 
-        protected override void OnCreate()
+        protected override void OnCreate( )
         {
             base.OnCreate();
 
@@ -92,7 +94,7 @@ namespace EasyZoning.Tools
             m_SelectedEntities = new NativeList<Entity>(Allocator.Persistent);
         }
 
-        protected override void OnDestroy()
+        protected override void OnDestroy( )
         {
             if (m_SelectedEntities.IsCreated)
                 m_SelectedEntities.Dispose();
@@ -100,7 +102,7 @@ namespace EasyZoning.Tools
             base.OnDestroy();
         }
 
-        protected override void OnStartRunning()
+        protected override void OnStartRunning( )
         {
             base.OnStartRunning();
 
@@ -121,7 +123,7 @@ namespace EasyZoning.Tools
 #endif
         }
 
-        protected override void OnStopRunning()
+        protected override void OnStopRunning( )
         {
             applyAction.shouldBeEnabled = false;
             cancelAction.shouldBeEnabled = false;
@@ -129,6 +131,21 @@ namespace EasyZoning.Tools
             requireZones = false;
             requireNet = Layer.None;
             allowUnderground = false;
+
+
+            // Tool deactivation cleanup: clear highlight blue outline state.
+            for (int i = 0; i < m_SelectedEntities.Length; i++)
+                m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
+
+            m_SelectedEntities.Clear();
+
+            if (m_PreviewEntity != Entity.Null)
+                m_Highlight.HighlightEntity(m_PreviewEntity, false);
+
+            m_PreviewEntity = Entity.Null;
+            m_PendingPreviewEntity = Entity.Null;
+            m_PendingPreviewFrames = 0;
+
 
             base.OnStopRunning();
 
@@ -187,12 +204,16 @@ namespace EasyZoning.Tools
                     AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
             }
 
+
             if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
                 m_Mode = Mode.Select;
             else if (applyAction.WasReleasedThisFrame() && hasRoad)
                 m_Mode = Mode.Apply;
+            else if (applyAction.WasReleasedThisFrame() && !hasRoad)
+                m_Mode = Mode.Cancel;
             else
                 m_Mode = Mode.Preview;
+
 
             var ecb = m_ToolOutputBarrier.CreateCommandBuffer();
 
@@ -211,6 +232,28 @@ namespace EasyZoning.Tools
                             AudioManager.instance.PlayUISound(soundbank.m_SelectEntitySound);
                     }
                     break;
+
+
+                case Mode.Cancel:
+                    {
+                        // Clear highlight state for all selected entities.
+                        for (int i = 0; i < m_SelectedEntities.Length; i++)
+                            m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
+
+                        m_SelectedEntities.Clear();
+
+                        if (m_PreviewEntity != Entity.Null)
+                            m_Highlight.HighlightEntity(m_PreviewEntity, false);
+
+                        m_PreviewEntity = Entity.Null;
+                        m_PendingPreviewEntity = Entity.Null;
+                        m_PendingPreviewFrames = 0;
+
+                        if (haveSoundbank)
+                            AudioManager.instance.PlayUISound(soundbank.m_NetCancelSound);
+
+                        break;
+                    }
 
                 case Mode.Apply:
                     {
@@ -361,7 +404,7 @@ namespace EasyZoning.Tools
             return math.any(desired != current);
         }
 
-        public override PrefabBase GetPrefab() => m_ToolPrefab;
+        public override PrefabBase GetPrefab( ) => m_ToolPrefab;
 
         public override bool TrySetPrefab(PrefabBase prefab)
         {
@@ -372,7 +415,7 @@ namespace EasyZoning.Tools
             return true;
         }
 
-        public override void InitializeRaycast()
+        public override void InitializeRaycast( )
         {
             base.InitializeRaycast();
             m_ToolRaycastSystem.typeMask = TypeMask.Net;
@@ -451,7 +494,7 @@ namespace EasyZoning.Tools
             public int2 ToolDepths;
             public EntityCommandBuffer ECB;
 
-            public void Execute()
+            public void Execute( )
             {
                 foreach (Entity e in Entities)
                 {
