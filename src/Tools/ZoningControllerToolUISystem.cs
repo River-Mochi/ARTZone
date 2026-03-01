@@ -3,7 +3,7 @@
 //  • Expose UI bindings the React UI reads/writes
 //    (ToolZoningMode, RoadZoningMode, IsZonableRoadPrefab, IsPhotoMode, ContourEnabled).
 //  • Handle triggers (Change/Flip/Toggle) with null guards.
-//  • Show the “Zone Change” section when this tool is active OR a RoadPrefab is active.
+//  • Show the “Zone Change” section when this tool is active OR a zonable RoadPrefab is active.
 //  • Provide a Contour toggle when the EasyZoning tool is active.
 
 namespace EasyZoning.Tools
@@ -19,7 +19,7 @@ namespace EasyZoning.Tools
     {
         private ValueBinding<int> m_ToolZoningMode = null!;
         private ValueBinding<int> m_RoadZoningMode = null!;
-        private ValueBinding<bool> m_IsZonableRoadPrefab = null!;   // section visibility flag
+        private ValueBinding<bool> m_IsZonableRoadPrefab = null!;  // true when zonable road prefab is active (UI section visibility)
         private ValueBinding<bool> m_ContourEnabled = null!; // contour toggle in update panel
 
         private ToolSystem m_MainToolSystem = null!;

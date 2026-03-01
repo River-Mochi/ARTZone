@@ -37,8 +37,12 @@ Custom zoning for new and existing roads; includes Contour on/off toggle.
 5. Show Contour terrain lines even if you do not need to update zoning.
 
 ## Compatibility
+- Remove Zone Tools or ART mod to avoid conflicts.
 - No Harmony, extends vanilla UI (helps it be more stable on game patch days and increases compatibility).
 - Uses native game inputs and sounds.
+- Safe to remove any time. Road you zoned will keep their zoning.
+- Should work with Platter mod.
+- Lightweight, optimized, runs only when needed.
 
 ## Support and feedback
 - If mod helps you, give it a Like, it's free + easy :)
@@ -46,8 +50,9 @@ Custom zoning for new and existing roads; includes Contour on/off toggle.
 
 ## Tech notes
 
-- For newly drawn roads, the zoning side **←|→** is relative to the road segment’s internal orientation. 
-At certain diagonal angles, one-sided zoning (↖||↗) may be assigned to the other side (just swap it).
+- At certain diagonal angles, one-sided zoning left or right (↖||↗) may be assigned to the other side than you expect (just swap it).
+Reason: newly drawn roads, the zoning side ←|→ is relative to the road segment’s internal orientation. 
+
 
 ## Credits
 

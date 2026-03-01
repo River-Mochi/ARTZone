@@ -132,7 +132,6 @@ namespace EasyZoning.Tools
             requireNet = Layer.None;
             allowUnderground = false;
 
-
             // Tool deactivation cleanup: clear highlight blue outline state.
             for (int i = 0; i < m_SelectedEntities.Length; i++)
                 m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
@@ -145,7 +144,6 @@ namespace EasyZoning.Tools
             m_PreviewEntity = Entity.Null;
             m_PendingPreviewEntity = Entity.Null;
             m_PendingPreviewFrames = 0;
-
 
             base.OnStopRunning();
 
@@ -196,6 +194,15 @@ namespace EasyZoning.Tools
             }
             catch { }
 
+            bool escapePressed = false;
+            try
+            {
+                var kb = Keyboard.current;
+                if (kb != null && kb.escapeKey.wasPressedThisFrame)
+                    escapePressed = true;
+            }
+            catch { }
+
             // RMB: cycle tool mode even without a hit; preview/selection still depends on hit.
             if (rmbPressed)
             {
@@ -204,8 +211,10 @@ namespace EasyZoning.Tools
                     AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
             }
 
-
-            if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
+            // Escape: cancel only when there is an active selection/preview to clear.
+            if (escapePressed && (m_SelectedEntities.Length > 0 || m_PreviewEntity != Entity.Null))
+                m_Mode = Mode.Cancel;
+            else if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
                 m_Mode = Mode.Select;
             else if (applyAction.WasReleasedThisFrame() && hasRoad)
                 m_Mode = Mode.Apply;
@@ -213,7 +222,6 @@ namespace EasyZoning.Tools
                 m_Mode = Mode.Cancel;
             else
                 m_Mode = Mode.Preview;
-
 
             var ecb = m_ToolOutputBarrier.CreateCommandBuffer();
 
@@ -232,7 +240,6 @@ namespace EasyZoning.Tools
                             AudioManager.instance.PlayUISound(soundbank.m_SelectEntitySound);
                     }
                     break;
-
 
                 case Mode.Cancel:
                     {
@@ -280,6 +287,9 @@ namespace EasyZoning.Tools
                             m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
 
                         m_SelectedEntities.Clear();
+                        m_PreviewEntity = Entity.Null;
+                        m_PendingPreviewEntity = Entity.Null;
+                        m_PendingPreviewFrames = 0;
 
                         if (haveSoundbank)
                             AudioManager.instance.PlayUISound(soundbank.m_NetBuildSound);
@@ -321,7 +331,6 @@ namespace EasyZoning.Tools
 
         private void UpdatePreviewSelection(bool hasRoad, Entity hitEntity)
         {
-
             if (!hasRoad)
             {
                 // No hit: clear preview/selection state cleanly.
@@ -338,7 +347,6 @@ namespace EasyZoning.Tools
                 m_PendingPreviewFrames = 0;
                 return;
             }
-
 
             if (hitEntity == m_PreviewEntity)
             {
@@ -366,7 +374,6 @@ namespace EasyZoning.Tools
 
             m_SelectedEntities.Clear();
             m_PreviewEntity = Entity.Null;
-
 
             m_Highlight.HighlightEntity(hitEntity, true);
             m_SelectedEntities.Add(hitEntity);
