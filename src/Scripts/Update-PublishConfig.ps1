@@ -1,4 +1,4 @@
-# File: tools/Update-PublishConfig.ps1
+﻿# File: tools/Update-PublishConfig.ps1
 # Purpose:
 #   - Sync <ModVersion Value="..."/> in PublishConfiguration.xml to csproj <Version>.
 #   - Enforce consistent line endings (CRLF or LF) to prevent VS "MIXED" + popup.
@@ -12,7 +12,7 @@ param(
   [Parameter(Mandatory = $true)][string]$Version,
 
   # Enforced line ending style == PICK ONE ==
-  [ValidateSet('crlf','lf')][string]$Eol = 'lf',
+  [ValidateSet('crlf','lf')][string]$Eol = 'crlf',
 
   # Optional flag: if present, strip leading spaces/tabs *inside* LongDescription + ChangeLog blocks only
   [switch]$LeftAlignBlocks
