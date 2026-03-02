@@ -1,14 +1,12 @@
-// File: lang/zh-HANT.json traditional chinese
 {
-  "EasyZoning.Zone_Controller.ToolName": "簡易分區",
-  "EasyZoning.Zone_Controller.TooltipTitle": "[簡易分區]",
-  "EasyZoning.Zone_Controller.TooltipBody": "開啟 EZ 現有道路分區面板。\n快捷鍵：Ctrl+Z",
+  "EasyZoning.Zone_Controller.ToolName": "輕鬆分區",
+  "EasyZoning.Zone_Controller.ToolDescription": "開啟 EZ 的道路更新面板。\n快捷鍵: Ctrl+Z",
 
-  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "分區調整",
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "分區變更",
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "等高線",
 
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "兩側。右鍵循環模式。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "僅左側。右鍵循環模式。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "僅右側。右鍵循環模式。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "兩側。右鍵可循環切換模式。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "僅左側。右鍵可循環切換模式。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "僅右側。右鍵可循環切換模式。",
   "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "顯示地形等高線。"
 }

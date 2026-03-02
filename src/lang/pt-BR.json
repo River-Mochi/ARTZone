@@ -1,14 +1,12 @@
-// File: lang/pt-BR.json
 {
   "EasyZoning.Zone_Controller.ToolName": "Zoneamento Fácil",
-  "EasyZoning.Zone_Controller.TooltipTitle": "[Zoneamento Fácil]",
-  "EasyZoning.Zone_Controller.TooltipBody": "Abre o painel do EZ para atualizar o zoneamento em estradas existentes.\nAtalho: Ctrl+Z",
+  "EasyZoning.Zone_Controller.ToolDescription": "Abre o painel do EZ para atualizar estradas.\nAtalho: Ctrl+Z",
 
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Mudança de zoneamento",
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "Contorno",
 
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Ambos os lados. Clique direito alterna os modos.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Somente lado esquerdo. Clique direito alterna os modos.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Somente lado direito. Clique direito alterna os modos.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Ambos os lados. Clique direito percorre os modos.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Somente lado esquerdo. Clique direito percorre os modos.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Somente lado direito. Clique direito percorre os modos.",
   "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "Mostrar linhas de contorno do terreno."
 }

@@ -1,14 +1,12 @@
-// file it-IT.json
 {
   "EasyZoning.Zone_Controller.ToolName": "Zonizzazione Facile",
-  "EasyZoning.Zone_Controller.TooltipTitle": "[Zonizzazione Facile]",
-  "EasyZoning.Zone_Controller.TooltipBody": "Apre il pannello EZ per modificare la zonizzazione delle strade esistenti.\nScorciatoia: Ctrl+Z",
+  "EasyZoning.Zone_Controller.ToolDescription": "Apre il pannello EZ per aggiornare le strade.\nScorciatoia: Ctrl+Z",
 
-  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Cambio zonizzazione",
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Cambio di zonizzazione",
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "Curve di livello",
 
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Entrambi i lati. Clic destro scorre le modalità.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Solo lato sinistro. Clic destro scorre le modalità.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Solo lato destro. Clic destro scorre le modalità.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Entrambi i lati. Clic destro scorre i modi.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Solo lato sinistro. Clic destro scorre i modi.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Solo lato destro. Clic destro scorre i modi.",
   "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "Mostra le curve di livello del terreno."
 }
