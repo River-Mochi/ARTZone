@@ -1,7 +1,7 @@
 // File: src/Settings/Setting.cs
 // Purpose: Options UI + One rebindable entry (Ctrl+Z).
 // Note: RMB is *not* declared here; the Game’s own RMB/cancel bindings remain vanilla.
-// Later in the tool, the RMB is read for preview flip.
+// Later in the tool, the RMB is read for preview cycle.
 
 namespace EasyZoning
 {
@@ -17,8 +17,8 @@ namespace EasyZoning
 
     // Tabs & groups
     [SettingsUITabOrder(kActionsTab, kAboutTab)]
-    [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup, kAboutInfoGroup, kAboutLinksGroup)]
-    [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup)]
+    [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup, kLegacyGroup, kAboutInfoGroup, kAboutLinksGroup)]
+    [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup, kLegacyGroup)]
 
     // Declare ONLY the keyboard action (Ctrl+Z). RMB is vanilla cancelAction.
     [SettingsUIKeyboardAction(Mod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
@@ -31,6 +31,7 @@ namespace EasyZoning
         // Groups
         public const string kToggleGroup = "Zoning Tools";
         public const string kKeybindingGroup = "Key bindings";
+        public const string kLegacyGroup = "Legacy Tool";
         public const string kAboutInfoGroup = "Info";
         public const string kAboutLinksGroup = "Links";
 
@@ -52,22 +53,26 @@ namespace EasyZoning
             get; set;
         } = true;
 
-        // RMB cycling behavior (update-existing-roads tool):
-        // - OFF (default): full 4-cycle (Both → Left → Right → None → Both)
-        // - ON: legacy 2-set toggle (Left ↔ Right, Both ↔ None)
-        [SettingsUISection(kActionsTab, kToggleGroup)]
-        public bool LegacyRightClickCycle
-        {
-            get; set;
-        } = false;
-
         // --- Key bindings (only Ctrl+Z exposed) ---
+
         [SettingsUIKeyboardBinding(BindingKeyboard.Z, Mod.kToggleToolActionName, ctrl: true)]
         [SettingsUISection(kActionsTab, kKeybindingGroup)]
         public ProxyBinding ToggleZoneTool
         {
             get; set;
         }
+
+        // --- Legacy Tool behavior ---
+
+        // RMB cycling (update-existing-roads tool):
+        // Legacy
+        // - OFF (default): full 4-cycle (Both → Left → Right → None → Both)
+        // - ON: legacy 2-set toggle (Left ↔ Right, Both ↔ None)
+        [SettingsUISection(kActionsTab, kLegacyGroup)]
+        public bool LegacyRightClickCycle
+        {
+            get; set;
+        } = false;
 
         // --- About (read-only) ---
 
@@ -97,7 +102,9 @@ namespace EasyZoning
                 {
                     Application.OpenURL(UrlParadox);
                 }
-                catch (Exception) { }
+                catch (Exception)
+                {
+                }
             }
         }
 
@@ -112,7 +119,9 @@ namespace EasyZoning
                 {
                     Application.OpenURL(UrlDiscord);
                 }
-                catch (Exception) { }
+                catch (Exception)
+                {
+                }
             }
         }
 

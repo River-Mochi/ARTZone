@@ -8,22 +8,26 @@
 	<DisplayName Value="Easy Zoning [EZ]" />
 
 	<!-- Short one-liner -->
-	<ShortDescription Value="Change zoning on the sides of roads: Both/Left/Right/None. Cycle all with RMB, apply with LMB." />
+	<ShortDescription Value="Change road Zoning: Both/Left/Right/None. RMB cycles, LMB applies." />
 
 	<!-- Long description (minimal markdown supported) -->
 	<LongDescription>
 # Easy Zoning [EZ] Beta
 
-Custom zoning for new and existing roads; includes Contour on/off toggle.
+Custom zoning for new and existing roads; includes Contour lines on/off toggle.
 
 ## Features
+- Options menu checkboxes to protect existing buildings and already-zoned grids
 
-- **Right-Click** flips preview (Left↔Right or Both↔None)
-- Small vanilla-style “Zone Change” panel beside Roads
-- Show Contour Topography toggle (on/off)
-- Hover to Preview and remembers your last selection
-- Options to protect existing buildings and already-zoned grids
-- Launch: Top-left icon or **Ctrl + Z** hotkey
+Existing roads:
+
+- Hover to Preview
+- Launch: **Ctrl + Z** hotkey or use Top-left icon
+- **Hold LMB + drag** to select multiple segments, **release** to apply
+- **RMB cycles**: **Both → Left → Right → None**
+- **Legacy RMB mode** (optional): RMB toggles **Left↔Right** and **Both↔None** instead of all 4 states
+- **Contour Lines** toggle (tool-only)
+
 
 ## How to use
 
@@ -39,7 +43,6 @@ Custom zoning for new and existing roads; includes Contour on/off toggle.
 ## Compatibility
 - Remove Zone Tools or ART mod to avoid conflicts.
 - No Harmony, extends vanilla UI (helps it be more stable on game patch days and increases compatibility).
-- Uses native game inputs and sounds.
 - Safe to remove any time. Road you zoned will keep their zoning.
 - Should work with Platter mod.
 - Lightweight, optimized, runs only when needed.
@@ -49,9 +52,8 @@ Custom zoning for new and existing roads; includes Contour on/off toggle.
 - Feedback to GitHub, Discord, or forum links on this page.
 
 ## Tech notes
-
-- At certain diagonal angles, one-sided zoning left or right (↖||↗) may be assigned to the other side than you expect (just swap it).
-Reason: newly drawn roads, the zoning side ←|→ is relative to the road segment’s internal orientation. 
+For newly drawn roads, “Left/Right” is relative to the segment’s orientation.
+At some diagonal angles  (↖||↗) it may apply flipped from what you want — use RMB to swap.
 
 
 ## Credits
@@ -88,9 +90,9 @@ Reason: newly drawn roads, the zoning side ←|→ is relative to the road segme
 
 	<!-- Changelog -->
 	<ChangeLog>
-- added 4 mode cycle for updating road zoning: Both->Left->Right->None
-- added Options menu Legacy toggle for players who still want the old behavior of only toggling Left/Right and Both/None separately.
-- added UI locale DE, IT, zh-HANT
+- Existing roads: RMB now has 4-cycles **Both → Left → Right → None**
+- Added option: Options menu, can enable Legacy RMB toggle (original RMB of separate Left↔Right or Both↔None)
+- Added UI locale: de-DE, it-IT, zh-HANT
 </ChangeLog>
 
 	<!-- External links -->
