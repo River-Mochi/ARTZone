@@ -97,28 +97,46 @@ namespace EasyZoning.Tools
         }
 
         /// <summary>
-        /// RMB cycle order (ZoneTools-style):
-        /// Both → Left → Right → None → Both
+        /// RMB cycle behavior for the update tool:
+        /// - Default (LegacyRightClickCycle OFF): Both → Left → Right → None → Both
+        /// - Legacy (LegacyRightClickCycle ON): Left ↔ Right, Both ↔ None
         /// </summary>
         public void CycleMode( )
         {
             try
             {
+                bool legacy = EasyZoning.Mod.Settings != null && EasyZoning.Mod.Settings.LegacyRightClickCycle;
+
                 ZoningMode current = ToolZoningMode;
 
-                ZoningMode next = current switch
+                ZoningMode next;
+                if (legacy)
                 {
-                    ZoningMode.Both => ZoningMode.Left,
-                    ZoningMode.Left => ZoningMode.Right,
-                    ZoningMode.Right => ZoningMode.None,
-                    ZoningMode.None => ZoningMode.Both,
-                    _ => ZoningMode.Both
-                };
+                    next = current switch
+                    {
+                        ZoningMode.Left => ZoningMode.Right,
+                        ZoningMode.Right => ZoningMode.Left,
+                        ZoningMode.Both => ZoningMode.None,
+                        ZoningMode.None => ZoningMode.Both,
+                        _ => ZoningMode.Both
+                    };
+                }
+                else
+                {
+                    next = current switch
+                    {
+                        ZoningMode.Both => ZoningMode.Left,
+                        ZoningMode.Left => ZoningMode.Right,
+                        ZoningMode.Right => ZoningMode.None,
+                        ZoningMode.None => ZoningMode.Both,
+                        _ => ZoningMode.Both
+                    };
+                }
 
                 m_ToolZoningMode.Update((int) next);
 
 #if DEBUG
-                Dbg($"CycleMode → Tool={ModeToStr(next)}");
+                Dbg($"CycleMode → Tool={ModeToStr(next)} legacy={legacy}");
                 LogToolDepths("CycleMode");
 #endif
             }
@@ -127,10 +145,6 @@ namespace EasyZoning.Tools
             }
         }
 
-        /// <summary>
-        /// Toggle terrain contour lines while the zone update tool is active.
-        /// If selectedSnap cannot be accessed, this becomes a no-op.
-        /// </summary>
         private void ToggleContourLines( )
         {
             try

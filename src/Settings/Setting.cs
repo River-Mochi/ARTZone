@@ -52,6 +52,15 @@ namespace EasyZoning
             get; set;
         } = true;
 
+        // RMB cycling behavior (update-existing-roads tool):
+        // - OFF (default): full 4-cycle (Both → Left → Right → None → Both)
+        // - ON: legacy 2-set toggle (Left ↔ Right, Both ↔ None)
+        [SettingsUISection(kActionsTab, kToggleGroup)]
+        public bool LegacyRightClickCycle
+        {
+            get; set;
+        } = false;
+
         // --- Key bindings (only Ctrl+Z exposed) ---
         [SettingsUIKeyboardBinding(BindingKeyboard.Z, Mod.kToggleToolActionName, ctrl: true)]
         [SettingsUISection(kActionsTab, kKeybindingGroup)]
@@ -88,9 +97,7 @@ namespace EasyZoning
                 {
                     Application.OpenURL(UrlParadox);
                 }
-                catch (Exception)
-                {
-                }
+                catch (Exception) { }
             }
         }
 
@@ -105,9 +112,7 @@ namespace EasyZoning
                 {
                     Application.OpenURL(UrlDiscord);
                 }
-                catch (Exception)
-                {
-                }
+                catch (Exception) { }
             }
         }
 
@@ -115,6 +120,7 @@ namespace EasyZoning
         {
             RemoveZonedCells = true;
             RemoveOccupiedCells = true;
+            LegacyRightClickCycle = false;
         }
     }
 }

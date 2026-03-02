@@ -41,6 +41,13 @@ namespace EasyZoning
                     "**Buildings = occupied cells**. Prevents preview/apply of new zones from turning existing buildings into condemned.\n\n" +
                 "**[ ✓ ] Enabled recommended.**" },
 
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Right-click cycle: legacy mode" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
+                    "When enabled: Right-click toggles in two sets:\n" +
+                    "Left<->Right and Both<->None.\n\n" +
+                    "When disabled: Right-click cycles all 4 modes:\n" +
+                    "Both -> Left -> Right -> None -> Both." },
+
                 // Keybind (only one visible)
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Toggle Panel" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Show the Easy Zoning panel button (default Ctrl+Z)." },
@@ -68,6 +75,7 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Join the mod Discord." },
             };
+
             return d;
         }
 
