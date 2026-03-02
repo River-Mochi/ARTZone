@@ -1,0 +1,11 @@
+{
+  "EasyZoning.Zone_Controller.ToolName": "Zonizzazione Facile",
+
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Cambia zonizzazione",
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "Curve di livello",
+
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Entrambi i lati. Clic destro per scorrere le modalità.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Solo lato sinistro. Clic destro per scorrere le modalità.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Solo lato destro. Clic destro per scorrere le modalità.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "Mostra le curve di livello del terreno."
+}

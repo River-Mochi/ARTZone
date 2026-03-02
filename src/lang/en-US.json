@@ -4,7 +4,10 @@
   "EasyZoning.Zone_Controller.ToolName": "Easy Zoning",
 
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Zone Change",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Toggle Both/None.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "LEFT side only Zone.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "RIGHT side only Zone."
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "Contour",
+
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Both sides. Right-click cycles zones.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Left side only. Right-click cycles zones.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Right side only. Right-click cycles zones.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "Show terrain contour lines."
 }

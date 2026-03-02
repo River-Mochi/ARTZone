@@ -1,0 +1,12 @@
+// File: lang/de-DE.json
+{
+  "EasyZoning.Zone_Controller.ToolName": "Einfaches Zoning",
+
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Zonen ändern",
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "Höhenlinien",
+
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Beide Seiten. Rechtsklick wechselt die Zonenmodi.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Nur linke Seite. Rechtsklick wechselt die Zonenmodi.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Nur rechte Seite. Rechtsklick wechselt die Zonenmodi.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "Gelände-Höhenlinien anzeigen."
+}
