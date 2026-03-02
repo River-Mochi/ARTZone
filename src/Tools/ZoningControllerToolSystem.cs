@@ -14,7 +14,6 @@ namespace EasyZoning.Tools
     using Game.Prefabs;
     using Game.Tools;
     using Game.Zones;
-    using System;
     using Unity.Collections;
     using Unity.Entities;
     using Unity.Jobs;
@@ -211,7 +210,7 @@ namespace EasyZoning.Tools
                     AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
             }
 
-            // Escape: cancel only when there is an active selection/preview to clear.
+            // Escape: cancel only when something exists to clear.
             if (escapePressed && (m_SelectedEntities.Length > 0 || m_PreviewEntity != Entity.Null))
                 m_Mode = Mode.Cancel;
             else if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
@@ -243,7 +242,6 @@ namespace EasyZoning.Tools
 
                 case Mode.Cancel:
                     {
-                        // Clear highlight state for all selected entities.
                         for (int i = 0; i < m_SelectedEntities.Length; i++)
                             m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
 
@@ -298,15 +296,13 @@ namespace EasyZoning.Tools
                     }
             }
 
-            // Temp preview sync + cleanup (same pattern as ART).
-            var tempLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true);
-            var depthLookupForPreview = GetComponentLookup<ZoningDepthComponent>(isReadOnly: true);
+            // Temp preview sync + cleanup (ART pattern), but only mark Updated when something changed.
+            var previewWriteLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: false);
 
             JobHandle syncTempJob = new SyncTempJob
             {
                 ECB = m_ToolOutputBarrier.CreateCommandBuffer().AsParallelWriter(),
-                ZoningPreviewLookup = tempLookup,
-                DepthLookup = depthLookupForPreview,
+                ZoningPreviewLookup = previewWriteLookup,
                 SelectedEntities = m_SelectedEntities.AsArray().AsReadOnly(),
                 ToolDepths = Depths
             }.Schedule(m_SelectedEntities.Length, 32, inputDeps);
@@ -333,7 +329,6 @@ namespace EasyZoning.Tools
         {
             if (!hasRoad)
             {
-                // No hit: clear preview/selection state cleanly.
                 for (int i = 0; i < m_SelectedEntities.Length; i++)
                     m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
 
@@ -355,7 +350,6 @@ namespace EasyZoning.Tools
                 return;
             }
 
-            // Stability filter: require same candidate for N frames.
             if (hitEntity == m_PendingPreviewEntity)
             {
                 m_PendingPreviewFrames++;
@@ -395,7 +389,6 @@ namespace EasyZoning.Tools
                 return false;
             }
 
-            // If tool would not change this entity, treat as "no hit" (ART behavior).
             if (!WouldChange(entity))
             {
                 entity = Entity.Null;
@@ -458,7 +451,6 @@ namespace EasyZoning.Tools
         {
             public EntityCommandBuffer.ParallelWriter ECB;
             public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
-            public ComponentLookup<ZoningDepthComponent> DepthLookup;
             public NativeArray<Entity>.ReadOnly SelectedEntities;
             public int2 ToolDepths;
 
@@ -467,19 +459,26 @@ namespace EasyZoning.Tools
                 Entity e = SelectedEntities[index];
                 int2 preview = ToolDepths;
 
+                bool changed = false;
+
                 if (ZoningPreviewLookup.TryGetComponent(e, out ZoningPreviewComponent data))
                 {
                     if (!math.all(data.Depths == preview))
                     {
                         ECB.SetComponent(index, e, new ZoningPreviewComponent { Depths = preview });
+                        changed = true;
                     }
                 }
                 else
                 {
                     ECB.AddComponent(index, e, new ZoningPreviewComponent { Depths = preview });
+                    changed = true;
                 }
 
-                ECB.AddComponent<Updated>(index, e);
+                if (changed)
+                {
+                    ECB.AddComponent<Updated>(index, e);
+                }
             }
         }
 

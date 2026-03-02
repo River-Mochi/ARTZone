@@ -70,7 +70,7 @@ Reason: newly drawn roads, the zoning side ←|→ is relative to the road segme
 	<Thumbnail Value="Properties/urbanPlanning01.jpg" />
 	<Screenshot Value="Properties/imageEZ-10.jpg" />
 	<Screenshot Value="Properties/imageEZ-20.jpg" />
-
+    <Screenshot Value="Properties/imageEZ-30-Options.jpg" />
 
 	<!--Tag, can be set multiple times-->
 	<Tag Value="Code Mod" />
