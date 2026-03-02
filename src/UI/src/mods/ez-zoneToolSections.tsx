@@ -97,15 +97,15 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
         );
         const tipLeft = translate(
             "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]",
-            "Zone only the left side."
+            "Zone left side only."
         );
         const tipRight = translate(
             "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]",
-            "Zone only the right side."
+            "Zone right side only."
         );
         const tipContour = translate(
             "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]",
-            "Toggle terrain contour lines while Easy Zoning is active."
+            "Toggle terrain contour lines."
         );
 
         const shouldShowZoneSection = roadPrefabActive || zoningToolOn;

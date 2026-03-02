@@ -8,38 +8,39 @@
 	<DisplayName Value="Easy Zoning [EZ]" />
 
 	<!-- Short one-liner -->
-	<ShortDescription Value="Change zoning on the sides of roads: Left/Right/Both/None. Flip with RMB, apply with LMB." />
+	<ShortDescription Value="Change road Zoning: Both/Left/Right/None. Contour lines terrain toggle." />
 
 	<!-- Long description (minimal markdown supported) -->
 	<LongDescription>
 # Easy Zoning [EZ] Beta
 
-Custom zoning for new and existing roads; includes Contour on/off toggle.
-
-## Features
-
-- **Right-Click** flips preview (Left↔Right or Both↔None)
-- Small vanilla-style “Zone Change” panel beside Roads
-- Show Contour Topography toggle (on/off)
-- Hover to Preview and remembers your last selection
-- Options to protect existing buildings and already-zoned grids
-- Launch: Top-left icon or **Ctrl + Z** hotkey
+Custom zoning for new and existing roads.
 
 ## How to use
 
-**New Road:** open game **Roads** panel → select the **Zoning** icon desired, draw roads as usual.
+**New Road**
+1. Open Roads panel (i.e., pick small roads)
+2. Near the bottom of the road tool panel, pick one of 3 EZ icons (see image).
+3. Draw as usual (road appears with cells on one side or no-sides if the 3 icons are flipped off).
 
-**Existing Road:**
-1. Open EZ panel > use Top Left icon or Ctrl+Z keybind.
-2. Select the Zone icon (see image) > Hover a road to preview.
-3. **Right-Click** to switch sides; **Left-Click** to apply.
-4. Bonus: moving the mouse a little to the left or right of the road will also flip the side.
-5. Show Contour terrain lines even if you do not need to update zoning.
+**Existing Road**
+1. Open EZ Update panel: Ctrl+Z toggles panel on/off (top-left icon does the same).
+2. Select an icon to pick a zone side (see image).
+3. Hover a road to preview.
+4. Right-Click on roads to switch sides (infinitely); **RMB cycles** Both → Left → Right → None →...
+5. Left-Click (LMB) to apply (lock it in).
+6. Or LMB hold+drag along many road sections, release and update is applied.
+7. Optional: **Contour Lines** terrain toggle
+
+Options Menu
+- ✅ Protect occupied cells (buildings).
+- ✅ Protect zoned-but-empty cells.
+- ✅ Default **Ctrl +Z** short-cut can be changed (it opens/closes EZ panel fast)
+- ✅ **Legacy RMB mode** (optional): RMB toggles **Left↔Right** and **Both↔None** instead of all 4-states
 
 ## Compatibility
-- Remove Zone Tools or ART mod to avoid conflicts.
+- To avoid conflicts, don't run "Zone Tools" or ART mod at the same time as EZ.
 - No Harmony, extends vanilla UI (helps it be more stable on game patch days and increases compatibility).
-- Uses native game inputs and sounds.
 - Safe to remove any time. Road you zoned will keep their zoning.
 - Should work with Platter mod.
 - Lightweight, optimized, runs only when needed.
@@ -49,9 +50,10 @@ Custom zoning for new and existing roads; includes Contour on/off toggle.
 - Feedback to GitHub, Discord, or forum links on this page.
 
 ## Tech notes
-
-- At certain diagonal angles, one-sided zoning left or right (↖||↗) may be assigned to the other side than you expect (just swap it).
-Reason: newly drawn roads, the zoning side ←|→ is relative to the road segment’s internal orientation. 
+- For newly drawn roads, “Left/Right” is relative to the segment’s orientation.
+At some diagonal angles  (↖||↗) it may apply flipped from what you want — use RMB to swap.
+- Highlight outline color on the road indicates the section could be changed.
+No outline highlight means it's already changed to the current selected option.
 
 
 ## Credits
@@ -79,7 +81,7 @@ Reason: newly drawn roads, the zoning side ←|→ is relative to the road segme
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/easy-zoning.1905089/" />
 
 	<!-- Versioning of mod and base game-->
-	<ModVersion Value="1.0.4" />
+	<ModVersion Value="1.0.5" />
 	<GameVersion Value="1.5.*" />
 
 	<!-- Dependencies / DLC (optional) -->
@@ -88,7 +90,9 @@ Reason: newly drawn roads, the zoning side ←|→ is relative to the road segme
 
 	<!-- Changelog -->
 	<ChangeLog>
-- fix blue highlight lingers even if mouse moves off the road.	
+- Added new RMB cycle mode to existing roads panel: now cycles all 4 states (**Both → Left → Right → None**)
+- Added Options menu item: can enable Legacy RMB toggle (original RMB of separate Left↔Right or Both↔None)
+- Added UI locale: de-DE, it-IT, zh-HANT
 </ChangeLog>
 
 	<!-- External links -->

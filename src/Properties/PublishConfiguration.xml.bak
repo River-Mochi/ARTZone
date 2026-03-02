@@ -1,0 +1,106 @@
+<Publish>
+	<!--This PublishConfiguration.xml file is required to publish a mod on Paradox website and is part of the CSII toolchain-->
+	
+	<!-- Id must be set in order to update existing mod; not required for publishing mod for the first time -->
+	<ModId Value="136261" />
+
+	<!-- Display name -->
+	<DisplayName Value="Easy Zoning [EZ]" />
+
+	<!-- Short one-liner -->
+	<ShortDescription Value="Change road Zoning: Both/Left/Right/None. RMB cycles, LMB applies." />
+
+	<!-- Long description (minimal markdown supported) -->
+	<LongDescription>
+        # Easy Zoning [EZ] Beta
+
+        Custom zoning for new and existing roads.
+
+        ## How to use
+
+        **New Road:**
+        1. Open Roads panel (i.e., pick small roads)
+        2. Near the bottom of the road tool panel, pick one of 3 EZ icons (see image).
+        3. Draw as usual (road appears with cells on one side or no-sides if the 3 icons are flipped off).
+
+        **Existing Road:**
+        1. Open EZ Update panel: Ctrl+Z toggles panel on/off (top-left icon does the same).
+        2. Select an icon to pick a zone side (see image).
+        3. Hover a road to preview.
+        4. Right-Click road to switch sides (infinitely); **RMB cycles** Both → Left → Right → None →...
+        5. Left-Click (LMB) to apply (lock it in).
+        6. Or LMB hold+drag along many road sections, release and update is applied.
+        7. If the road has a blue color outline, then it's a candidate for the update; if no color, then there is no change (it already has zoning on that side).
+
+        ## Features
+        - **Contour Lines** terrain toggle
+        - Highlight outline blue color indicates the road did not get the change yet.
+
+        Options Menu
+        - ✅ Protect occupied cells (buildings).
+        - ✅ Protect zoned-but-empty cells.
+        - ✅ Default **Ctrl +Z** short-cut can be changed (it opens/closes EZ panel fast)
+        - ✅ **Legacy RMB mode** (optional): RMB toggles **Left↔Right** and **Both↔None** instead of all 4-states
+
+        ## Compatibility
+        - Remove Zone Tools or ART mod to avoid conflicts.
+        - No Harmony, extends vanilla UI (helps it be more stable on game patch days and increases compatibility).
+        - Safe to remove any time. Road you zoned will keep their zoning.
+        - Should work with Platter mod.
+        - Lightweight, optimized, runs only when needed.
+
+        ## Support and feedback
+        - If mod helps you, give it a Like, it's free + easy :)
+        - Feedback to GitHub, Discord, or forum links on this page.
+
+        ## Tech notes
+        For newly drawn roads, “Left/Right” is relative to the segment’s orientation.
+        At some diagonal angles  (↖||↗) it may apply flipped from what you want — use RMB to swap.
+
+
+        ## Credits
+
+        - River-mochi - author
+        - thanks to Kemorno (original ART mod, retired) and zeeshanabid 94 (zoning toolkit, retired)
+        - yenyang - technical support and encouragement
+        - Rouchesta - testing
+        - CS2 modding community for testing, feedback
+
+
+    </LongDescription>
+	
+	<!-- Assets -->
+	  <!--Thumbnail-->
+	<Thumbnail Value="Properties/urbanPlanning01.jpg" />
+	<Screenshot Value="Properties/imageEZ-10.jpg" />
+	<Screenshot Value="Properties/imageEZ-20.jpg" />
+    <Screenshot Value="Properties/imageEZ-30-Options.jpg" />
+
+	<!--Tag, can be set multiple times-->
+	<Tag Value="Code Mod" />
+
+	<!--Link to the forum post where the mod can be discussed-->
+	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/easy-zoning.1905089/" />
+
+	<!-- Versioning of mod and base game-->
+	<ModVersion Value="1.0.5" />
+	<GameVersion Value="1.5.*" />
+
+	<!-- Dependencies / DLC (optional) -->
+	<Dependency Id="" />
+	<RequiredDLC Value="" />
+
+	<!-- Changelog -->
+	<ChangeLog>
+- Existing roads: RMB now has 4-cycles **Both → Left → Right → None**
+- Added option: Options menu, can enable Legacy RMB toggle (original RMB of separate Left↔Right or Both↔None)
+- Added UI locale: de-DE, it-IT, zh-HANT
+</ChangeLog>
+
+	<!-- External links -->
+	<ExternalLink Type="discord" Url="https://discord.gg/HTav7ARPs2" />
+	<ExternalLink Type="github"  Url="https://github.com/River-Mochi/EasyZoning" />
+
+	<!--Supported values Public, Private, Unlisted-->
+	<AccessLevel Value="Public" />
+</Publish>

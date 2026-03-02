@@ -33,6 +33,13 @@ type PropsSection = {
     children: ReactNode;
 };
 
+type PropsDescriptionTooltip = {
+    title?: string | null;
+    description?: string | null;
+    direction?: any;
+    children: ReactNode;
+};
+
 type PropsColorField = {
     focusKey?: FocusKey;
     disabled?: boolean;
@@ -55,6 +62,10 @@ const registryIndex = {
     ToolButton: [
         "game-ui/game/components/tool-options/tool-button/tool-button.tsx",
         "ToolButton",
+    ],
+    DescriptionTooltip: [
+        "game-ui/common/tooltip/description-tooltip/description-tooltip.tsx",
+        "DescriptionTooltip",
     ],
     toolButtonTheme: [
         "game-ui/game/components/tool-options/tool-button/tool-button.module.scss",
@@ -112,6 +123,10 @@ export class VanillaComponentResolver {
 
     public get ToolButton(): (props: PropsToolButton) => ReactElement {
         return this.cachedData["ToolButton"] ?? this.updateCache("ToolButton");
+    }
+
+    public get DescriptionTooltip(): (props: PropsDescriptionTooltip) => ReactElement {
+        return this.cachedData["DescriptionTooltip"] ?? this.updateCache("DescriptionTooltip");
     }
 
     public get ColorField(): (props: PropsColorField) => ReactElement {

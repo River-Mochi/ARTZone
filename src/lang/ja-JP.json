@@ -1,10 +1,12 @@
-// File: lang/ja-JP.json
-// Japanese
 {
-  "EasyZoning.Zone_Controller.ToolName": "イージーゾーニング",
+  "EasyZoning.Zone_Controller.ToolName": "簡単ゾーニング",
+  "EasyZoning.Zone_Controller.ToolDescription": "EZの道路更新パネルを開きます。\nショートカット: Ctrl+Z",
 
-  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "ゾーニング側",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "両方／なし を切り替え。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "左側だけをゾーン。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "右側だけをゾーン。"
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "ゾーン変更",
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "等高線",
+
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "両側。右クリックでモードを切り替えます。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "左側のみ。右クリックでモードを切り替えます。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "右側のみ。右クリックでモードを切り替えます。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "地形の等高線を表示します。"
 }

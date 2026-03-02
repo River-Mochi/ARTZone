@@ -1,10 +1,12 @@
-// File: lang/fr-FR.json
-// French
 {
   "EasyZoning.Zone_Controller.ToolName": "Zonage Facile",
+  "EasyZoning.Zone_Controller.ToolDescription": "Ouvre le panneau EZ pour mettre à jour les routes.\nRaccourci : Ctrl+Z",
 
-  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Côté de Zonage",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Basculer Les Deux/Aucun.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Zoner uniquement le côté gauche.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Zoner uniquement le côté droit."
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Changement de zonage",
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "Courbes",
+
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Deux côtés. Clic droit pour faire défiler les modes.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Côté gauche uniquement. Clic droit pour faire défiler les modes.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Côté droit uniquement. Clic droit pour faire défiler les modes.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "Afficher les courbes de niveau du terrain."
 }

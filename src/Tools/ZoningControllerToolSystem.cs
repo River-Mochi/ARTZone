@@ -176,9 +176,8 @@ namespace EasyZoning.Tools
             m_SubBlockLookup.Update(this);
             m_ZoningDepthLookup.Update(this);
 
-            bool hasRoad = TryGetRoadUnderCursor(out Entity hitEntity, out RaycastHit hit);
+            bool hasRoad = TryGetRoadUnderCursor(out Entity hitEntity, out RaycastHit _);
 
-            // UI vanilla sounds
             bool haveSoundbank = m_SoundbankQuery.CalculateEntityCount() > 0;
             ToolUXSoundSettingsData soundbank = default;
             if (haveSoundbank)
@@ -202,15 +201,13 @@ namespace EasyZoning.Tools
             }
             catch { }
 
-            // RMB: cycle tool mode even without a hit; preview/selection still depends on hit.
             if (rmbPressed)
             {
-                m_UISystem.CycleToolSideMode();
+                m_UISystem.CycleMode();
                 if (haveSoundbank)
                     AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
             }
 
-            // Escape: cancel only when something exists to clear.
             if (escapePressed && (m_SelectedEntities.Length > 0 || m_PreviewEntity != Entity.Null))
                 m_Mode = Mode.Cancel;
             else if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
@@ -263,12 +260,7 @@ namespace EasyZoning.Tools
                 case Mode.Apply:
                     {
                         var previewLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true);
-                        var depthLookup = GetComponentLookup<ZoningDepthComponent>(isReadOnly: false);
-
-#if DEBUG
-                        var d = Depths;
-                        Dbg($"Apply: Depths=({d.x},{d.y}) SelectedCount={m_SelectedEntities.Length}");
-#endif
+                        var depthLookup = GetComponentLookup<ZoningDepthComponent>(isReadOnly: true);
 
                         JobHandle setJob = new SetZoningDepthJob
                         {
@@ -296,13 +288,12 @@ namespace EasyZoning.Tools
                     }
             }
 
-            // Temp preview sync + cleanup (ART pattern), but only mark Updated when something changed.
-            var previewWriteLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: false);
+            var previewReadLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true);
 
             JobHandle syncTempJob = new SyncTempJob
             {
                 ECB = m_ToolOutputBarrier.CreateCommandBuffer().AsParallelWriter(),
-                ZoningPreviewLookup = previewWriteLookup,
+                ZoningPreviewLookup = previewReadLookup,
                 SelectedEntities = m_SelectedEntities.AsArray().AsReadOnly(),
                 ToolDepths = Depths
             }.Schedule(m_SelectedEntities.Length, 32, inputDeps);
@@ -377,7 +368,6 @@ namespace EasyZoning.Tools
             m_PendingPreviewFrames = 0;
         }
 
-        // Filtered raycast: only returns a road segment when a change would occur.
         private bool TryGetRoadUnderCursor(out Entity entity, out RaycastHit hit)
         {
             if (!base.GetRaycastResult(out entity, out hit))
@@ -429,7 +419,6 @@ namespace EasyZoning.Tools
             m_ToolRaycastSystem.netLayerMask = Layer.Road;
         }
 
-        // Called by UI toggle/hotkey.
         public void SetToolEnabled(bool isEnabled)
         {
             if (m_ToolSystem == null)
@@ -450,7 +439,8 @@ namespace EasyZoning.Tools
         public struct SyncTempJob : IJobParallelFor
         {
             public EntityCommandBuffer.ParallelWriter ECB;
-            public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
+
+            [ReadOnly] public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
             public NativeArray<Entity>.ReadOnly SelectedEntities;
             public int2 ToolDepths;
 
@@ -459,24 +449,17 @@ namespace EasyZoning.Tools
                 Entity e = SelectedEntities[index];
                 int2 preview = ToolDepths;
 
-                bool changed = false;
-
                 if (ZoningPreviewLookup.TryGetComponent(e, out ZoningPreviewComponent data))
                 {
                     if (!math.all(data.Depths == preview))
                     {
                         ECB.SetComponent(index, e, new ZoningPreviewComponent { Depths = preview });
-                        changed = true;
+                        ECB.AddComponent<Updated>(index, e);
                     }
                 }
                 else
                 {
                     ECB.AddComponent(index, e, new ZoningPreviewComponent { Depths = preview });
-                    changed = true;
-                }
-
-                if (changed)
-                {
                     ECB.AddComponent<Updated>(index, e);
                 }
             }
@@ -502,8 +485,10 @@ namespace EasyZoning.Tools
         public struct SetZoningDepthJob : IJob
         {
             public NativeArray<Entity>.ReadOnly Entities;
-            public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
-            public ComponentLookup<ZoningDepthComponent> DepthLookup;
+
+            [ReadOnly] public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
+            [ReadOnly] public ComponentLookup<ZoningDepthComponent> DepthLookup;
+
             public int2 ToolDepths;
             public EntityCommandBuffer ECB;
 

@@ -1,0 +1,12 @@
+{
+  "EasyZoning.Zone_Controller.ToolName": "Einfaches Zoning",
+  "EasyZoning.Zone_Controller.ToolDescription": "Öffnet das EZ-Panel zum Aktualisieren von Straßen.\nTastenkürzel: Ctrl+Z",
+
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Zonen ändern",
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "Höhenlinien",
+
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Beide Seiten. Rechtsklick wechselt die Modi durch.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Nur linke Seite. Rechtsklick wechselt die Modi durch.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Nur rechte Seite. Rechtsklick wechselt die Modi durch.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "Geländehöhenlinien anzeigen."
+}

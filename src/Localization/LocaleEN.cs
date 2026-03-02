@@ -28,34 +28,48 @@ namespace EasyZoning
                 // Groups
                 { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Zone Options" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Key bindings" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kLegacyGroup),   "Legacy Tool behavior" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
                 // Toggles
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Do not reset existing zoned squares" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Do not reset already zoned cells during preview/apply.\n\n" +
-                "**[ ✓ ] Enabled recommended.**" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
+                    "Do not reset already zoned cells during preview/apply.\n\n" +
+                    "**[ ✓ ] Enabled recommended.**" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent buildings from being removed" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
                     "**Buildings = occupied cells**. Prevents preview/apply of new zones from turning existing buildings into condemned.\n\n" +
-                "**[ ✓ ] Enabled recommended.**" },
+                    "**[ ✓ ] Enabled recommended.**" },
+
 
                 // Keybind (only one visible)
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Toggle Panel" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Show the Easy Zoning panel button (default Ctrl+Z)." },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Toggle Update Panel" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
+                    "Show the Easy Zoning panel (**default Ctrl+Z**)."
+                },
 
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Legacy RMB cycle" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
+                    "**OFF is recommended.**\n" +
+                    "When off, then RMB (right-click) can cycle all 4 modes:\n" +
+                    "Both → Left → Right → None → ...\n\n" +
+                    "Advantage: faster, less need to move mouse back to the panel.\n\n" +
+
+                    "**ON:** RMB toggles in two separate sets:\n" +
+                    "Left ↔ Right\n" +
+                    "Both ↔ None"
+                },
+
+   
                 // Binding title in the keybinding dialog
                 { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Toggle Easy Zoning Button Panel" },
 
-                // Legacy Panel (Road Services tile)
-                //{ $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Easy Zoning" },
-                //{ $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                //  "Choose zoning for roads: both, left, right, or none.\nRight-click flips; left-click applies." },
-
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
                     "Change zoning: both sides, left<->right, or none.\n" +
-                    "Left-click applies. Drag along a road to update multiple segments." },
+                    "Left-click locks-in the choice. Left-hold + Drag along a road to update multiple segments." },
 
                 // About tab labels
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Mod name" },
@@ -68,6 +82,7 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Join the mod Discord." },
             };
+
             return d;
         }
 
