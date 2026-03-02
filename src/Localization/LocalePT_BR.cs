@@ -1,5 +1,5 @@
 // File: src/Localization/LocalePT_BR.cs
-// Purpose: Portuguese (pt-BR) strings for Options UI + Panel text.
+// Purpose: Portuguese-BR (pt-BR) strings for Options UI + Panel text.
 
 namespace EasyZoning
 {
@@ -28,46 +28,61 @@ namespace EasyZoning
                 // Groups
                 { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Opções de zoneamento" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Atalhos do teclado" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kLegacyGroup),   "Comportamento legado da ferramenta" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
                 // Toggles
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Não redefinir quadrados já zoneados" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Não redefinir células já zoneadas durante a pré-visualização/aplicação.\n\n" +
-                "**[ ✓ ] Recomendado ativar.**" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
+                    "Não redefine células já zoneadas durante prévia/aplicar.\n\n" +
+                    "**[ ✓ ] Ativado recomendado.**" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Impedir remoção de edifícios" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Impedir que edifícios sejam removidos" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
-                    "**Edifícios = células ocupadas**. Impede que a pré-visualização/aplicação de novas zonas transforme edifícios existentes em condenados.\n\n" +
-                "**[ ✓ ] Recomendado ativar.**" },
+                    "**Edifícios = células ocupadas**. Impede que a prévia/aplicação de novas zonas transforme edifícios existentes em condenados.\n\n" +
+                    "**[ ✓ ] Ativado recomendado.**" },
+
 
                 // Keybind (only one visible)
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Alternar painel" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Mostrar o botão do painel do Easy Zoning (padrão: Ctrl+Z)." },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Alternar painel de atualização" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
+                    "Mostrar o painel Easy Zoning (**padrão Ctrl+Z**)."
+                },
+
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Ciclo RMB legado" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
+                    "**OFF é recomendado.**\n" +
+                    "Quando OFF, RMB (clique direito) pode ciclar os 4 modos:\n" +
+                    "Ambos → Esquerda → Direita → Nenhum → ...\n\n" +
+                    "Vantagem: mais rápido, menos necessidade de voltar ao painel.\n\n" +
+
+                    "**ON:** RMB alterna em dois conjuntos separados:\n" +
+                    "Esquerda ↔ Direita\n" +
+                    "Ambos ↔ Nenhum"
+                },
+
 
                 // Binding title in the keybinding dialog
-                { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Alternar painel do botão Easy Zoning" },
-
-                // Legacy Panel (Road Services tile)
-                //{ $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Easy Zoning" },
-                //{ $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                //  "Choose zoning for roads: both, left, right, or none.\nRight-click flips; left-click applies." },
+                { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Alternar painel de botões do Easy Zoning" },
 
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                    "Alterar o zoneamento: ambos os lados, esquerda<->direita ou nenhum.\n" +
-                    "Clique esquerdo aplica. Arraste ao longo de uma via para atualizar vários segmentos." },
+                    "Alterar zoneamento: ambos os lados, esquerda<->direita, ou nenhum.\n" +
+                    "Clique esquerdo confirma a escolha. Segure clique esquerdo + arraste ao longo de uma via para atualizar vários segmentos." },
 
                 // About tab labels
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Nome do mod" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Nome de exibição deste mod." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Nome exibido deste mod." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "Versão" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "Versão atual do mod." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadox)),    "Paradox Mods" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),     "Abrir a página do autor no Paradox Mods." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),     "Abrir a página Paradox Mods do autor." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Entrar no Discord do mod." },
             };
+
             return d;
         }
 

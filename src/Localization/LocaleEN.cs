@@ -43,10 +43,18 @@ namespace EasyZoning
                     "**Buildings = occupied cells**. Prevents preview/apply of new zones from turning existing buildings into condemned.\n\n" +
                     "**[ ✓ ] Enabled recommended.**" },
 
+
+                // Keybind (only one visible)
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Toggle Update Panel" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
+                    "Show the Easy Zoning panel (**default Ctrl+Z**)."
+                },
+
+
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Legacy RMB cycle" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
-                    "**OFF (recommended):**\n" +
-                    "When off, then RMB can cycle all 4 modes:\n" +
+                    "**OFF is recommended.**\n" +
+                    "When off, then RMB (right-click) can cycle all 4 modes:\n" +
                     "Both → Left → Right → None → ...\n\n" +
                     "Advantage: faster, less need to move mouse back to the panel.\n\n" +
 
@@ -55,11 +63,7 @@ namespace EasyZoning
                     "Both ↔ None"
                 },
 
-
-                // Keybind (only one visible)
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Toggle Update Panel" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Show the Easy Zoning panel button (default Ctrl+Z)." },
-
+   
                 // Binding title in the keybinding dialog
                 { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Toggle Easy Zoning Button Panel" },
 

@@ -23,51 +23,66 @@ namespace EasyZoning
 
                 // Tabs
                 { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "Azioni" },
-                { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "Info" },
+                { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "Informazioni" },
 
                 // Groups
-                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Opzioni zona" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Scorciatoie tasti" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Opzioni di zonizzazione" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Scorciatoie da tastiera" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kLegacyGroup),   "Comportamento legacy dello strumento" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
                 // Toggles
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Non ripristinare le zone esistenti" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),  "Non ripristina le celle già zonate durante anteprima/applica.\n\n" +
-                "**[ ✓ ] Consigliato attivo.**" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Non ripristinare i quadrati già zonizzati" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
+                    "Non ripristina le celle già zonizzate durante anteprima/applicazione.\n\n" +
+                    "**[ ✓ ] Attivato consigliato.**" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Evita la rimozione degli edifici" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Impedisci la rimozione degli edifici" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
-                    "**Edifici = celle occupate**. Impedisce che anteprima/applica delle nuove zone trasformi gli edifici esistenti in 'da demolire'.\n\n" +
-                "**[ ✓ ] Consigliato attivo.**" },
+                    "**Edifici = celle occupate**. Impedisce che anteprima/applicazione di nuove zone trasformi edifici esistenti in condannati.\n\n" +
+                    "**[ ✓ ] Attivato consigliato.**" },
+
 
                 // Keybind (only one visible)
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Pannello ON/OFF" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),  "Mostra il pulsante del pannello Easy Zoning (predefinito Ctrl+Z)." },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Attiva/disattiva pannello di aggiornamento" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
+                    "Mostra il pannello Easy Zoning (**Ctrl+Z predefinito**)."
+                },
+
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Ciclo RMB legacy" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
+                    "**OFF consigliato.**\n" +
+                    "Quando è OFF, RMB (clic destro) può ciclare tutti e 4 i modi:\n" +
+                    "Entrambi → Sinistra → Destra → Nessuno → ...\n\n" +
+                    "Vantaggio: più veloce, meno bisogno di tornare al pannello con il mouse.\n\n" +
+
+                    "**ON:** RMB alterna in due set separati:\n" +
+                    "Sinistra ↔ Destra\n" +
+                    "Entrambi ↔ Nessuno"
+                },
+
 
                 // Binding title in the keybinding dialog
-                { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Pannello pulsanti Easy Zoning ON/OFF" },
-
-                // Legacy Panel (Road Services tile)
-                //{ $"Assets.NAME[{ZoningControllerToolSystem.ToolID}]", "Easy Zoning" },
-                //{ $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                //  "Choose zoning for roads: both, left, right, or none.\nRight-click flips; left-click applies." },
+                { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Attiva/disattiva pannello pulsanti Easy Zoning" },
 
                 { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                    "Cambia zonizzazione: entrambi i lati, sinistra<->destra o nessuna.\n" +
-                    "Clic sinistro applica. Trascina lungo una strada per aggiornare più segmenti." },
+                    "Cambia zonizzazione: entrambi i lati, sinistra<->destra, o nessuno.\n" +
+                    "Clic sinistro conferma la scelta. Tieni premuto clic sinistro + trascina lungo una strada per aggiornare più segmenti." },
 
                 // About tab labels
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Nome mod" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Nome visualizzato di questo mod." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Nome visualizzato di questa mod." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "Versione" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "Versione attuale del mod." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "Versione corrente della mod." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadox)),    "Paradox Mods" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),     "Apri la pagina Paradox Mods dell'autore." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),     "Apri la pagina Paradox Mods dell’autore." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Entra nel Discord del mod." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Unisciti al Discord della mod." },
             };
+
             return d;
         }
 

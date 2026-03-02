@@ -1,12 +1,14 @@
 // File: lang/de-DE.json
 {
   "EasyZoning.Zone_Controller.ToolName": "Einfaches Zoning",
+  "EasyZoning.Zone_Controller.TooltipTitle": "[Einfaches Zoning]",
+  "EasyZoning.Zone_Controller.TooltipBody": "Öffnet das EZ-Panel zum Anpassen des Zoning an bestehenden Straßen.\nTastenkürzel: Strg+Z",
 
-  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Zonen ändern",
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Zoning ändern",
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "Höhenlinien",
 
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Beide Seiten. Rechtsklick wechselt die Zonenmodi.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Nur linke Seite. Rechtsklick wechselt die Zonenmodi.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Nur rechte Seite. Rechtsklick wechselt die Zonenmodi.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "Gelände-Höhenlinien anzeigen."
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Beide Seiten. Rechtsklick wechselt die Modi.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Nur linke Seite. Rechtsklick wechselt die Modi.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Nur rechte Seite. Rechtsklick wechselt die Modi.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "Geländehöhenlinien anzeigen."
 }

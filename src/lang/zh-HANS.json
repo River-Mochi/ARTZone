@@ -1,12 +1,14 @@
 // File: lang/zh-HANS.json simplified chinese
 {
-  "EasyZoning.Zone_Controller.ToolName": "轻松分区",
+  "EasyZoning.Zone_Controller.ToolName": "简易分区",
+  "EasyZoning.Zone_Controller.TooltipTitle": "[简易分区]",
+  "EasyZoning.Zone_Controller.TooltipBody": "打开 EZ 现有道路分区面板。\n快捷键：Ctrl+Z",
 
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "分区调整",
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "等高线",
 
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "两侧。右键循环切换模式。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "仅左侧。右键循环切换模式。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "仅右侧。右键循环切换模式。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "两侧。右键循环模式。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "仅左侧。右键循环模式。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "仅右侧。右键循环模式。",
   "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "显示地形等高线。"
 }

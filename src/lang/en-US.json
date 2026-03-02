@@ -1,7 +1,6 @@
-// File: lang/en-US.json
-
 {
   "EasyZoning.Zone_Controller.ToolName": "Easy Zoning",
+  "EasyZoning.Zone_Controller.ToolDescription": "This opens the EZ update roads panel.\nShortcut: Ctrl+Z",
 
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Zone Change",
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "Contour",

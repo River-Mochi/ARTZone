@@ -1,12 +1,14 @@
 // File: lang/es-ES.json
 {
   "EasyZoning.Zone_Controller.ToolName": "Zonificación Fácil",
+  "EasyZoning.Zone_Controller.TooltipTitle": "[Zonificación Fácil]",
+  "EasyZoning.Zone_Controller.TooltipBody": "Abre el panel de EZ para actualizar carreteras.\nAtajo: Ctrl+Z",
 
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Cambio de zonificación",
-  "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "Curvas de nivel",
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "Contorno",
 
   "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Ambos lados. Clic derecho recorre los modos.",
   "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Solo lado izquierdo. Clic derecho recorre los modos.",
   "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Solo lado derecho. Clic derecho recorre los modos.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "Mostrar curvas de nivel del terreno."
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "Mostrar líneas de contorno del terreno."
 }

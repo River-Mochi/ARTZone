@@ -1,12 +1,14 @@
 // File: lang/ko-KR.json
 {
   "EasyZoning.Zone_Controller.ToolName": "이지 조닝",
+  "EasyZoning.Zone_Controller.TooltipTitle": "[이지 조닝]",
+  "EasyZoning.Zone_Controller.TooltipBody": "기존 도로 존(구역) 변경 패널을 엽니다.\n단축키: Ctrl+Z",
 
-  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "구역 변경",
+  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "존 변경",
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "등고선",
 
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "양쪽. 우클릭으로 모드를 순환합니다.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "왼쪽만. 우클릭으로 모드를 순환합니다.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "오른쪽만. 우클릭으로 모드를 순환합니다.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "지형 등고선을 표시합니다."
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "양쪽. 우클릭으로 모드 순환.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "왼쪽만. 우클릭으로 모드 순환.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "오른쪽만. 우클릭으로 모드 순환.",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "지형 등고선 표시."
 }
