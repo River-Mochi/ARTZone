@@ -49,6 +49,10 @@ dotnet_diagnostic.IDE0130.severity = none         # Namespace vs folder
 # Our k/m/s scheme conflicts with IDE1006; quiet it
 dotnet_diagnostic.IDE1006.severity = none
 
+# Silent IDE013 "Namespace does not match folder structure" warnings
+dotnet_diagnostic.IDE0130.severity = silent
+
+
 # =========================
 # Naming symbols (targets)
 # =========================
@@ -117,4 +121,5 @@ dotnet_naming_rule.const_fields_k_prefix.severity = suggestion
 dotnet_naming_rule.private_internal_const_fields_k_prefix.symbols = private_internal_const_fields
 dotnet_naming_rule.private_internal_const_fields_k_prefix.style = k_prefix_pascal
 dotnet_naming_rule.private_internal_const_fields_k_prefix.severity = suggestion
+
 

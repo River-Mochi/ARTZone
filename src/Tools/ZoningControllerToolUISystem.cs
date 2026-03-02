@@ -105,7 +105,7 @@ namespace EasyZoning.Tools
             Dbg($"{tag}: ToolZoningMode={ModeToStr(mode)} ToolDepths=({d.x},{d.y})");
         }
 #else
-        private static void Dbg(string msg)
+        private static void Dbg(string _)
         {
         }
 #endif

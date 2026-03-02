@@ -66,7 +66,7 @@ namespace EasyZoning.Tools
             try { Mod.s_Log?.Info("[EZ][Tool] " + msg); } catch { }
         }
 #else
-        private static void Dbg(string msg)
+        private static void Dbg(string _)
         {
         }
 #endif
