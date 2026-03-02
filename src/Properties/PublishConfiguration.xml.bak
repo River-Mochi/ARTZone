@@ -8,7 +8,7 @@
 	<DisplayName Value="Easy Zoning [EZ]" />
 
 	<!-- Short one-liner -->
-	<ShortDescription Value="Change zoning on the sides of roads: Both/Left/Right/None. Cycle all with RMB, apply with LMB." />
+	<ShortDescription Value="Change zoning on the sides of roads: Left/Right/Both/None. Flip with RMB, apply with LMB." />
 
 	<!-- Long description (minimal markdown supported) -->
 	<LongDescription>
@@ -32,7 +32,7 @@ Custom zoning for new and existing roads; includes Contour on/off toggle.
 **Existing Road:**
 1. Open EZ panel > use Top Left icon or Ctrl+Z keybind.
 2. Select the Zone icon (see image) > Hover a road to preview.
-3. **Right-Click** RMB to switch sides; **Left-Click** LMB to apply.
+3. **Right-Click** to switch sides; **Left-Click** to apply.
 4. Bonus: moving the mouse a little to the left or right of the road will also flip the side.
 5. Show Contour terrain lines even if you do not need to update zoning.
 
@@ -79,7 +79,7 @@ Reason: newly drawn roads, the zoning side ←|→ is relative to the road segme
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/easy-zoning.1905089/" />
 
 	<!-- Versioning of mod and base game-->
-	<ModVersion Value="1.0.5" />
+	<ModVersion Value="1.0.4" />
 	<GameVersion Value="1.5.*" />
 
 	<!-- Dependencies / DLC (optional) -->
@@ -88,10 +88,10 @@ Reason: newly drawn roads, the zoning side ←|→ is relative to the road segme
 
 	<!-- Changelog -->
 	<ChangeLog>
-- added 4 mode cycle for updating road zoning: Both->Left->Right->None
+- added 4 cycle toggle for updating road zoning: Both->Left->Right->None
 - added Options menu Legacy toggle for players who still want the old behavior of only toggling Left/Right and Both/None separately.
 - added UI locale DE, IT, zh-HANT
-</ChangeLog>
+    </ChangeLog>
 
 	<!-- External links -->
 	<ExternalLink Type="discord" Url="https://discord.gg/HTav7ARPs2" />
