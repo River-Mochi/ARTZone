@@ -37,7 +37,7 @@ Options Menu
 - ✅ Protect occupied cells (buildings).
 - ✅ Protect zoned-but-empty cells.
 - ✅ Default **Ctrl +Z** short-cut can be changed (it opens/closes EZ panel fast)
-- ✅ **Legacy RMB mode** (optional): RMB toggles only **Left↔Right** or **Both↔None** instead of all 4-cycles.
+- ✅ **Legacy RMB mode** (optional): RMB toggles only **Left↔Right** Or **Both↔None** instead of all 4-cycles.
 
 ## Compatibility
 - To avoid conflicts, do not run "Zone Tools" or ART mod at the same time as EZ.
