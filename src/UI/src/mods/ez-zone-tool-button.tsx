@@ -15,7 +15,7 @@ import MainIconPath from "../../images/ico-zones-color02.svg";
 
 export default function EZZoneToolButton() {
     const { translate } = useLocalization();
-
+// Tooltip on GTL button.
     const title = translate("EasyZoning.Zone_Controller.ToolName", "Easy Zoning");
     const description = translate(
         "EasyZoning.Zone_Controller.ToolDescription",
