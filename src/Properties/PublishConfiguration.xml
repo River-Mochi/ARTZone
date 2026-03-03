@@ -88,8 +88,8 @@ No outline highlight means it's already changed to the current selected option.
 	<Dependency Id="" />
 	<RequiredDLC Value="" />
 
-	<!-- Changelog -->
-	<ChangeLog>
+<!-- Changelog -->
+<ChangeLog>
 - Added new RMB cycle mode to existing roads panel: now cycles all 4 states (**Both → Left → Right → None**)
 - Added Options menu item: can enable Legacy RMB toggle (original RMB of separate Left↔Right or Both↔None)
 - Added UI locale: de-DE, it-IT, zh-HANT

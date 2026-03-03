@@ -56,11 +56,13 @@ namespace EasyZoning
                     "**OFF is recommended.**\n" +
                     "When off, then RMB (right-click) can cycle all 4 modes:\n" +
                     "Both → Left → Right → None → ...\n\n" +
-                    "Advantage: faster, less need to move mouse back to the panel.\n\n" +
+                    "Faster, less need to move mouse back to the panel.\n\n" +
 
-                    "**ON:** RMB toggles in two separate sets:\n" +
+                    "When **ON**, then the RMB toggles in two separate sets:\n" +
                     "Left ↔ Right\n" +
-                    "Both ↔ None"
+                    "Both ↔ None\n" +
+                    "Must move mouse back to switch icons, but less risk of using both/none if you only use Left/Right."
+
                 },
 
    
