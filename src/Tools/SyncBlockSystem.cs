@@ -8,6 +8,7 @@ namespace EasyZoning.Tools
     using Game;
     using Game.Common;
     using Game.Zones;
+    using System;                  // NullReferenceException
     using Unity.Collections;
     using Unity.Entities;
     using Unity.Jobs;
@@ -62,10 +63,10 @@ namespace EasyZoning.Tools
             }
 #endif
 
-            var ecb = m_ModificationBarrier.CreateCommandBuffer();
-            var updatedBlocks = m_UpdatedBlocksQuery.ToEntityArray(Allocator.TempJob);
+            EntityCommandBuffer ecb = m_ModificationBarrier.CreateCommandBuffer();
+            NativeArray<Entity> updatedBlocks = m_UpdatedBlocksQuery.ToEntityArray(Allocator.TempJob);
 
-            var syncBlockJob = new SyncBlockJob
+            JobHandle syncBlockJob = new SyncBlockJob
             {
                 ECB = ecb.AsParallelWriter(),
                 Entities = updatedBlocks.AsReadOnly(),
@@ -77,38 +78,24 @@ namespace EasyZoning.Tools
                 ZoningPreviewLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true),
                 RemoveOccupiedCells = removeOccupied,
                 RemoveZonedCells = removeZoned,
-            }.Schedule(updatedBlocks.Length, 32, this.Dependency);
+            }.Schedule(updatedBlocks.Length, 32, Dependency);
 
             updatedBlocks.Dispose(syncBlockJob);
-            this.Dependency = JobHandle.CombineDependencies(this.Dependency, syncBlockJob);
-            m_ModificationBarrier.AddJobHandleForProducer(this.Dependency);
+            Dependency = JobHandle.CombineDependencies(Dependency, syncBlockJob);
+            m_ModificationBarrier.AddJobHandleForProducer(Dependency);
         }
-
-
-
 
         public struct SyncBlockJob : IJobParallelFor
         {
             public EntityCommandBuffer.ParallelWriter ECB;
             public NativeArray<Entity>.ReadOnly Entities;
 
-            [ReadOnly]
-            public ComponentLookup<Block> BlockLookup;
-
-            [ReadOnly]
-            public ComponentLookup<ValidArea> ValidAreaLookup;
-
-            [ReadOnly]
-            public BufferLookup<Cell> CellLookup;
-
-            [ReadOnly]
-            public ComponentLookup<Owner> OwnerLookup;
-
-            [ReadOnly]
-            public ComponentLookup<ZoningDepthComponent> ZoningDepthLookup;
-
-            [ReadOnly]
-            public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
+            [ReadOnly] public ComponentLookup<Block> BlockLookup;
+            [ReadOnly] public ComponentLookup<ValidArea> ValidAreaLookup;
+            [ReadOnly] public BufferLookup<Cell> CellLookup;
+            [ReadOnly] public ComponentLookup<Owner> OwnerLookup;
+            [ReadOnly] public ComponentLookup<ZoningDepthComponent> ZoningDepthLookup;
+            [ReadOnly] public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
 
             public bool RemoveOccupiedCells;
             public bool RemoveZonedCells;
@@ -123,7 +110,7 @@ namespace EasyZoning.Tools
                 if (!OwnerLookup.TryGetComponent(blockEntity, out Owner owner))
                 {
 #if DEBUG
-    throw new NullReferenceException($"Block {blockEntity} has no owner assigned.");
+                    throw new InvalidOperationException($"[EZ] Block {blockEntity} missing Owner (query expected Owner).");
 #else
                     return;
 #endif
@@ -131,7 +118,7 @@ namespace EasyZoning.Tools
 
                 Entity roadEntity = owner.m_Owner;
 
-                bool left = IsLeftSide(CellLookup[blockEntity], block, validArea);
+                bool left = IsLeftSide(block);
 
                 int depth;
                 if (ZoningPreviewLookup.TryGetComponent(roadEntity, out ZoningPreviewComponent zoningPreview))
@@ -149,12 +136,14 @@ namespace EasyZoning.Tools
                     return;
                 }
 
-                if (RemoveOccupiedCells && IsAnyCellOccupied(CellLookup[blockEntity], block, validArea))
+                DynamicBuffer<Cell> cells = CellLookup[blockEntity];
+
+                if (RemoveOccupiedCells && IsAnyCellOccupied(cells, block, validArea))
                 {
                     return;
                 }
 
-                if (RemoveZonedCells && IsAnyCellZoned(CellLookup[blockEntity], block, validArea))
+                if (RemoveZonedCells && IsAnyCellZoned(cells, block, validArea))
                 {
                     return;
                 }
@@ -166,13 +155,12 @@ namespace EasyZoning.Tools
                 ECB.SetComponent(index, blockEntity, validArea);
             }
 
-            private static bool IsLeftSide(DynamicBuffer<Cell> cells, Block block, ValidArea validArea)
+            private static bool IsLeftSide(Block block)
             {
                 // ART behavior: use block direction sign as the left/right discriminator.
                 // (float2(1,1) matches ART's implicit math.dot(1, dir) usage.)
                 return math.dot(new float2(1f, 1f), block.m_Direction) < 0f;
             }
-
 
             private static bool IsAnyCellOccupied(DynamicBuffer<Cell> cells, Block block, ValidArea validArea)
             {

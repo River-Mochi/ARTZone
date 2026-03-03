@@ -5,6 +5,7 @@
 
 namespace EasyZoning.Tools
 {
+    using Colossal.Logging;
     using EasyZoning.Components;
     using Game;
     using Game.Common;
@@ -25,7 +26,7 @@ namespace EasyZoning.Tools
 #if DEBUG
         private static void Dbg(string msg)
         {
-            var log = Mod.s_Log;
+            ILog log = Mod.s_Log;
             if (log == null)
                 return;
             try
@@ -68,7 +69,7 @@ namespace EasyZoning.Tools
                 return;
 
 
-            var ecb = m_ModificationBarrier.CreateCommandBuffer();
+            EntityCommandBuffer ecb = m_ModificationBarrier.CreateCommandBuffer();
             NativeArray<Entity> entities = m_NewCreatedRoadsQuery.ToEntityArray(Allocator.TempJob);
 
 #if DEBUG

@@ -46,7 +46,7 @@ namespace EasyZoning.Tools
 
         protected override void OnUpdate( )
         {
-            var ecb = m_ToolOutputBarrier.CreateCommandBuffer();
+            EntityCommandBuffer ecb = m_ToolOutputBarrier.CreateCommandBuffer();
 
             m_EdgeLookup.Update(this);
             m_HighlightedLookup.Update(this);
@@ -55,7 +55,7 @@ namespace EasyZoning.Tools
 
             if (!m_ToHighlight.IsEmpty)
             {
-                var job = new HighlightJob
+                JobHandle job = new HighlightJob
                 {
                     Entities = m_ToHighlight.AsReadOnly(),
                     HighlightedLookup = m_HighlightedLookup,
@@ -68,7 +68,7 @@ namespace EasyZoning.Tools
 
             if (!m_ToUnhighlight.IsEmpty)
             {
-                var job = new UnhighlightJob
+                JobHandle job = new UnhighlightJob
                 {
                     Entities = m_ToUnhighlight.AsReadOnly(),
                     HighlightedLookup = m_HighlightedLookup,
@@ -112,7 +112,7 @@ namespace EasyZoning.Tools
 
             public void Execute(int index)
             {
-                var entity = Entities[index];
+                Entity entity = Entities[index];
                 if (entity == Entity.Null)
                     return;
 
@@ -122,7 +122,7 @@ namespace EasyZoning.Tools
                     ECB.AddComponent<BatchesUpdated>(index, entity);
                 }
 
-                if (EdgeLookup.TryGetComponent(entity, out var edge))
+                if (EdgeLookup.TryGetComponent(entity, out Edge edge))
                 {
                     ECB.AddComponent<Updated>(index, edge.m_Start);
                     ECB.AddComponent<Updated>(index, edge.m_End);
@@ -139,7 +139,7 @@ namespace EasyZoning.Tools
 
             public void Execute(int index)
             {
-                var entity = Entities[index];
+                Entity entity = Entities[index];
                 if (entity == Entity.Null)
                     return;
 
@@ -149,7 +149,7 @@ namespace EasyZoning.Tools
                     ECB.AddComponent<BatchesUpdated>(index, entity);
                 }
 
-                if (EdgeLookup.TryGetComponent(entity, out var edge))
+                if (EdgeLookup.TryGetComponent(entity, out Edge edge))
                 {
                     ECB.AddComponent<Updated>(index, edge.m_Start);
                     ECB.AddComponent<Updated>(index, edge.m_End);

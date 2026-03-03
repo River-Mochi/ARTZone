@@ -89,11 +89,7 @@
 
 	<!-- AUTO UPDATE PublishConfiguration ModVersion using CSPROJ Version number
 		 remove bom, make EOL=CRLF, and left-align text -->
-	<Target Name="UpdatePublishConfigVersion"
-			BeforeTargets="Build"
-			Condition="'$(Configuration)' == 'Release'
-                  AND Exists('$(MSBuildProjectDirectory)\Scripts\Update-PublishConfig.ps1')
-                  AND Exists('$(MSBuildProjectDirectory)\$(PublishConfigurationPath)')">
+	<Target Name="UpdatePublishConfigVersion" BeforeTargets="Build" Condition="'$(Configuration)' == 'Release'&#xD;&#xA;                  AND Exists('$(MSBuildProjectDirectory)\Scripts\Update-PublishConfig.ps1')&#xD;&#xA;                  AND Exists('$(MSBuildProjectDirectory)\$(PublishConfigurationPath)')">
 
 		<Message Text="EZ PublishConfig: syncing ModVersion + normalizing EOL/BOM + left-align blocks..." Importance="high" />
 
@@ -103,55 +99,33 @@
 
 
 	<!-- Run npm ci AFTER C# build, only when needed (stamp-based) -->
-	<Target Name="NpmInstallIfNeeded"
-	        AfterTargets="Build"
-	        Condition="'$(RunEZUIBuild)'=='true'
-	                  AND Exists('$(ProjectDir)UI\package.json')
-	                  AND Exists('$(ProjectDir)UI\package-lock.json')"
-	        Inputs="$(ProjectDir)UI\package-lock.json"
-	        Outputs="$(ProjectDir)UI\node_modules\.stamp">
+	<Target Name="NpmInstallIfNeeded" AfterTargets="Build" Condition="'$(RunEZUIBuild)'=='true'&#xD;&#xA;	                  AND Exists('$(ProjectDir)UI\package.json')&#xD;&#xA;	                  AND Exists('$(ProjectDir)UI\package-lock.json')" Inputs="$(ProjectDir)UI\package-lock.json" Outputs="$(ProjectDir)UI\node_modules\.stamp">
 
 		<Message Text="EZ UI: npm ci (first-time or lockfile changed)..." Importance="high" />
 
-		<Exec Command="npm ci"
-		      WorkingDirectory="$(ProjectDir)UI"
-		      IgnoreExitCode="true"
-		      Timeout="$(EZNpmCiTimeoutMs)">
+		<Exec Command="npm ci" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true" Timeout="$(EZNpmCiTimeoutMs)">
 			<Output TaskParameter="ExitCode" PropertyName="NpmCiExit" />
 		</Exec>
 
 		<!-- Release: fail hard. Debug: warn only. -->
-		<Error Condition="'$(Configuration)'=='Release' AND '$(NpmCiExit)'!='0'"
-		       Text="EZ UI: 'npm ci' failed (exit $(NpmCiExit)). Release build aborted." />
-		<Warning Condition="'$(Configuration)'=='Debug' AND '$(NpmCiExit)'!='0'"
-		         Text="EZ UI: 'npm ci' failed (exit $(NpmCiExit)). Continuing (Debug)." />
+		<Error Condition="'$(Configuration)'=='Release' AND '$(NpmCiExit)'!='0'" Text="EZ UI: 'npm ci' failed (exit $(NpmCiExit)). Release build aborted." />
+		<Warning Condition="'$(Configuration)'=='Debug' AND '$(NpmCiExit)'!='0'" Text="EZ UI: 'npm ci' failed (exit $(NpmCiExit)). Continuing (Debug)." />
 
 		<!-- Stamp written only on success; skip npm ci until lockfile changes again -->
-		<WriteLinesToFile Condition="'$(NpmCiExit)' == '0'"
-		                  File="$(ProjectDir)UI\node_modules\.stamp"
-		                  Lines="ok"
-		                  Overwrite="true" />
+		<WriteLinesToFile Condition="'$(NpmCiExit)' == '0'" File="$(ProjectDir)UI\node_modules\.stamp" Lines="ok" Overwrite="true" />
 	</Target>
 
 	<!-- Always run the UI bundle AFTER C# build; runs after NpmInstallIfNeeded -->
-	<Target Name="BuildUI"
-	        AfterTargets="Build"
-	        DependsOnTargets="NpmInstallIfNeeded"
-	        Condition="'$(RunEZUIBuild)'=='true' AND Exists('$(ProjectDir)UI\package.json')">
+	<Target Name="BuildUI" AfterTargets="Build" DependsOnTargets="NpmInstallIfNeeded" Condition="'$(RunEZUIBuild)'=='true' AND Exists('$(ProjectDir)UI\package.json')">
 
 		<Message Text="EZ UI: npm run build ($(Configuration))..." Importance="high" />
 
-		<Exec Command="npm run build"
-		      WorkingDirectory="$(ProjectDir)UI"
-		      IgnoreExitCode="true"
-		      Timeout="$(EZNpmBuildTimeoutMs)">
+		<Exec Command="npm run build" WorkingDirectory="$(ProjectDir)UI" IgnoreExitCode="true" Timeout="$(EZNpmBuildTimeoutMs)">
 			<Output TaskParameter="ExitCode" PropertyName="NpmBuildExit" />
 		</Exec>
 
 		<!-- Release: fail hard. Debug: warn only. -->
-		<Error Condition="'$(Configuration)'=='Release' AND '$(NpmBuildExit)'!='0'"
-		       Text="EZ UI: 'npm run build' failed (exit $(NpmBuildExit)). Release build aborted." />
-		<Warning Condition="'$(Configuration)'=='Debug' AND '$(NpmBuildExit)'!='0'"
-		         Text="EZ UI: 'npm run build' failed (exit $(NpmBuildExit)). Continuing (Debug)." />
+		<Error Condition="'$(Configuration)'=='Release' AND '$(NpmBuildExit)'!='0'" Text="EZ UI: 'npm run build' failed (exit $(NpmBuildExit)). Release build aborted." />
+		<Warning Condition="'$(Configuration)'=='Debug' AND '$(NpmBuildExit)'!='0'" Text="EZ UI: 'npm run build' failed (exit $(NpmBuildExit)). Continuing (Debug)." />
 	</Target>
 </Project>

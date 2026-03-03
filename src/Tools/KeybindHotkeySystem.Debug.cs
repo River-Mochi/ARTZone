@@ -6,39 +6,46 @@
 #if DEBUG
 namespace EasyZoning.Tools
 {
+    using Game.Input;
+    using System;
     using System.Collections;
     using System.Reflection;
-    using Game.Input;
 
     public sealed partial class KeybindHotkeySystem
     {
-        partial void DebugInit()
+        partial void DebugInit( )
         {
             Dbg("Created; hotkeys wired (DEBUG build).");
-            DumpInputActions();
+
+
+            if (m_Toggle == null)
+            {
+                Dbg("Toggle action is null; dumping InputManager actions for debugging.");
+                DumpInputActions();
+            }
+
         }
 
-        private static void DumpInputActions()
+        private static void DumpInputActions( )
         {
             try
             {
-                var imType = typeof(InputManager);
+                Type imType = typeof(InputManager);
 
-                var instanceProp = imType.GetProperty("instance", BindingFlags.Public | BindingFlags.Static);
+                PropertyInfo instanceProp = imType.GetProperty("instance", BindingFlags.Public | BindingFlags.Static);
                 object? inputManager = instanceProp?.GetValue(null);
                 if (inputManager == null)
                     return;
 
-                var actionsField = imType.GetField("m_Actions", BindingFlags.NonPublic | BindingFlags.Instance);
+                FieldInfo actionsField = imType.GetField("m_Actions", BindingFlags.NonPublic | BindingFlags.Instance);
                 if (actionsField == null)
                     return;
 
-                var dict = actionsField.GetValue(inputManager) as IDictionary;
-                if (dict == null)
+                if (actionsField.GetValue(inputManager) is not IDictionary dict)
                     return;
 
                 int shown = 0;
-                foreach (var key in dict.Keys)
+                foreach (object? key in dict.Keys)
                 {
                     if (shown++ > 25)
                         break;

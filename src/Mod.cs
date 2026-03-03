@@ -52,6 +52,7 @@ namespace EasyZoning
         private const string BuildTag = "[RELEASE]";
 #endif
 
+        // create Mod specific log file.
         public static readonly ILog s_Log =
             LogManager.GetLogger(ModID).SetShowsErrorsInUI(
 #if DEBUG
@@ -233,7 +234,7 @@ namespace EasyZoning
 #if DEBUG
                 if (!string.Equals(id, s_LastLocaleId, StringComparison.Ordinal))
                 {
-                    LogSafe(() => "[EZ] Active locale = " + id);
+                    LogSafe(( ) => "[EZ] Active locale = " + id);
                     s_LastLocaleId = id;
                 }
 #endif

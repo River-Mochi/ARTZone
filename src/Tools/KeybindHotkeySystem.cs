@@ -1,11 +1,12 @@
 // File: src/Tools/KeybindHotkeySystem.cs
-// Purpose: Ctrl+Z (or rebound) toggles EasyZoning.ZoningTool on/off.
+// Purpose: Ctrl+Z toggles EasyZoning.ZoningTool on/off.
 // Notes:   RMB preview flip is handled inside ZoningControllerToolSystem via cancelAction.
 //          Debug-only helpers live in KeybindHotkeySystem.Debug.cs.
 
 
 namespace EasyZoning.Tools
 {
+    using Colossal.Logging;
     using Game;
     using Game.Input;
     using Game.Tools;
@@ -20,7 +21,7 @@ namespace EasyZoning.Tools
         {
             try
             {
-                var log = Mod.s_Log;
+                ILog log = Mod.s_Log;
                 if (log != null)
                     log.Info("[EZ][Hotkeys] " + message);
             }
@@ -44,11 +45,14 @@ namespace EasyZoning.Tools
 
         protected override void OnUpdate( )
         {
-            var toggle = m_Toggle;
+            if (m_Toggle == null)
+                m_Toggle = Mod.ToggleToolAction;
+
+            ProxyAction? toggle = m_Toggle;
             if (toggle == null || !toggle.WasPressedThisFrame())
                 return;
 
-            var toolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
+            ToolSystem toolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
             bool willEnable =
                 toolSystem != null &&
                 m_Tool != null &&

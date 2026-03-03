@@ -12,7 +12,7 @@ namespace EasyZoning
     using System;
     using UnityEngine;
 
-    // Persisted settings location (rebranded)
+    // Persisted settings location
     [FileLocation("ModsSettings/EasyZoning/EasyZoning")]
 
     // Tabs & groups
