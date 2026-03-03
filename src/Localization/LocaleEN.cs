@@ -1,4 +1,4 @@
-// File: src/Localization/LocaleEN.cs
+﻿// File: src/Localization/LocaleEN.cs
 // Purpose: English (en-US) strings for Options UI + Panel text.
 
 namespace EasyZoning
@@ -16,7 +16,7 @@ namespace EasyZoning
             IList<IDictionaryEntryError> errors,
             Dictionary<string, int> indexCounts)
         {
-            var d = new Dictionary<string, string>
+            Dictionary<string, string> d = new Dictionary<string, string>
             {
                 // Options title (single source of truth from Mod.cs)
                 { m_Settings.GetSettingsLocaleID(), Mod.ModName + " " + Mod.ModTag },
@@ -58,10 +58,9 @@ namespace EasyZoning
                     "Both → Left → Right → None → ...\n\n" +
                     "Faster, less need to move mouse back to the panel.\n\n" +
 
-                    "When **ON**, then the RMB toggles in two separate sets:\n" +
+                    "When **ON** - enabled: the RMB toggles in two separate sets either:\n" +
                     "Left ↔ Right\n" +
-                    "Both ↔ None\n" +
-                    "Must move mouse back to switch icons, but less risk of using both/none if you only use Left/Right."
+                    "Both ↔ None"
 
                 },
 
