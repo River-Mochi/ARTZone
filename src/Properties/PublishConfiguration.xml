@@ -91,9 +91,8 @@ No outline means it's already changed to the current selected option.
 
 <!-- Changelog -->
 <ChangeLog>
-- updated RMB 4-cycle mode: **Both → Left → Right → None**
-- update images
-- updated locales
+- Existing roads: right-click 4-cycle now better, uses CS2's own tool action input for 4 states: (**Both → Left → Right → None**).
+- internal refactor and performance tweak.
 </ChangeLog>
 
 	<!-- External links -->

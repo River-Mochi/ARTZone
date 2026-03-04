@@ -1,6 +1,7 @@
 // File: src/UI/src/mods/ez-zone-tool-button.tsx
-// Purpose: Floating GameTopLeft launcher button (icon + tooltip).
-//          Triggers ToggleZoneControllerTool on the C# side.
+// Purpose:
+//   Floating GameTopLeft launcher button (icon + tooltip).
+//   Click triggers ToggleZoneControllerTool on the C# side.
 
 import React from "react";
 import { Button } from "cs2/ui";
@@ -15,7 +16,7 @@ import MainIconPath from "../../images/ico-zones-color02.svg";
 
 export default function EZZoneToolButton() {
     const { translate } = useLocalization();
-// Tooltip on GTL button.
+
     const title = translate("EasyZoning.Zone_Controller.ToolName", "Easy Zoning");
     const description = translate(
         "EasyZoning.Zone_Controller.ToolDescription",
@@ -24,10 +25,11 @@ export default function EZZoneToolButton() {
 
     const handleClick = () => {
         trigger(mod.id, "ToggleZoneControllerTool");
+
+        // For devtools tracing (localhost:9444)
         try {
             console.log("[EZ][UI] GameTopLeft button → ToggleZoneControllerTool");
         } catch {
-            // Ignore console failures
         }
     };
 

@@ -2,14 +2,13 @@
 // Purpose: Dev-only diagnostics for KeybindHotkeySystem.
 //          Adds DebugInit() and reflection-based inspection of InputManager.
 
-
 #if DEBUG
 namespace EasyZoning.Tools
 {
-    using Game.Input;
-    using System;
-    using System.Collections;
-    using System.Reflection;
+    using Game.Input;           // InputManager
+    using System;               // Type
+    using System.Collections;   // IDictionary
+    using System.Reflection;    // BindingsFlags, PropertyInfo, FieldInfo
 
     public sealed partial class KeybindHotkeySystem
     {
@@ -17,13 +16,11 @@ namespace EasyZoning.Tools
         {
             Dbg("Created; hotkeys wired (DEBUG build).");
 
-
             if (m_Toggle == null)
             {
                 Dbg("Toggle action is null; dumping InputManager actions for debugging.");
                 DumpInputActions();
             }
-
         }
 
         private static void DumpInputActions( )

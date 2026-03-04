@@ -1,15 +1,13 @@
 // File: src/Tools/KeybindHotkeySystem.cs
 // Purpose: Ctrl+Z toggles EasyZoning.ZoningTool on/off.
-// Notes:   RMB preview flip is handled inside ZoningControllerToolSystem via cancelAction.
+// Notes:   RMB cycling is handled inside ZoningControllerToolSystem (Mouse.current right button).
 //          Debug-only helpers live in KeybindHotkeySystem.Debug.cs.
-
 
 namespace EasyZoning.Tools
 {
-    using Colossal.Logging;
-    using Game;
-    using Game.Input;
-    using Game.Tools;
+    using Game;         // GameSystembase
+    using Game.Input;   // ProxyAction
+    using Game.Tools;   // ToolSystem
 
     public sealed partial class KeybindHotkeySystem : GameSystemBase
     {
@@ -21,7 +19,7 @@ namespace EasyZoning.Tools
         {
             try
             {
-                ILog log = Mod.s_Log;
+                Colossal.Logging.ILog log = Mod.s_Log;
                 if (log != null)
                     log.Info("[EZ][Hotkeys] " + message);
             }

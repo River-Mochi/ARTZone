@@ -1,16 +1,17 @@
 // File: src/Settings/Setting.cs
-// Purpose: Options UI + One rebindable entry (Ctrl+Z).
-// Note: RMB is *not* declared here; the Game’s own RMB/cancel bindings remain vanilla.
-// Later in the tool, the RMB is read for preview cycle.
+// Purpose: Options UI + one rebindable hotkey (Ctrl+Z).
+// Notes:
+//   - Only Ctrl+Z is declared here (Options → Keybindings).
+//   - RMB is NOT declared here; the tool uses CS2's built-in Secondary Apply to cycle.
 
 namespace EasyZoning
 {
-    using Colossal.IO.AssetDatabase;
-    using Game.Input;
-    using Game.Modding;
-    using Game.Settings;
-    using System;
-    using UnityEngine;
+    using Colossal.IO.AssetDatabase; // FileLocation attribute (settings storage path)
+    using Game.Input;                // ProxyBinding, BindingKeyboard, ActionType
+    using Game.Modding;              // IMod, ModSetting base
+    using Game.Settings;             // Settings UI attributes (tabs/groups/sections/buttons)
+    using System;                    // Exception in URL open handlers
+    using UnityEngine;               // Application.OpenURL
 
     // Persisted settings location
     [FileLocation("ModsSettings/EasyZoning/EasyZoning")]
@@ -20,7 +21,7 @@ namespace EasyZoning
     [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup, kLegacyGroup, kAboutInfoGroup, kAboutLinksGroup)]
     [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup, kLegacyGroup)]
 
-    // Declare ONLY the keyboard action (Ctrl+Z). RMB is vanilla cancelAction.
+    // Declare ONLY the keyboard action (Ctrl+Z). RMB uses the game’s built-in Secondary Apply action.
     [SettingsUIKeyboardAction(Mod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
     public sealed class Setting : ModSetting
     {

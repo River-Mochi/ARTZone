@@ -3,13 +3,13 @@
 
 namespace EasyZoning.Tools
 {
-    using Game;
-    using Game.Common;
-    using Game.Net;
-    using Game.Tools;
-    using Unity.Collections;
-    using Unity.Entities;
-    using Unity.Jobs;
+    using Game;                     // GameSystemBase
+    using Game.Common;              // Updated, BatchesUpdated
+    using Game.Net;                 // Edge (for endpoints)
+    using Game.Tools;               // ToolOutputBarrier
+    using Unity.Collections;        // NativeList, NativeArray
+    using Unity.Entities;           // ComponentLookup, ECB, Entity
+    using Unity.Jobs;               // IJobParallelFor, JobHandle
 
     public partial class ToolHighlightSystem : GameSystemBase
     {

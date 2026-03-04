@@ -1,9 +1,13 @@
 // File: src/UI/src/index.tsx
 // Purpose: Hook the UI into vanilla, register top-left button + Tool Options
 // section, and keep the options panel visible when the zoning tool is active.
+// To Launch game in UI development mode (include --uiDeveloperMode in the launch options)
+// - Access the dev tools by opening localhost:9444 in chrome browser.
+// - use the useModding() hook to access exposed UI, api and native coherent engine interfaces.
 
 import type { ModRegistrar, ModuleRegistry } from "cs2/modding";
 import { VanillaComponentResolver } from "./components/VanillaComponentResolver";
+import mod from "mod.json";
 
 import EasyZoningToolButton from "./mods/ez-zone-tool-button";
 import { ZoningToolController } from "./mods/ez-zoneToolSections";
@@ -29,7 +33,8 @@ const VANILLA = {
     },
 };
 
-// Helper: extend a vanilla module export with error guarding.
+// Helper: registry.extend can throw if a vanilla path/export changes after a game patch.
+// Keeps the mod from breaking the entire UI when a single hook fails.
 function extendSafe(
     registry: ModuleRegistry,
     modulePath: string,
@@ -39,22 +44,17 @@ function extendSafe(
     try {
         registry.extend(modulePath, exportId, extension);
     } catch (err) {
-        try {
-            console.error(`[EZ][UI] extend failed for ${modulePath}#${exportId}`, err);
-        } catch {
-            // Ignore console failures
-        }
+        console.error(`[EZ][UI] extend failed for ${modulePath}#${exportId}`, err);
     }
 }
 
 const register: ModRegistrar = (moduleRegistry) => {
-    // Inject ModuleRegistry into the resolver singleton. setRegistry must come before use of VanillaComponentResolver.
     VanillaComponentResolver.setRegistry(moduleRegistry);
 
-    // Floating button in GameTopLeft that toggles the zoning controller tool.
+    console.log(mod.id + " UI module registrations started.");
+
     moduleRegistry.append("GameTopLeft", EasyZoningToolButton);
 
-    // Inject custom Tool Options section + visibility rules.
     extendSafe(
         moduleRegistry,
         VANILLA.MouseToolOptions.path,
@@ -67,6 +67,8 @@ const register: ModRegistrar = (moduleRegistry) => {
         VANILLA.ToolOptionsPanelVisible.exportId,
         ToolOptionsVisibility
     );
+
+    console.log(mod.id + " UI module registration completed.");
 };
 
 export default register;

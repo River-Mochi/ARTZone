@@ -2,12 +2,13 @@
 // Purpose: Holds temporary preview depths (left/right) while hovering / previewing.
 // Preview = temporary overlay, Depth = real stored setting.
 
+
 namespace EasyZoning.Components
 {
-    using Colossal.Serialization.Entities;
-    using System;
-    using Unity.Entities;
-    using Unity.Mathematics;
+    using Colossal.Serialization.Entities; // ISerializable, IWriter/IReader for save/load
+    using System;                          // IEquatable
+    using Unity.Entities;                  // IComponentData
+    using Unity.Mathematics;               // int2
 
     /// <summary>
     /// Live preview depths (hover/flip) for a road entity.
@@ -32,7 +33,7 @@ namespace EasyZoning.Components
 
         public int2 Depths
         {
-            get => new int2(depthLeft, depthRight);
+            readonly get => new int2(depthLeft, depthRight);
             set
             {
                 depthLeft = value.x;
@@ -40,10 +41,10 @@ namespace EasyZoning.Components
             }
         }
 
-        public bool Equals(ZoningDepthComponent other) =>
+        public readonly bool Equals(ZoningDepthComponent other) =>
             other.depthLeft == depthLeft && other.depthRight == depthRight;
 
-        public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
+        public readonly void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
         {
             writer.Write(depthLeft);
             writer.Write(depthRight);

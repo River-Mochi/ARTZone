@@ -2,24 +2,26 @@
 // Purpose: Mod entrypoint; registers settings, localization, ECS systems, keybindings, and locale-change hooks.
 // Notes:
 //   • Locales install before Options UI so labels render correctly.
-//   • RMB flip stays vanilla (ToolBaseSystem.cancelAction) — no custom binding.
+//   • Existing-roads tool uses the game tool actions:
+//     - LMB = Apply
+//     - RMB = Secondary Apply (4 cycles mode)
+//     - ESC = explicit Keyboard cancel (because vanilla Cancel is often bound to RMB).
 //   • Top-left button points at coui://ui-mods/images/* assets.
 
 namespace EasyZoning
 {
-    using Colossal;                  // IDictionarySource
+    using Colossal;                  // IDictionarySource (locale sources)
     using Colossal.IO.AssetDatabase; // AssetDatabase.LoadSettings
-    using Colossal.Localization;     // LocalizationManager
-    using Colossal.Logging;          // ILog, LogManager
-    using CS2HonuShared;             // LogUtils
-    using EasyZoning.Tools;          // ECS systems
+    using Colossal.Localization;     // LocalizationManager (locale sources + change hook)
+    using Colossal.Logging;          // ILog, LogManager (mod log)
+    using CS2HonuShared;             // LogUtils (safe logging + WarnOnce)
+    using EasyZoning.Tools;          // ECS systems scheduled by UpdateSystem
     using Game;                      // UpdateSystem, SystemUpdatePhase
-    using Game.Input;                // ProxyAction
+    using Game.Input;                // ProxyAction (Ctrl+Z action)
     using Game.Modding;              // IMod
-    using Game.SceneFlow;            // GameManager
+    using Game.SceneFlow;            // GameManager (localization manager access)
     using System;                    // Exception, Func<T>, StringComparison
-    using System.Reflection;         // Assembly
-    using static Game.UI.Menu.AssetUploadPanelUISystem;
+    using System.Reflection;         // Assembly (version number from csproj)
 
     public sealed class Mod : IMod
     {
@@ -38,7 +40,7 @@ namespace EasyZoning
         // COUI base
         public const string UiCouiRoot = "coui://ui-mods";
 
-        // Top-left floating action button (color)
+        // Top-left floating action button
         public const string MainIconPath = UiCouiRoot + "/images/ico-zones-color02.svg";
 
         // Rebindable action ID exposed in Options UI
@@ -155,7 +157,7 @@ namespace EasyZoning
             // ECS systems
             try
             {
-                // Tool logic: selection and apply.
+                // Tool logic: selection and apply (only runs when tool is active).
                 updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
 
                 // Visual highlight for blocks under the tool.
@@ -167,8 +169,8 @@ namespace EasyZoning
                 // Existing-block sync: apply tool depths to zone blocks on existing roads.
                 updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
 
-                // Cohtml UI bridge for the EZ panel.
-                updateSystem.UpdateAt<ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
+                // UI bridge: binds C# values to the React UI (runs every frame in UIUpdate).
+                updateSystem.UpdateAt<ZoneControlBridgeUI>(SystemUpdatePhase.UIUpdate);
 
                 // Hotkey system that listens to ToggleZoneTool (CTRL+Z).
                 updateSystem.UpdateAt<KeybindHotkeySystem>(SystemUpdatePhase.ToolUpdate);
