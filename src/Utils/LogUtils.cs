@@ -8,9 +8,9 @@
 
 namespace CS2HonuShared
 {
-    using Colossal.Logging;
-    using System;
-    using System.Collections.Generic;
+    using Colossal.Logging;               // ILog + Level
+    using System;                         // Exception, Func<T>, StringComparer
+    using System.Collections.Generic;     // HashSet<T>
 
     public static class LogUtils
     {

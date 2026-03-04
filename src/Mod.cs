@@ -7,18 +7,19 @@
 
 namespace EasyZoning
 {
-    using Colossal;                  // IDictionarySource
+    using Colossal;                  // IDictionarySource (locale sources)
     using Colossal.IO.AssetDatabase; // AssetDatabase.LoadSettings
-    using Colossal.Localization;     // LocalizationManager
-    using Colossal.Logging;          // ILog, LogManager
-    using CS2HonuShared;             // LogUtils
-    using EasyZoning.Tools;          // ECS systems
+    using Colossal.Localization;     // LocalizationManager (locale sources + change hook)
+    using Colossal.Logging;          // ILog, LogManager (mod log)
+    using CS2HonuShared;             // LogUtils (safe logging + WarnOnce)
+    using EasyZoning.Tools;          // ECS systems scheduled by UpdateSystem
     using Game;                      // UpdateSystem, SystemUpdatePhase
-    using Game.Input;                // ProxyAction
+    using Game.Input;                // ProxyAction (Ctrl+Z action)
     using Game.Modding;              // IMod
-    using Game.SceneFlow;            // GameManager
+    using Game.SceneFlow;            // GameManager (localization manager access)
     using System;                    // Exception, Func<T>, StringComparison
-    using System.Reflection;         // Assembly
+    using System.Reflection;         // Assembly (version number from csproj)
+
 
     public sealed class Mod : IMod
     {

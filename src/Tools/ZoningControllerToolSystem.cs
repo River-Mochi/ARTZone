@@ -241,7 +241,8 @@ namespace EasyZoning.Tools
                     AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
             }
 
-            // ESC cancel: explicit key read so RMB stays dedicated to cycling.
+            // NOTE: Escape is read via Keyboard.current because the tool's Cancel action is often bound to RMB in vanilla.
+            // Keeping Escape explicit prevents RMB-cycle from accidental cancel trigger and stays dedicated to 4-cycle.
             bool escapePressed = false;
             try
             {
