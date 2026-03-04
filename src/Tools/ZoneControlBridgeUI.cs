@@ -1,15 +1,16 @@
 // File: src/Tools/ZoneControlBridgeUI.cs
 // Purpose:
-//   - Expose UI bindings consumed by the React UI
-//     (ToolZoningMode, RoadZoningMode, IsZonableRoadPrefab, ContourEnabled).
+//   - Expose UI bindings consumed by React
+//     (ToolZoningMode, RoadZoningMode, IsZonableRoadPrefab, ContourEnabled, IsPhotoMode).
 //   - Track tool/prefab changes for section visibility.
-// Notes:
-//   - Trigger handlers live in ZoneControlBridgeUI.Actions.cs.
+//   - Safety latch: when Photo Mode turns ON, disable EZ tool once if it is active.
+// Notes: Trigger handlers live in ZoneControlBridgeUI.Actions.cs.
 
 namespace EasyZoning.Tools
 {
-    using Colossal.UI.Binding;      // ValueBinding, TriggerBinding
+    using Colossal.UI.Binding;      // ValueBinding, TriggerBinding, GetterValueBinding
     using Game.Prefabs;             // PrefabBase, RoadPrefab
+    using Game.Rendering;           // PhotoModeRenderSystem
     using Game.Tools;               // ToolSystem, ToolBaseSystem
     using Game.UI;                  // UISystemBase
     using Unity.Mathematics;        // int2
@@ -23,6 +24,9 @@ namespace EasyZoning.Tools
 
         private ToolSystem m_MainToolSystem = null!;
         private ZoningControllerToolSystem m_ZoningTool = null!;
+        private PhotoModeRenderSystem m_PhotoModeSystem = null!;
+
+        private bool m_LastPhotoModeEnabled;
 
         public ZoningMode ToolZoningMode => (ZoningMode) m_ToolZoningMode.value;
         public ZoningMode RoadZoningMode => (ZoningMode) m_RoadZoningMode.value;
@@ -107,6 +111,13 @@ namespace EasyZoning.Tools
             AddBinding(m_ContourEnabled =
                 new ValueBinding<bool>(Mod.ModID, "ContourEnabled", false));
 
+            // Photo Mode binding (used by UI; also used internally for the safety latch).
+            m_PhotoModeSystem = World.GetOrCreateSystemManaged<PhotoModeRenderSystem>();
+            AddUpdateBinding(new GetterValueBinding<bool>(
+                Mod.ModID,
+                "IsPhotoMode",
+                ( ) => m_PhotoModeSystem != null && m_PhotoModeSystem.Enabled));
+
             // Triggers from UI (handlers are in ZoneControlBridgeUI.Actions.cs)
             AddBinding(new TriggerBinding<int>(Mod.ModID, "ChangeRoadZoningMode", ChangeRoadZoningMode));
             AddBinding(new TriggerBinding<int>(Mod.ModID, "ChangeToolZoningMode", ChangeToolZoningMode));
@@ -134,6 +145,16 @@ namespace EasyZoning.Tools
             }
             catch { }
 
+            // Initialize photo mode edge tracking.
+            try
+            {
+                m_LastPhotoModeEnabled = m_PhotoModeSystem != null && m_PhotoModeSystem.Enabled;
+            }
+            catch
+            {
+                m_LastPhotoModeEnabled = false;
+            }
+
             // Init visibility once.
             try
             {
@@ -154,7 +175,7 @@ namespace EasyZoning.Tools
                 m_IsZonableRoadPrefab.Update(show);
 
 #if DEBUG
-                Dbg($"Init visibility → show={show}, tool={(activeTool != null ? activeTool.GetType().Name : "(null)")}, prefab={(activePrefab != null ? activePrefab.name : "(null)")}"); 
+                Dbg($"Init visibility → show={show}, tool={(activeTool != null ? activeTool.GetType().Name : "(null)")}, prefab={(activePrefab != null ? activePrefab.name : "(null)")}");
 #endif
             }
             catch { }
@@ -162,6 +183,42 @@ namespace EasyZoning.Tools
 #if DEBUG
             Dbg("ZoneControlBridgeUI created and bindings registered.");
 #endif
+        }
+
+        protected override void OnUpdate( )
+        {
+            base.OnUpdate();
+
+            bool photoModeEnabled;
+            try
+            {
+                photoModeEnabled = m_PhotoModeSystem != null && m_PhotoModeSystem.Enabled;
+            }
+            catch
+            {
+                photoModeEnabled = false;
+            }
+
+            // Photo Mode transition OFF -> ON: disable EZ tool once to avoid input/tool conflicts.
+            if (photoModeEnabled && !m_LastPhotoModeEnabled)
+            {
+                try
+                {
+                    ToolBaseSystem active = (m_MainToolSystem != null) ? m_MainToolSystem.activeTool : null!;
+                    if (active is ZoningControllerToolSystem && m_ZoningTool != null)
+                    {
+                        m_ZoningTool.SetToolEnabled(false);
+#if DEBUG
+                        Dbg("Photo Mode entered -> EZ tool disabled.");
+#endif
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            m_LastPhotoModeEnabled = photoModeEnabled;
         }
 
         protected override void OnDestroy( )
@@ -194,7 +251,7 @@ namespace EasyZoning.Tools
                 m_IsZonableRoadPrefab.Update(show);
 
 #if DEBUG
-                Dbg($"OnToolChanged: show={show} activeTool={(tool != null ? tool.GetType().Name : "(null)")} prefab={(prefab != null ? prefab.name : "(null)")}"); 
+                Dbg($"OnToolChanged: show={show} activeTool={(tool != null ? tool.GetType().Name : "(null)")} prefab={(prefab != null ? prefab.name : "(null)")}");
 #endif
             }
             catch { }
@@ -215,7 +272,7 @@ namespace EasyZoning.Tools
                 m_IsZonableRoadPrefab.Update(show);
 
 #if DEBUG
-                Dbg($"OnPrefabChanged: show={show} prefab={(prefab != null ? prefab.name : "(null)")} tool={(tool != null ? tool.GetType().Name : "(null)")}"); 
+                Dbg($"OnPrefabChanged: show={show} prefab={(prefab != null ? prefab.name : "(null)")} tool={(tool != null ? tool.GetType().Name : "(null)")}");
 #endif
             }
             catch { }

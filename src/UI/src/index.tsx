@@ -33,7 +33,8 @@ const VANILLA = {
     },
 };
 
-// Helper: extend a vanilla module export with error guarding.
+// Helper: registry.extend can throw if a vanilla path/export changes after a game patch.
+// Keeps the mod from breaking the entire UI when a single hook fails.
 function extendSafe(
     registry: ModuleRegistry,
     modulePath: string,
@@ -43,23 +44,17 @@ function extendSafe(
     try {
         registry.extend(modulePath, exportId, extension);
     } catch (err) {
-        try {
-            console.error(`[EZ][UI] extend failed for ${modulePath}#${exportId}`, err);
-        } catch {
-            // Ignore console failures
-        }
+        console.error(`[EZ][UI] extend failed for ${modulePath}#${exportId}`, err);
     }
 }
 
 const register: ModRegistrar = (moduleRegistry) => {
-    // Inject ModuleRegistry into the resolver singleton. setRegistry must come before use of VanillaComponentResolver.
     VanillaComponentResolver.setRegistry(moduleRegistry);
+
     console.log(mod.id + " UI module registrations started.");
 
-    // Floating button in GameTopLeft that toggles the zoning controller tool.
     moduleRegistry.append("GameTopLeft", EasyZoningToolButton);
 
-    // Inject custom Tool Options section + visibility rules.
     extendSafe(
         moduleRegistry,
         VANILLA.MouseToolOptions.path,
@@ -74,7 +69,6 @@ const register: ModRegistrar = (moduleRegistry) => {
     );
 
     console.log(mod.id + " UI module registration completed.");
-
 };
 
 export default register;

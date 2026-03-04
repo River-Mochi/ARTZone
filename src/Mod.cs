@@ -4,7 +4,7 @@
 //   • Locales install before Options UI so labels render correctly.
 //   • Existing-roads tool uses the game tool actions:
 //     - LMB = Apply
-//     - RMB = Secondary Apply (cycles mode)
+//     - RMB = Secondary Apply (4 cycles mode)
 //     - ESC = explicit Keyboard cancel (because vanilla Cancel is often bound to RMB).
 //   • Top-left button points at coui://ui-mods/images/* assets.
 
@@ -40,7 +40,7 @@ namespace EasyZoning
         // COUI base
         public const string UiCouiRoot = "coui://ui-mods";
 
-        // Top-left floating action button (color)
+        // Top-left floating action button
         public const string MainIconPath = UiCouiRoot + "/images/ico-zones-color02.svg";
 
         // Rebindable action ID exposed in Options UI
