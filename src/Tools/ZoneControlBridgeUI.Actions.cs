@@ -24,7 +24,7 @@ namespace EasyZoning.Tools
                     if (m_PhotoModeSystem != null && m_PhotoModeSystem.Enabled)
                     {
 #if DEBUG
-                Dbg("ToggleTool ignored (Photo Mode).");
+                        Dbg("ToggleTool ignored (Photo Mode).");
 #endif
                         return;
                     }
@@ -40,7 +40,7 @@ namespace EasyZoning.Tools
                 m_ZoningTool.SetToolEnabled(enable);
 
 #if DEBUG
-        Dbg($"ToggleTool → enable={enable}");
+                Dbg($"ToggleTool → enable={enable}");
 #endif
             }
             catch { }

@@ -58,7 +58,8 @@ namespace EasyZoning.Tools
             if (count != m_LastCount || (m_LogTick % 60) == 0)
             {
                 Mod.s_Log.Info(
-                    $"[EZ][SyncBlock] blocks={count} removeOcc={removeOccupied} removeZoned={removeZoned}");
+                    $"[EZ][SyncBlock] scan Updated blocks={count} (game-driven dirty flags are normal after load)\n " +
+                    $"settings: removeOcc={removeOccupied} removeZoned={removeZoned}");
                 m_LastCount = count;
             }
 #endif
