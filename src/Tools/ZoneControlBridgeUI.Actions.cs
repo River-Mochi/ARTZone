@@ -1,6 +1,6 @@
 // File: src/Tools/ZoneControlBridgeUI.Actions.cs
 // Purpose:
-//  • UI trigger handlers and small helper actions for ZoningControllerToolUISystem.
+//  • UI trigger handlers and small helper actions for ZoneControlBridgeUI.
 //  • Contains CycleMode() (RMB behavior) and toggle/apply UI bindings.
 
 namespace EasyZoning.Tools

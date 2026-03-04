@@ -15,7 +15,7 @@ import { VanillaComponentResolver } from "../components/VanillaComponentResolver
 // Icon emitted by webpack to coui://ui-mods/images/
 import MainIconPath from "../../images/ico-zones-color02.svg";
 
-// C# binding (ZoningControllerToolUISystem exposes IsPhotoMode)
+// C# binding (ZoneControlBridgeUI exposes IsPhotoMode)
 const IsPhotoMode$ = bindValue<boolean>(mod.id, "IsPhotoMode");
 
 export default function EZZoneToolButton() {

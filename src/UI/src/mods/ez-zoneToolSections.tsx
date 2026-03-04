@@ -41,7 +41,7 @@ const ToolZoningMode$ = bindValue<number>(mod.id, "ToolZoningMode");
 const IsZonableRoadPrefab$ = bindValue<boolean>(mod.id, "IsZonableRoadPrefab");
 const ContourEnabled$ = bindValue<boolean>(mod.id, "ContourEnabled");
 
-// C# binding (ZoningControllerToolUISystem exposes IsPhotoMode)
+// C# binding (ZoneControlBridgeUI exposes IsPhotoMode)
 const IsPhotoMode$ = bindValue<boolean>(mod.id, "IsPhotoMode");
 
 function setToolZoningMode(value: ZoningMode) {

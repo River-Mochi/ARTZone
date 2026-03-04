@@ -4,7 +4,7 @@
 //    (ToolZoningMode, RoadZoningMode, IsZonableRoadPrefab, IsPhotoMode, ContourEnabled).
 //  • Track tool/prefab changes for section visibility.
 // Notes:
-//  • Action/trigger handlers live in ZoningControllerToolUISystem.Actions.cs.
+//  • Action/trigger handlers live in ZoneControlBridgeUI.Actions.cs.
 
 namespace EasyZoning.Tools
 {
