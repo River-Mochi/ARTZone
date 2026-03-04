@@ -1,7 +1,8 @@
 // File: src/Settings/Setting.cs
-// Purpose: Options UI + One rebindable entry (Ctrl+Z).
-// Note: RMB is *not* declared here; the Game’s own RMB/cancel bindings remain vanilla.
-// Later in the tool, the RMB is read for preview cycle.
+// Purpose: Options UI + One rebindable hotkey (Ctrl+Z).
+// Note: RMB is not declared here.
+// RMB cycling is handled inside the tool by reading Mouse.current (Phase 1).
+// (Phase 2 may switch to ToolBaseSystem actions like secondaryApplyAction/cancelAction.)
 
 namespace EasyZoning
 {

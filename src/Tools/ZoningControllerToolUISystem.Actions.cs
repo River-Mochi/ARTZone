@@ -30,7 +30,7 @@ namespace EasyZoning.Tools
         {
             try
             {
-                var next = (ToolZoningMode == ZoningMode.Both) ? ZoningMode.None : ZoningMode.Both;
+                ZoningMode next = (ToolZoningMode == ZoningMode.Both) ? ZoningMode.None : ZoningMode.Both;
                 m_ToolZoningMode.Update((int) next);
 
 #if DEBUG
@@ -45,7 +45,7 @@ namespace EasyZoning.Tools
         {
             try
             {
-                var next = (RoadZoningMode == ZoningMode.Both) ? ZoningMode.None : ZoningMode.Both;
+                ZoningMode next = (RoadZoningMode == ZoningMode.Both) ? ZoningMode.None : ZoningMode.Both;
                 m_RoadZoningMode.Update((int) next);
 
 #if DEBUG
@@ -62,7 +62,7 @@ namespace EasyZoning.Tools
                 m_ToolZoningMode.Update(value);
 
 #if DEBUG
-                Dbg($"ChangeToolZoningMode → Tool={ModeToStr((ZoningMode)value)} rawValue={value}");
+                Dbg($"ChangeToolZoningMode → Tool={ModeToStr((ZoningMode) value)} rawValue={value}");
                 LogToolDepths("ChangeToolZoningMode");
 #endif
             }
@@ -76,7 +76,7 @@ namespace EasyZoning.Tools
                 m_RoadZoningMode.Update(value);
 
 #if DEBUG
-                Dbg($"ChangeRoadZoningMode → Road={ModeToStr((ZoningMode)value)} rawValue={value}");
+                Dbg($"ChangeRoadZoningMode → Road={ModeToStr((ZoningMode) value)} rawValue={value}");
 #endif
             }
             catch { }
@@ -98,14 +98,14 @@ namespace EasyZoning.Tools
 
         /// <summary>
         /// RMB cycle behavior for the update tool:
-        /// - Default (LegacyRightClickCycle OFF): Both → Left → Right → None → Both
+        /// - Default (LegacyRightClickCycle OFF): Both → Left → Right → None → ...
         /// - Legacy (LegacyRightClickCycle ON): Left ↔ Right, Both ↔ None
         /// </summary>
         public void CycleMode( )
         {
             try
             {
-                bool legacy = EasyZoning.Mod.Settings != null && EasyZoning.Mod.Settings.LegacyRightClickCycle;
+                bool legacy = Mod.Settings != null && Mod.Settings.LegacyRightClickCycle;
 
                 ZoningMode current = ToolZoningMode;
 
@@ -152,11 +152,11 @@ namespace EasyZoning.Tools
                 bool next = !ContourEnabled;
                 m_ContourEnabled.Update(next);
 
-                var toolSystem = m_MainToolSystem;
+                ToolSystem toolSystem = m_MainToolSystem;
                 if (toolSystem == null)
                     return;
 
-                var active = toolSystem.activeTool;
+                ToolBaseSystem active = toolSystem.activeTool;
                 if (active == null)
                     return;
 

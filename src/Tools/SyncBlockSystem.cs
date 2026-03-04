@@ -8,7 +8,7 @@ namespace EasyZoning.Tools
     using Game;
     using Game.Common;
     using Game.Zones;
-    using System;                  // NullReferenceException
+    using System;                  // InvalidOperationException
     using Unity.Collections;
     using Unity.Entities;
     using Unity.Jobs;
@@ -164,21 +164,38 @@ namespace EasyZoning.Tools
 
             private static bool IsAnyCellOccupied(DynamicBuffer<Cell> cells, Block block, ValidArea validArea)
             {
-                if (validArea.m_Area.y * validArea.m_Area.w == 0)
-                {
-                    return false;
-                }
+                int x0 = validArea.m_Area.x;
+                int x1 = validArea.m_Area.y;
+                int z0 = validArea.m_Area.z;
+                int z1 = validArea.m_Area.w;
 
-                for (int z = validArea.m_Area.z; z < validArea.m_Area.w; z++)
+                // Empty or invalid ranges.
+                if (x1 <= x0 || z1 <= z0)
+                    return false;
+
+                // Clamp to block bounds.
+                x0 = math.clamp(x0, 0, block.m_Size.x);
+                x1 = math.clamp(x1, 0, block.m_Size.x);
+                z0 = math.clamp(z0, 0, block.m_Size.y);
+                z1 = math.clamp(z1, 0, block.m_Size.y);
+
+                if (x1 <= x0 || z1 <= z0)
+                    return false;
+
+                int stride = block.m_Size.x;
+
+                for (int z = z0; z < z1; z++)
                 {
-                    for (int x = validArea.m_Area.x; x < validArea.m_Area.y; x++)
+                    int row = z * stride;
+                    for (int x = x0; x < x1; x++)
                     {
-                        int idx = z * block.m_Size.x + x;
+                        int idx = row + x;
+                        if ((uint) idx >= (uint) cells.Length)
+                            continue;
+
                         Cell cell = cells[idx];
                         if ((cell.m_State & CellFlags.Occupied) != 0)
-                        {
                             return true;
-                        }
                     }
                 }
 
@@ -187,26 +204,44 @@ namespace EasyZoning.Tools
 
             private static bool IsAnyCellZoned(DynamicBuffer<Cell> cells, Block block, ValidArea validArea)
             {
-                if (validArea.m_Area.y * validArea.m_Area.w == 0)
-                {
-                    return false;
-                }
+                int x0 = validArea.m_Area.x;
+                int x1 = validArea.m_Area.y;
+                int z0 = validArea.m_Area.z;
+                int z1 = validArea.m_Area.w;
 
-                for (int z = validArea.m_Area.z; z < validArea.m_Area.w; z++)
+                // Empty or invalid ranges.
+                if (x1 <= x0 || z1 <= z0)
+                    return false;
+
+                // Clamp to block bounds.
+                x0 = math.clamp(x0, 0, block.m_Size.x);
+                x1 = math.clamp(x1, 0, block.m_Size.x);
+                z0 = math.clamp(z0, 0, block.m_Size.y);
+                z1 = math.clamp(z1, 0, block.m_Size.y);
+
+                if (x1 <= x0 || z1 <= z0)
+                    return false;
+
+                int stride = block.m_Size.x;
+
+                for (int z = z0; z < z1; z++)
                 {
-                    for (int x = validArea.m_Area.x; x < validArea.m_Area.y; x++)
+                    int row = z * stride;
+                    for (int x = x0; x < x1; x++)
                     {
-                        int idx = z * block.m_Size.x + x;
+                        int idx = row + x;
+                        if ((uint) idx >= (uint) cells.Length)
+                            continue;
+
                         Cell cell = cells[idx];
                         if (cell.m_Zone.m_Index != ZoneType.None.m_Index)
-                        {
                             return true;
-                        }
                     }
                 }
 
                 return false;
             }
+
         }
     }
 }

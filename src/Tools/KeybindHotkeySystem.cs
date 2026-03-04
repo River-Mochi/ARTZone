@@ -1,8 +1,7 @@
 // File: src/Tools/KeybindHotkeySystem.cs
 // Purpose: Ctrl+Z toggles EasyZoning.ZoningTool on/off.
-// Notes:   RMB preview flip is handled inside ZoningControllerToolSystem via cancelAction.
+// Notes:   RMB cycling is handled inside ZoningControllerToolSystem (Mouse.current right button).
 //          Debug-only helpers live in KeybindHotkeySystem.Debug.cs.
-
 
 namespace EasyZoning.Tools
 {

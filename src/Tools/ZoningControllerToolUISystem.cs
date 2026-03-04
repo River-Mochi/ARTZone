@@ -8,6 +8,7 @@
 
 namespace EasyZoning.Tools
 {
+    using Colossal.Logging;
     using Colossal.UI.Binding;
     using Game.Prefabs;
     using Game.Rendering;
@@ -50,7 +51,7 @@ namespace EasyZoning.Tools
             get => DepthsFromMode(ToolZoningMode);
             set
             {
-                var mode = ZoningMode.None;
+                ZoningMode mode = ZoningMode.None;
                 if (value.x > 0)
                     mode |= ZoningMode.Left;
                 if (value.y > 0)
@@ -68,7 +69,7 @@ namespace EasyZoning.Tools
             get => DepthsFromMode(RoadZoningMode);
             set
             {
-                var mode = ZoningMode.None;
+                ZoningMode mode = ZoningMode.None;
                 if (value.x > 0)
                     mode |= ZoningMode.Left;
                 if (value.y > 0)
@@ -81,10 +82,14 @@ namespace EasyZoning.Tools
 #if DEBUG
         private static void Dbg(string msg)
         {
-            var log = Mod.s_Log;
+            ILog log = Mod.s_Log;
             if (log == null)
                 return;
-            try { log.Info("[EZ][UI] " + msg); } catch { }
+            try
+            {
+                log.Info("[EZ][UI] " + msg);
+            }
+            catch { }
         }
 
         private static string ModeToStr(ZoningMode z) =>
@@ -95,8 +100,8 @@ namespace EasyZoning.Tools
 
         private void LogToolDepths(string tag)
         {
-            var mode = ToolZoningMode;
-            var d = ToolDepths;
+            ZoningMode mode = ToolZoningMode;
+            int2 d = ToolDepths;
             Dbg($"{tag}: ToolZoningMode={ModeToStr(mode)} ToolDepths=({d.x},{d.y})");
         }
 #else

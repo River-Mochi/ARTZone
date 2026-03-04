@@ -32,7 +32,7 @@ namespace EasyZoning.Components
 
         public int2 Depths
         {
-            get => new int2(depthLeft, depthRight);
+            readonly get => new int2(depthLeft, depthRight);
             set
             {
                 depthLeft = value.x;
@@ -40,10 +40,10 @@ namespace EasyZoning.Components
             }
         }
 
-        public bool Equals(ZoningDepthComponent other) =>
+        public readonly bool Equals(ZoningDepthComponent other) =>
             other.depthLeft == depthLeft && other.depthRight == depthRight;
 
-        public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
+        public readonly void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
         {
             writer.Write(depthLeft);
             writer.Write(depthRight);
