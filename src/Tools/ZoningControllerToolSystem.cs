@@ -1,34 +1,37 @@
 // File: src/Tools/ZoningControllerToolSystem.cs
 // Purpose:
-//   Runtime tool. LMB selects and applies zoning depths to existing roads.
-//   Secondary Apply cycles current tool mode (Left/Right/Both/None) without applying.
-//   Preview reflects current tool mode for hovered segments.
+//   Runtime tool for updating zoning on EXISTING roads.
+//   - LMB select/drag/apply
+//   - RMB (Secondary Apply) cycles mode without applying
+//   - Hover preview highlights only when a change would occur
 //
 // Notes:
-//   - RMB is handled via secondaryApplyAction (CS2 UI tool system).
-//   - Escape cancel is read via Keyboard.current because vanilla Cancel is often RMB.
+//   - RMB uses secondaryApplyAction (CS2 tool action system).
+//   - ESC uses Keyboard.current because vanilla Cancel is commonly bound to RMB.
+//   - Updated component is only added when something actually changes (spam reduction).
 
 namespace EasyZoning.Tools
 {
-    using EasyZoning.Components;
-    using Game;
-    using Game.Audio;
-    using Game.Common;
-    using Game.Net;
-    using Game.Prefabs;
-    using Game.Tools;
-    using Game.Zones;
-    using Unity.Collections;
-    using Unity.Entities;
-    using Unity.Jobs;
-    using Unity.Mathematics;
-    using UnityEngine.InputSystem;
+    using EasyZoning.Components;     // ZoningPreviewComponent, ZoningDepthComponent
+    using Game.Audio;                // ToolUXSoundSettingsData, AudioManager
+    using Game.Common;               // Updated
+    using Game.Net;                  // Layer
+    using Game.Prefabs;              // PrefabBase
+    using Game.Tools;                // ToolBaseSystem, ToolSystem, RaycastHit, ToolOutputBarrier
+    using Game.Zones;                // Sublock
+    using Unity.Collections;         // NativeArray, NativeList, Allocator
+    using Unity.Entities;            // Entity, EntityQuery, ComponentLookup, BufferLookup, ECB
+    using Unity.Jobs;                // JobHandle, IJob, IJobParallelFor
+    using Unity.Mathematics;         // int2, math
+    using UnityEngine.InputSystem;   // Keyboard (ESC cancel)
 
     public partial class ZoningControllerToolSystem : ToolBaseSystem
     {
         public const string ToolID = "EasyZoning.ZoningTool";
         public override string toolID => ToolID;
 
+        // Vanilla zoning depth baseline (cells). If road has no ZoningDepthComponent,
+        // treat it as vanilla (6,6).
         private static readonly int2 kVanillaDepths = new int2(6, 6);
 
         private ToolOutputBarrier m_ToolOutputBarrier = null!;
@@ -43,6 +46,7 @@ namespace EasyZoning.Tools
 
         private PrefabBase m_ToolPrefab = null!;
 
+        // Selected/preview road entities for “drag to apply”.
         private NativeList<Entity> m_SelectedEntities;
 
         private enum Mode
@@ -57,11 +61,13 @@ namespace EasyZoning.Tools
         private Mode m_Mode;
         private Entity m_PreviewEntity;
 
-        // Intersection stability: require same candidate for N frames before switching preview.
+        // Preview stability: intersections can flicker between candidates.
+        // Require the same hit for N frames before switching the highlighted preview target.
         private Entity m_PendingPreviewEntity;
         private int m_PendingPreviewFrames;
         private const int StableSwitchFrames = 2;
 
+        // Current desired depths for the update tool (not the new-road tool).
         private int2 Depths => m_UISystem.ToolDepths;
 
 #if DEBUG
@@ -83,18 +89,22 @@ namespace EasyZoning.Tools
         {
             base.OnCreate();
 
+            // Barriers/systems used every frame while tool is active.
             m_ToolOutputBarrier = World.GetOrCreateSystemManaged<ToolOutputBarrier>();
             m_UISystem = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
             m_Highlight = World.GetOrCreateSystemManaged<ToolHighlightSystem>();
 
+            // Query used to clean up preview components when hover leaves.
             m_ZoningPreviewQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<ZoningPreviewComponent>()
                 .Build(this);
 
+            // Sound settings (vanilla UI tool sounds).
             m_SoundbankQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<ToolUXSoundSettingsData>()
                 .Build(this);
 
+            // Lookups updated per-frame in OnUpdate.
             m_SubBlockLookup = GetBufferLookup<SubBlock>(isReadOnly: true);
             m_ZoningDepthLookup = GetComponentLookup<ZoningDepthComponent>(isReadOnly: true);
 
@@ -115,16 +125,20 @@ namespace EasyZoning.Tools
 
             // Tool actions:
             // - Apply = LMB (select/drag/apply)
-            // - Secondary Apply = RMB (cycle)
-            // Cancel action is NOT used here (vanilla Cancel is commonly RMB).
+            // - Secondary Apply = RMB (cycle mode)
+            //
+            // Cancel action is NOT enabled here because vanilla Cancel is commonly RMB
+            // and we must keep RMB dedicated to “cycle mode”.
             applyAction.shouldBeEnabled = true;
             secondaryApplyAction.shouldBeEnabled = true;
             cancelAction.shouldBeEnabled = false;
 
+            // Limit raycast/interaction to roads + zoning.
             requireZones = true;
             requireNet = Layer.Road;
             allowUnderground = false;
 
+            // Contour snap option is controlled by UI toggle.
             bool contourOn = m_UISystem != null && m_UISystem.ContourEnabled;
             selectedSnap = contourOn
                 ? (Snap.All | Snap.ContourLines)
@@ -145,6 +159,7 @@ namespace EasyZoning.Tools
             requireNet = Layer.None;
             allowUnderground = false;
 
+            // Clear all highlight state and selections.
             for (int i = 0; i < m_SelectedEntities.Length; i++)
                 m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
 
@@ -168,6 +183,7 @@ namespace EasyZoning.Tools
         {
             base.GetAvailableSnapMask(out onMask, out offMask);
 
+            // Keep contour snap state consistent with the UI toggle.
             bool contourOn = m_UISystem != null && m_UISystem.ContourEnabled;
 
             if (contourOn)
@@ -186,17 +202,21 @@ namespace EasyZoning.Tools
         {
             inputDeps = Dependency;
 
+            // Update lookups used by filtering and apply logic.
             m_SubBlockLookup.Update(this);
             m_ZoningDepthLookup.Update(this);
 
+            // Hit-test + filter: only “true” when hit is a road and it would actually change.
             bool hasRoad = TryGetRoadUnderCursor(out Entity hitEntity, out RaycastHit _);
 
+            // Load vanilla soundbank (if present).
             bool haveSoundbank = m_SoundbankQuery.CalculateEntityCount() > 0;
             ToolUXSoundSettingsData soundbank = default;
             if (haveSoundbank)
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
-            // RMB cycle: tool action system.
+            // RMB cycle: use CS2 tool action system (Secondary Apply).
+            // This is the Phase-2 migration away from Mouse.current polling.
             bool cyclePressed = false;
             try
             {
@@ -211,7 +231,7 @@ namespace EasyZoning.Tools
                     AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
             }
 
-            // Escape cancel: explicit key read so RMB is free for cycling.
+            // ESC cancel: explicit key read so RMB stays dedicated to cycling.
             bool escapePressed = false;
             try
             {
@@ -221,6 +241,7 @@ namespace EasyZoning.Tools
             }
             catch { }
 
+            // Determine tool state for this frame.
             if (escapePressed && (m_SelectedEntities.Length > 0 || m_PreviewEntity != Entity.Null))
                 m_Mode = Mode.Cancel;
             else if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
@@ -241,10 +262,12 @@ namespace EasyZoning.Tools
                     break;
 
                 case Mode.Select when hasRoad:
+                    // Dragging selects multiple segments.
                     if (!m_SelectedEntities.Contains(hitEntity))
                     {
                         m_SelectedEntities.Add(hitEntity);
                         m_Highlight.HighlightEntity(hitEntity, true);
+
                         if (haveSoundbank)
                             AudioManager.instance.PlayUISound(soundbank.m_SelectEntitySound);
                     }
@@ -252,6 +275,7 @@ namespace EasyZoning.Tools
 
                 case Mode.Cancel:
                     {
+                        // Cancel clears any selection + preview highlight.
                         for (int i = 0; i < m_SelectedEntities.Length; i++)
                             m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
 
@@ -272,9 +296,13 @@ namespace EasyZoning.Tools
 
                 case Mode.Apply:
                     {
-                        ComponentLookup<ZoningPreviewComponent> previewLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true);
-                        ComponentLookup<ZoningDepthComponent> depthLookup = GetComponentLookup<ZoningDepthComponent>(isReadOnly: true);
-                        ComponentLookup<Updated> updatedLookup = GetComponentLookup<Updated>(isReadOnly: true);
+                        // Apply commits ToolDepths to the selected road entities.
+                        ComponentLookup<ZoningPreviewComponent> previewLookup =
+                            GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true);
+                        ComponentLookup<ZoningDepthComponent> depthLookup =
+                            GetComponentLookup<ZoningDepthComponent>(isReadOnly: true);
+                        ComponentLookup<Updated> updatedLookup =
+                            GetComponentLookup<Updated>(isReadOnly: true);
 
                         JobHandle setJob = new SetZoningDepthJob
                         {
@@ -288,6 +316,7 @@ namespace EasyZoning.Tools
 
                         inputDeps = JobHandle.CombineDependencies(inputDeps, setJob);
 
+                        // Clear selection highlight immediately (visual feedback).
                         for (int i = 0; i < m_SelectedEntities.Length; i++)
                             m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
 
@@ -303,8 +332,15 @@ namespace EasyZoning.Tools
                     }
             }
 
-            ComponentLookup<ZoningPreviewComponent> previewReadLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true);
-            ComponentLookup<Updated> updatedReadLookup2 = GetComponentLookup<Updated>(isReadOnly: true);
+            // Preview overlay sync:
+            // - Add/Update ZoningPreviewComponent for currently selected entities
+            // - Remove ZoningPreviewComponent from entities no longer selected
+            //
+            // Updated is only added when the preview data actually changes (spam reduction).
+            ComponentLookup<ZoningPreviewComponent> previewReadLookup =
+                GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true);
+            ComponentLookup<Updated> updatedReadLookup2 =
+                GetComponentLookup<Updated>(isReadOnly: true);
 
             JobHandle syncTempJob = new SyncTempJob
             {
@@ -317,9 +353,11 @@ namespace EasyZoning.Tools
 
             inputDeps = JobHandle.CombineDependencies(inputDeps, syncTempJob);
 
-            NativeArray<Entity> zoningPreviewEntities = m_ZoningPreviewQuery.ToEntityArray(Allocator.TempJob);
+            NativeArray<Entity> zoningPreviewEntities =
+                m_ZoningPreviewQuery.ToEntityArray(Allocator.TempJob);
 
-            ComponentLookup<Updated> updatedReadLookup3 = GetComponentLookup<Updated>(isReadOnly: true);
+            ComponentLookup<Updated> updatedReadLookup3 =
+                GetComponentLookup<Updated>(isReadOnly: true);
 
             JobHandle cleanupTempJob = new CleanupTempJob
             {
@@ -338,6 +376,7 @@ namespace EasyZoning.Tools
 
         private void UpdatePreviewSelection(bool hasRoad, Entity hitEntity)
         {
+            // No hit → clear selection and preview so the tool “lets go” naturally.
             if (!hasRoad)
             {
                 for (int i = 0; i < m_SelectedEntities.Length; i++)
@@ -354,6 +393,7 @@ namespace EasyZoning.Tools
                 return;
             }
 
+            // Same as current preview → stable.
             if (hitEntity == m_PreviewEntity)
             {
                 m_PendingPreviewEntity = Entity.Null;
@@ -361,6 +401,7 @@ namespace EasyZoning.Tools
                 return;
             }
 
+            // Stability gating to avoid intersection flicker.
             if (hitEntity == m_PendingPreviewEntity)
             {
                 m_PendingPreviewFrames++;
@@ -374,6 +415,7 @@ namespace EasyZoning.Tools
             if (m_PendingPreviewFrames < StableSwitchFrames)
                 return;
 
+            // Switch preview target.
             for (int i = 0; i < m_SelectedEntities.Length; i++)
                 m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
 
@@ -388,6 +430,9 @@ namespace EasyZoning.Tools
             m_PendingPreviewFrames = 0;
         }
 
+        // Filtered raycast:
+        // - Must be a road segment (has SubBlock buffer)
+        // - Must represent a change (WouldChange) so the tool only highlights actionable segments
         private bool TryGetRoadUnderCursor(out Entity entity, out RaycastHit hit)
         {
             if (!base.GetRaycastResult(out entity, out hit))
@@ -408,6 +453,7 @@ namespace EasyZoning.Tools
             return true;
         }
 
+        // Decide if applying the current tool depth would change this road.
         private bool WouldChange(Entity entity)
         {
             int2 desired = Depths;
@@ -439,6 +485,7 @@ namespace EasyZoning.Tools
             m_ToolRaycastSystem.netLayerMask = Layer.Road;
         }
 
+        // Called by UI button / Ctrl+Z hotkey.
         public void SetToolEnabled(bool isEnabled)
         {
             if (m_ToolSystem == null)
@@ -456,6 +503,8 @@ namespace EasyZoning.Tools
             }
         }
 
+        // Keep preview component in sync for selected entities.
+        // Updated is only added when preview changes or is newly added.
         public struct SyncTempJob : IJobParallelFor
         {
             public EntityCommandBuffer.ParallelWriter ECB;
@@ -491,6 +540,7 @@ namespace EasyZoning.Tools
             }
         }
 
+        // Remove preview components from entities not currently selected.
         public struct CleanupTempJob : IJobParallelFor
         {
             public EntityCommandBuffer.ParallelWriter ECB;
@@ -513,6 +563,8 @@ namespace EasyZoning.Tools
             }
         }
 
+        // Apply commits the chosen depths to roads.
+        // Updated is only added if it isn't already present.
         public struct SetZoningDepthJob : IJob
         {
             public NativeArray<Entity>.ReadOnly Entities;
