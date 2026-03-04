@@ -8,13 +8,13 @@
 
 namespace EasyZoning.Tools
 {
-    using Colossal.Logging;
-    using Colossal.UI.Binding;
-    using Game.Prefabs;
-    using Game.Rendering;
-    using Game.Tools;
-    using Game.UI;
-    using Unity.Mathematics;
+    using Colossal.UI.Binding;      // ValueBinding, TriggerBinding, GetterValueBinding
+    using Game.Prefabs;             // PrefabBase, RoadPrefab
+    using Game.Rendering;           // PhotoModeRenderSystem
+    using Game.Tools;               // ToolSystem, ToolBaseSystem, Snap
+    using Game.UI;                  // UISystemBase
+    using Unity.Mathematics;        // int2
+
 
     public partial class ZoningControllerToolUISystem : UISystemBase
     {
@@ -82,7 +82,7 @@ namespace EasyZoning.Tools
 #if DEBUG
         private static void Dbg(string msg)
         {
-            ILog log = Mod.s_Log;
+            Colossal.Logging.ILog log = Mod.s_Log;
             if (log == null)
                 return;
             try

@@ -1,8 +1,8 @@
 // File: src/Settings/Setting.cs
-// Purpose: Options UI + One rebindable hotkey (Ctrl+Z).
-// Note: RMB is not declared here.
-// RMB cycling is handled inside the tool by reading Mouse.current (Phase 1).
-// (Phase 2 may switch to ToolBaseSystem actions like secondaryApplyAction/cancelAction.)
+// Purpose: Options UI + one rebindable hotkey (Ctrl+Z).
+// Notes:
+//   - Only Ctrl+Z is declared here (Options → Keybindings).
+//   - RMB is NOT declared here; the tool reads the game’s built-in Secondary Apply action for cycling.
 
 namespace EasyZoning
 {
@@ -21,7 +21,7 @@ namespace EasyZoning
     [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup, kLegacyGroup, kAboutInfoGroup, kAboutLinksGroup)]
     [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup, kLegacyGroup)]
 
-    // Declare ONLY the keyboard action (Ctrl+Z). RMB is vanilla cancelAction.
+    // Declare ONLY the keyboard action (Ctrl+Z). RMB uses the game’s built-in Secondary Apply action.
     [SettingsUIKeyboardAction(Mod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
     public sealed class Setting : ModSetting
     {

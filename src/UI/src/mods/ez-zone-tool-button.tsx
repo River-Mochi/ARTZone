@@ -19,7 +19,7 @@ import MainIconPath from "../../images/ico-zones-color02.svg";
 const IsPhotoMode$ = bindValue<boolean>(mod.id, "IsPhotoMode");
 
 export default function EZZoneToolButton() {
-    // Hook must be inside the component function.
+    // Hide the GTL button in Photo Mode for clean screenshots.
     const photoMode = useValue(IsPhotoMode$) === true;
     if (photoMode) return null;
 

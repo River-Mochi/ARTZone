@@ -4,15 +4,15 @@
 
 namespace EasyZoning.Tools
 {
-    using EasyZoning.Components;
+    using EasyZoning.Components;    // ZoningDepthComponent, ZoningPreviewComponent
     using Game;
-    using Game.Common;
-    using Game.Zones;
-    using System;                  // InvalidOperationException
-    using Unity.Collections;
-    using Unity.Entities;
-    using Unity.Jobs;
-    using Unity.Mathematics;
+    using Game.Common;              // Owner, Updated (dirty marker pattern)
+    using Game.Zones;               // Block, ValidArea, Cell, ZoneType
+    using System;                   // InvalidOperationException (DEBUG guard)
+    using Unity.Collections;        // NativeArray
+    using Unity.Entities;           // EntityQuery, ComponentLookup, BufferLookup, ECB
+    using Unity.Jobs;               // IJobParallelFor, JobHandle
+    using Unity.Mathematics;        // math.clamp
 
     public partial class SyncBlockSystem : GameSystemBase
     {

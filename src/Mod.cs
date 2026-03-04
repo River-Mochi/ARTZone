@@ -19,7 +19,6 @@ namespace EasyZoning
     using Game.SceneFlow;            // GameManager
     using System;                    // Exception, Func<T>, StringComparison
     using System.Reflection;         // Assembly
-    using static Game.UI.Menu.AssetUploadPanelUISystem;
 
     public sealed class Mod : IMod
     {

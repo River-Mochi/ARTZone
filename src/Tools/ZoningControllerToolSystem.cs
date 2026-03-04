@@ -13,12 +13,13 @@
 namespace EasyZoning.Tools
 {
     using EasyZoning.Components;     // ZoningPreviewComponent, ZoningDepthComponent
-    using Game.Audio;                // ToolUXSoundSettingsData, AudioManager
-    using Game.Common;               // Updated
+    using Game.Audio;                // ToolUXSoundSettingsData, AudioManager UI sounds
+    using Game.Common;               // Updated marker (dirty flag)
     using Game.Net;                  // Layer
     using Game.Prefabs;              // PrefabBase
     using Game.Tools;                // ToolBaseSystem, ToolSystem, RaycastHit, ToolOutputBarrier
-    using Game.Zones;                // Sublock
+    using Game.Zones;                // SubBlock (zone blocks buffer on road net entities)
+    using System;                    // Exception (WarnOnce guard)
     using Unity.Collections;         // NativeArray, NativeList, Allocator
     using Unity.Entities;            // Entity, EntityQuery, ComponentLookup, BufferLookup, ECB
     using Unity.Jobs;                // JobHandle, IJob, IJobParallelFor
@@ -215,14 +216,23 @@ namespace EasyZoning.Tools
             if (haveSoundbank)
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
-            // RMB cycle: use CS2 tool action system (Secondary Apply).
-            // This is the Phase-2 migration away from Mouse.current polling.
+            // RMB cycle: use CS2 tool system (Secondary Apply).
+            // This is Phase-2 migration away from Mouse.current polling.
             bool cyclePressed = false;
             try
             {
                 cyclePressed = secondaryApplyAction.WasPressedThisFrame();
             }
-            catch { }
+            catch (Exception ex)
+            {
+#if DEBUG
+                Mod.WarnOnce(
+                    "SecondaryApplyAction.ReadFailed",
+                    ( ) => $"[EZ] secondaryApplyAction read failed: {ex.GetType().Name}: {ex.Message}");
+#else
+                _ = ex; // silence "unused variable" in Release builds
+#endif
+            }
 
             if (cyclePressed)
             {

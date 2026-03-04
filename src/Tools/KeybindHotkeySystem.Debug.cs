@@ -5,10 +5,10 @@
 #if DEBUG
 namespace EasyZoning.Tools
 {
-    using Game.Input;
-    using System;
-    using System.Collections;
-    using System.Reflection;
+    using Game.Input;           // InputManager
+    using System;               // Type
+    using System.Collections;   // IDictionary
+    using System.Reflection;    // BindingsFlags, PropertyInfo, FieldInfo
 
     public sealed partial class KeybindHotkeySystem
     {

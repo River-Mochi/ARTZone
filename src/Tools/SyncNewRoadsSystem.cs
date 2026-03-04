@@ -6,17 +6,16 @@
 
 namespace EasyZoning.Tools
 {
-    using Colossal.Logging;
-    using EasyZoning.Components;
-    using Game;
-    using Game.Common;
-    using Game.Net;
-    using Game.Tools;
-    using Game.Zones;
-    using Unity.Collections;
-    using Unity.Entities;
-    using Unity.Jobs;
-    using Unity.Mathematics;
+    using EasyZoning.Components;    // ZoningDepthComponent
+    using Game;                     // GameSystemBase
+    using Game.Common;              // Created, Updated
+    using Game.Net;                 // Road
+    using Game.Tools;               // Temp
+    using Game.Zones;               // SubBlock
+    using Unity.Collections;        // NativeArray
+    using Unity.Entities;           // EntityQuery, ComponentLookup, ECB
+    using Unity.Jobs;               // IJobParallelFor, JobHandle
+    using Unity.Mathematics;        // int2, math.any/all
 
     public partial class SyncNewRoadsSystem : GameSystemBase
     {
@@ -29,7 +28,7 @@ namespace EasyZoning.Tools
 #if DEBUG
         private static void Dbg(string msg)
         {
-            ILog log = Mod.s_Log;
+            Colossal.Logging.ILog log = Mod.s_Log;
             if (log == null)
                 return;
             try
