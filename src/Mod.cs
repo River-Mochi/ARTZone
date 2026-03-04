@@ -2,7 +2,10 @@
 // Purpose: Mod entrypoint; registers settings, localization, ECS systems, keybindings, and locale-change hooks.
 // Notes:
 //   • Locales install before Options UI so labels render correctly.
-//   • RMB flip stays vanilla (ToolBaseSystem.cancelAction) — no custom binding.
+//   • Existing-roads tool uses the game tool actions:
+//     - LMB = Apply
+//     - RMB = Secondary Apply (cycles mode)
+//     - ESC = explicit Keyboard cancel (because vanilla Cancel is often bound to RMB).
 //   • Top-left button points at coui://ui-mods/images/* assets.
 
 namespace EasyZoning
@@ -19,7 +22,6 @@ namespace EasyZoning
     using Game.SceneFlow;            // GameManager (localization manager access)
     using System;                    // Exception, Func<T>, StringComparison
     using System.Reflection;         // Assembly (version number from csproj)
-
 
     public sealed class Mod : IMod
     {
@@ -155,7 +157,7 @@ namespace EasyZoning
             // ECS systems
             try
             {
-                // Tool logic: selection and apply.
+                // Tool logic: selection and apply (only runs when tool is active).
                 updateSystem.UpdateAt<ZoningControllerToolSystem>(SystemUpdatePhase.ToolUpdate);
 
                 // Visual highlight for blocks under the tool.
@@ -167,7 +169,7 @@ namespace EasyZoning
                 // Existing-block sync: apply tool depths to zone blocks on existing roads.
                 updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
 
-                // Cohtml UI bridge for the EZ panel.
+                // UI bridge: binds C# values to the React UI (runs every frame in UIUpdate).
                 updateSystem.UpdateAt<ZoneControlBridgeUI>(SystemUpdatePhase.UIUpdate);
 
                 // Hotkey system that listens to ToggleZoneTool (CTRL+Z).
