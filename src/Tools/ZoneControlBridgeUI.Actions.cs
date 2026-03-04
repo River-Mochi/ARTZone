@@ -9,6 +9,7 @@ namespace EasyZoning.Tools
 
     public partial class ZoneControlBridgeUI
     {
+
         private void ToggleTool( )
         {
             try
@@ -16,11 +17,30 @@ namespace EasyZoning.Tools
                 if (m_MainToolSystem == null || m_ZoningTool == null)
                     return;
 
+                // Photo Mode guard: refuse enabling EZ tool while Photo Mode is active.
+                // Prevents the 1-frame “flash” and avoids tool/input conflicts.
+                try
+                {
+                    if (m_PhotoModeSystem != null && m_PhotoModeSystem.Enabled)
+                    {
+#if DEBUG
+                Dbg("ToggleTool ignored (Photo Mode).");
+#endif
+                        return;
+                    }
+                }
+                catch
+                {
+                    // Fail open: if PhotoModeRenderSystem throws, do not block tool toggling.
+                }
+
+                // Reference compare (not type):
+                // If the active tool is *this exact instance*, then disable; otherwise enable.
                 bool enable = m_MainToolSystem.activeTool != m_ZoningTool;
                 m_ZoningTool.SetToolEnabled(enable);
 
 #if DEBUG
-                Dbg($"ToggleTool → enable={enable}");
+        Dbg($"ToggleTool → enable={enable}");
 #endif
             }
             catch { }
