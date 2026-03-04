@@ -92,8 +92,7 @@ No outline means it's already changed to the current selected option.
 <!-- Changelog -->
 <ChangeLog>
 - Existing roads: right-click 4-cycle now better and uses CS2's own tool action input (**Both → Left → Right → None**).
-- updated Photo mode: EZ top left button is hidden for clean screenshots.
-- internal performance: reduce updated tag when preview data did not change.
+- internal performance/refactor
 </ChangeLog>
 
 	<!-- External links -->
