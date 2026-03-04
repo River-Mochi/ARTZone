@@ -3,6 +3,10 @@
 //   Runtime tool. LMB selects and applies zoning depths to existing roads.
 //   Secondary Apply cycles current tool mode (Left/Right/Both/None) without applying.
 //   Preview reflects current tool mode for hovered segments.
+//
+// Notes:
+//   - RMB is handled via secondaryApplyAction (CS2 UI tool system).
+//   - Escape cancel is read via Keyboard.current because vanilla Cancel is often RMB.
 
 namespace EasyZoning.Tools
 {
@@ -18,6 +22,7 @@ namespace EasyZoning.Tools
     using Unity.Entities;
     using Unity.Jobs;
     using Unity.Mathematics;
+    using UnityEngine.InputSystem;
 
     public partial class ZoningControllerToolSystem : ToolBaseSystem
     {
@@ -111,10 +116,10 @@ namespace EasyZoning.Tools
             // Tool actions:
             // - Apply = LMB (select/drag/apply)
             // - Secondary Apply = RMB (cycle)
-            // - Cancel = Escape (clear selection/preview)
+            // Cancel action is NOT used here (vanilla Cancel is commonly RMB).
             applyAction.shouldBeEnabled = true;
             secondaryApplyAction.shouldBeEnabled = true;
-            cancelAction.shouldBeEnabled = true;
+            cancelAction.shouldBeEnabled = false;
 
             requireZones = true;
             requireNet = Layer.Road;
@@ -140,7 +145,6 @@ namespace EasyZoning.Tools
             requireNet = Layer.None;
             allowUnderground = false;
 
-            // Tool deactivation cleanup: clear highlight blue outline state.
             for (int i = 0; i < m_SelectedEntities.Length; i++)
                 m_Highlight.HighlightEntity(m_SelectedEntities[i], false);
 
@@ -192,7 +196,7 @@ namespace EasyZoning.Tools
             if (haveSoundbank)
                 soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
 
-            // RMB cycle: use tool action system (respects UI focus).
+            // RMB cycle: tool action system.
             bool cyclePressed = false;
             try
             {
@@ -207,15 +211,17 @@ namespace EasyZoning.Tools
                     AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
             }
 
-            // Cancel (Escape). Guarded so cycle does not accidentally cancel if bindings overlap.
-            bool cancelPressed = false;
+            // Escape cancel: explicit key read so RMB is free for cycling.
+            bool escapePressed = false;
             try
             {
-                cancelPressed = !cyclePressed && cancelAction.WasPressedThisFrame();
+                Keyboard kb = Keyboard.current;
+                if (kb != null && kb.escapeKey.wasPressedThisFrame)
+                    escapePressed = true;
             }
             catch { }
 
-            if (cancelPressed && (m_SelectedEntities.Length > 0 || m_PreviewEntity != Entity.Null))
+            if (escapePressed && (m_SelectedEntities.Length > 0 || m_PreviewEntity != Entity.Null))
                 m_Mode = Mode.Cancel;
             else if (applyAction.WasPressedThisFrame() || applyAction.IsPressed())
                 m_Mode = Mode.Select;
