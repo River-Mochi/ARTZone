@@ -4,7 +4,7 @@
 //   - Hidden in Photo Mode (clean screenshots).
 //   - Click triggers ToggleZoneControllerTool on the C# side.
 
-import React from "react";
+import React, { CSSProperties } from "react";
 import { Button } from "cs2/ui";
 import { useLocalization } from "cs2/l10n";
 import { bindValue, trigger, useValue } from "cs2/api";
@@ -19,11 +19,14 @@ import MainIconPath from "../../images/ico-zones-color02.svg";
 const IsPhotoMode$ = bindValue<boolean>(mod.id, "IsPhotoMode");
 
 export default function EZZoneToolButton() {
-    // Hide the GTL button in Photo Mode for clean screenshots.
-    const photoMode = useValue(IsPhotoMode$) === true;
-    if (photoMode) return null;
-
+    // Hooks must not be conditional. Always call hooks first.
     const { translate } = useLocalization();
+    const photoMode = useValue(IsPhotoMode$) === true;
+
+    // Hide in Photo Mode without unmounting other UI.
+    const buttonStyle: CSSProperties = {
+        display: photoMode ? "none" : undefined,
+    };
 
     // Tooltip strings come from lang/*.json
     const title = translate("EasyZoning.Zone_Controller.ToolName", "Easy Zoning");
@@ -35,6 +38,13 @@ export default function EZZoneToolButton() {
     const handleClick = () => {
         // C# side listens for this trigger.
         trigger(mod.id, "ToggleZoneControllerTool");
+
+        // Keep this: useful when debugging UI injection.
+        try {
+            console.log("[EZ][UI] GameTopLeft button → ToggleZoneControllerTool");
+        } catch {
+            // Ignore console failures
+        }
     };
 
     // Use vanilla DescriptionTooltip (same pattern as ZoneTools)
@@ -43,7 +53,7 @@ export default function EZZoneToolButton() {
 
     return (
         <DescriptionTooltip title={title} description={description} direction="right">
-            <Button variant="floating" onClick={handleClick}>
+            <Button style={buttonStyle} variant="floating" onClick={handleClick}>
                 <img src={MainIconPath} />
             </Button>
         </DescriptionTooltip>

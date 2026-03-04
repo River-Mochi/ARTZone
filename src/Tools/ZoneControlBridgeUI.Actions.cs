@@ -1,4 +1,4 @@
-// File: src/Tools/ZoningControllerToolUISystem.Actions.cs
+// File: src/Tools/ZoneControlBridgeUI.Actions.cs
 // Purpose:
 //  • UI trigger handlers and small helper actions for ZoningControllerToolUISystem.
 //  • Contains CycleMode() (RMB behavior) and toggle/apply UI bindings.
@@ -7,7 +7,7 @@ namespace EasyZoning.Tools
 {
     using Game.Tools;   // Snap, ToolSystem
 
-    public partial class ZoningControllerToolUISystem
+    public partial class ZoneControlBridgeUI
     {
         private void ToggleTool( )
         {

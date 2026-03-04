@@ -23,7 +23,7 @@ namespace EasyZoning.Tools
 
         private EntityQuery m_NewCreatedRoadsQuery;
         private ModificationBarrier4 m_ModificationBarrier = null!;
-        private ZoningControllerToolUISystem m_UISystem = null!;
+        private ZoneControlBridgeUI m_UISystem = null!;
 
 #if DEBUG
         private static void Dbg(string msg)
@@ -53,7 +53,7 @@ namespace EasyZoning.Tools
                 .Build(this);
 
             m_ModificationBarrier = World.GetOrCreateSystemManaged<ModificationBarrier4>();
-            m_UISystem = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
+            m_UISystem = World.GetOrCreateSystemManaged<ZoneControlBridgeUI>();
         }
 
         protected override void OnUpdate( )

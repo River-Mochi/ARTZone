@@ -36,7 +36,7 @@ namespace EasyZoning.Tools
         private static readonly int2 kVanillaDepths = new int2(6, 6);
 
         private ToolOutputBarrier m_ToolOutputBarrier = null!;
-        private ZoningControllerToolUISystem m_UISystem = null!;
+        private ZoneControlBridgeUI m_UISystem = null!;
         private ToolHighlightSystem m_Highlight = null!;
 
         private BufferLookup<SubBlock> m_SubBlockLookup;
@@ -92,7 +92,7 @@ namespace EasyZoning.Tools
 
             // Barriers/systems used every frame while tool is active.
             m_ToolOutputBarrier = World.GetOrCreateSystemManaged<ToolOutputBarrier>();
-            m_UISystem = World.GetOrCreateSystemManaged<ZoningControllerToolUISystem>();
+            m_UISystem = World.GetOrCreateSystemManaged<ZoneControlBridgeUI>();
             m_Highlight = World.GetOrCreateSystemManaged<ToolHighlightSystem>();
 
             // Query used to clean up preview components when hover leaves.

@@ -1,4 +1,4 @@
-// File: src/Tools/ZoningControllerToolUISystem.cs
+// File: src/Tools/ZoneControlBridgeUI.cs
 // Purpose:
 //  • Expose UI bindings the React UI reads/writes
 //    (ToolZoningMode, RoadZoningMode, IsZonableRoadPrefab, IsPhotoMode, ContourEnabled).
@@ -16,7 +16,7 @@ namespace EasyZoning.Tools
     using Unity.Mathematics;        // int2
 
 
-    public partial class ZoningControllerToolUISystem : UISystemBase
+    public partial class ZoneControlBridgeUI : UISystemBase
     {
         private ValueBinding<int> m_ToolZoningMode = null!;
         private ValueBinding<int> m_RoadZoningMode = null!;
@@ -26,6 +26,7 @@ namespace EasyZoning.Tools
         private ToolSystem m_MainToolSystem = null!;
         private ZoningControllerToolSystem m_ZoningTool = null!;
         private PhotoModeRenderSystem m_PhotoModeSystem = null!;
+        private bool m_LastPhotoModeEnabled;
 
         public ZoningMode ToolZoningMode => (ZoningMode) m_ToolZoningMode.value;
         public ZoningMode RoadZoningMode => (ZoningMode) m_RoadZoningMode.value;
@@ -186,6 +187,45 @@ namespace EasyZoning.Tools
             Dbg("UISystem created and bindings registered.");
 #endif
         }
+
+
+        protected override void OnUpdate( )
+        {
+            base.OnUpdate();
+
+            bool photoModeEnabled = false;
+            try
+            {
+                photoModeEnabled = m_PhotoModeSystem != null && m_PhotoModeSystem.Enabled;
+            }
+            catch
+            {
+                photoModeEnabled = false;
+            }
+
+            // Photo Mode transition OFF -> ON: disable EZ tool once to avoid input/tool conflicts.
+            if (photoModeEnabled && !m_LastPhotoModeEnabled)
+            {
+                try
+                {
+                    ToolBaseSystem active = (m_MainToolSystem != null) ? m_MainToolSystem.activeTool : null!;
+                    if (active is ZoningControllerToolSystem && m_ZoningTool != null)
+                    {
+                        m_ZoningTool.SetToolEnabled(false);
+#if DEBUG
+                        Dbg("Photo Mode entered -> EZ tool disabled.");
+#endif
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            m_LastPhotoModeEnabled = photoModeEnabled;
+        }
+
+
 
         protected override void OnDestroy( )
         {

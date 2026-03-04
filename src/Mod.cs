@@ -168,7 +168,7 @@ namespace EasyZoning
                 updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
 
                 // Cohtml UI bridge for the EZ panel.
-                updateSystem.UpdateAt<ZoningControllerToolUISystem>(SystemUpdatePhase.UIUpdate);
+                updateSystem.UpdateAt<ZoneControlBridgeUI>(SystemUpdatePhase.UIUpdate);
 
                 // Hotkey system that listens to ToggleZoneTool (CTRL+Z).
                 updateSystem.UpdateAt<KeybindHotkeySystem>(SystemUpdatePhase.ToolUpdate);
