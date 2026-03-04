@@ -91,8 +91,8 @@ No outline means it's already changed to the current selected option.
 
 <!-- Changelog -->
 <ChangeLog>
-- Existing roads: right-click 4-cycle now better and uses CS2's own tool action input (**Both → Left → Right → None**).
-- internal performance/refactor
+- Existing roads: right-click 4-cycle now better, uses CS2's own tool action input for 4 states: (**Both → Left → Right → None**).
+- internal refactor and performance tweak.
 </ChangeLog>
 
 	<!-- External links -->
