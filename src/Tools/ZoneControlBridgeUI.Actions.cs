@@ -17,8 +17,8 @@ namespace EasyZoning.Tools
                 if (m_MainToolSystem == null || m_ZoningTool == null)
                     return;
 
-                // Photo Mode guard: refuse enabling EZ tool while Photo Mode is active.
-                // Prevents the 1-frame “flash” and avoids tool/input conflicts.
+                // Guard: prevents EZ from enabling in Photo Mode + disables when entering Photo Mode.
+                // avoids input conflicts and flashing zoning blocks if GTL button is clicked (if GTL not hidden).
                 try
                 {
                     if (m_PhotoModeSystem != null && m_PhotoModeSystem.Enabled)
