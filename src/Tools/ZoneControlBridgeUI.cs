@@ -17,21 +17,27 @@ namespace EasyZoning.Tools
 
     public partial class ZoneControlBridgeUI : UISystemBase
     {
+        // UI bindings consumed by React.
+        // (React reads these via ModID + binding name strings.)
         private ValueBinding<int> m_ToolZoningMode = null!;
         private ValueBinding<int> m_RoadZoningMode = null!;
         private ValueBinding<bool> m_IsZonableRoadPrefab = null!;
         private ValueBinding<bool> m_ContourEnabled = null!;
 
+        // Game systems used for tool state + Photo Mode guard.
         private ToolSystem m_MainToolSystem = null!;
         private ZoningControllerToolSystem m_ZoningTool = null!;
         private PhotoModeRenderSystem m_PhotoModeSystem = null!;
 
+        // Tracks last Photo Mode state to detect OFF -> ON edge.
         private bool m_LastPhotoModeEnabled;
 
+        // Convenience getters for current binding values.
         public ZoningMode ToolZoningMode => (ZoningMode) m_ToolZoningMode.value;
         public ZoningMode RoadZoningMode => (ZoningMode) m_RoadZoningMode.value;
         public bool ContourEnabled => m_ContourEnabled.value;
 
+        // Converts a mode (Left/Right/Both/None) into depth values used by UI sliders.
         private static int2 DepthsFromMode(ZoningMode mode)
         {
             return new int2(
@@ -40,37 +46,44 @@ namespace EasyZoning.Tools
             );
         }
 
+        // Tool depth "view" (used by React controls).
         public int2 ToolDepths
         {
             get => DepthsFromMode(ToolZoningMode);
             set
             {
+                // Build a mode enum from depth values.
                 ZoningMode mode = ZoningMode.None;
                 if (value.x > 0)
                     mode |= ZoningMode.Left;
                 if (value.y > 0)
                     mode |= ZoningMode.Right;
 
+                // Setter routes to handler in Actions file.
                 SetToolZoningMode(mode);
             }
         }
 
+        // Road placement depth "view" (used by React controls).
         public int2 RoadDepths
         {
             get => DepthsFromMode(RoadZoningMode);
             set
             {
+                // Build a mode enum from depth values.
                 ZoningMode mode = ZoningMode.None;
                 if (value.x > 0)
                     mode |= ZoningMode.Left;
                 if (value.y > 0)
                     mode |= ZoningMode.Right;
 
+                // Setter routes to handler in Actions file.
                 ChangeRoadZoningMode((int) mode);
             }
         }
 
 #if DEBUG
+        // Debug logging helper (writes to mod log only).
         private static void Dbg(string msg)
         {
             Colossal.Logging.ILog log = Mod.s_Log;
@@ -86,6 +99,7 @@ namespace EasyZoning.Tools
             : z == ZoningMode.Right ? "Right"
             : "None";
 
+        // Debug-only: logs current tool mode + computed depths.
         private void LogToolDepths(string tag)
         {
             ZoningMode mode = ToolZoningMode;
@@ -102,6 +116,7 @@ namespace EasyZoning.Tools
         {
             base.OnCreate();
 
+            // Bindings: provide state values for React to read/write.
             AddBinding(m_ToolZoningMode =
                 new ValueBinding<int>(Mod.ModID, "ToolZoningMode", (int) ZoningMode.Both));
             AddBinding(m_RoadZoningMode =
@@ -111,14 +126,15 @@ namespace EasyZoning.Tools
             AddBinding(m_ContourEnabled =
                 new ValueBinding<bool>(Mod.ModID, "ContourEnabled", false));
 
-            // Photo Mode binding (used by UI; also used internally for the safety latch).
+            // PhotoMode: expose a read-only binding for UI checks.
+            // Also used internally for the safety latch.
             m_PhotoModeSystem = World.GetOrCreateSystemManaged<PhotoModeRenderSystem>();
             AddUpdateBinding(new GetterValueBinding<bool>(
                 Mod.ModID,
                 "IsPhotoMode",
                 ( ) => m_PhotoModeSystem != null && m_PhotoModeSystem.Enabled));
 
-            // Triggers from UI (handlers are in ZoneControlBridgeUI.Actions.cs)
+            // Trigger bindings: React calls these; handlers are in Actions.cs.
             AddBinding(new TriggerBinding<int>(Mod.ModID, "ChangeRoadZoningMode", ChangeRoadZoningMode));
             AddBinding(new TriggerBinding<int>(Mod.ModID, "ChangeToolZoningMode", ChangeToolZoningMode));
             AddBinding(new TriggerBinding(Mod.ModID, "FlipToolBothMode", FlipToolBothMode));
@@ -126,6 +142,7 @@ namespace EasyZoning.Tools
             AddBinding(new TriggerBinding(Mod.ModID, "ToggleZoneControllerTool", ToggleTool));
             AddBinding(new TriggerBinding(Mod.ModID, "ToggleContourLines", ToggleContourLines));
 
+            // ToolSystem events drive section visibility updates.
             try
             {
                 m_MainToolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
@@ -139,13 +156,14 @@ namespace EasyZoning.Tools
             }
             catch { }
 
+            // Cache EZ tool instance (used for enable/disable calls).
             try
             {
                 m_ZoningTool = World.GetOrCreateSystemManaged<ZoningControllerToolSystem>();
             }
             catch { }
 
-            // Initialize photo mode edge tracking.
+            // Initialize PhotoMode edge tracking state.
             try
             {
                 m_LastPhotoModeEnabled = m_PhotoModeSystem != null && m_PhotoModeSystem.Enabled;
@@ -155,7 +173,7 @@ namespace EasyZoning.Tools
                 m_LastPhotoModeEnabled = false;
             }
 
-            // Init visibility once.
+            // Initialize section visibility once at creation time.
             try
             {
                 ToolBaseSystem activeTool = null!;
@@ -189,6 +207,7 @@ namespace EasyZoning.Tools
         {
             base.OnUpdate();
 
+            // Read PhotoMode state each frame (needed for OFF -> ON detection).
             bool photoModeEnabled;
             try
             {
@@ -199,7 +218,8 @@ namespace EasyZoning.Tools
                 photoModeEnabled = false;
             }
 
-            // Photo Mode transition OFF -> ON: disable EZ tool once to avoid input/tool conflicts.
+            // PhotoMode transition OFF -> ON:
+            // Disable EZ tool once if it is active, to avoid tool/input conflicts.
             if (photoModeEnabled && !m_LastPhotoModeEnabled)
             {
                 try
@@ -218,11 +238,13 @@ namespace EasyZoning.Tools
                 }
             }
 
+            // Update edge-tracking state.
             m_LastPhotoModeEnabled = photoModeEnabled;
         }
 
         protected override void OnDestroy( )
         {
+            // Unhook events to avoid holding stale delegates across reloads.
             try
             {
                 if (m_MainToolSystem != null)
@@ -236,6 +258,7 @@ namespace EasyZoning.Tools
             base.OnDestroy();
         }
 
+        // Tool changed: recompute whether EZ Tool Options section should be visible.
         private void OnToolChanged(ToolBaseSystem tool)
         {
             try
@@ -257,6 +280,7 @@ namespace EasyZoning.Tools
             catch { }
         }
 
+        // Prefab changed: recompute whether EZ Tool section should be visible.
         private void OnPrefabChanged(PrefabBase prefab)
         {
             try
@@ -278,13 +302,16 @@ namespace EasyZoning.Tools
             catch { }
         }
 
+        // Returns whether the EZ Tool section should be visible.
         private static bool ShouldShowFor(ToolBaseSystem? tool, PrefabBase? prefab)
         {
             try
             {
+                // Show when EZ tool is active.
                 if (tool is ZoningControllerToolSystem)
                     return true;
 
+                // Otherwise show when a zonable road is selected in the Net tool.
                 return IsZonableRoadPrefab(prefab);
             }
             catch
@@ -293,6 +320,7 @@ namespace EasyZoning.Tools
             }
         }
 
+        // Determines whether the selected prefab supports zoning blocks and is not a highway.
         private static bool IsZonableRoadPrefab(PrefabBase? prefab)
         {
             if (prefab is not RoadPrefab road)

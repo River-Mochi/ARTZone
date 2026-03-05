@@ -17,22 +17,25 @@ import MainIconPath from "../../images/ico-zones-color02.svg";
 export default function EZZoneToolButton() {
     const { translate } = useLocalization();
 
+    // Tooltip strings live in locale files; fallback text here.
     const title = translate("EasyZoning.Zone_Controller.ToolName", "Easy Zoning");
     const description = translate(
         "EasyZoning.Zone_Controller.ToolDescription",
         "This opens the EZ update roads panel.\nShortcut: Ctrl+Z"
     );
 
+    // UI only sends the trigger; C# side performs tool toggle + PhotoMode guard.
     const handleClick = () => {
         trigger(mod.id, "ToggleZoneControllerTool");
 
-        // For devtools tracing (localhost:9444)
+        // Devtools trace (localhost:9444).
         try {
             console.log("[EZ][UI] GameTopLeft button → ToggleZoneControllerTool");
         } catch {
         }
     };
 
+    // Vanilla tooltip component resolver (avoids importing private vanilla internals directly).
     const resolver = VanillaComponentResolver.instance;
     const DescriptionTooltip = resolver.DescriptionTooltip;
 
