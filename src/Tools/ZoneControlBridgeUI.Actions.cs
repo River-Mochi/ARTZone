@@ -9,43 +9,69 @@ namespace EasyZoning.Tools
 
     public partial class ZoneControlBridgeUI
     {
-
+        // Toggle EZ tool on/off.
+        // Safety: refuse enabling while PhotoMode is active (or PhotoMode state cannot be read).
         private void ToggleTool( )
         {
             try
             {
+                // Required systems must exist.
                 if (m_MainToolSystem == null || m_ZoningTool == null)
                     return;
 
-                // Guard: prevents EZ from enabling in Photo Mode + disables when entering Photo Mode.
-                // avoids input conflicts and flashing zoning blocks if GTL button is clicked (if GTL not hidden).
+                // Determine whether the request is enable vs disable.
+                // Reference compare (not type): only treat the exact instance as "active".
+                bool isActive = (m_MainToolSystem.activeTool == m_ZoningTool);
+
+                // Disabling is always allowed (even during PhotoMode / even if PhotoMode check throws).
+                if (isActive)
+                {
+                    m_ZoningTool.SetToolEnabled(false);
+
+#if DEBUG
+                    Dbg("ToggleTool → enable=False (disable request)");
+#endif
+                    return;
+                }
+
+                // Enabling: guard against Photo Mode.
+                bool photoModeEnabled;
                 try
                 {
-                    if (m_PhotoModeSystem != null && m_PhotoModeSystem.Enabled)
-                    {
-#if DEBUG
-                        Dbg("ToggleTool ignored (Photo Mode).");
-#endif
-                        return;
-                    }
+                    photoModeEnabled = (m_PhotoModeSystem != null && m_PhotoModeSystem.Enabled);
                 }
                 catch
                 {
-                    // Fail open: if PhotoModeRenderSystem throws, do not block tool toggling.
-                }
-
-                // Reference compare (not type):
-                // If the active tool is *this exact instance*, then disable; otherwise enable.
-                bool enable = m_MainToolSystem.activeTool != m_ZoningTool;
-                m_ZoningTool.SetToolEnabled(enable);
+                    // Fail-closed for enabling: assume PhotoMode could be active if the state cannot be read.
+                    photoModeEnabled = true;
 
 #if DEBUG
-                Dbg($"ToggleTool → enable={enable}");
+                    Dbg("ToggleTool blocked (Photo Mode state read failed).");
+#endif
+                }
+
+                if (photoModeEnabled)
+                {
+#if DEBUG
+                    Dbg("ToggleTool blocked (Photo Mode).");
+#endif
+                    return;
+                }
+
+                // Enable request (non-Photo Mode).
+                m_ZoningTool.SetToolEnabled(true);
+
+#if DEBUG
+                Dbg("ToggleTool → enable=True");
 #endif
             }
-            catch { }
+            catch
+            {
+                // Silent by design: UI triggers must never break the frame.
+            }
         }
 
+        // Flip tool depth mode: Both <-> None.
         private void FlipToolBothMode( )
         {
             try
@@ -58,9 +84,12 @@ namespace EasyZoning.Tools
                 LogToolDepths("FlipToolBothMode");
 #endif
             }
-            catch { }
+            catch
+            {
+            }
         }
 
+        // Flip road placement depth mode: Both <-> None.
         private void FlipRoadBothMode( )
         {
             try
@@ -72,9 +101,12 @@ namespace EasyZoning.Tools
                 Dbg($"FlipRoadBothMode → Road={ModeToStr(next)}");
 #endif
             }
-            catch { }
+            catch
+            {
+            }
         }
 
+        // Set tool mode from UI (raw int from bindings).
         private void ChangeToolZoningMode(int value)
         {
             try
@@ -86,9 +118,12 @@ namespace EasyZoning.Tools
                 LogToolDepths("ChangeToolZoningMode");
 #endif
             }
-            catch { }
+            catch
+            {
+            }
         }
 
+        // Set road placement mode from UI (raw int from bindings).
         private void ChangeRoadZoningMode(int value)
         {
             try
@@ -99,9 +134,12 @@ namespace EasyZoning.Tools
                 Dbg($"ChangeRoadZoningMode → Road={ModeToStr((ZoningMode) value)} rawValue={value}");
 #endif
             }
-            catch { }
+            catch
+            {
+            }
         }
 
+        // Programmatic tool mode set (used by ToolDepths setter).
         public void SetToolZoningMode(ZoningMode mode)
         {
             try
@@ -113,18 +151,21 @@ namespace EasyZoning.Tools
                 LogToolDepths("SetToolZoningMode");
 #endif
             }
-            catch { }
+            catch
+            {
+            }
         }
 
         /// <summary>
-        /// RMB cycle behavior for the update tool:
+        /// Update panel: RMB cycle behavior
         /// - Default (LegacyRightClickCycle OFF): Both → Left → Right → None → ...
-        /// - Legacy (LegacyRightClickCycle ON): Left ↔ Right, Both ↔ None
+        /// - Legacy (LegacyRightClickCycle ON): Left <-> Right "OR" Both <-> None
         /// </summary>
         public void CycleMode( )
         {
             try
             {
+                // Read setting each time (supports live toggling).
                 bool legacy = Mod.Settings != null && Mod.Settings.LegacyRightClickCycle;
 
                 ZoningMode current = ToolZoningMode;
@@ -165,13 +206,16 @@ namespace EasyZoning.Tools
             }
         }
 
+        // Toggle contour line snapping on the currently active tool.
         private void ToggleContourLines( )
         {
             try
             {
+                // Update mod binding first (UI state).
                 bool next = !ContourEnabled;
                 m_ContourEnabled.Update(next);
 
+                // Apply to the active tool snap flags.
                 ToolSystem toolSystem = m_MainToolSystem;
                 if (toolSystem == null)
                     return;
@@ -192,7 +236,7 @@ namespace EasyZoning.Tools
                     active.selectedSnap = snap;
 
 #if DEBUG
-                    Dbg($"ToggleContourLines → {(next ? "ON" : "OFF")}  selectedSnap={snap}");
+                    Dbg($"ToggleContourLines → {(next ? "ON" : "OFF")} selectedSnap={snap}");
 #endif
                 }
                 catch
