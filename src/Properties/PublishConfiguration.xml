@@ -97,8 +97,7 @@ No outline means it's already changed to the current selected option.
 
 <!-- Changelog -->
 <ChangeLog>
-- Hotkey changed to Ctrl+V; use Options Menu to Reset to new Default (avoids conflict with Move-It mod).
-- Existing roads: right-click 4-cycle now better, uses CS2's own tool action input for 4 states: (**Both → Left → Right → None**).
+- Hotkey changed to Ctrl+V (avoids conflict with Move-It mod); use Options Menu to Reset to new Default
 - internal refactor and performance tweak.
 </ChangeLog>
 
