@@ -14,7 +14,7 @@
 	<LongDescription>
 # Easy Zoning [EZ] Beta
 
-Custom zoning for new and existing roads.
+Custom zoning for new and existing roads. New alternative to Zone Tools.
 
 ## How to use
 
@@ -39,16 +39,22 @@ Options Menu
 - ✅ Default **Ctrl +Z** short-cut can be changed (it opens/closes EZ panel fast)
 - ✅ **Legacy RMB mode** (optional): RMB toggles only **Left↔Right** Or **Both↔None** instead of all 4-cycles.
 
+## Support and feedback
+- If the mod helps you, give it a Like, it's free + easy :)
+- Feedback to GitHub or Discord links on this page.
+
+Power Trick: if you have existing roads and do not want a new road intersecting it to alter zoning,
+pick **none**, then draw the new road. Your existing road should keep zoning facing the same original direction you set.
+
 ## Compatibility
-- To avoid conflicts, do not run "Zone Tools" or ART mod at the same time as EZ.
-- No Harmony, extends vanilla UI (means more stable on game patch days and increases compatibility).
+- No Harmony patch used, extends vanilla UI (means more stable on patch days, and compatibility).
 - Safe to remove any time. Road you zoned will keep their zoning.
 - Should work with Platter mod.
 - Lightweight, optimized, runs only when needed.
+- EZ mod is similar to "Zone Tools" or old ART mod with different UX. I had both EZ + ZT installed to switch back/forth for testing.
+- Recommend: pick one you like more to avoid any unknown/unforeseen future conflicts. Both use the same game systems, can accomplish the same goal.
+ ZT is older, has a moveable panel; EZ is the newest mod with more features: contour button + uses vanilla tool panel + sounds, and tidy.
 
-## Support and feedback
-- If the mod helps you, give it a Like, it's free + easy :)
-- Feedback to GitHub, Discord, or forum links on this page.
 
 ## Tech notes
 - For newly drawn roads, “Left/Right” is relative to the segment’s orientation.
@@ -91,9 +97,8 @@ No outline means it's already changed to the current selected option.
 
 <!-- Changelog -->
 <ChangeLog>
-    - Hotkey changed to Ctrl+V; use Options Menu to Reset to new Default (avoids conflict with Move-It mod).
-    - Existing roads: right-click 4-cycle now better, uses CS2's own tool action input for 4 states: (**Both → Left → Right → None**).
-    - internal refactor and performance tweak.
+- Hotkey changed to Ctrl+V (avoids Move-It conflict); use Options Menu to Reset to new Default
+- internal refactor and performance tweak.
 </ChangeLog>
 
 	<!-- External links -->

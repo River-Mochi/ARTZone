@@ -58,7 +58,7 @@ namespace EasyZoning
                     "Both → Left → Right → None → ...\n\n" +
                     "Faster, less need to move mouse back to the panel.\n\n" +
 
-                    "When **ON** - enabled: the RMB toggles in two separate sets either:\n" +
+                    "When ON (enabled): the RMB toggles in two separate sets either:\n" +
                     "Left ↔ Right\n" +
                     "Both ↔ None"
 
