@@ -1,8 +1,8 @@
 // File: src/Settings/Setting.cs
-// Purpose: Options UI + one rebindable hotkey (default Shift+V).
+// Purpose: Options UI + one rebindable hotkey (default Ctrl+V).
 // Notes:
 //   - Keyboard action declared once (ToggleZoneTool), game shows it in Options.
-//   - Default binding defined by SettingsUIKeyboardBinding (Shift+V).
+//   - Default binding defined by SettingsUIKeyboardBinding (Ctrl+V).
 //   - RMB cycling is not declared here; it uses the game’s built-in SecondaryApply tool action.
 
 namespace EasyZoning
@@ -57,8 +57,8 @@ namespace EasyZoning
 
         // --- Key bindings ---
         // ProxyBinding holds the saved/rebound key, stored by the settings system.
-        // Default is Shift+V, declared by SettingsUIKeyboardBinding.
-        [SettingsUIKeyboardBinding(BindingKeyboard.V, Mod.kToggleToolActionName, shift: true)]
+        // Default is Ctrl+V, declared by SettingsUIKeyboardBinding.
+        [SettingsUIKeyboardBinding(BindingKeyboard.V, Mod.kToggleToolActionName, ctrl: true)]
         [SettingsUISection(kActionsTab, kKeybindingGroup)]
         public ProxyBinding ToggleZoneTool
         {
@@ -132,7 +132,7 @@ namespace EasyZoning
             RemoveZonedCells = true;
             RemoveOccupiedCells = true;
             LegacyRightClickCycle = false;
-            // ToggleZoneTool default binding from SettingsUIKeyboardBinding (Shift+V).
+            // ToggleZoneTool default binding from SettingsUIKeyboardBinding (Ctrl+V).
         }
     }
 }

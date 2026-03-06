@@ -47,7 +47,7 @@ namespace EasyZoning
                 // Keybind (only one visible)
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Przełącz panel aktualizacji" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "Pokaż panel Easy Zoning (**domyślnie Shift+V**)."
+                    "Pokaż panel Easy Zoning (**domyślnie Ctrl+V**)."
                 },
 
 

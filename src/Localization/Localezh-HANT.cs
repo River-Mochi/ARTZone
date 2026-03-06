@@ -47,7 +47,7 @@ namespace EasyZoning
                 // Keybind (only one visible)
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "切換更新面板" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "顯示 Easy Zoning 面板（**預設 Shift+V**）。"
+                    "顯示 Easy Zoning 面板（**預設 Ctrl+V**）。"
                 },
 
 

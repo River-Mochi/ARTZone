@@ -17,6 +17,7 @@ namespace EasyZoning.Tools
     using Game.Common;               // Updated marker (dirty flag)
     using Game.Net;                  // Layer
     using Game.Prefabs;              // PrefabBase
+    using Game.Rendering;            // PhotoModeRenderSystem
     using Game.Tools;                // ToolBaseSystem, ToolSystem, RaycastHit, ToolOutputBarrier
     using Game.Zones;                // SubBlock (zone blocks buffer on road net entities)
     using System;                    // Exception (WarnOnce guard)
@@ -38,6 +39,7 @@ namespace EasyZoning.Tools
         private ToolOutputBarrier m_ToolOutputBarrier = null!;
         private ZoneControlBridgeUI m_UISystem = null!;
         private ToolHighlightSystem m_Highlight = null!;
+        private PhotoModeRenderSystem m_PhotoModeSystem = null!;
 
         private BufferLookup<SubBlock> m_SubBlockLookup;
         private ComponentLookup<ZoningDepthComponent> m_ZoningDepthLookup;
@@ -86,6 +88,19 @@ namespace EasyZoning.Tools
         }
 #endif
 
+        private bool IsPhotoModeEnabled( )
+        {
+            try
+            {
+                return m_PhotoModeSystem != null && m_PhotoModeSystem.Enabled;
+            }
+            catch
+            {
+                // Fail-closed for enabling decisions.
+                return true;
+            }
+        }
+
         protected override void OnCreate( )
         {
             base.OnCreate();
@@ -94,6 +109,7 @@ namespace EasyZoning.Tools
             m_ToolOutputBarrier = World.GetOrCreateSystemManaged<ToolOutputBarrier>();
             m_UISystem = World.GetOrCreateSystemManaged<ZoneControlBridgeUI>();
             m_Highlight = World.GetOrCreateSystemManaged<ToolHighlightSystem>();
+            m_PhotoModeSystem = World.GetOrCreateSystemManaged<PhotoModeRenderSystem>();
 
             // Query used to clean up preview components when hover leaves.
             m_ZoningPreviewQuery = new EntityQueryBuilder(Allocator.Temp)
@@ -496,7 +512,8 @@ namespace EasyZoning.Tools
             m_ToolRaycastSystem.netLayerMask = Layer.Road;
         }
 
-        // Called by UI button / Shift+V hotkey.
+        // Called by GTL UI button or Hot Keybind.
+        // Enabling is blocked during Photo Mode; disabling is always allowed.
         public void SetToolEnabled(bool isEnabled)
         {
             if (m_ToolSystem == null)
@@ -504,6 +521,14 @@ namespace EasyZoning.Tools
 
             if (isEnabled)
             {
+                if (IsPhotoModeEnabled())
+                {
+#if DEBUG
+            Dbg("SetToolEnabled(true) blocked (PhotoMode).");
+#endif
+                    return;
+                }
+
                 if (m_ToolSystem.activeTool != this)
                     m_ToolSystem.activeTool = this;
             }
@@ -513,6 +538,7 @@ namespace EasyZoning.Tools
                     m_ToolSystem.activeTool = World.GetOrCreateSystemManaged<DefaultToolSystem>();
             }
         }
+
 
         // Keep preview component in sync for selected entities.
         // Updated is only added when preview changes or is newly added.

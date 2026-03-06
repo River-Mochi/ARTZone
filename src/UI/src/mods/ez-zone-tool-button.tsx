@@ -4,7 +4,7 @@
 //   Clicking triggers ToggleZoneControllerTool on the C# side.
 // Notes:
 //   - Uses cs2/ui Button "floating" variant, with icon via the `src` prop.
-//   - Uses onSelect (CS2 UI convention: mouse click OR gamepad select).
+//   - Uses onSelect (CS2 UI toolchain) and not not onClick.
 
 import React from "react";
 import { Button } from "cs2/ui";
@@ -24,7 +24,7 @@ export default function EZZoneToolButton() {
     const title = translate("EasyZoning.Zone_Controller.ToolName", "Easy Zoning");
     const description = translate(
         "EasyZoning.Zone_Controller.ToolDescription",
-        "This opens the EZ update roads panel.\nShortcut: Shift+V"
+        "This opens the EZ update roads panel.\nShortcut: Ctrl+V"
     );
 
     // UI only sends the trigger; C# side performs tool toggle + PhotoMode guard.
@@ -42,6 +42,9 @@ export default function EZZoneToolButton() {
     const resolver = VanillaComponentResolver.instance;
     const DescriptionTooltip = resolver.DescriptionTooltip;
 
+
+    // - onSelect is the CS2 UI handler
+    // - Keeps the GTL button independent from keybind conflicts (if Ctrl+V fails, button still works).
     return (
         <DescriptionTooltip title={title} description={description} direction="right">
             <Button

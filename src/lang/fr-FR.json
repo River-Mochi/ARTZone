@@ -1,6 +1,6 @@
 {
   "EasyZoning.Zone_Controller.ToolName": "Zonage Facile",
-  "EasyZoning.Zone_Controller.ToolDescription": "Ouvre le panneau EZ pour mettre à jour les routes.\nRaccourci : Shift+V",
+  "EasyZoning.Zone_Controller.ToolDescription": "Ouvre le panneau EZ pour mettre à jour les routes.\nRaccourci : Ctrl+V",
 
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Changement de zonage",
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "Courbes",

@@ -1,7 +1,7 @@
 // File: src/Tools/KeybindHotkeySystem.cs
 // Purpose: Default hotkey toggles EasyZoning.ZoningTool on/off.
 // Notes:
-//   - actual keybind (Shift+V, etc.) is defined where Mod.ToggleToolAction is created.
+//   - actual keybind (Ctrl+V, etc.) is defined where Mod.ToggleToolAction is created.
 //   - This system only listens for the action and applies the toggle.
 //   - RMB cycling is handled inside ZoningControllerToolSystem.
 //   - Debug-only helpers live in KeybindHotkeySystem.Debug.cs.
@@ -53,6 +53,7 @@ namespace EasyZoning.Tools
 
         protected override void OnUpdate( )
         {
+
             // Action can be assigned after OnCreate; refresh if needed.
             if (m_Toggle == null)
                 m_Toggle = Mod.ToggleToolAction;

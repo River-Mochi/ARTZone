@@ -1,6 +1,6 @@
 {
   "EasyZoning.Zone_Controller.ToolName": "이지 조닝",
-  "EasyZoning.Zone_Controller.ToolDescription": "EZ 도로 업데이트 패널을 엽니다.\n단축키: Shift+V",
+  "EasyZoning.Zone_Controller.ToolDescription": "EZ 도로 업데이트 패널을 엽니다.\n단축키: Ctrl+V",
 
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "조닝 변경",
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "등고선",

@@ -17,7 +17,7 @@ namespace EasyZoning
     using CS2HonuShared;             // LogUtils (safe logging + WarnOnce)
     using EasyZoning.Tools;          // ECS systems scheduled by UpdateSystem
     using Game;                      // UpdateSystem, SystemUpdatePhase
-    using Game.Input;                // ProxyAction (Shift+V action)
+    using Game.Input;                // ProxyAction (Ctrl+V action)
     using Game.Modding;              // IMod
     using Game.SceneFlow;            // GameManager (localization manager access)
     using System;                    // Exception, Func<T>, StringComparison
@@ -44,7 +44,7 @@ namespace EasyZoning
         public const string MainIconPath = UiCouiRoot + "/images/ico-zones-color02.svg";
 
         // Rebindable action ID exposed in Options UI
-        public const string kToggleToolActionName = "ToggleZoneTool";   // default Shift+V
+        public const string kToggleToolActionName = "ToggleZoneTool";   // default Ctrl+V
 
         // ---- BUILD TAG / LOGGER ----
 
@@ -75,7 +75,7 @@ namespace EasyZoning
         }
 
         /// <summary>
-        /// ProxyAction for the Easy Zoning tool toggle (default Shift+V).
+        /// ProxyAction for the Easy Zoning tool toggle (default Ctrl+V).
         /// </summary>
         public static ProxyAction? ToggleToolAction
         {
@@ -172,7 +172,7 @@ namespace EasyZoning
                 // UI bridge: binds C# values to the React UI (runs every frame in UIUpdate).
                 updateSystem.UpdateAt<ZoneControlBridgeUI>(SystemUpdatePhase.UIUpdate);
 
-                // Hotkey system that listens to ToggleZoneTool (Shift+V).
+                // Hotkey system that listens to ToggleZoneTool (Ctrl+V).
                 updateSystem.UpdateAt<KeybindHotkeySystem>(SystemUpdatePhase.ToolUpdate);
             }
             catch (Exception ex)

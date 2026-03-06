@@ -9,60 +9,23 @@ namespace EasyZoning.Tools
 
     public partial class ZoneControlBridgeUI
     {
+
         // Toggle EZ tool on/off.
-        // Safety: refuse enabling while PhotoMode is active (or PhotoMode state cannot be read).
+        // PhotoMode enable-guard enforced inside ZoningControllerToolSystem.SetToolEnabled().
         private void ToggleTool( )
         {
             try
             {
-                // Required systems must exist.
                 if (m_MainToolSystem == null || m_ZoningTool == null)
                     return;
 
-                // Determine whether the request is enable vs disable.
-                // Reference compare (not type): only treat the exact instance as "active".
                 bool isActive = (m_MainToolSystem.activeTool == m_ZoningTool);
+                bool enable = !isActive;
 
-                // Disabling is always allowed (even during PhotoMode / even if PhotoMode check throws).
-                if (isActive)
-                {
-                    m_ZoningTool.SetToolEnabled(false);
+                m_ZoningTool.SetToolEnabled(enable);
 
 #if DEBUG
-                    Dbg("ToggleTool → enable=False (disable request)");
-#endif
-                    return;
-                }
-
-                // Enabling: guard against Photo Mode.
-                bool photoModeEnabled;
-                try
-                {
-                    photoModeEnabled = (m_PhotoModeSystem != null && m_PhotoModeSystem.Enabled);
-                }
-                catch
-                {
-                    // Fail-closed for enabling: assume PhotoMode could be active if the state cannot be read.
-                    photoModeEnabled = true;
-
-#if DEBUG
-                    Dbg("ToggleTool blocked (Photo Mode state read failed).");
-#endif
-                }
-
-                if (photoModeEnabled)
-                {
-#if DEBUG
-                    Dbg("ToggleTool blocked (Photo Mode).");
-#endif
-                    return;
-                }
-
-                // Enable request (non-Photo Mode).
-                m_ZoningTool.SetToolEnabled(true);
-
-#if DEBUG
-                Dbg("ToggleTool → enable=True");
+        Dbg("ToggleTool → enable=" + enable);
 #endif
             }
             catch
@@ -70,6 +33,7 @@ namespace EasyZoning.Tools
                 // Silent by design: UI triggers must never break the frame.
             }
         }
+
 
         // Flip tool depth mode: Both <-> None.
         private void FlipToolBothMode( )

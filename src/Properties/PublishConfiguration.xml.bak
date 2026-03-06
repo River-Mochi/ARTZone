@@ -24,7 +24,7 @@ Custom zoning for new and existing roads.
 3. Draw as usual (road appears with cells on one side or no-sides if the 3 icons are flipped off).
 
 **Existing Road**
-1. Open EZ Update panel: Shift+V toggles panel On/Off (top-left icon does the same).
+1. Open EZ Update panel: Ctrl+V toggles panel On/Off (top-left icon does the same).
 2. Select an icon to pick a zone side (see image).
 3. Hover and preview a road.
 4. Right-Click on roads to switch sides (infinitely); **RMB cycles** Both → Left → Right → None →...
@@ -91,7 +91,7 @@ No outline means it's already changed to the current selected option.
 
 <!-- Changelog -->
 <ChangeLog>
-    - Hotkey changed to Shift+V; use Options Menu to Reset to new Default (avoids conflict with Move-It mod).
+    - Hotkey changed to Ctrl+V; use Options Menu to Reset to new Default (avoids conflict with Move-It mod).
     - Existing roads: right-click 4-cycle now better, uses CS2's own tool action input for 4 states: (**Both → Left → Right → None**).
     - internal refactor and performance tweak.
 </ChangeLog>

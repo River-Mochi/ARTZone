@@ -1,6 +1,6 @@
 {
   "EasyZoning.Zone_Controller.ToolName": "Einfaches Zoning",
-  "EasyZoning.Zone_Controller.ToolDescription": "Öffnet das EZ-Panel zum Aktualisieren von Straßen.\nTastenkürzel: Shift+V",
+  "EasyZoning.Zone_Controller.ToolDescription": "Öffnet das EZ-Panel zum Aktualisieren von Straßen.\nTastenkürzel: Ctrl+V",
 
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Zonen ändern",
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "Höhenlinien",

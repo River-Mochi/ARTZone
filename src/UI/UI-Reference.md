@@ -21,6 +21,10 @@
 - For floating icon buttons, prefer:
   - `<Button variant="floating" src={IconPath} onSelect={...} />`
 
+Tool Buttons, Use onSelect (NOT onClick):
+- onSelect is the CS2 UI handler: mouse click OR gamepad SELECT.
+- Keep the GTL button independent from keybind conflicts (Ctrl+V can fail, button still works).
+
 ## Verification
 - Local types: `src/UI/types/ui.d.ts` and `src/UI/types/input.d.ts`
 - Devtools: http://localhost:9444/
@@ -28,3 +32,4 @@
   - Search module paths used by ModuleRegistry:
     - game-ui/.../tool-button.tsx
     - game-ui/.../description-tooltip.tsx
+
