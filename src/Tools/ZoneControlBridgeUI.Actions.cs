@@ -25,8 +25,9 @@ namespace EasyZoning.Tools
                 m_ZoningTool.SetToolEnabled(enable);
 
 #if DEBUG
-        Dbg("ToggleTool → enable=" + enable);
+                Dbg("ToggleTool → enable=" + enable);
 #endif
+
             }
             catch
             {
