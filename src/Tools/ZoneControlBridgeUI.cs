@@ -19,10 +19,11 @@ namespace EasyZoning.Tools
     {
         // UI bindings consumed by React.
         // (React reads these via ModID + binding name strings.)
+        private ValueBinding<bool> m_ContourEnabled = null!;
         private ValueBinding<int> m_ToolZoningMode = null!;
         private ValueBinding<int> m_RoadZoningMode = null!;
         private ValueBinding<bool> m_IsZonableRoadPrefab = null!;
-        private ValueBinding<bool> m_ContourEnabled = null!;
+      
 
         // Game systems used for tool state + Photo Mode guard.
         private ToolSystem m_MainToolSystem = null!;

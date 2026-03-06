@@ -1,7 +1,6 @@
 // File: src/UI/tsconfig.json
 {
   "compilerOptions": {
-    "jsx": "react-jsx",
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Node",
@@ -12,12 +11,14 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "src",
     "skipLibCheck": true,
+    "jsx": "react-jsx",
 
-    "typeRoots": [ "./types" ],
+    // "typeRoots": ["./types"]
+    // "typeRoots": [ "./types", "./node_modules/@types" ],
     "resolveJsonModule": true,
 
     "paths": {
       "mod.json": [ "../mod.json" ]
     }
   }
-} 
+}

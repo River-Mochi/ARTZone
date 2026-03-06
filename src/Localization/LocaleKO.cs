@@ -47,7 +47,7 @@ namespace EasyZoning
                 // Keybind (only one visible)
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "업데이트 패널 토글" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "Easy Zoning 패널 표시 (**기본 Ctrl+Z**)."
+                    "Easy Zoning 패널 표시 (**기본 Shift+V**)."
                 },
 
 

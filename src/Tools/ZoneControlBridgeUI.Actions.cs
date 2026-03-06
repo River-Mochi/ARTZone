@@ -165,7 +165,7 @@ namespace EasyZoning.Tools
         {
             try
             {
-                // Read setting each time (supports live toggling).
+                // Read setting each time (supports live toggle, click icon, instant highlight)
                 bool legacy = Mod.Settings != null && Mod.Settings.LegacyRightClickCycle;
 
                 ZoningMode current = ToolZoningMode;

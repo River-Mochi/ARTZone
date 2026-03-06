@@ -371,6 +371,11 @@ declare module "cs2/ui" {
   	hover?: UISound | string | null;
   	focus?: UISound | string | null;
   }
+
+    // Notes:
+    // - ButtonProps extends React.ButtonHTMLAttributes, so onClick exists as a DOM-style handler.
+    // - Prefer cs2/ui onSelect for cs2/ui buttons; it is intended to fire for mouse click and gamepad SELECT.
+    // - Use onClick mainly for DOM/pointer-centric widgets or components that explicitly document onClick semantics.
   export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement | HTMLDivElement> {
   	focusKey?: FocusKey;
   	debugName?: string;
@@ -380,8 +385,9 @@ declare module "cs2/ui" {
   	selectAction?: InputAction;
   	selectSound?: UISound | string | null;
   	tooltipLabel?: ReactNode;
-  	disableHint?: boolean;
-  	/** When the button is clicked or the SELECT button on a gamepad is pressed */
+      disableHint?: boolean;
+     /** Preferred handler for cs2/ui buttons: mouse click OR gamepad SELECT. */
+     /** When the button is clicked or the SELECT button on a gamepad is pressed */
   	onSelect?: () => void;
   	as?: "button" | "div";
   	hintAction?: InputAction;
@@ -393,6 +399,9 @@ declare module "cs2/ui" {
   export interface IconButtonTheme extends ButtonTheme {
   	icon: string;
   }
+
+    // Icon buttons use `src` for the icon asset (e.g., coui://ui-mods/images/...).
+    // cs2/ui Button supports icon-style usage via optional `src` because it includes Partial<...IconButtonProps>.
   export interface IconButtonProps extends ButtonProps {
   	src: string;
   	tinted?: boolean;

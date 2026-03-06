@@ -1,6 +1,6 @@
 {
   "EasyZoning.Zone_Controller.ToolName": "簡単ゾーニング",
-  "EasyZoning.Zone_Controller.ToolDescription": "EZの道路更新パネルを開きます。\nショートカット: Ctrl+Z",
+  "EasyZoning.Zone_Controller.ToolDescription": "EZの道路更新パネルを開きます。\nショートカット: Shift+V",
 
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "ゾーン変更",
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "等高線",

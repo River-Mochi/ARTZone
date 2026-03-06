@@ -1,7 +1,10 @@
 // File: src/UI/src/mods/ez-zone-tool-button.tsx
 // Purpose:
 //   Floating GameTopLeft launcher button (icon + tooltip).
-//   Click triggers ToggleZoneControllerTool on the C# side.
+//   Clicking triggers ToggleZoneControllerTool on the C# side.
+// Notes:
+//   - Uses cs2/ui Button "floating" variant, with icon via the `src` prop.
+//   - Uses onSelect (CS2 UI convention: mouse click OR gamepad select).
 
 import React from "react";
 import { Button } from "cs2/ui";
@@ -17,15 +20,15 @@ import MainIconPath from "../../images/ico-zones-color02.svg";
 export default function EZZoneToolButton() {
     const { translate } = useLocalization();
 
-    // Tooltip strings live in locale files; fallback text here.
+    // Tooltip strings live in locale files; fallback text lives here.
     const title = translate("EasyZoning.Zone_Controller.ToolName", "Easy Zoning");
     const description = translate(
         "EasyZoning.Zone_Controller.ToolDescription",
-        "This opens the EZ update roads panel.\nShortcut: Ctrl+Z"
+        "This opens the EZ update roads panel.\nShortcut: Shift+V"
     );
 
     // UI only sends the trigger; C# side performs tool toggle + PhotoMode guard.
-    const handleClick = () => {
+    const handleSelect = () => {
         trigger(mod.id, "ToggleZoneControllerTool");
 
         // Devtools trace (localhost:9444).
@@ -41,9 +44,11 @@ export default function EZZoneToolButton() {
 
     return (
         <DescriptionTooltip title={title} description={description} direction="right">
-            <Button variant="floating" onClick={handleClick}>
-                <img src={MainIconPath} />
-            </Button>
+            <Button
+                variant="floating"
+                src={MainIconPath}
+                onSelect={handleSelect}
+            />
         </DescriptionTooltip>
     );
 }

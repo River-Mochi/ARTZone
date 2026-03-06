@@ -47,7 +47,7 @@ namespace EasyZoning
                 // Keybind (only one visible)
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Attiva/disattiva pannello di aggiornamento" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "Mostra il pannello Easy Zoning (**Ctrl+Z predefinito**)."
+                    "Mostra il pannello Easy Zoning (**Shift+V predefinito**)."
                 },
 
 

@@ -496,7 +496,7 @@ namespace EasyZoning.Tools
             m_ToolRaycastSystem.netLayerMask = Layer.Road;
         }
 
-        // Called by UI button / Ctrl+Z hotkey.
+        // Called by UI button / Shift+V hotkey.
         public void SetToolEnabled(bool isEnabled)
         {
             if (m_ToolSystem == null)

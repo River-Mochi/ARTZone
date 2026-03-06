@@ -24,7 +24,7 @@ Custom zoning for new and existing roads.
 3. Draw as usual (road appears with cells on one side or no-sides if the 3 icons are flipped off).
 
 **Existing Road**
-1. Open EZ Update panel: Ctrl+Z toggles panel On/Off (top-left icon does the same).
+1. Open EZ Update panel: Shift+V toggles panel On/Off (top-left icon does the same).
 2. Select an icon to pick a zone side (see image).
 3. Hover and preview a road.
 4. Right-Click on roads to switch sides (infinitely); **RMB cycles** Both → Left → Right → None →...
@@ -37,7 +37,7 @@ Options Menu
 - ✅ Protect occupied cells (buildings).
 - ✅ Protect zoned-but-empty cells.
 - ✅ Default **Ctrl +Z** short-cut can be changed (it opens/closes EZ panel fast)
-- ✅ **Legacy RMB mode** (optional): RMB toggles only **Left↔Right** or **Both↔None** instead of all 4-cycles.
+- ✅ **Legacy RMB mode** (optional): RMB toggles only **Left↔Right** Or **Both↔None** instead of all 4-cycles.
 
 ## Compatibility
 - To avoid conflicts, do not run "Zone Tools" or ART mod at the same time as EZ.
@@ -82,7 +82,7 @@ No outline means it's already changed to the current selected option.
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/easy-zoning.1905089/" />
 
 	<!-- Versioning of mod and base game-->
-	<ModVersion Value="1.0.5" />
+	<ModVersion Value="1.0.6" />
 	<GameVersion Value="1.5.*" />
 
 	<!-- Dependencies / DLC (optional) -->
@@ -91,9 +91,9 @@ No outline means it's already changed to the current selected option.
 
 <!-- Changelog -->
 <ChangeLog>
-- updated RMB 4-cycle mode: **Both → Left → Right → None**
-- update images
-- updated locales
+    - Hotkey changed to Shift+V; use Options Menu to Reset to new Default (avoids conflict with Move-It mod).
+    - Existing roads: right-click 4-cycle now better, uses CS2's own tool action input for 4 states: (**Both → Left → Right → None**).
+    - internal refactor and performance tweak.
 </ChangeLog>
 
 	<!-- External links -->
