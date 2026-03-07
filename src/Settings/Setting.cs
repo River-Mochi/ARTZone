@@ -1,8 +1,9 @@
 // File: src/Settings/Setting.cs
-// Purpose: Options UI + one rebindable hotkey (Ctrl+Z).
+// Purpose: Options UI + one rebindable hotkey (default Ctrl+V).
 // Notes:
-//   - Only Ctrl+Z is declared here (Options → Keybindings).
-//   - RMB is NOT declared here; the tool uses CS2's built-in Secondary Apply to cycle.
+//   - Keyboard action declared once (ToggleZoneTool), game shows it in Options.
+//   - Default binding defined by SettingsUIKeyboardBinding (Ctrl+V).
+//   - RMB cycling is not declared here; it uses the game’s built-in SecondaryApply tool action.
 
 namespace EasyZoning
 {
@@ -13,15 +14,15 @@ namespace EasyZoning
     using System;                    // Exception in URL open handlers
     using UnityEngine;               // Application.OpenURL
 
-    // Persisted settings location
+    // Persist settings under: .../ModsSettings/EasyZoning/EasyZoning
     [FileLocation("ModsSettings/EasyZoning/EasyZoning")]
 
-    // Tabs & groups
+    // Options UI structure.
     [SettingsUITabOrder(kActionsTab, kAboutTab)]
     [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup, kLegacyGroup, kAboutInfoGroup, kAboutLinksGroup)]
     [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup, kLegacyGroup)]
 
-    // Declare ONLY the keyboard action (Ctrl+Z). RMB uses the game’s built-in Secondary Apply action.
+    // Declares the rebindable action that appears in Options → Key bindings.
     [SettingsUIKeyboardAction(Mod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
     public sealed class Setting : ModSetting
     {
@@ -54,9 +55,10 @@ namespace EasyZoning
             get; set;
         } = true;
 
-        // --- Key bindings (only Ctrl+Z exposed) ---
-
-        [SettingsUIKeyboardBinding(BindingKeyboard.Z, Mod.kToggleToolActionName, ctrl: true)]
+        // --- Key bindings ---
+        // ProxyBinding holds the saved/rebound key, stored by the settings system.
+        // Default is Ctrl+V, declared by SettingsUIKeyboardBinding.
+        [SettingsUIKeyboardBinding(BindingKeyboard.V, Mod.kToggleToolActionName, ctrl: true)]
         [SettingsUISection(kActionsTab, kKeybindingGroup)]
         public ProxyBinding ToggleZoneTool
         {
@@ -66,9 +68,8 @@ namespace EasyZoning
         // --- Legacy Tool behavior ---
 
         // RMB cycling (update-existing-roads tool):
-        // Legacy
-        // - OFF (default): full 4-cycle (Both → Left → Right → None → Both)
-        // - ON: legacy 2-set toggle (Left ↔ Right, Both ↔ None)
+        // - OFF (default): Both → Left → Right → None → ...
+        // - ON: Left <-> Right OR Both <-> None
         [SettingsUISection(kActionsTab, kLegacyGroup)]
         public bool LegacyRightClickCycle
         {
@@ -131,6 +132,7 @@ namespace EasyZoning
             RemoveZonedCells = true;
             RemoveOccupiedCells = true;
             LegacyRightClickCycle = false;
+            // ToggleZoneTool default binding from SettingsUIKeyboardBinding (Ctrl+V).
         }
     }
 }

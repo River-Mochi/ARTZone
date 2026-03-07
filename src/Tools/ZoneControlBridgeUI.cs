@@ -19,6 +19,7 @@ namespace EasyZoning.Tools
     {
         // UI bindings consumed by React.
         // (React reads these via ModID + binding name strings.)
+        private ValueBinding<bool> m_ContourEnabled = null!;
         private ValueBinding<int> m_ToolZoningMode = null!;
         private ValueBinding<int> m_RoadZoningMode = null!;
         private ValueBinding<bool> m_IsZonableRoadPrefab = null!;
@@ -123,7 +124,7 @@ namespace EasyZoning.Tools
                 new ValueBinding<bool>(Mod.ModID, "IsZonableRoadPrefab", false));
 
             // PhotoMode: expose a read-only binding for UI checks.
-            // Also used internally for the safety latch.
+            // safety latch: auto-shutdown when photoMode begins.
             m_PhotoModeSystem = World.GetOrCreateSystemManaged<PhotoModeRenderSystem>();
             AddUpdateBinding(new GetterValueBinding<bool>(
                 Mod.ModID,

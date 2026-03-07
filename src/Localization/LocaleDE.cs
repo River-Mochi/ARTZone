@@ -47,7 +47,7 @@ namespace EasyZoning
                 // Keybind (only one visible)
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Update-Panel umschalten" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "Easy-Zoning-Panel anzeigen (**Standard Ctrl+Z**)."
+                    "Easy-Zoning-Panel anzeigen (**Standard Ctrl+V**)."
                 },
 
 

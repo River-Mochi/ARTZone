@@ -1,4 +1,4 @@
-﻿// File: src/Localization/LocaleEN.cs
+// File: src/Localization/LocaleEN.cs
 // Purpose: English (en-US) strings for Options UI + Panel text.
 
 namespace EasyZoning
@@ -47,7 +47,7 @@ namespace EasyZoning
                 // Keybind (only one visible)
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Toggle Update Panel" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "Show the Easy Zoning panel (**default Ctrl+Z**)."
+                    "Show the Easy Zoning panel (**default Ctrl+V**)."
                 },
 
 
@@ -58,7 +58,7 @@ namespace EasyZoning
                     "Both → Left → Right → None → ...\n\n" +
                     "Faster, less need to move mouse back to the panel.\n\n" +
 
-                    "When **ON** - enabled: the RMB toggles in two separate sets either:\n" +
+                    "When ON (enabled): the RMB toggles in two separate sets either:\n" +
                     "Left ↔ Right\n" +
                     "Both ↔ None"
 

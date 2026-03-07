@@ -47,7 +47,7 @@ namespace EasyZoning
                 // Keybind (only one visible)
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Alternar painel de atualização" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "Mostrar o painel Easy Zoning (**padrão Ctrl+Z**)."
+                    "Mostrar o painel Easy Zoning (**padrão Ctrl+V**)."
                 },
 
 

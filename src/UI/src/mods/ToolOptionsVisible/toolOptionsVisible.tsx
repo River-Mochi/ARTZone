@@ -1,7 +1,10 @@
 // File: src/UI/src/mods/ToolOptionsVisible/toolOptionsVisible.tsx
 // Purpose:
 //   Keep the Tool Options panel visible while the Easy Zoning tool is active.
+// Notes:
+//   - useValue(...) subscribes to activeTool$ so visibility updates immediately on tool changes.
 
+import { useValue } from "cs2/api";
 import { tool } from "cs2/bindings";
 import { ZONING_TOOL_ID } from "../../shared/tool-ids";
 
@@ -15,11 +18,11 @@ export const ToolOptionsVisibility: ExtendHook<UseToolOptionsVisible> = (useTool
         // Preserve vanilla behavior first.
         const vanillaVisible = !!useToolOptionsVisible?.(...args);
 
-        // Coherent binding: current active tool instance (id is stable identifier).
-        const activeId = tool.activeTool$.value?.id;
+        // Reactive read: re-render when active tool changes (id is stable identifier)
+        const activeId = useValue(tool.activeTool$)?.id;
         const ours = activeId === ZONING_TOOL_ID;
 
-        // Force-visible when EZ tool is active so buttons remain accessible.
+        // Keep Tool Options open when EZ tool is active (vanilla may hide it otherwise).
         return vanillaVisible || ours;
     };
 };

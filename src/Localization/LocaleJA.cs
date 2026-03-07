@@ -47,7 +47,7 @@ namespace EasyZoning
                 // Keybind (only one visible)
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "更新パネルの切り替え" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "Easy Zoning パネルを表示（**既定 Ctrl+Z**）。"
+                    "Easy Zoning パネルを表示（**既定 Ctrl+V**）。"
                 },
 
 

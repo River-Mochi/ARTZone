@@ -1,6 +1,6 @@
 {
   "EasyZoning.Zone_Controller.ToolName": "Zonificación Fácil",
-  "EasyZoning.Zone_Controller.ToolDescription": "Esto abre el panel de EZ para actualizar carreteras.\nAtajo: Ctrl+Z",
+  "EasyZoning.Zone_Controller.ToolDescription": "Esto abre el panel de EZ para actualizar carreteras.\nAtajo: Ctrl+V",
 
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Cambio de zonificación",
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "Contorno",

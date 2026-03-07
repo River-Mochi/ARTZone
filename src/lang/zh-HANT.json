@@ -1,6 +1,6 @@
 {
   "EasyZoning.Zone_Controller.ToolName": "輕鬆分區",
-  "EasyZoning.Zone_Controller.ToolDescription": "開啟 EZ 的道路更新面板。\n快捷鍵: Ctrl+Z",
+  "EasyZoning.Zone_Controller.ToolDescription": "開啟 EZ 的道路更新面板。\n快捷鍵: Ctrl+V",
 
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "分區變更",
   "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "等高線",
