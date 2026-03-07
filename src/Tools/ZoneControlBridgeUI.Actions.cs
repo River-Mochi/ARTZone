@@ -205,47 +205,5 @@ namespace EasyZoning.Tools
             {
             }
         }
-
-        // Toggle contour line snapping on the currently active tool.
-        private void ToggleContourLines( )
-        {
-            try
-            {
-                // Update mod binding first (UI state).
-                bool next = !ContourEnabled;
-                m_ContourEnabled.Update(next);
-
-                // Apply to the active tool snap flags.
-                ToolSystem toolSystem = m_MainToolSystem;
-                if (toolSystem == null)
-                    return;
-
-                ToolBaseSystem active = toolSystem.activeTool;
-                if (active == null)
-                    return;
-
-                try
-                {
-                    Snap snap = active.selectedSnap;
-
-                    if (next)
-                        snap |= Snap.ContourLines;
-                    else
-                        snap &= ~Snap.ContourLines;
-
-                    active.selectedSnap = snap;
-
-#if DEBUG
-                    Dbg($"ToggleContourLines → {(next ? "ON" : "OFF")} selectedSnap={snap}");
-#endif
-                }
-                catch
-                {
-                }
-            }
-            catch
-            {
-            }
-        }
     }
 }

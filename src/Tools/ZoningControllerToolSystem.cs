@@ -12,7 +12,9 @@
 
 namespace EasyZoning.Tools
 {
+    using Colossal.Serialization.Entities;
     using EasyZoning.Components;     // ZoningPreviewComponent, ZoningDepthComponent
+    using Game;
     using Game.Audio;                // ToolUXSoundSettingsData, AudioManager UI sounds
     using Game.Common;               // Updated marker (dirty flag)
     using Game.Net;                  // Layer
@@ -20,6 +22,7 @@ namespace EasyZoning.Tools
     using Game.Tools;                // ToolBaseSystem, ToolSystem, RaycastHit, ToolOutputBarrier
     using Game.Zones;                // SubBlock (zone blocks buffer on road net entities)
     using System;                    // Exception (WarnOnce guard)
+    using System.Reflection;
     using Unity.Collections;         // NativeArray, NativeList, Allocator
     using Unity.Entities;            // Entity, EntityQuery, ComponentLookup, BufferLookup, ECB
     using Unity.Jobs;                // JobHandle, IJob, IJobParallelFor
@@ -46,6 +49,8 @@ namespace EasyZoning.Tools
         private EntityQuery m_SoundbankQuery;
 
         private PrefabBase m_ToolPrefab = null!;
+
+        private bool m_FoundTopoToggle; // Use to determine if contour snapping should be shown or not.
 
         // Selected/preview road entities for “drag to apply”.
         private NativeList<Entity> m_SelectedEntities;
@@ -139,12 +144,6 @@ namespace EasyZoning.Tools
             requireNet = Layer.Road;
             allowUnderground = false;
 
-            // Contour snap option is controlled by UI toggle.
-            bool contourOn = m_UISystem != null && m_UISystem.ContourEnabled;
-            selectedSnap = contourOn
-                ? (Snap.All | Snap.ContourLines)
-                : (Snap.All & ~Snap.ContourLines);
-
 #if DEBUG
             Dbg("OnStartRunning: tool ACTIVE");
 #endif
@@ -183,19 +182,27 @@ namespace EasyZoning.Tools
         public override void GetAvailableSnapMask(out Snap onMask, out Snap offMask)
         {
             base.GetAvailableSnapMask(out onMask, out offMask);
-
-            // Keep contour snap state consistent with the UI toggle.
-            bool contourOn = m_UISystem != null && m_UISystem.ContourEnabled;
-
-            if (contourOn)
+            if (!m_FoundTopoToggle)
             {
                 onMask |= Snap.ContourLines;
-                offMask &= ~Snap.ContourLines;
-            }
-            else
-            {
-                onMask &= ~Snap.ContourLines;
                 offMask |= Snap.ContourLines;
+            }
+        }
+
+        protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
+        {
+            base.OnGameLoadingComplete(purpose, mode);
+            // Topo toggle compatibility
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+            foreach (Assembly assembly in assemblies)
+            {
+                if (assembly.FullName.Contains("TopoToggle,"))
+                {
+                    Mod.s_Log.Info($"{nameof(ZoningControllerToolSystem)}.{nameof(OnGameLoadingComplete)} Found Assembly: {assembly.FullName}"); // You can remove this log if you don't want it.
+                    m_FoundTopoToggle = true;
+                    break;
+                }
             }
         }
 
