@@ -24,7 +24,6 @@ namespace EasyZoning.Tools
         private ValueBinding<int> m_RoadZoningMode = null!;
         private ValueBinding<bool> m_IsZonableRoadPrefab = null!;
 
-
         // Game systems used for tool state + Photo Mode guard.
         private ToolSystem m_MainToolSystem = null!;
         private ZoningControllerToolSystem m_ZoningTool = null!;
@@ -36,7 +35,6 @@ namespace EasyZoning.Tools
         // Convenience getters for current binding values.
         public ZoningMode ToolZoningMode => (ZoningMode) m_ToolZoningMode.value;
         public ZoningMode RoadZoningMode => (ZoningMode) m_RoadZoningMode.value;
-        public bool ContourEnabled => m_ContourEnabled.value;
 
         // Converts a mode (Left/Right/Both/None) into depth values used by UI sliders.
         private static int2 DepthsFromMode(ZoningMode mode)
@@ -124,8 +122,6 @@ namespace EasyZoning.Tools
                 new ValueBinding<int>(Mod.ModID, "RoadZoningMode", (int) ZoningMode.Both));
             AddBinding(m_IsZonableRoadPrefab =
                 new ValueBinding<bool>(Mod.ModID, "IsZonableRoadPrefab", false));
-            AddBinding(m_ContourEnabled =
-                new ValueBinding<bool>(Mod.ModID, "ContourEnabled", false));
 
             // PhotoMode: expose a read-only binding for UI checks.
             // safety latch: auto-shutdown when photoMode begins.
@@ -141,7 +137,6 @@ namespace EasyZoning.Tools
             AddBinding(new TriggerBinding(Mod.ModID, "FlipToolBothMode", FlipToolBothMode));
             AddBinding(new TriggerBinding(Mod.ModID, "FlipRoadBothMode", FlipRoadBothMode));
             AddBinding(new TriggerBinding(Mod.ModID, "ToggleZoneControllerTool", ToggleTool));
-            AddBinding(new TriggerBinding(Mod.ModID, "ToggleContourLines", ToggleContourLines));
 
             // ToolSystem events drive section visibility updates.
             try

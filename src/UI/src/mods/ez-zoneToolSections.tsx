@@ -42,7 +42,6 @@ export enum ZoningMode {
 const RoadZoningMode$ = bindValue<number>(mod.id, "RoadZoningMode");
 const ToolZoningMode$ = bindValue<number>(mod.id, "ToolZoningMode");
 const IsZonableRoadPrefab$ = bindValue<boolean>(mod.id, "IsZonableRoadPrefab");
-const ContourEnabled$ = bindValue<boolean>(mod.id, "ContourEnabled");
 
 // C# binding (ZoneControlBridgeUI exposes IsPhotoMode).
 const IsPhotoMode$ = bindValue<boolean>(mod.id, "IsPhotoMode");
@@ -62,10 +61,6 @@ function flipRoadBothMode() {
 
 function flipToolBothMode() {
     trigger(mod.id, "FlipToolBothMode");
-}
-
-function toggleContourLines() {
-    trigger(mod.id, "ToggleContourLines");
 }
 
 // registry.extend hook: wraps the vanilla MouseToolOptions component.
@@ -90,7 +85,6 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
         // Current mode state read from bindings.
         const toolMode = useValue(ToolZoningMode$) as ZoningMode;
         const roadMode = useValue(RoadZoningMode$) as ZoningMode;
-        const contourEnabled = !!useValue(ContourEnabled$);
 
         // Render vanilla first. If vanilla throws, do not take down the UI.
         let result: any;
@@ -181,25 +175,7 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
 
         const sections: any[] = [];
 
-        // Contour row: only when EZ tool is active (update-existing mode).
-        if (zoningToolOn) {
-            sections.push(
-                <Section key="EZ_Contour" title={titleContour}>
-                    <div className={rowClass}>
-                        <ToolButton
-                            selected={contourEnabled}
-                            tooltip={tipContour}
-                            onSelect={toggleContourLines}
-                            src={IconContour}
-                            focusKey={FOCUS_DISABLED}
-                            className={toolButtonClass}
-                        />
-                    </div>
-                </Section>
-            );
-        }
-
-        // Zone row: shown for both vanilla road tool and EZ tool.
+        // Zone row: shown for both vanilla road tool (new roads) and EZ tool (update mode).
         if (shouldShowZoneSection) {
             // If a road prefab is active and EZ tool is not, UI edits RoadZoningMode.
             // Otherwise UI edits ToolZoningMode (EZ tool state).
