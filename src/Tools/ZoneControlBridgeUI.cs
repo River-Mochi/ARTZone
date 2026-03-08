@@ -37,7 +37,7 @@ namespace EasyZoning.Tools
         public ZoningMode RoadZoningMode => (ZoningMode) m_RoadZoningMode.value;
         public bool ContourEnabled => m_ContourEnabled.value;
 
-        // Converts a mode (Left/Right/Both/None) into depth values used by UI sliders.
+        // Converts a mode (Left/Right/Both/None) into two depth numbers (LeftCells, rightCells) that UI uses internally.
         private static int2 DepthsFromMode(ZoningMode mode)
         {
             return new int2(
