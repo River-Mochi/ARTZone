@@ -24,13 +24,12 @@ namespace EasyZoning.Tools
         private ValueBinding<int> m_RoadZoningMode = null!;
         private ValueBinding<bool> m_IsZonableRoadPrefab = null!;
 
-
-        // Game systems used for tool state + Photo Mode guard.
+        // Game systems used for tool state + PhotoMode guard.
         private ToolSystem m_MainToolSystem = null!;
         private ZoningControllerToolSystem m_ZoningTool = null!;
         private PhotoModeRenderSystem m_PhotoModeSystem = null!;
 
-        // Tracks last Photo Mode state to detect OFF -> ON edge.
+        // Tracks last PhotoMode state to detect OFF -> ON edge.
         private bool m_LastPhotoModeEnabled;
 
         // Convenience getters for current binding values.
@@ -91,7 +90,11 @@ namespace EasyZoning.Tools
             if (log == null)
                 return;
 
-            try { log.Info("[EZ][UI] " + msg); } catch { }
+            try
+            {
+                log.Info("[EZ][UI] " + msg);
+            }
+            catch { }
         }
 
         private static string ModeToStr(ZoningMode z) =>
@@ -127,8 +130,11 @@ namespace EasyZoning.Tools
             AddBinding(m_ContourEnabled =
                 new ValueBinding<bool>(Mod.ModID, "ContourEnabled", false));
 
+            // UI -> C# logging trigger (UI can write into EasyZoning.log).
+            AddBinding(new TriggerBinding<string>(Mod.ModID, "UILogWarn", UILogWarn));
+
             // PhotoMode: expose a read-only binding for UI checks.
-            // safety latch: auto-shutdown when photoMode begins.
+            // Safety latch: auto-shutdown when Photo Mode begins.
             m_PhotoModeSystem = World.GetOrCreateSystemManaged<PhotoModeRenderSystem>();
             AddUpdateBinding(new GetterValueBinding<bool>(
                 Mod.ModID,
@@ -195,6 +201,7 @@ namespace EasyZoning.Tools
 
 #if DEBUG
                 Dbg($"Init visibility → show={show}, tool={(activeTool != null ? activeTool.GetType().Name : "(null)")}, prefab={(activePrefab != null ? activePrefab.name : "(null)")}");
+
 #endif
             }
             catch { }
@@ -276,6 +283,7 @@ namespace EasyZoning.Tools
 
 #if DEBUG
                 Dbg($"OnToolChanged: show={show} activeTool={(tool != null ? tool.GetType().Name : "(null)")} prefab={(prefab != null ? prefab.name : "(null)")}");
+
 #endif
             }
             catch { }
@@ -298,6 +306,7 @@ namespace EasyZoning.Tools
 
 #if DEBUG
                 Dbg($"OnPrefabChanged: show={show} prefab={(prefab != null ? prefab.name : "(null)")} tool={(tool != null ? tool.GetType().Name : "(null)")}");
+
 #endif
             }
             catch { }

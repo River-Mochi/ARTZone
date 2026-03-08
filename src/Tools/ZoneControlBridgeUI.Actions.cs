@@ -2,6 +2,7 @@
 // Purpose:
 //  • UI trigger handlers and small helper actions for ZoneControlBridgeUI.
 //  • Contains CycleMode() (RMB behavior) and toggle/apply UI bindings.
+//  • Contour line snap.
 
 namespace EasyZoning.Tools
 {
@@ -9,6 +10,20 @@ namespace EasyZoning.Tools
 
     public partial class ZoneControlBridgeUI
     {
+        // UI -> C# log bridge (writes console problems to EasyZoning.log).
+        private void UILogWarn(string message)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(message))
+                    return;
+
+                Mod.s_Log?.Warn("[EZ][UI] " + message);
+            }
+            catch
+            {
+            }
+        }
 
         // Toggle EZ tool on/off.
         // PhotoMode enable-guard enforced inside ZoningControllerToolSystem.SetToolEnabled().
@@ -27,14 +42,12 @@ namespace EasyZoning.Tools
 #if DEBUG
                 Dbg("ToggleTool → enable=" + enable);
 #endif
-
             }
             catch
             {
                 // Silent by design: UI triggers must never break the frame.
             }
         }
-
 
         // Flip tool depth mode: Both <-> None.
         private void FlipToolBothMode( )
@@ -123,8 +136,8 @@ namespace EasyZoning.Tools
 
         /// <summary>
         /// Update panel: RMB cycle behavior
-        /// - Default (LegacyRightClickCycle OFF): Both → Left → Right → None → ...
-        /// - Legacy (LegacyRightClickCycle ON): Left <-> Right "OR" Both <-> None
+        /// - Default (LegacyRightClickCycle OFF) do all: Both → Left → Right → None → ...
+        /// - Legacy (LegacyRightClickCycle ON) do 2 sets: Left <-> Right "OR" Both <-> None
         /// </summary>
         public void CycleMode( )
         {
