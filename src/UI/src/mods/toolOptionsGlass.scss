@@ -1,0 +1,32 @@
+// File: src/UI/src/mods/toolOptionsGlass.scss
+// Purpose:
+//   Make the vanilla Tool Options panel translucent while EZ tool is active.
+// Notes:
+//   - Activated by body class: "ez-tooloptions-glass".
+//   - Only affects Tool Options panel (best-effort selector match).
+
+/* Panel root (try both hyphen + camel variants, game updates can vary) */
+body.ez-tooloptions-glass [class*="tool-options-panel_"],
+body.ez-tooloptions-glass [class*="toolOptionsPanel_"] {
+    --menuPanel1: transparent;
+    --menuPanel2: transparent;
+    --panelColorDark: transparent;
+    --panelColorNormal: transparent;
+    --sectionHeaderColor: transparent;
+    background-color: transparent !important;
+    background-image: none !important;
+}
+
+    /* Header tint */
+    body.ez-tooloptions-glass [class*="tool-options-panel_"] [class*="header_"],
+    body.ez-tooloptions-glass [class*="toolOptionsPanel_"] [class*="header_"] {
+        background-color: rgba(40, 58, 74, 0.32) !important;
+        background-image: none !important;
+    }
+
+    /* Content tint */
+    body.ez-tooloptions-glass [class*="tool-options-panel_"] [class*="content_"],
+    body.ez-tooloptions-glass [class*="toolOptionsPanel_"] [class*="content_"] {
+        background-color: rgba(255, 255, 255, 0.10) !important;
+        background-image: none !important;
+    }

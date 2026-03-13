@@ -16,7 +16,7 @@ namespace EasyZoning
             IList<IDictionaryEntryError> errors,
             Dictionary<string, int> indexCounts)
         {
-            var d = new Dictionary<string, string>
+            Dictionary<string, string> d = new Dictionary<string, string>
             {
                 // Options title (single source of truth from Mod.cs)
                 { m_Settings.GetSettingsLocaleID(), Mod.ModName + " " + Mod.ModTag },
@@ -66,10 +66,6 @@ namespace EasyZoning
 
                 // Binding title in the keybinding dialog
                 { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Przełącz panel przycisków Easy Zoning" },
-
-                { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                    "Zmień strefowanie: obie strony, lewa<->prawa albo brak.\n" +
-                    "Lewy klik zatwierdza wybór. Przytrzymaj lewy klik + przeciągnij wzdłuż drogi, aby zaktualizować wiele segmentów." },
 
                 // About tab labels
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Nazwa moda" },

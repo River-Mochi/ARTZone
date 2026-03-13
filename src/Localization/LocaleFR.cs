@@ -67,10 +67,6 @@ namespace EasyZoning
                 // Binding title in the keybinding dialog
                 { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Easy Zoning – Basculer le panneau" },
 
-                { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                    "Modifier le zonage : deux côtés, gauche<->droite, ou aucun.\n" +
-                    "Clic gauche confirme le choix. Maintenir clic gauche + glisser le long d’une route pour mettre à jour plusieurs segments." },
-
                 // About tab labels
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Nom du mod" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Nom d’affichage de ce mod." },

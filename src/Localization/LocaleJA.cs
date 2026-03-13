@@ -67,10 +67,6 @@ namespace EasyZoning
                 // Binding title in the keybinding dialog
                 { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Easy Zoning ボタンパネルの切り替え" },
 
-                { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                    "ゾーンを変更：両側、左<->右、またはなし。\n" +
-                    "左クリックで確定。左クリック長押し + 道路に沿ってドラッグで複数セグメントを更新します。" },
-
                 // About tab labels
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Mod 名" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "このModの表示名。" },

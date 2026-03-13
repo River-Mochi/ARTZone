@@ -6,6 +6,7 @@
 import type { ModRegistrar, ModuleRegistry } from "cs2/modding";
 import { VanillaComponentResolver } from "./components/VanillaComponentResolver";
 import mod from "mod.json";
+import "./mods/toolOptionsGlass.scss";
 
 import EasyZoningToolButton from "./mods/ez-zone-tool-button";
 import { ZoningToolController } from "./mods/ez-zoneToolSections";

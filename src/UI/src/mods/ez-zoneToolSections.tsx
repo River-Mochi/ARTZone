@@ -87,6 +87,29 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
         // True when EZ tool is the active tool.
         const zoningToolOn = activeToolId === ZONING_TOOL_ID;
 
+        // Make the vanilla Tool Options panel transparent ONLY while EZ tool is active.
+        // This is styling only (no behavior changes).
+        // Uses a body class so SCSS can target vanilla DOM safely.
+        React.useEffect(() => {
+            const cls = "ez-tooloptions-glass";
+
+            try {
+                if (zoningToolOn && !photoMode) {
+                    document.body.classList.add(cls);
+                } else {
+                    document.body.classList.remove(cls);
+                }
+            } catch {
+            }
+
+            return () => {
+                try {
+                    document.body.classList.remove(cls);
+                } catch {
+                }
+            };
+        }, [zoningToolOn, photoMode]);
+
         // Current mode state read from bindings.
         const toolMode = useValue(ToolZoningMode$) as ZoningMode;
         const roadMode = useValue(RoadZoningMode$) as ZoningMode;

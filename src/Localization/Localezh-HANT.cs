@@ -16,7 +16,7 @@ namespace EasyZoning
             IList<IDictionaryEntryError> errors,
             Dictionary<string, int> indexCounts)
         {
-            var d = new Dictionary<string, string>
+            Dictionary<string, string> d = new Dictionary<string, string>
             {
                 // Options title (single source of truth from Mod.cs)
                 { m_Settings.GetSettingsLocaleID(), Mod.ModName + " " + Mod.ModTag },
@@ -66,10 +66,6 @@ namespace EasyZoning
 
                 // Binding title in the keybinding dialog
                 { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "切換 Easy Zoning 按鈕面板" },
-
-                { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                    "更改分區：雙側、左<->右，或無。\n" +
-                    "左鍵確認選擇。按住左鍵並沿道路拖曳，可更新多個路段。" },
 
                 // About tab labels
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "模組名稱" },

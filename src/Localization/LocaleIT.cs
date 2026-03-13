@@ -16,7 +16,7 @@ namespace EasyZoning
             IList<IDictionaryEntryError> errors,
             Dictionary<string, int> indexCounts)
         {
-            var d = new Dictionary<string, string>
+            Dictionary<string, string> d = new Dictionary<string, string>
             {
                 // Options title (single source of truth from Mod.cs)
                 { m_Settings.GetSettingsLocaleID(), Mod.ModName + " " + Mod.ModTag },
@@ -66,10 +66,6 @@ namespace EasyZoning
 
                 // Binding title in the keybinding dialog
                 { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Attiva/disattiva pannello pulsanti Easy Zoning" },
-
-                { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                    "Cambia zonizzazione: entrambi i lati, sinistra<->destra, o nessuno.\n" +
-                    "Clic sinistro conferma la scelta. Tieni premuto clic sinistro + trascina lungo una strada per aggiornare più segmenti." },
 
                 // About tab labels
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Nome mod" },

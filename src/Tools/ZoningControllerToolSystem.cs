@@ -29,8 +29,7 @@ namespace EasyZoning.Tools
 
     public partial class ZoningControllerToolSystem : ToolBaseSystem
     {
-        public const string ToolID = "EasyZoning.ZoningTool";
-        public override string toolID => ToolID;
+        public override string toolID => "EasyZoning.ZoningTool";
 
         // Vanilla zoning depth baseline (cells). If road has no ZoningDepthComponent,
         // treat it as vanilla (6,6).
