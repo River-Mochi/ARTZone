@@ -6,6 +6,8 @@
 import type { ModRegistrar, ModuleRegistry } from "cs2/modding";
 import { VanillaComponentResolver } from "./components/VanillaComponentResolver";
 import mod from "mod.json";
+
+// Global (non-module) styling for EZ-only glass Tool Options panel.
 import "./mods/toolOptionsGlass.scss";
 
 import EasyZoningToolButton from "./mods/ez-zone-tool-button";

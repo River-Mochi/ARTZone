@@ -1,14 +1,13 @@
 // File: src/UI/src/mods/ez-zoneToolSections.tsx
 // Purpose:
-//   Injects Easy Zoning controls into the Tool Options panel.
-//   When relevant, appends EZ sections after vanilla sections so
-//   snap/underground rows and other vanilla rows remain visible.
-//
-// Safety / robustness:
-//   - Never inject in PhotoMode (vanilla UI must remain stable).
-//   - Never assumes vanilla element shape; returns vanilla unchanged if unexpected.
-//   - Never mutates result.props directly (uses React.cloneElement).
-//   - All hooks are unconditional calls.
+//   Inject Easy Zoning controls into the vanilla Tool Options panel.
+//   Existing-roads tool uses a compact transparent layout.
+// Notes:
+//   - No custom UI in Photo Mode.
+//   - New-road vanilla tool panel keeps vanilla labels.
+//   - Existing-roads layout uses 2 rows:
+//       row 1 = zoning icons
+//       row 2 = contour icon
 
 import React from "react";
 import { ModuleRegistryExtend } from "cs2/modding";
@@ -20,7 +19,7 @@ import mod from "mod.json";
 import { ZONING_TOOL_ID } from "../shared/tool-ids";
 import { VanillaComponentResolver } from "../components/VanillaComponentResolver";
 
-import { row } from "./ez-zoneToolSections.module.scss";
+import { row, rowExisting } from "./ez-zoneToolSections.module.scss";
 
 // Icon assets (webpack emits to coui://ui-mods/images/)
 import IconBoth from "../../images/icons/mode-icon-both.svg";
@@ -38,13 +37,10 @@ export enum ZoningMode {
 }
 
 // Value bindings exported by C# (ZoneControlBridgeUI).
-// bindValue() creates a live binding object; useValue() reads it reactively.
 const RoadZoningMode$ = bindValue<number>(mod.id, "RoadZoningMode");
 const ToolZoningMode$ = bindValue<number>(mod.id, "ToolZoningMode");
 const IsZonableRoadPrefab$ = bindValue<boolean>(mod.id, "IsZonableRoadPrefab");
 const ContourEnabled$ = bindValue<boolean>(mod.id, "ContourEnabled");
-
-// C# binding (ZoneControlBridgeUI exposes IsPhotoMode).
 const IsPhotoMode$ = bindValue<boolean>(mod.id, "IsPhotoMode");
 
 // Trigger helpers (UI -> C#).
@@ -68,79 +64,81 @@ function toggleContourLines() {
     trigger(mod.id, "ToggleContourLines");
 }
 
-// registry.extend hook: wraps the vanilla MouseToolOptions component.
-// The wrapper renders vanilla first, then conditionally appends EZ sections.
+// Wrap vanilla MouseToolOptions component.
 export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
     return (props: any) => {
-        // Hooks must be unconditional and always called in the same order.
         const { translate } = useLocalization();
 
-        // PhotoMode rule: do not inject any custom UI into Tool Options.
+        // Never inject custom UI into Photo Mode.
         const photoMode = useValue(IsPhotoMode$) === true;
 
-        // Active tool id is a stable identifier for comparisons (vanilla + mods).
+        // EZ existing-roads tool active?
         const activeToolId = useValue(tool.activeTool$)?.id;
-
-        // True when a road prefab is selected and supports zoning blocks.
-        const roadPrefabActive = useValue(IsZonableRoadPrefab$) === true;
-
-        // True when EZ tool is the active tool.
         const zoningToolOn = activeToolId === ZONING_TOOL_ID;
 
-        // Make the vanilla Tool Options panel transparent ONLY while EZ tool is active.
-        // This is styling only (no behavior changes).
-        // Uses a body class so SCSS can target vanilla DOM safely.
+        // Vanilla road tool on a zonable road prefab?
+        const roadPrefabActive = useValue(IsZonableRoadPrefab$) === true;
+
+        // Apply compact transparent styling only while EZ existing-roads tool is active.
+        // Delay on removal helps reduce the brief vanilla close flash.
         React.useEffect(() => {
             const cls = "ez-tooloptions-glass";
+            const removeDelayMs = 220;
+            let removeTimer: number | undefined;
 
             try {
                 if (zoningToolOn && !photoMode) {
                     document.body.classList.add(cls);
                 } else {
-                    document.body.classList.remove(cls);
+                    removeTimer = window.setTimeout(() => {
+                        try {
+                            document.body.classList.remove(cls);
+                        } catch {
+                        }
+                    }, removeDelayMs);
                 }
             } catch {
             }
 
             return () => {
+                if (removeTimer !== undefined) {
+                    window.clearTimeout(removeTimer);
+                }
+
                 try {
-                    document.body.classList.remove(cls);
+                    if (zoningToolOn && !photoMode) {
+                        document.body.classList.remove(cls);
+                    }
                 } catch {
                 }
             };
         }, [zoningToolOn, photoMode]);
 
-        // Current mode state read from bindings.
         const toolMode = useValue(ToolZoningMode$) as ZoningMode;
         const roadMode = useValue(RoadZoningMode$) as ZoningMode;
         const contourEnabled = !!useValue(ContourEnabled$);
 
-        // Render vanilla first. If vanilla throws, do not take down the UI.
+        // Render vanilla first.
         let result: any;
         try {
-            // Note: in CS2 module registry extensions, Component is often a function.
             result = Component(props);
         } catch (err) {
             try {
                 console.error("[EZ][UI] ToolOptions injection: vanilla component threw", err);
             } catch {
-                // ignore
             }
             return null;
         }
 
-        // PhotoMode must remain vanilla-clean (no injection).
         if (photoMode) {
             return result;
         }
 
-        // If vanilla returned something unexpected (non-React element), do nothing.
         if (!React.isValidElement(result)) {
             return result;
         }
 
-        // Resolve vanilla UI components (Section, ToolButton, styling theme).
-        // Resolver indirection avoids importing private vanilla modules directly.
+        // Resolve vanilla pieces through registry wrapper.
         let Section: any;
         let ToolButton: any;
         let FOCUS_DISABLED: any;
@@ -156,76 +154,62 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
             return result;
         }
 
-        // If resolver is not ready, keep vanilla unchanged.
         if (typeof Section !== "function" || typeof ToolButton !== "function") {
             return result;
         }
 
-        // Layout class for the row of tool buttons.
-        const rowClass = row ?? undefined;
+        // New roads keep the normal row class.
+        // Existing roads use the compact right-aligned row class.
+        const activeRowClass = zoningToolOn ? rowExisting : row;
 
-        // Section titles.
-        const titleZone = translate(
-            "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]",
-            "Zone Change"
-        );
-        const titleContour = translate(
-            "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]",
-            "Contour lines"
-        );
+        // Section labels:
+        // - keep vanilla-like labels for new roads
+        // - hide labels for EZ existing-roads compact panel
+        const titleZone = zoningToolOn
+            ? null
+            : translate(
+                "ToolOptions.SECTION[EZ.Zone_Controller.SectionTitle]",
+                "Zone Change"
+            );
 
-        // Tooltips.
+        const titleContour = zoningToolOn
+            ? null
+            : translate(
+                "ToolOptions.SECTION[EZ.Zone_Controller.ContourTitle]",
+                "Contour"
+            );
+
+        // Tooltip keys from /lang/en-US.json.
+        // Fallback text is intentionally shorter so missing localization is obvious.
         const tipBoth = translate(
-            "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]",
-            "Toggle zoning on both sides."
+            "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ZoningModeBothDescription]",
+            "Both sides."
         );
         const tipLeft = translate(
-            "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]",
-            "Zone left side only."
+            "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ZoningModeLeftDescription]",
+            "Left only."
         );
         const tipRight = translate(
-            "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]",
-            "Zone right side only."
+            "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ZoningModeRightDescription]",
+            "Right only."
         );
         const tipContour = translate(
-            "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]",
-            "Toggle terrain contour lines."
+            "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ContourDescription]",
+            "Contour lines."
         );
 
-        // Show zone buttons if either:
-        // - a zonable road prefab is active (vanilla road tool case), or
-        // - EZ tool is active (update-existing case).
+        // Show EZ controls for:
+        // - vanilla road tool on a zonable road prefab
+        // - EZ existing-roads tool
         const shouldShowZoneSection = roadPrefabActive || zoningToolOn;
-
-        // When nothing relevant is active, keep vanilla unchanged.
-        if (!roadPrefabActive && !zoningToolOn) {
+        if (!shouldShowZoneSection) {
             return result;
         }
 
         const sections: any[] = [];
 
-        // Contour row: only when EZ tool is active (update-existing mode).
-        if (zoningToolOn) {
-            sections.push(
-                <Section key="EZ_Contour" title={titleContour}>
-                    <div className={rowClass}>
-                        <ToolButton
-                            selected={contourEnabled}
-                            tooltip={tipContour}
-                            onSelect={toggleContourLines}
-                            src={IconContour}
-                            focusKey={FOCUS_DISABLED}
-                            className={toolButtonClass}
-                        />
-                    </div>
-                </Section>
-            );
-        }
-
-        // Zone row: shown for both vanilla road tool and EZ tool.
-        if (shouldShowZoneSection) {
-            // If a road prefab is active and EZ tool is not, UI edits RoadZoningMode.
-            // Otherwise UI edits ToolZoningMode (EZ tool state).
+        // Row 1: zoning icons.
+        {
             const usingRoadState = roadPrefabActive && !zoningToolOn;
             const selectedMode = usingRoadState ? roadMode : toolMode;
 
@@ -239,13 +223,14 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
                     ? setRoadZoningMode(ZoningMode.Right)
                     : setToolZoningMode(ZoningMode.Right);
 
-            // Both-mode behavior uses “flip” triggers (Both <-> None).
             const onBoth = () =>
-                usingRoadState ? flipRoadBothMode() : flipToolBothMode();
+                usingRoadState
+                    ? flipRoadBothMode()
+                    : flipToolBothMode();
 
             sections.push(
                 <Section key="EZ_ZoneChange" title={titleZone}>
-                    <div className={rowClass}>
+                    <div className={activeRowClass}>
                         <ToolButton
                             selected={(selectedMode & ZoningMode.Both) === ZoningMode.Both}
                             tooltip={tipBoth}
@@ -275,12 +260,24 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
             );
         }
 
-        if (sections.length === 0) {
-            return result;
+        // Row 2: contour icon, only for EZ existing-roads tool.
+        if (zoningToolOn) {
+            sections.push(
+                <Section key="EZ_Contour" title={titleContour}>
+                    <div className={activeRowClass}>
+                        <ToolButton
+                            selected={contourEnabled}
+                            tooltip={tipContour}
+                            onSelect={toggleContourLines}
+                            src={IconContour}
+                            focusKey={FOCUS_DISABLED}
+                            className={toolButtonClass}
+                        />
+                    </div>
+                </Section>
+            );
         }
 
-        // Merge vanilla children with EZ sections.
-        // Appends EZ after vanilla so stock rows remain present.
         const existingChildren = (result as any).props?.children;
 
         const mergedChildren =
@@ -290,7 +287,6 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
                     ? [...existingChildren, ...sections]
                     : [existingChildren, ...sections];
 
-        // TS2769 fix: cloneElement typing is strict; cast to any intentionally.
         return React.cloneElement(result as any, undefined, mergedChildren);
     };
 };

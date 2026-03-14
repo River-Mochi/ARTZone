@@ -1,32 +1,108 @@
-// File: src/UI/src/mods/toolOptionsGlass.scss
-// Purpose:
-//   Make the vanilla Tool Options panel translucent while EZ tool is active.
-// Notes:
-//   - Activated by body class: "ez-tooloptions-glass".
-//   - Only affects Tool Options panel (best-effort selector match).
+/* File: src/UI/src/mods/toolOptionsGlass.scss
+ * Purpose:
+ *   Style the vanilla Tool Options panel ONLY while EZ existing-roads tool is active.
+ *
+ * Notes:
+ *   - Global SCSS is correct here because this file targets vanilla DOM.
+ *   - No blur. Plain tint only.
+ *   - New roads stay vanilla because the body class is only added for EZ existing-roads tool.
+ *   - Tuning knobs:
+ *       --ezToolOptionsWidth    = overall compact panel width
+ *       --ezToolOptionsRightGap = distance from the right side of the vanilla column
+ */
 
-/* Panel root (try both hyphen + camel variants, game updates can vary) */
-body.ez-tooloptions-glass [class*="tool-options-panel_"],
-body.ez-tooloptions-glass [class*="toolOptionsPanel_"] {
-    --menuPanel1: transparent;
-    --menuPanel2: transparent;
-    --panelColorDark: transparent;
-    --panelColorNormal: transparent;
-    --sectionHeaderColor: transparent;
-    background-color: transparent !important;
-    background-image: none !important;
+body.ez-tooloptions-glass {
+    --ezToolOptionsBodyBg: rgba(255, 255, 255, 0.10);
+    --ezToolOptionsWidth: 102rem;
+    --ezToolOptionsRightGap: 0rem;
 }
 
-    /* Header tint */
-    body.ez-tooloptions-glass [class*="tool-options-panel_"] [class*="header_"],
-    body.ez-tooloptions-glass [class*="toolOptionsPanel_"] [class*="header_"] {
-        background-color: rgba(40, 58, 74, 0.32) !important;
-        background-image: none !important;
+    /* The vanilla side column is wide.
+   Force the wrapper to place the compact panel against the RIGHT side. */
+    body.ez-tooloptions-glass div[class*="tool-side-column_"] {
+        overflow: visible !important;
     }
 
-    /* Content tint */
-    body.ez-tooloptions-glass [class*="tool-options-panel_"] [class*="content_"],
-    body.ez-tooloptions-glass [class*="toolOptionsPanel_"] [class*="content_"] {
-        background-color: rgba(255, 255, 255, 0.10) !important;
+    body.ez-tooloptions-glass div[class*="wrapper_"] {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-end !important;
+        width: 100% !important;
+        overflow: visible !important;
+    }
+
+    /* Outer vanilla Tool Options panel */
+    body.ez-tooloptions-glass div[class*="tool-options-panel_"] {
+        width: var(--ezToolOptionsWidth) !important;
+        min-width: var(--ezToolOptionsWidth) !important;
+        max-width: var(--ezToolOptionsWidth) !important;
+        margin-left: auto !important;
+        margin-right: var(--ezToolOptionsRightGap) !important;
+        /* top right bottom left */
+        padding: 8rem 5rem 5rem 4rem !important;
+        background-color: var(--ezToolOptionsBodyBg) !important;
         background-image: none !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+        /* Each injected section row */
+        body.ez-tooloptions-glass div[class*="tool-options-panel_"] div[class*="item_"] {
+            display: flex !important;
+            align-items: center !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            margin: 0 0 4rem 0 !important;
+            padding: 0 !important;
+            background-color: transparent !important;
+            background-image: none !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+
+            body.ez-tooloptions-glass div[class*="tool-options-panel_"] div[class*="item_"]:last-child {
+                margin-bottom: 0 !important;
+            }
+
+        /* Hide the left label column only for EZ existing-roads compact layout.
+   New roads keep vanilla labels because this body class is not active there. */
+        body.ez-tooloptions-glass div[class*="tool-options-panel_"] div[class*="label_"] {
+            display: none !important;
+            width: 0 !important;
+            min-width: 0 !important;
+            max-width: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            flex: 0 0 0 !important;
+            overflow: hidden !important;
+        }
+
+        /* Inner content area that holds the button rows */
+        body.ez-tooloptions-glass div[class*="tool-options-panel_"] div[class*="content_"] {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-end !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: transparent !important;
+            background-image: none !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+
+    /* Keep the EZ existing-roads rows pinned to the right side */
+    body.ez-tooloptions-glass div[class*="rowExisting_"] {
+        justify-content: flex-end !important;
+        width: 100% !important;
     }

@@ -2,11 +2,11 @@
   "EasyZoning.Zone_Controller.ToolName": "轻松分区",
   "EasyZoning.Zone_Controller.ToolDescription": "打开 EZ 的道路更新面板。\n快捷键: Ctrl+V",
 
-  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "分区更改",
-  "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "等高线",
+  "ToolOptions.SECTION[EZ.Zone_Controller.SectionTitle]": "分区更改",
+  "ToolOptions.SECTION[EZ.Zone_Controller.ContourTitle]": "等高线",
 
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "两侧。右键循环切换模式。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "仅左侧。右键循环切换模式。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "仅右侧。右键循环切换模式。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "显示地形等高线。"
+  "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ZoningModeBothDescription]": "两侧。右键循环切换模式。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ZoningModeLeftDescription]": "仅左侧。右键循环切换模式。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ZoningModeRightDescription]": "仅右侧。右键循环切换模式。",
+  "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ContourDescription]": "显示地形等高线。"
 }
