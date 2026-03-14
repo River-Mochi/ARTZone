@@ -2,10 +2,10 @@
 // Purpose:
 //   Local layout classes for EZ rows inside the vanilla Tool Options panel.
 // Notes:
-//   - .row is used for new roads and keeps the normal left-to-right vanilla feel.
-//   - .rowExisting is used only for EZ existing-roads compact panel.
+//   - .rowNewRoads is only for vanilla new roads.
+//   - .rowExisting is only for EZ existing-roads compact panel.
 
-.row {
+.rowNewRoads {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -20,4 +20,6 @@
     justify-content: flex-end;
     gap: 2rem;
     width: 100%;
+    /* More negative = shift both rows farther left */
+    transform: translateX(-1.5rem);
 }

@@ -1,16 +1,19 @@
 // File: src/Localization/LocalePT_BR.cs
-// Purpose: Portuguese-BR (pt-BR) strings for Options UI + Panel text.
+// Purpose: Portuguese (pt-BR) strings for Options UI + Panel text.
 
 namespace EasyZoning
 {
     using Colossal;
-    using EasyZoning.Tools;
     using System.Collections.Generic;
 
     public sealed class LocalePT_BR : IDictionarySource
     {
         private readonly Setting m_Settings;
-        public LocalePT_BR(Setting setting) => m_Settings = setting;
+
+        public LocalePT_BR(Setting setting)
+        {
+            m_Settings = setting;
+        }
 
         public IEnumerable<KeyValuePair<string, string>> ReadEntries(
             IList<IDictionaryEntryError> errors,
@@ -18,63 +21,106 @@ namespace EasyZoning
         {
             Dictionary<string, string> d = new Dictionary<string, string>
             {
-                // Options title (single source of truth from Mod.cs)
+                // Options title
                 { m_Settings.GetSettingsLocaleID(), Mod.ModName + " " + Mod.ModTag },
 
                 // Tabs
                 { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "Ações" },
+                { m_Settings.GetOptionTabLocaleID(Setting.kLegacyTab),  "Legacy" },
                 { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "Sobre" },
 
                 // Groups
-                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Opções de zoneamento" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Atalhos do teclado" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kLegacyGroup),   "Comportamento legado da ferramenta" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),         "Opções de zoneamento" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup),     "Atalhos de teclado" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup),  "Compatibilidade" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "Interface" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup),          "USO" },
+
+                // Legacy group header hidden
+                { m_Settings.GetOptionGroupLocaleID(Setting.kLegacyGroup), "" },
+
+                // About group headers hidden
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
-                // Toggles
+                // Zone options
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Não redefinir quadrados já zoneados" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
-                    "Não redefine células já zoneadas durante prévia/aplicar.\n\n" +
-                    "**[ ✓ ] Ativado recomendado.**" },
+                    "Não redefine células já zoneadas durante prévia/aplicação.\n\n" +
+                    "**[ ✓ ] Recomendado ativado.**" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Impedir que edifícios sejam removidos" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Evitar que edifícios sejam removidos" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
                     "**Edifícios = células ocupadas**. Impede que a prévia/aplicação de novas zonas transforme edifícios existentes em condenados.\n\n" +
-                    "**[ ✓ ] Ativado recomendado.**" },
+                    "**[ ✓ ] Recomendado ativado.**" },
 
-
-                // Keybind (only one visible)
+                // Keybind
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Alternar painel de atualização" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "Mostrar o painel Easy Zoning (**padrão Ctrl+V**)."
-                },
+                    "Mostra o painel Easy Zoning (**padrão Ctrl+V**)." },
 
+                // Compatibility
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ Botão de contorno" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
+                    "**[ ✓ ] ativado**, mostra o botão de Contorno no painel Easy Zoning para estradas existentes.\n\n" +
+                    "Desative isto se outro mod já controlar as linhas de contorno do terreno." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Ciclo RMB legado" },
+                // UI
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Estilo de painel translúcido" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
+                    "**[ ✓ ] ativado**, usa um estilo de painel translúcido mais claro.\n" +
+                    "**[   ] desativado**, usa um painel mais escuro no estilo vanilla.\n\n" +
+                    "Apenas estilo visual. Nenhum blur é usado." },
+
+                // Usage toggle + multiline block
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Mostrar instruções" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),
+                    "Mostra ou oculta as **instruções de uso** abaixo." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
+                    "<Nova estrada>\n" +
+                    "1. Abra o painel de Estradas (escolha uma estrada).\n" +
+                    "2. Na parte inferior do painel da ferramenta de estrada: escolha um dos 3 ícones de zona.\n" +
+                    "3. Desenhe normalmente.\n\n" +
+                    "-----------------------------------------\n" +
+                    "  RMB = clique direito, LMB = clique esquerdo\n" +
+                    "-----------------------------------------\n\n" +
+                    "<Estrada existente>\n" +
+                    "1. Abra o painel EZ Update: clique <Ctrl+V> para ligar/desligar o painel\n" +
+                    "   (ou o <ícone no canto superior esquerdo> faz o mesmo).\n" +
+                    "2. Selecione um ícone de zona no painel inferior.\n" +
+                    "3. Passe o mouse sobre uma estrada + veja a prévia.\n" +
+                    "4. <RMB alterna>: Ambos os lados → Esquerda → Direita → Nenhum → ...\n" +
+                    "5. <LMB uma vez>: aplica (confirma).\n" +
+                    "6. <Segure LMB + arraste> por vários trechos de estrada, solte para aplicar.\n" +
+                    "7. <Cancelar:> mova o mouse para fora e solte **LMB**.\n\n" +
+                    "-------------------------------------------\n" +
+                    "<BOTÃO OPCIONAL>\n" +
+                    "• <Contour> mostra linhas de elevação do terreno." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
+
+                // Legacy
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Ciclo legado com clique direito" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
-                    "**OFF é recomendado.**\n" +
-                    "Quando OFF, RMB (clique direito) pode ciclar os 4 modos:\n" +
-                    "Ambos → Esquerda → Direita → Nenhum → ...\n\n" +
-                    "Vantagem: mais rápido, menos necessidade de voltar ao painel.\n\n" +
-
-                    "**ON:** RMB alterna em dois conjuntos separados:\n" +
+                    "**Recomendado OFF** para que RMB percorra os 4 modos:\n" +
+                    "**Ambos os lados → Esquerda → Direita → Nenhum → ...**\n\n" +
+                    "Vantagem: menos necessidade de mover o mouse de volta ao painel da ferramenta.\n\n" +
+                    "--------------------------------------\n" +
+                    "Se Legacy estiver ON: RMB alterna entre dois conjuntos separados:\n" +
                     "Esquerda ↔ Direita\n" +
-                    "Ambos ↔ Nenhum"
-                },
+                    "Ambos os lados ↔ Nenhum" },
 
+                // Keybinding dialog title
+                { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Alternar painel de atualização Easy Zoning" },
 
-                // Binding title in the keybinding dialog
-                { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Alternar painel de botões do Easy Zoning" },
-
-                // About tab labels
+                // About tab
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Nome do mod" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Nome exibido deste mod." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "Versão" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "Versão atual do mod." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadox)),    "Paradox Mods" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),     "Abrir a página Paradox Mods do autor." },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadox)), "Paradox Mods" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),  "Abrir a página do autor no Paradox Mods." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Entrar no Discord do mod." },
             };

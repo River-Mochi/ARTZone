@@ -16,8 +16,12 @@ namespace EasyZoning
 
     [FileLocation("ModsSettings/EasyZoning/EasyZoning")]
     [SettingsUITabOrder(kActionsTab, kLegacyTab, kAboutTab)]
-    [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup, kUsageGroup, kLegacyGroup, kAboutInfoGroup, kAboutLinksGroup)]
-    [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup, kUsageGroup)]  // kLegacyGroup name omitted on purpose to not display.
+    [SettingsUIGroupOrder(
+        kToggleGroup, kKeybindingGroup, kCompatibilityGroup, kUiGroup, kUsageGroup,
+        kLegacyGroup,
+        kAboutInfoGroup, kAboutLinksGroup)]
+    [SettingsUIShowGroupName(
+        kToggleGroup, kUsageGroup)] // kLegacyGroup and other names omitted on purpose.
     [SettingsUIKeyboardAction(Mod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
     public sealed class Setting : ModSetting
     {
@@ -29,6 +33,8 @@ namespace EasyZoning
         // Groups
         public const string kToggleGroup = "Zoning Tools";
         public const string kKeybindingGroup = "Key bindings";
+        public const string kCompatibilityGroup = "Compatibility";
+        public const string kUiGroup = "UI";
         public const string kUsageGroup = "Usage";
         public const string kLegacyGroup = "Legacy Tool";
         public const string kAboutInfoGroup = "Info";
@@ -55,19 +61,29 @@ namespace EasyZoning
             get; set;
         }
 
-        // --- USAGE (Actions tab) ---
+        // --- Compatibility ---
 
-        // Default OFF: show the instructions in options menu.
+        // Default ON.
+        [SettingsUISection(kActionsTab, kCompatibilityGroup)]
+        public bool ShowContourButton { get; set; } = true;
+
+        // --- UI ---
+
+        // Default ON.
+        [SettingsUISection(kActionsTab, kUiGroup)]
+        public bool UseGlassPanel { get; set; } = true;
+
+        // --- Usage (Actions tab) ---
+
+        // Default OFF.
         [SettingsUISection(kActionsTab, kUsageGroup)]
         public bool ShowUsage { get; set; } = false;
 
-        // Multiline instructions block (localized).
         [SettingsUIMultilineText]
         [SettingsUIHideByCondition(typeof(Setting), nameof(HideUsageText))]
         [SettingsUISection(kActionsTab, kUsageGroup)]
         public string UsageText => string.Empty;
 
-        // Return true to hide UsageText.
         private bool HideUsageText( ) => !ShowUsage;
 
         // --- Legacy (Legacy tab) ---
@@ -104,7 +120,9 @@ namespace EasyZoning
                 {
                     Application.OpenURL(UrlParadox);
                 }
-                catch (Exception) { }
+                catch (Exception)
+                {
+                }
             }
         }
 
@@ -119,7 +137,9 @@ namespace EasyZoning
                 {
                     Application.OpenURL(UrlDiscord);
                 }
-                catch (Exception) { }
+                catch (Exception)
+                {
+                }
             }
         }
 
@@ -127,7 +147,8 @@ namespace EasyZoning
         {
             RemoveZonedCells = true;
             RemoveOccupiedCells = true;
-
+            ShowContourButton = true;
+            UseGlassPanel = true;
             ShowUsage = false;
             LegacyRightClickCycle = false;
         }

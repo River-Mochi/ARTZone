@@ -4,13 +4,16 @@
 namespace EasyZoning
 {
     using Colossal;
-    using EasyZoning.Tools;
     using System.Collections.Generic;
 
     public sealed class LocaleEN : IDictionarySource
     {
         private readonly Setting m_Settings;
-        public LocaleEN(Setting setting) => m_Settings = setting;
+
+        public LocaleEN(Setting setting)
+        {
+            m_Settings = setting;
+        }
 
         public IEnumerable<KeyValuePair<string, string>> ReadEntries(
             IList<IDictionaryEntryError> errors,
@@ -27,11 +30,13 @@ namespace EasyZoning
                 { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "About" },
 
                 // Groups
-                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Zone Options" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Key bindings" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup),      "USAGE" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),         "Zone Options" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup),     "Key bindings" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup),  "Compatibility" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "UI" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup),          "USAGE" },
 
-                // Legacy group header hidden (tab should show only the toggle)
+                // Legacy group header hidden
                 { m_Settings.GetOptionGroupLocaleID(Setting.kLegacyGroup), "" },
 
                 // About group headers hidden
@@ -54,13 +59,24 @@ namespace EasyZoning
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
                     "Show the Easy Zoning panel (**default Ctrl+V**)." },
 
-                // USAGE toggle + multiline block
+                // Compatibility
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ Contour button" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
+                    "**[ ✓ ] enabled**, show the Contour button in the Easy Zoning existing-roads panel.\n\n" +
+                    "Disable this if another mod already handles terrain contour lines." },
+
+                // UI
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Glass panel style" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
+                    "**[ ✓ ] enabled**, use the clearer translucent panel style.\n" +
+                    "**[   ] disabled**, use a darker vanilla-style panel.\n\n" +
+                    "Visual style only. No blur is used." },
+
+                // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Show Instructions" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),
-                    "Show or hide the **usage instructions** below."
-                },
+                    "Show or hide the **usage instructions** below." },
 
-                // Multiline body is localized via the LABEL field (CitizenCleaner style)
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<New Road>\n" +
                     "1. Open Roads panel (pick a road).\n" +
@@ -70,9 +86,9 @@ namespace EasyZoning
                     "  RMB = right-click, LMB = left-click\n" +
                     "-----------------------------------------\n\n" +
                     "<Existing Road>\n" +
-                    "1. Open EZ Update panel: click <Ctrl+V> to turn the panel On/Off \n" +
+                    "1. Open EZ Update panel: click <Ctrl+V> to turn the panel On/Off\n" +
                     "   (or <top-left icon> does the same).\n" +
-                    "2. Select a zone icon from the bottom panel (e.g. Left-side only)\n" +
+                    "2. Select a zone icon from the bottom panel.\n" +
                     "3. Hover + preview a road.\n" +
                     "4. <RMB cycles>: Both → Left → Right → None → ...\n" +
                     "5. <LMB one time>: applies (locks it in).\n" +
@@ -80,9 +96,7 @@ namespace EasyZoning
                     "7. <Cancel:> move mouse away and release **LMB**.\n\n" +
                     "-------------------------------------------\n" +
                     "<OPTIONAL BUTTON>\n" +
-                    "•  <Contour> shows terrain elevation lines."
-                },
-
+                    "• <Contour> shows terrain elevation lines." },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy
@@ -94,9 +108,7 @@ namespace EasyZoning
                     "--------------------------------------\n" +
                     "If Legacy is ON: RMB toggles in two separate sets:\n" +
                     "Left ↔ Right\n" +
-                    "Both ↔ None\n" +
-                    "For players who might want a limited right-click"
-                },
+                    "Both ↔ None" },
 
                 // Keybinding dialog title
                 { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Toggle Easy Zoning Update Panel" },

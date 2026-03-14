@@ -2,8 +2,14 @@
   "EasyZoning.Zone_Controller.ToolName": "Easy Zoning",
   "EasyZoning.Zone_Controller.ToolDescription": "This opens the EZ update roads panel.\nShortcut: Ctrl+V default (see Options menu).",
 
-  "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ZoningModeBothDescription]": "Both sides. Click twice for None.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ZoningModeLeftDescription]": "Left side only. Right-click cycles zones.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ZoningModeRightDescription]": "Right side only. Right-click cycles zones.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ContourDescription]": "Show terrain contour lines."
+  "EasyZoning.NewRoads.SectionTitle": "Zone Change",
+
+  "EasyZoning.NewRoads.Tooltip.Both": "Both sides. All off for none.",
+  "EasyZoning.NewRoads.Tooltip.Left": "Left side only.",
+  "EasyZoning.NewRoads.Tooltip.Right": "Right side only.",
+
+  "EasyZoning.ExistingRoads.Tooltip.Both": "Both sides. Click twice for None.",
+  "EasyZoning.ExistingRoads.Tooltip.Left": "Left side only. Right-click cycles zones.",
+  "EasyZoning.ExistingRoads.Tooltip.Right": "Right side only. Right-click cycles zones.",
+  "EasyZoning.ExistingRoads.Tooltip.Contour": "Show terrain contour lines."
 }

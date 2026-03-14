@@ -4,77 +4,123 @@
 namespace EasyZoning
 {
     using Colossal;
-    using EasyZoning.Tools;
     using System.Collections.Generic;
 
     public sealed class LocaleFR : IDictionarySource
     {
         private readonly Setting m_Settings;
-        public LocaleFR(Setting setting) => m_Settings = setting;
+
+        public LocaleFR(Setting setting)
+        {
+            m_Settings = setting;
+        }
 
         public IEnumerable<KeyValuePair<string, string>> ReadEntries(
             IList<IDictionaryEntryError> errors,
             Dictionary<string, int> indexCounts)
         {
-            var d = new Dictionary<string, string>
+            Dictionary<string, string> d = new Dictionary<string, string>
             {
-                // Options title (single source of truth from Mod.cs)
+                // Options title
                 { m_Settings.GetSettingsLocaleID(), Mod.ModName + " " + Mod.ModTag },
 
                 // Tabs
                 { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "Actions" },
+                { m_Settings.GetOptionTabLocaleID(Setting.kLegacyTab),  "Classique" },
                 { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "À propos" },
 
                 // Groups
-                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Options de zonage" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Raccourcis clavier" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kLegacyGroup),     "Comportement hérité de l’outil" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),         "Options de zonage" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup),     "Raccourcis clavier" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup),  "Compatibilité" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "Interface" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup),          "UTILISATION" },
+
+                // Legacy group header hidden
+                { m_Settings.GetOptionGroupLocaleID(Setting.kLegacyGroup), "" },
+
+                // About group headers hidden
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
-                // Toggles
+                // Zone options
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Ne pas réinitialiser les cases déjà zonées" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
-                    "Ne réinitialise pas les cellules déjà zonées pendant la prévisualisation / l’application.\n\n" +
-                    "**[ ✓ ] Activation recommandée.**" },
+                    "Ne réinitialise pas les cellules déjà zonées pendant l'aperçu/l'application.\n\n" +
+                    "**[ ✓ ] Activé recommandé.**" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Empêcher la suppression des bâtiments" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
-                    "**Bâtiments = cellules occupées**. Empêche la prévisualisation / l’application de nouveaux zones de transformer des bâtiments existants en condamnés.\n\n" +
-                    "**[ ✓ ] Activation recommandée.**" },
+                    "**Les bâtiments = cellules occupées**. Empêche l'aperçu/l'application de nouveaux zonages de transformer des bâtiments existants en bâtiments condamnés.\n\n" +
+                    "**[ ✓ ] Activé recommandé.**" },
 
-
-                // Keybind (only one visible)
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Afficher le panneau de mise à jour" },
+                // Keybind
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Afficher/Masquer le panneau de mise à jour" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "Afficher le panneau Easy Zoning (**Ctrl+V par défaut**)."
-                },
+                    "Afficher le panneau Easy Zoning (**Ctrl+V par défaut**)." },
 
+                // Compatibility
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ Bouton Contour" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
+                    "**[ ✓ ] activé**, affiche le bouton Contour dans le panneau Easy Zoning pour les routes existantes.\n\n" +
+                    "Désactiver si un autre mod gère déjà les courbes de niveau du terrain." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Cycle RMB hérité" },
+                // UI
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Style de panneau transparent" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
+                    "**[ ✓ ] activé**, utilise un panneau translucide plus clair.\n" +
+                    "**[   ] désactivé**, utilise un panneau plus sombre de style vanilla.\n\n" +
+                    "Style visuel uniquement. Aucun flou n'est utilisé." },
+
+                // Usage toggle + multiline block
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Afficher les instructions" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),
+                    "Afficher ou masquer les **instructions d'utilisation** ci-dessous." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
+                    "<Nouvelle route>\n" +
+                    "1. Ouvrir le panneau Routes (choisir une route).\n" +
+                    "2. En bas du panneau d'outil route : choisir l'une des 3 icônes de zonage.\n" +
+                    "3. Tracer la route normalement.\n\n" +
+                    "-----------------------------------------\n" +
+                    "  RMB = clic droit, LMB = clic gauche\n" +
+                    "-----------------------------------------\n\n" +
+                    "<Route existante>\n" +
+                    "1. Ouvrir le panneau EZ de mise à jour : cliquer sur <Ctrl+V> pour afficher/masquer le panneau\n" +
+                    "   (ou <l'icône en haut à gauche> fait la même chose).\n" +
+                    "2. Sélectionner une icône de zonage dans le panneau du bas.\n" +
+                    "3. Survoler + prévisualiser une route.\n" +
+                    "4. <RMB fait défiler> : Deux côtés → Gauche → Droite → Aucun → ...\n" +
+                    "5. <LMB une fois> : applique (valide).\n" +
+                    "6. <Maintenir LMB + glisser> sur plusieurs segments de route, puis relâcher pour appliquer.\n" +
+                    "7. <Annuler :> éloigner la souris et relâcher **LMB**.\n\n" +
+                    "-------------------------------------------\n" +
+                    "<BOUTON OPTIONNEL>\n" +
+                    "• <Contour> affiche les lignes d'altitude du terrain." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
+
+                // Legacy
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Cycle classique par clic droit" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
-                    "**Désactivé recommandé.**\n" +
-                    "Lorsqu’il est désactivé, le RMB (clic droit) peut parcourir les 4 modes :\n" +
-                    "Deux côtés → Gauche → Droite → Aucun → ...\n\n" +
-                    "Avantage : plus rapide, moins besoin de revenir au panneau avec la souris.\n\n" +
-
-                    "**Activé :** le RMB bascule entre deux ensembles séparés :\n" +
+                    "**OFF recommandé** pour que RMB fasse défiler les 4 modes :\n" +
+                    "**Deux côtés → Gauche → Droite → Aucun → ...**\n\n" +
+                    "Avantage : moins besoin de ramener la souris vers le panneau d'outil.\n\n" +
+                    "--------------------------------------\n" +
+                    "Si le mode classique est ON : RMB alterne entre deux ensembles séparés :\n" +
                     "Gauche ↔ Droite\n" +
-                    "Deux côtés ↔ Aucun"
-                },
+                    "Deux côtés ↔ Aucun" },
 
+                // Keybinding dialog title
+                { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Afficher/Masquer le panneau Easy Zoning de mise à jour" },
 
-                // Binding title in the keybinding dialog
-                { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Easy Zoning – Basculer le panneau" },
-
-                // About tab labels
+                // About tab
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Nom du mod" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Nom d’affichage de ce mod." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Nom affiché de ce mod." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "Version" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "Version actuelle du mod." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadox)),    "Paradox Mods" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),     "Ouvrir la page Paradox Mods de l’auteur." },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadox)), "Paradox Mods" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),  "Ouvrir la page Paradox Mods de l'auteur." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Rejoindre le Discord du mod." },
             };

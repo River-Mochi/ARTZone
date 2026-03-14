@@ -1,12 +1,15 @@
 {
-  "EasyZoning.Zone_Controller.ToolName": "Zonage Facile",
-  "EasyZoning.Zone_Controller.ToolDescription": "Ouvre le panneau EZ pour mettre à jour les routes.\nRaccourci : Ctrl+V",
+  "EasyZoning.Zone_Controller.ToolName": "Easy Zoning",
+  "EasyZoning.Zone_Controller.ToolDescription": "Ouvre le panneau EZ de mise à jour des routes.\nRaccourci par défaut : Ctrl+V (voir le menu Options).",
 
-  "ToolOptions.SECTION[EZ.Zone_Controller.SectionTitle]": "Changement de zonage",
-  "ToolOptions.SECTION[EZ.Zone_Controller.ContourTitle]": "Courbes",
+  "EasyZoning.NewRoads.SectionTitle": "Changement de zonage",
 
-  "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ZoningModeBothDescription]": "Deux côtés. Clic droit pour faire défiler les modes.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ZoningModeLeftDescription]": "Côté gauche uniquement. Clic droit pour faire défiler les modes.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ZoningModeRightDescription]": "Côté droit uniquement. Clic droit pour faire défiler les modes.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ContourDescription]": "Afficher les courbes de niveau du terrain."
+  "EasyZoning.NewRoads.Tooltip.Both": "Deux côtés. Tout désactivé = aucun côté.",
+  "EasyZoning.NewRoads.Tooltip.Left": "Côté gauche uniquement.",
+  "EasyZoning.NewRoads.Tooltip.Right": "Côté droit uniquement.",
+
+  "EasyZoning.ExistingRoads.Tooltip.Both": "Deux côtés. Cliquer deux fois pour Aucun.",
+  "EasyZoning.ExistingRoads.Tooltip.Left": "Côté gauche uniquement. Le clic droit fait défiler les modes.",
+  "EasyZoning.ExistingRoads.Tooltip.Right": "Côté droit uniquement. Le clic droit fait défiler les modes.",
+  "EasyZoning.ExistingRoads.Tooltip.Contour": "Afficher les courbes de niveau du terrain."
 }

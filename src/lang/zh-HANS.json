@@ -1,12 +1,15 @@
 {
-  "EasyZoning.Zone_Controller.ToolName": "轻松分区",
-  "EasyZoning.Zone_Controller.ToolDescription": "打开 EZ 的道路更新面板。\n快捷键: Ctrl+V",
+  "EasyZoning.Zone_Controller.ToolName": "Easy Zoning",
+  "EasyZoning.Zone_Controller.ToolDescription": "打开 EZ 道路更新面板。\n默认快捷键：Ctrl+V（见选项菜单）。",
 
-  "ToolOptions.SECTION[EZ.Zone_Controller.SectionTitle]": "分区更改",
-  "ToolOptions.SECTION[EZ.Zone_Controller.ContourTitle]": "等高线",
+  "EasyZoning.NewRoads.SectionTitle": "分区更改",
 
-  "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ZoningModeBothDescription]": "两侧。右键循环切换模式。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ZoningModeLeftDescription]": "仅左侧。右键循环切换模式。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ZoningModeRightDescription]": "仅右侧。右键循环切换模式。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EZ.Zone_Controller.ContourDescription]": "显示地形等高线。"
+  "EasyZoning.NewRoads.Tooltip.Both": "双侧。全部关闭则为无。",
+  "EasyZoning.NewRoads.Tooltip.Left": "仅左侧。",
+  "EasyZoning.NewRoads.Tooltip.Right": "仅右侧。",
+
+  "EasyZoning.ExistingRoads.Tooltip.Both": "双侧。点击两次可设为无。",
+  "EasyZoning.ExistingRoads.Tooltip.Left": "仅左侧。右键循环切换分区。",
+  "EasyZoning.ExistingRoads.Tooltip.Right": "仅右侧。右键循环切换分区。",
+  "EasyZoning.ExistingRoads.Tooltip.Contour": "显示地形等高线。"
 }
