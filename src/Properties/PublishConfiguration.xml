@@ -5,14 +5,14 @@
 	<ModId Value="136261" />
 
 	<!-- Display name -->
-	<DisplayName Value="Easy Zoning [EZ]" />
+	<DisplayName Value="Easy Zoning" />
 
 	<!-- Short one-liner -->
 	<ShortDescription Value="Change road Zoning and toggle Contour terrain lines. Roads can have zoning Left > Right > None > Both sides." />
 
 	<!-- Long description (minimal markdown supported) -->
 	<LongDescription>
-# Easy Zoning [EZ] Beta
+# Easy Zoning
 
 Custom zoning for new and existing roads. New alternative to Zone Tools.
 
