@@ -19,10 +19,16 @@ namespace EasyZoning
             IList<IDictionaryEntryError> errors,
             Dictionary<string, int> indexCounts)
         {
+            string title = Mod.ModName;
+            if (!string.IsNullOrEmpty(Mod.ModVersion))
+            {
+                title = title + " (" + Mod.ModVersion + ")";
+            }
+
             Dictionary<string, string> d = new Dictionary<string, string>
             {
                 // Options title
-                { m_Settings.GetSettingsLocaleID(), Mod.ModName + " " + Mod.ModTag },
+                { m_Settings.GetSettingsLocaleID(), title },
 
                 // Tabs
                 { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "Ações" },
