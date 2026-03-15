@@ -4,13 +4,17 @@
 namespace EasyZoning
 {
     using Colossal;
-    using EasyZoning.Tools;
+    using Colossal.IO.AssetDatabase.Internal;
     using System.Collections.Generic;
 
     public sealed class LocaleEN : IDictionarySource
     {
         private readonly Setting m_Settings;
-        public LocaleEN(Setting setting) => m_Settings = setting;
+
+        public LocaleEN(Setting setting)
+        {
+            m_Settings = setting;
+        }
 
         public IEnumerable<KeyValuePair<string, string>> ReadEntries(
             IList<IDictionaryEntryError> errors,
@@ -18,21 +22,29 @@ namespace EasyZoning
         {
             Dictionary<string, string> d = new Dictionary<string, string>
             {
-                // Options title (single source of truth from Mod.cs)
+                // Options title
                 { m_Settings.GetSettingsLocaleID(), Mod.ModName + " " + Mod.ModTag },
 
                 // Tabs
                 { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "Actions" },
+                { m_Settings.GetOptionTabLocaleID(Setting.kLegacyTab),  "Legacy" },
                 { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "About" },
 
                 // Groups
-                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),     "Zone Options" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Key bindings" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kLegacyGroup),   "Legacy Tool behavior" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),         "Zone Options" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup),     "Key bindings" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup),  "Compatibility" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "UI" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup),          "USAGE" },
+
+                // Legacy group header hidden
+                { m_Settings.GetOptionGroupLocaleID(Setting.kLegacyGroup), "" },
+
+                // About group headers hidden
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
-                // Toggles
+                // Zone options
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Do not reset existing zoned squares" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
                     "Do not reset already zoned cells during preview/apply.\n\n" +
@@ -43,43 +55,74 @@ namespace EasyZoning
                     "**Buildings = occupied cells**. Prevents preview/apply of new zones from turning existing buildings into condemned.\n\n" +
                     "**[ ✓ ] Enabled recommended.**" },
 
-
-                // Keybind (only one visible)
+                // Keybind
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Toggle Update Panel" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "Show the Easy Zoning panel (**default Ctrl+V**)."
-                },
+                    "Show the Easy Zoning panel (**default Ctrl+V**)." },
 
+                // Compatibility
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ Contour button" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
+                    "**[ ✓ ] enabled**, show the Contour button in the Easy Zoning existing-roads panel.\n\n" +
+                    "● Disable this if a smaller panel is preferred or another mod handles terrain contour lines." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Legacy RMB cycle" },
+                // UI
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Glass panel style" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
+                    "**[ ✓ ] enabled**, use the clearer translucent panel style.\n" +
+                    "**[   ] disabled**, use a gray panel.\n\n" +
+                    "Visual style only." },
+
+                // Usage toggle + multiline block
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Show Instructions" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),
+                    "Show or hide the **usage instructions** below." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
+                    "<New Road>\n" +
+                    "1. Open Roads panel (pick a road).\n" +
+                    "2. At bottom of the road tool panel: pick one of the 3 zone icons.\n" +
+                    "3. Draw as usual.\n\n" +
+                    "-----------------------------------------\n" +
+                    "  RMB = right-click, LMB = left-click\n" +
+                    "-----------------------------------------\n\n" +
+                    "<Existing Road>\n" +
+                    "1. Open EZ Update panel: click <Ctrl+V> to turn the panel On/Off\n" +
+                    "   (or <top-left icon> does the same).\n" +
+                    "2. Select a zone icon from the bottom panel.\n" +
+                    "3. Hover + preview a road.\n" +
+                    "4. <RMB cycles>: Both → Left → Right → None → ...\n" +
+                    "5. <LMB one time>: applies (locks it in).\n" +
+                    "6. <LMB hold + drag> along many road sections, release to apply.\n" +
+                    "7. <Cancel:> move mouse away and release **LMB**.\n\n" +
+                    "-------------------------------------------\n" +
+                    "<OPTIONAL BUTTON>\n" +
+                    "• <Contour> shows terrain elevation lines." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
+
+                // Legacy
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Legacy right-click cycle" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
-                    "**OFF is recommended.**\n" +
-                    "When off, then RMB (right-click) can cycle all 4 modes:\n" +
-                    "Both → Left → Right → None → ...\n\n" +
-                    "Faster, less need to move mouse back to the panel.\n\n" +
-
-                    "When ON (enabled): the RMB toggles in two separate sets either:\n" +
-                    "Left ↔ Right\n" +
-                    "Both ↔ None"
-
+                    "**OFF is recommended**\n" +
+                    "Off means RMB cycles all 4 modes: **Both → Left → Right → None → ...**\n\n" +
+                    "Disabled Advantage: less need to move the mouse back to the tool panel.\n\n" +
+                    "--------------------------------------\n" +
+                    "If Legacy is ON: RMB toggles in two separate sets:\n" +
+                    "Left ↔ Right only\n" +
+                    "Both ↔ None only"
                 },
 
-   
-                // Binding title in the keybinding dialog
-                { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Toggle Easy Zoning Button Panel" },
+                // Keybinding dialog title
+                { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Toggle Easy Zoning Update Panel" },
 
-                { $"Assets.DESCRIPTION[{ZoningControllerToolSystem.ToolID}]",
-                    "Change zoning: both sides, left<->right, or none.\n" +
-                    "Left-click locks-in the choice. Left-hold + Drag along a road to update multiple segments." },
-
-                // About tab labels
+                // About tab
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Mod name" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Display name of this mod." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "Version" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "Current mod version." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadox)),    "Paradox Mods" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),     "Open the author's Paradox Mods page." },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadox)), "Paradox Mods" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),  "Open the author's Paradox Mods page." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Join the mod Discord." },
             };

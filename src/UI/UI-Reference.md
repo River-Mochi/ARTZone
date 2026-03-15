@@ -26,17 +26,18 @@ Tool Buttons, Use onSelect (NOT onClick):
 - onSelect is the CS2 UI handler: mouse click OR gamepad SELECT.
 - Keep the GTL button independent from keybind conflicts (Ctrl+V can fail, button still works).
 
-## Styling: why GameTopLeft FAB needs no SCSS
-
-### GameTopLeft (GTL) region
-- `moduleRegistry.append("GameTopLeft", ...)` inserts the component into a **vanilla-owned UI slot**.
+### GameTopLeft (GTL) floating button (no scss needed)
+- `moduleRegistry.append("GameTopLeft", ...)` inserts the component into a **vanilla-owned UI slot** that already has layout.
 - The slot already provides layout (row placement, spacing) and the game’s global button styling.
-- Using `cs2/ui` `<Button variant="floating" ... />` pulls in **built-in styling** for the floating icon button.
+- Using `cs2/ui` `<Button variant="floating" ... />` uses **built-in CS2 UI styling**, so it matches other mods automatically.
 - The icon is passed via `src={...}` (webpack emits the asset to `coui://ui-mods/images/`), so no custom CSS is required just to show it.
 
 **Result:** the GTL launcher button works with **zero SCSS** because the host container + `cs2/ui` button variant already handle visuals.
 
-### Tool Options panel sections (MouseToolOptions) DO need SCSS
+SCSS is typically only needed for Tool Options panel sections (the panel content area), where layout/spacing and icon rows often need explicit styling.
+
+
+### Tool Options panel sections (MouseToolOptions) NEEDS SCSS
 - Tool Options extensions render inside a larger vanilla panel, but **your section layout** (rows, spacing, alignment, custom icon grids, etc.) is *your responsibility*.
 - When adding custom controls/components in panel sections (`...Sections.tsx` / Tool Options UI), SCSS is used to:
   - match vanilla spacing/typography

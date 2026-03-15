@@ -1,0 +1,105 @@
+/* File: src/UI/src/mods/toolOptionsGlass.scss
+ * Purpose:
+ *   Style the vanilla Tool Options panel only while EZ existing-roads tool is active.
+ *
+ * Notes:
+ *   - Global SCSS is correct here because this targets vanilla DOM.
+ *   - No blur. Tint only.
+ *   - New roads stay vanilla because these body classes are only added for EZ existing-roads tool.
+ *   - Tuning knobs:
+ *       width: overall compact panel width
+ *       margin-right: increase to move panel left
+ *       padding: top right bottom left
+ */
+
+body.ez-tooloptions-existing div[class*="tool-side-column_"] {
+    overflow: visible !important;
+}
+
+body.ez-tooloptions-existing div[class*="wrapper_"] {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    width: 100% !important;
+    overflow: visible !important;
+}
+
+/* Common panel layout */
+body.ez-tooloptions-existing div[class*="tool-options-panel_"] {
+    width: 102rem !important;
+    min-width: 102rem !important;
+    max-width: 102rem !important;
+    margin-left: auto !important;
+    margin-right: 0rem !important; /* increase to move panel left */
+
+    padding: 8rem 4rem 5rem 4rem !important; /* top right bottom left */
+
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Glass style */
+body.ez-tooloptions-existing.ez-tooloptions-glass div[class*="tool-options-panel_"] {
+    background-color: rgba(255, 255, 255, 0.10) !important;
+    background-image: none !important;
+}
+
+/* Darker vanilla-style option */
+body.ez-tooloptions-existing.ez-tooloptions-vanilla div[class*="tool-options-panel_"] {
+    background-color: transparent !important;
+    background-image: linear-gradient( to bottom, rgba(45, 79, 92, 0.88), rgba(39, 55, 78, 0.70) ) !important;
+}
+
+/* Each injected row */
+body.ez-tooloptions-existing div[class*="tool-options-panel_"] div[class*="item_"] {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 0 4rem 0 !important;
+    padding: 0 !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+    body.ez-tooloptions-existing div[class*="tool-options-panel_"] div[class*="item_"]:last-child {
+        margin-bottom: 0 !important;
+    }
+
+/* Hide the vanilla text labels only for EZ existing-roads compact panel */
+body.ez-tooloptions-existing div[class*="tool-options-panel_"] div[class*="label_"] {
+    display: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    flex: 0 0 0 !important;
+    overflow: hidden !important;
+}
+
+/* Content area that holds the button rows */
+body.ez-tooloptions-existing div[class*="tool-options-panel_"] div[class*="content_"] {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}

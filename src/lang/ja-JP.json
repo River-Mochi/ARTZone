@@ -1,12 +1,15 @@
 {
-  "EasyZoning.Zone_Controller.ToolName": "簡単ゾーニング",
-  "EasyZoning.Zone_Controller.ToolDescription": "EZの道路更新パネルを開きます。\nショートカット: Ctrl+V",
+  "EasyZoning.Zone_Controller.ToolName": "Easy Zoning",
+  "EasyZoning.Zone_Controller.ToolDescription": "EZ道路更新パネルを開きます。\nデフォルトのショートカット: Ctrl+V（オプションメニューを参照）。",
 
-  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "ゾーン変更",
-  "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "等高線",
+  "EasyZoning.NewRoads.SectionTitle": "ゾーン変更",
 
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "両側。右クリックでモードを切り替えます。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "左側のみ。右クリックでモードを切り替えます。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "右側のみ。右クリックでモードを切り替えます。",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "地形の等高線を表示します。"
+  "EasyZoning.NewRoads.Tooltip.Both": "両側です。すべてオフでなしになります。",
+  "EasyZoning.NewRoads.Tooltip.Left": "左側のみです。",
+  "EasyZoning.NewRoads.Tooltip.Right": "右側のみです。",
+
+  "EasyZoning.ExistingRoads.Tooltip.Both": "両側です。2回クリックでなしになります。",
+  "EasyZoning.ExistingRoads.Tooltip.Left": "左側のみです。右クリックでゾーンを切り替えます。",
+  "EasyZoning.ExistingRoads.Tooltip.Right": "右側のみです。右クリックでゾーンを切り替えます。",
+  "EasyZoning.ExistingRoads.Tooltip.Contour": "地形の等高線を表示します。"
 }

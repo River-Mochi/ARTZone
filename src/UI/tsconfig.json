@@ -13,8 +13,7 @@
     "skipLibCheck": true,
     "jsx": "react-jsx",
 
-    // "typeRoots": ["./types"]
-    // "typeRoots": [ "./types", "./node_modules/@types" ],
+   "typeRoots": [ "./types", "./node_modules/@types" ],
     "resolveJsonModule": true,
 
     "paths": {

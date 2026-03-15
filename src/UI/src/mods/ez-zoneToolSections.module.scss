@@ -1,11 +1,25 @@
 // File: src/UI/src/mods/ez-zoneToolSections.module.scss
-// Purpose: Minimal layout for EZ rows inside the vanilla Tool Options panel.
-// Styling is kept light; vanilla tool-button theme controls colors and hover.
+// Purpose:
+//   Local layout classes for EZ rows inside the vanilla Tool Options panel.
+// Notes:
+//   - .rowNewRoads is only for vanilla new roads.
+//   - .rowExisting is only for EZ existing-roads compact panel.
 
-.row {
+.rowNewRoads {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
-    gap: 2rem; // tighter spacing so the panel stays narrow
+    gap: 2rem;
+}
+
+.rowExisting {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2rem;
+    width: 100%;
+    /* More negative = shift both rows farther left */
+    transform: translateX(-1.5rem);
 }

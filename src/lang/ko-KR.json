@@ -1,12 +1,15 @@
 {
-  "EasyZoning.Zone_Controller.ToolName": "이지 조닝",
-  "EasyZoning.Zone_Controller.ToolDescription": "EZ 도로 업데이트 패널을 엽니다.\n단축키: Ctrl+V",
+  "EasyZoning.Zone_Controller.ToolName": "Easy Zoning",
+  "EasyZoning.Zone_Controller.ToolDescription": "EZ 도로 업데이트 패널을 엽니다.\n기본 단축키: Ctrl+V (옵션 메뉴 참고).",
 
-  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "조닝 변경",
-  "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "등고선",
+  "EasyZoning.NewRoads.SectionTitle": "구역 변경",
 
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "양쪽. 우클릭으로 모드를 순환합니다.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "왼쪽만. 우클릭으로 모드를 순환합니다.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "오른쪽만. 우클릭으로 모드를 순환합니다.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "지형 등고선을 표시합니다."
+  "EasyZoning.NewRoads.Tooltip.Both": "양쪽. 모두 끄면 없음.",
+  "EasyZoning.NewRoads.Tooltip.Left": "왼쪽만.",
+  "EasyZoning.NewRoads.Tooltip.Right": "오른쪽만.",
+
+  "EasyZoning.ExistingRoads.Tooltip.Both": "양쪽. 두 번 클릭하면 없음.",
+  "EasyZoning.ExistingRoads.Tooltip.Left": "왼쪽만. 우클릭으로 구역을 순환합니다.",
+  "EasyZoning.ExistingRoads.Tooltip.Right": "오른쪽만. 우클릭으로 구역을 순환합니다.",
+  "EasyZoning.ExistingRoads.Tooltip.Contour": "지형 등고선을 표시합니다."
 }

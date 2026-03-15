@@ -1,12 +1,15 @@
 {
-  "EasyZoning.Zone_Controller.ToolName": "Zonizzazione Facile",
-  "EasyZoning.Zone_Controller.ToolDescription": "Apre il pannello EZ per aggiornare le strade.\nScorciatoia: Ctrl+V",
+  "EasyZoning.Zone_Controller.ToolName": "Easy Zoning",
+  "EasyZoning.Zone_Controller.ToolDescription": "Questo apre il pannello EZ per aggiornare le strade.\nScorciatoia predefinita: Ctrl+V (vedi menu Opzioni).",
 
-  "ToolOptions.SECTION[EasyZoning.Zone_Controller.SectionTitle]": "Cambio di zonizzazione",
-  "ToolOptions.SECTION[EasyZoning.Zone_Controller.ContourTitle]": "Curve di livello",
+  "EasyZoning.NewRoads.SectionTitle": "Modifica zone",
 
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeBothDescription]": "Entrambi i lati. Clic destro scorre i modi.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeLeftDescription]": "Solo lato sinistro. Clic destro scorre i modi.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ZoningModeRightDescription]": "Solo lato destro. Clic destro scorre i modi.",
-  "ToolOptions.TOOLTIP_DESCRIPTION[EasyZoning.Zone_Controller.ContourDescription]": "Mostra le curve di livello del terreno."
+  "EasyZoning.NewRoads.Tooltip.Both": "Entrambi i lati. Disattiva tutto per nessuno.",
+  "EasyZoning.NewRoads.Tooltip.Left": "Solo lato sinistro.",
+  "EasyZoning.NewRoads.Tooltip.Right": "Solo lato destro.",
+
+  "EasyZoning.ExistingRoads.Tooltip.Both": "Entrambi i lati. Clicca due volte per Nessuno.",
+  "EasyZoning.ExistingRoads.Tooltip.Left": "Solo lato sinistro. Il clic destro scorre le zone.",
+  "EasyZoning.ExistingRoads.Tooltip.Right": "Solo lato destro. Il clic destro scorre le zone.",
+  "EasyZoning.ExistingRoads.Tooltip.Contour": "Mostra le linee di livello del terreno."
 }

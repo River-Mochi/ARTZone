@@ -53,7 +53,7 @@ pick **none**, then draw the new road. Your existing road should keep zoning fac
 - Lightweight, optimized, runs only when needed.
 - EZ mod is similar to "Zone Tools" or old ART mod with different UX. I had both EZ + ZT installed to switch back/forth for testing.
 - Recommend: pick one you like more to avoid any unknown/unforeseen future conflicts. Both use the same game systems, can accomplish the same goal.
- ZT is older, has a moveable panel; EZ is the newest mod with more features: contour button + uses vanilla tool panel + sounds, and tidy.
+ZT is older, has a moveable panel; EZ is the newest mod with more features: contour button + uses vanilla tool panel + sounds, and tidy.
 
 
 ## Tech notes
@@ -97,8 +97,10 @@ No outline means it's already changed to the current selected option.
 
 <!-- Changelog -->
 <ChangeLog>
-- Hotkey changed to Ctrl+V (avoids Move-It conflict); use Options Menu to Reset to new Default
-- internal refactor and performance tweak.
+- UI new design: Transparent, smaller panel (no blur filter is used to improve performance).
+- Toggle choice in Options menu of Glass or Gray panel (design only, no behavior change).
+- Compatibility: choice of contour button enabled/disabled if prefered off.
+- internal refactor
 </ChangeLog>
 
 	<!-- External links -->

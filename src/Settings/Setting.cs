@@ -1,38 +1,41 @@
 // File: src/Settings/Setting.cs
 // Purpose: Options UI + one rebindable hotkey (default Ctrl+V).
 // Notes:
-//   - Keyboard action declared once (ToggleZoneTool), game shows it in Options.
-//   - Default binding defined by SettingsUIKeyboardBinding (Ctrl+V).
-//   - RMB cycling is not declared here; it uses the game’s built-in SecondaryApply tool action.
+//   - No UI strings live here. All text is in LocaleEN.cs for translation.
+//   - Usage instructions are a multiline row whose text is localized.
+//   - Usage row is hidden when ShowUsage is OFF.
 
 namespace EasyZoning
 {
     using Colossal.IO.AssetDatabase; // FileLocation attribute (settings storage path)
     using Game.Input;                // ProxyBinding, BindingKeyboard, ActionType
     using Game.Modding;              // IMod, ModSetting base
-    using Game.Settings;             // Settings UI attributes (tabs/groups/sections/buttons)
+    using Game.Settings;             // Settings UI attributes
     using System;                    // Exception in URL open handlers
     using UnityEngine;               // Application.OpenURL
 
-    // Persist settings under: .../ModsSettings/EasyZoning/EasyZoning
     [FileLocation("ModsSettings/EasyZoning/EasyZoning")]
-
-    // Options UI structure.
-    [SettingsUITabOrder(kActionsTab, kAboutTab)]
-    [SettingsUIGroupOrder(kToggleGroup, kKeybindingGroup, kLegacyGroup, kAboutInfoGroup, kAboutLinksGroup)]
-    [SettingsUIShowGroupName(kToggleGroup, kKeybindingGroup, kLegacyGroup)]
-
-    // Declares the rebindable action that appears in Options → Key bindings.
+    [SettingsUITabOrder(kActionsTab, kLegacyTab, kAboutTab)]
+    [SettingsUIGroupOrder(
+        kToggleGroup, kKeybindingGroup, kCompatibilityGroup, kUiGroup, kUsageGroup,
+        kLegacyGroup,
+        kAboutInfoGroup, kAboutLinksGroup)]
+    [SettingsUIShowGroupName(
+        kToggleGroup, kUsageGroup)] // kLegacyGroup and other names omitted on purpose.
     [SettingsUIKeyboardAction(Mod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
     public sealed class Setting : ModSetting
     {
         // Tabs
         public const string kActionsTab = "Actions";
+        public const string kLegacyTab = "Legacy";
         public const string kAboutTab = "About";
 
         // Groups
         public const string kToggleGroup = "Zoning Tools";
         public const string kKeybindingGroup = "Key bindings";
+        public const string kCompatibilityGroup = "Compatibility";
+        public const string kUiGroup = "UI";
+        public const string kUsageGroup = "Usage";
         public const string kLegacyGroup = "Legacy Tool";
         public const string kAboutInfoGroup = "Info";
         public const string kAboutLinksGroup = "Links";
@@ -41,23 +44,16 @@ namespace EasyZoning
         {
         }
 
-        // --- Toggles ---
+        // --- Zone Options ---
 
         [SettingsUISection(kActionsTab, kToggleGroup)]
-        public bool RemoveZonedCells
-        {
-            get; set;
-        } = true;
+        public bool RemoveZonedCells { get; set; } = true;
 
         [SettingsUISection(kActionsTab, kToggleGroup)]
-        public bool RemoveOccupiedCells
-        {
-            get; set;
-        } = true;
+        public bool RemoveOccupiedCells { get; set; } = true;
 
         // --- Key bindings ---
-        // ProxyBinding holds the saved/rebound key, stored by the settings system.
-        // Default is Ctrl+V, declared by SettingsUIKeyboardBinding.
+
         [SettingsUIKeyboardBinding(BindingKeyboard.V, Mod.kToggleToolActionName, ctrl: true)]
         [SettingsUISection(kActionsTab, kKeybindingGroup)]
         public ProxyBinding ToggleZoneTool
@@ -65,21 +61,41 @@ namespace EasyZoning
             get; set;
         }
 
-        // --- Legacy Tool behavior ---
+        // --- Compatibility ---
 
-        // RMB cycling (update-existing-roads tool):
-        // - OFF (default): Both → Left → Right → None → ...
-        // - ON: Left <-> Right OR Both <-> None
-        [SettingsUISection(kActionsTab, kLegacyGroup)]
-        public bool LegacyRightClickCycle
-        {
-            get; set;
-        } = false;
+        // Default ON.
+        [SettingsUISection(kActionsTab, kCompatibilityGroup)]
+        public bool ShowContourButton { get; set; } = true;
+
+        // --- UI ---
+
+        // Default ON.
+        [SettingsUISection(kActionsTab, kUiGroup)]
+        public bool UseGlassPanel { get; set; } = true;
+
+        // --- Usage (Actions tab) ---
+
+        // Default OFF.
+        [SettingsUISection(kActionsTab, kUsageGroup)]
+        public bool ShowUsage { get; set; } = false;
+
+        [SettingsUIMultilineText]
+        [SettingsUIHideByCondition(typeof(Setting), nameof(HideUsageText))]
+        [SettingsUISection(kActionsTab, kUsageGroup)]
+        public string UsageText => string.Empty;
+
+        private bool HideUsageText( ) => !ShowUsage;
+
+        // --- Legacy (Legacy tab) ---
+
+        // Default OFF.
+        [SettingsUISection(kLegacyTab, kLegacyGroup)]
+        public bool LegacyRightClickCycle { get; set; } = false;
 
         // --- About (read-only) ---
 
         [SettingsUISection(kAboutTab, kAboutInfoGroup)]
-        public string NameText => "Easy Zoning";
+        public string NameText => Mod.ModName;
 
         [SettingsUISection(kAboutTab, kAboutInfoGroup)]
         public string VersionText =>
@@ -131,8 +147,10 @@ namespace EasyZoning
         {
             RemoveZonedCells = true;
             RemoveOccupiedCells = true;
+            ShowContourButton = true;
+            UseGlassPanel = true;
+            ShowUsage = false;
             LegacyRightClickCycle = false;
-            // ToggleZoneTool default binding from SettingsUIKeyboardBinding (Ctrl+V).
         }
     }
 }

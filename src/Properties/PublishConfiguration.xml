@@ -88,7 +88,7 @@ No outline means it's already changed to the current selected option.
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/easy-zoning.1905089/" />
 
 	<!-- Versioning of mod and base game-->
-	<ModVersion Value="1.0.6" />
+	<ModVersion Value="1.0.7" />
 	<GameVersion Value="1.5.*" />
 
 	<!-- Dependencies / DLC (optional) -->
@@ -97,8 +97,10 @@ No outline means it's already changed to the current selected option.
 
 <!-- Changelog -->
 <ChangeLog>
-- Hotkey changed to Ctrl+V (avoids Move-It conflict); use Options Menu to Reset to new Default
-- internal refactor and performance tweak.
+- UI new design: Transparent, smaller panel (no blur filter is used to improve performance).
+- Toggle choice in Options menu of Glass or Gray panel (design only, no behavior change).
+- Compatibility: choice of contour button enabled/disabled if prefered off.
+- internal refactor
 </ChangeLog>
 
 	<!-- External links -->
