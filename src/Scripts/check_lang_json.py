@@ -509,7 +509,7 @@ def main() -> int:
             m, pretty, has_bom, bom_fixed = load_json_locale(p, fix_bom=args.fix_bom)
         except Exception as ex:
             any_problem = True
-            print("\n" + "=" * 70)
+            print("\n" + "=" * 60)
             print(p.name)
             print(f"ERROR parsing JSON locale: {ex}")
             continue

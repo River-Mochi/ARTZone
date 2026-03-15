@@ -14,7 +14,7 @@
 	<LongDescription>
 # Easy Zoning [EZ] Beta
 
-   Custom zoning for new and existing roads. New alternative to Zone Tools.
+Custom zoning for new and existing roads. New alternative to Zone Tools.
 
 ## How to use
 
@@ -25,7 +25,7 @@
 
 **Existing Road**
 1. Open EZ Update panel: Ctrl+V toggles panel On/Off (top-left icon does the same).
-  2. Select an icon to pick a zone side (see image).
+2. Select an icon to pick a zone side (see image).
 3. Hover and preview a road.
 4. Right-Click on roads to switch sides (infinitely); **RMB cycles** Both → Left → Right → None →...
 5. Left-Click (LMB) to apply (lock it in).
@@ -88,7 +88,7 @@ No outline means it's already changed to the current selected option.
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/easy-zoning.1905089/" />
 
 	<!-- Versioning of mod and base game-->
-	<ModVersion Value="1." />
+	<ModVersion Value="1.0.6" />
 	<GameVersion Value="1.5.*" />
 
 	<!-- Dependencies / DLC (optional) -->
@@ -97,8 +97,10 @@ No outline means it's already changed to the current selected option.
 
 <!-- Changelog -->
 <ChangeLog>
-    - Hotkey changed to Ctrl+V (avoids Move-It conflict); use Options Menu to Reset to new Default
-  - internal refactor and performance tweak.
+- UI new design: Transparent, smaller panel (no blur filter is used to improve performance).
+- Toggle choice in Options menu of Glass or Gray panel (design only, no behavior change).
+- Compatibility: choice of contour button enabled/disabled if prefered off.
+- internal refactor
 </ChangeLog>
 
 	<!-- External links -->

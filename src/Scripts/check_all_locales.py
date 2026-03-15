@@ -13,9 +13,9 @@ from pathlib import Path
 
 
 def run_check(label: str, script_path: Path, extra_args: list[str]) -> int:
-    print("\n" + "=" * 70)
+    print("\n" + "=" * 60)
     print(label)
-    print("=" * 70)
+    print("=" * 60)
 
     cmd = [sys.executable, str(script_path), *extra_args]
     result = subprocess.run(cmd)
@@ -64,14 +64,14 @@ def main() -> int:
 
     overall_rc = max(rc_locales, rc_json)
 
-    print("\n" + "=" * 70)
+    print("\n" + "=" * 60)
     if overall_rc == 0:
         print("ALL Localization checks GOOD")
     elif overall_rc == 1:
         print("Localization checks FOUND PROBLEMS")
     else:
         print("Localization checks FAILED TO RUN")
-    print("=" * 70)
+    print("=" * 60)
 
     return overall_rc
 

@@ -784,7 +784,7 @@ def main() -> int:
             m, keys_raw, pretty = load_locale(p)
         except Exception as ex:
             any_problem = True
-            print("\n" + "=" * 70)
+            print("\n" + "=" * 60)
             print(p.name)
             print(f"ERROR parsing locale: {ex}")
             continue
