@@ -50,12 +50,12 @@ namespace EasyZoning
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
                 // Zone options
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Do not reset existing zoned squares" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● Do not reset existing zoned squares" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
                     "Do not reset already zoned cells during preview/apply.\n\n" +
                     "**[ ✓ ] Enabled recommended.**" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Prevent buildings from being removed" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "● Prevent buildings from being removed" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
                     "**Buildings = occupied cells**. Prevents preview/apply of new zones from turning existing buildings into condemned.\n\n" +
                     "**[ ✓ ] Enabled recommended.**" },
