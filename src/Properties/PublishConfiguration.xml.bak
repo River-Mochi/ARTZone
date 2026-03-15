@@ -14,7 +14,7 @@
 	<LongDescription>
 # Easy Zoning [EZ] Beta
 
-Custom zoning for new and existing roads. New alternative to Zone Tools.
+   Custom zoning for new and existing roads. New alternative to Zone Tools.
 
 ## How to use
 
@@ -25,7 +25,7 @@ Custom zoning for new and existing roads. New alternative to Zone Tools.
 
 **Existing Road**
 1. Open EZ Update panel: Ctrl+V toggles panel On/Off (top-left icon does the same).
-2. Select an icon to pick a zone side (see image).
+  2. Select an icon to pick a zone side (see image).
 3. Hover and preview a road.
 4. Right-Click on roads to switch sides (infinitely); **RMB cycles** Both → Left → Right → None →...
 5. Left-Click (LMB) to apply (lock it in).
@@ -53,7 +53,7 @@ pick **none**, then draw the new road. Your existing road should keep zoning fac
 - Lightweight, optimized, runs only when needed.
 - EZ mod is similar to "Zone Tools" or old ART mod with different UX. I had both EZ + ZT installed to switch back/forth for testing.
 - Recommend: pick one you like more to avoid any unknown/unforeseen future conflicts. Both use the same game systems, can accomplish the same goal.
- ZT is older, has a moveable panel; EZ is the newest mod with more features: contour button + uses vanilla tool panel + sounds, and tidy.
+ZT is older, has a moveable panel; EZ is the newest mod with more features: contour button + uses vanilla tool panel + sounds, and tidy.
 
 
 ## Tech notes
@@ -88,7 +88,7 @@ No outline means it's already changed to the current selected option.
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/easy-zoning.1905089/" />
 
 	<!-- Versioning of mod and base game-->
-	<ModVersion Value="1.0.6" />
+	<ModVersion Value="1." />
 	<GameVersion Value="1.5.*" />
 
 	<!-- Dependencies / DLC (optional) -->
@@ -97,8 +97,8 @@ No outline means it's already changed to the current selected option.
 
 <!-- Changelog -->
 <ChangeLog>
-- Hotkey changed to Ctrl+V (avoids Move-It conflict); use Options Menu to Reset to new Default
-- internal refactor and performance tweak.
+    - Hotkey changed to Ctrl+V (avoids Move-It conflict); use Options Menu to Reset to new Default
+  - internal refactor and performance tweak.
 </ChangeLog>
 
 	<!-- External links -->

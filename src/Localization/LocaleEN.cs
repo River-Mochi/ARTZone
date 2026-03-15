@@ -4,6 +4,7 @@
 namespace EasyZoning
 {
     using Colossal;
+    using Colossal.IO.AssetDatabase.Internal;
     using System.Collections.Generic;
 
     public sealed class LocaleEN : IDictionarySource
@@ -63,14 +64,14 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ Contour button" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
                     "**[ ✓ ] enabled**, show the Contour button in the Easy Zoning existing-roads panel.\n\n" +
-                    "Disable this if another mod already handles terrain contour lines." },
+                    "● Disable this if a smaller panel is preferred or another mod handles terrain contour lines." },
 
                 // UI
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Glass panel style" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
                     "**[ ✓ ] enabled**, use the clearer translucent panel style.\n" +
-                    "**[   ] disabled**, use a darker vanilla-style panel.\n\n" +
-                    "Visual style only. No blur is used." },
+                    "**[   ] disabled**, use a gray panel.\n\n" +
+                    "Visual style only." },
 
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Show Instructions" },
@@ -102,13 +103,14 @@ namespace EasyZoning
                 // Legacy
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Legacy right-click cycle" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
-                    "**Recommend OFF** so that RMB cycles all 4 modes:\n" +
-                    "**Both → Left → Right → None → ...**\n\n" +
-                    "Advantage: less need to move the mouse back to the tool panel.\n\n" +
+                    "**OFF is recommended**\n" +
+                    "Off means RMB cycles all 4 modes: **Both → Left → Right → None → ...**\n\n" +
+                    "Disabled Advantage: less need to move the mouse back to the tool panel.\n\n" +
                     "--------------------------------------\n" +
                     "If Legacy is ON: RMB toggles in two separate sets:\n" +
-                    "Left ↔ Right\n" +
-                    "Both ↔ None" },
+                    "Left ↔ Right only\n" +
+                    "Both ↔ None only"
+                },
 
                 // Keybinding dialog title
                 { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Toggle Easy Zoning Update Panel" },
