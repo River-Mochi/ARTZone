@@ -8,7 +8,7 @@ namespace EasyZoning.Tools
     using Game;
     using Game.Common;              // Owner, Updated (dirty marker pattern)
     using Game.Net;                 // Curve, Upgraded
-    using Game.Tools;               // Temp
+    using Game.Tools;               // Temp, ToolSystem
     using Game.Zones;               // Block, ValidArea, Cell, ZoneType
     using System;                   // InvalidOperationException (DEBUG guard)
     using Unity.Collections;        // NativeArray
@@ -20,6 +20,7 @@ namespace EasyZoning.Tools
     {
         private EntityQuery m_UpdatedBlocksQuery;
         private ModificationBarrier4B m_ModificationBarrier = null!;
+        private ToolSystem m_ToolSystem = null!;
 #if DEBUG
         private int m_LogTick;
         private int m_LastCount;
@@ -35,6 +36,7 @@ namespace EasyZoning.Tools
                 .Build(this);
 
             m_ModificationBarrier = World.GetOrCreateSystemManaged<ModificationBarrier4B>();
+            m_ToolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
 
 #if DEBUG
             m_LogTick = 0;
@@ -67,6 +69,7 @@ namespace EasyZoning.Tools
 
             EntityCommandBuffer ecb = m_ModificationBarrier.CreateCommandBuffer();
             NativeArray<Entity> updatedBlocks = m_UpdatedBlocksQuery.ToEntityArray(Allocator.TempJob);
+            bool allowExistingRoadSync = m_ToolSystem != null && m_ToolSystem.activeTool is ZoningControllerToolSystem;
 
             JobHandle syncBlockJob = new SyncBlockJob
             {
@@ -85,6 +88,7 @@ namespace EasyZoning.Tools
                 ZoningRestoreLookup = GetComponentLookup<ZoningRestoreComponent>(isReadOnly: true),
                 RemoveOccupiedCells = removeOccupied,
                 RemoveZonedCells = removeZoned,
+                AllowExistingRoadSync = allowExistingRoadSync,
             }.Schedule(updatedBlocks.Length, 32, Dependency);
 
             updatedBlocks.Dispose(syncBlockJob);
@@ -111,6 +115,7 @@ namespace EasyZoning.Tools
 
             public bool RemoveOccupiedCells;
             public bool RemoveZonedCells;
+            public bool AllowExistingRoadSync;
 
             public void Execute(int index)
             {
@@ -129,8 +134,20 @@ namespace EasyZoning.Tools
                 }
 
                 Entity roadEntity = owner.m_Owner;
+                bool hasPreview = ZoningPreviewLookup.HasComponent(roadEntity);
+                bool hasRestore = ZoningRestoreLookup.HasComponent(roadEntity);
+                bool isTempRoad = TempLookup.HasComponent(roadEntity);
 
-                if (!ZoningPreviewLookup.HasComponent(roadEntity) &&
+                // Vanilla 1.5.6f1 existing-road zone FAB highlights original road sub-blocks
+                // through temp preview entities, which marks those real blocks Updated.
+                // When EZ is not the active existing-road tool, leave normal existing roads
+                // alone so vanilla can own its preview/add/remove workflow.
+                if (!hasPreview && !hasRestore && !isTempRoad && !AllowExistingRoadSync)
+                {
+                    return;
+                }
+
+                if (!hasPreview &&
                     TempLookup.TryGetComponent(roadEntity, out Temp roadTemp) &&
                     roadTemp.m_Original != Entity.Null)
                 {

@@ -436,6 +436,7 @@ namespace EasyZoning.Tools
                 SubBlockLookup = GetBufferLookup<SubBlock>(isReadOnly: true),
                 ZoningPreviewLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true),
                 ZoningRestoreLookup = GetComponentLookup<ZoningRestoreComponent>(isReadOnly: true),
+                UpgradedLookup = GetComponentLookup<Upgraded>(isReadOnly: true),
                 UpdatedLookup = updatedReadLookup3,
                 SelectedEntities = selectedReadOnly,
                 Entities = zoningPreviewEntities.AsReadOnly()
@@ -695,31 +696,85 @@ namespace EasyZoning.Tools
             {
                 Entity e = SelectedEntities[index];
                 int2 preview = ToolDepths;
+                bool changed = false;
 
                 if (ZoningPreviewLookup.TryGetComponent(e, out ZoningPreviewComponent data))
                 {
                     if (!math.all(data.Depths == preview))
                     {
-                        ECB.SetComponent(index, e, new ZoningPreviewComponent
+                        data = new ZoningPreviewComponent
                         {
                             Depths = preview,
-                            CommittedDepths = data.CommittedDepths
-                        });
-                        MarkRoadAndSubBlocksUpdated(index, e);
+                            CommittedDepths = data.CommittedDepths,
+                            CommittedFlags = data.CommittedFlags,
+                            HasCommittedUpgraded = data.HasCommittedUpgraded
+                        };
+                        ECB.SetComponent(index, e, data);
+                        changed = true;
                     }
+
+                    changed |= ApplyPreviewUpgradedState(index, e, data);
                 }
                 else
                 {
-                    ECB.AddComponent(index, e, new ZoningPreviewComponent
-                    {
-                        Depths = preview,
-                        CommittedDepths = GetCommittedRoadDepths(e)
-                    });
-                    MarkRoadAndSubBlocksUpdated(index, e);
+                    ZoningPreviewComponent previewData = CreatePreviewData(e, preview);
+                    ECB.AddComponent(index, e, previewData);
+                    changed = true;
+                    changed |= ApplyPreviewUpgradedState(index, e, previewData);
                 }
 
-                if (ZoningRestoreLookup.HasComponent(e))
+                bool removedRestore = ZoningRestoreLookup.HasComponent(e);
+                if (removedRestore)
+                {
                     ECB.RemoveComponent<ZoningRestoreComponent>(index, e);
+                    changed = true;
+                }
+
+                if (changed)
+                    MarkRoadAndSubBlocksUpdated(index, e);
+            }
+
+            private ZoningPreviewComponent CreatePreviewData(Entity roadEntity, int2 previewDepths)
+            {
+                bool hasCommittedUpgraded = UpgradedLookup.TryGetComponent(roadEntity, out Upgraded upgraded);
+                return new ZoningPreviewComponent
+                {
+                    Depths = previewDepths,
+                    CommittedDepths = GetCommittedRoadDepths(roadEntity),
+                    CommittedFlags = hasCommittedUpgraded ? upgraded.m_Flags : default,
+                    HasCommittedUpgraded = hasCommittedUpgraded
+                };
+            }
+
+            private bool ApplyPreviewUpgradedState(int index, Entity roadEntity, ZoningPreviewComponent preview)
+            {
+                bool hasUpgraded = UpgradedLookup.TryGetComponent(roadEntity, out Upgraded upgraded);
+                CompositionFlags baseFlags = preview.HasCommittedUpgraded ? preview.CommittedFlags : default;
+                CompositionFlags previewFlags = RoadZoneCompatibility.ApplyDepthsToFlags(baseFlags, preview.Depths);
+
+                if (RoadZoneCompatibility.HasAnyFlags(previewFlags) || preview.HasCommittedUpgraded)
+                {
+                    Upgraded nextUpgraded = new Upgraded { m_Flags = previewFlags };
+                    if (hasUpgraded)
+                    {
+                        if (upgraded.m_Flags == previewFlags)
+                            return false;
+
+                        ECB.SetComponent(index, roadEntity, nextUpgraded);
+                        return true;
+                    }
+
+                    ECB.AddComponent(index, roadEntity, nextUpgraded);
+                    return true;
+                }
+
+                if (hasUpgraded)
+                {
+                    ECB.RemoveComponent<Upgraded>(index, roadEntity);
+                    return true;
+                }
+
+                return false;
             }
 
             private int2 GetCommittedRoadDepths(Entity roadEntity)
@@ -823,6 +878,7 @@ namespace EasyZoning.Tools
             [ReadOnly] public BufferLookup<SubBlock> SubBlockLookup;
             [ReadOnly] public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
             [ReadOnly] public ComponentLookup<ZoningRestoreComponent> ZoningRestoreLookup;
+            [ReadOnly] public ComponentLookup<Upgraded> UpgradedLookup;
             [ReadOnly] public ComponentLookup<Updated> UpdatedLookup;
 
             public NativeArray<Entity>.ReadOnly SelectedEntities;
@@ -837,6 +893,7 @@ namespace EasyZoning.Tools
                 if (!ZoningPreviewLookup.TryGetComponent(e, out ZoningPreviewComponent preview))
                     return;
 
+                bool changed = RestoreCommittedUpgradedState(index, e, preview);
                 if (!math.all(preview.Depths == preview.CommittedDepths))
                 {
                     ZoningRestoreComponent restore = new ZoningRestoreComponent { Depths = preview.CommittedDepths };
@@ -845,10 +902,41 @@ namespace EasyZoning.Tools
                     else
                         ECB.AddComponent(index, e, restore);
 
-                    MarkRoadAndSubBlocksUpdated(index, e);
+                    changed = true;
                 }
 
+                if (changed)
+                    MarkRoadAndSubBlocksUpdated(index, e);
+
                 ECB.RemoveComponent<ZoningPreviewComponent>(index, e);
+            }
+
+            private bool RestoreCommittedUpgradedState(int index, Entity roadEntity, ZoningPreviewComponent preview)
+            {
+                bool hasUpgraded = UpgradedLookup.TryGetComponent(roadEntity, out Upgraded upgraded);
+                if (preview.HasCommittedUpgraded)
+                {
+                    Upgraded committedUpgraded = new Upgraded { m_Flags = preview.CommittedFlags };
+                    if (hasUpgraded)
+                    {
+                        if (upgraded.m_Flags == preview.CommittedFlags)
+                            return false;
+
+                        ECB.SetComponent(index, roadEntity, committedUpgraded);
+                        return true;
+                    }
+
+                    ECB.AddComponent(index, roadEntity, committedUpgraded);
+                    return true;
+                }
+
+                if (hasUpgraded)
+                {
+                    ECB.RemoveComponent<Upgraded>(index, roadEntity);
+                    return true;
+                }
+
+                return false;
             }
 
             private void MarkRoadAndSubBlocksUpdated(int index, Entity roadEntity)
@@ -890,7 +978,8 @@ namespace EasyZoning.Tools
             {
                 foreach (Entity e in Entities)
                 {
-                    if (ZoningPreviewLookup.HasComponent(e))
+                    bool hasPreview = ZoningPreviewLookup.TryGetComponent(e, out ZoningPreviewComponent preview);
+                    if (hasPreview)
                         ECB.RemoveComponent<ZoningPreviewComponent>(e);
 
                     if (ZoningRestoreLookup.HasComponent(e))
@@ -910,8 +999,13 @@ namespace EasyZoning.Tools
                     }
 
                     bool hasUpgraded = UpgradedLookup.TryGetComponent(e, out Upgraded upgraded);
+                    CompositionFlags baseFlags = hasPreview && preview.HasCommittedUpgraded
+                        ? preview.CommittedFlags
+                        : hasUpgraded
+                            ? upgraded.m_Flags
+                            : default;
                     CompositionFlags nextFlags = RoadZoneCompatibility.ApplyDepthsToFlags(
-                        hasUpgraded ? upgraded.m_Flags : default,
+                        baseFlags,
                         ToolDepths);
 
                     if (RoadZoneCompatibility.HasAnyFlags(nextFlags))
@@ -962,6 +1056,7 @@ namespace EasyZoning.Tools
                         continue;
 
                     ZoningPreviewComponent preview = EntityManager.GetComponentData<ZoningPreviewComponent>(roadEntity);
+                    bool changed = RestoreCommittedUpgradedStateImmediate(roadEntity, preview);
                     if (!math.all(preview.Depths == preview.CommittedDepths))
                     {
                         ZoningRestoreComponent restore = new ZoningRestoreComponent { Depths = preview.CommittedDepths };
@@ -970,8 +1065,11 @@ namespace EasyZoning.Tools
                         else
                             EntityManager.AddComponentData(roadEntity, restore);
 
-                        MarkRoadAndSubBlocksUpdatedImmediate(roadEntity);
+                        changed = true;
                     }
+
+                    if (changed)
+                        MarkRoadAndSubBlocksUpdatedImmediate(roadEntity);
 
                     EntityManager.RemoveComponent<ZoningPreviewComponent>(roadEntity);
                 }
@@ -980,6 +1078,35 @@ namespace EasyZoning.Tools
             {
                 previewEntities.Dispose();
             }
+        }
+
+        private bool RestoreCommittedUpgradedStateImmediate(Entity roadEntity, ZoningPreviewComponent preview)
+        {
+            bool hasUpgraded = EntityManager.HasComponent<Upgraded>(roadEntity);
+            if (preview.HasCommittedUpgraded)
+            {
+                Upgraded committedUpgraded = new Upgraded { m_Flags = preview.CommittedFlags };
+                if (hasUpgraded)
+                {
+                    Upgraded current = EntityManager.GetComponentData<Upgraded>(roadEntity);
+                    if (current.m_Flags == preview.CommittedFlags)
+                        return false;
+
+                    EntityManager.SetComponentData(roadEntity, committedUpgraded);
+                    return true;
+                }
+
+                EntityManager.AddComponentData(roadEntity, committedUpgraded);
+                return true;
+            }
+
+            if (hasUpgraded)
+            {
+                EntityManager.RemoveComponent<Upgraded>(roadEntity);
+                return true;
+            }
+
+            return false;
         }
 
         private void MarkRoadAndSubBlocksUpdatedImmediate(Entity roadEntity)

@@ -5,6 +5,7 @@
 
 namespace EasyZoning.Components
 {
+    using Game.Prefabs;                    // CompositionFlags
     using Colossal.Serialization.Entities; // ISerializable, IWriter/IReader for save/load
     using System;                          // IEquatable
     using Unity.Entities;                  // IComponentData
@@ -18,6 +19,8 @@ namespace EasyZoning.Components
     {
         public int2 Depths;          // x = left, y = right
         public int2 CommittedDepths; // x = left, y = right
+        public CompositionFlags CommittedFlags;
+        public bool HasCommittedUpgraded;
     }
 
     /// <summary>
