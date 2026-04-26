@@ -1,5 +1,6 @@
 // File: Utils/LogUtils.cs
 // Purpose: popup-safe logging helpers for CS2 mods.
+// Based on River-Mochi shared CS2 utilities.
 // Notes:
 // - Routine logs append directly to the mod log file instead of routing through
 //   Colossal's UI logger path, which can surface misleading popups.
