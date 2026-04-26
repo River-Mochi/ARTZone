@@ -4,6 +4,7 @@ Edit road zoning in Cities: Skylines II
 
 - **New roads** use buttons at the bottom of new road tool panel: **Both, Left, Right, None**
 - **Existing roads** can be previewed, cycled with **Right-Click**, and change applied with **Left-Click**.
+- **Existing roads** stay compatible with the vanilla road zoning FAB added in patch **1.5.6f1**.
 
 ---
 
@@ -15,12 +16,14 @@ Edit road zoning in Cities: Skylines II
 - No Harmony patches
 
 ### New roads
-- Adds EZ zoning buttons to the vanilla **Roads** tool options
+- Adds 3 EZ zoning buttons to the vanilla **Roads** tool options
+- Those 3 buttons cover the 4 states: **Both**, **Left**, **Right**, **None**
 - Pick a zoning side, then draw roads normally
 - Selected mode applies to newly drawn roads
 
 ### Existing roads tool
 - Open with the **top-left Easy Zoning button** or **Ctrl + V**
+- Use the same 3 zoning buttons for **Both**, **Left**, **Right**, or **None**
 - Hover a zonable road segment to preview the result
 - **Right-Click** cycles zoning choices before applying
 - **Left-Click** applies the change.
@@ -83,6 +86,7 @@ The mod includes these settings:
 
 - Safe to add or remove from a save
 - Built to stay close to vanilla behavior
+- Compatible with the vanilla existing-road zoning FAB introduced in **1.5.6f1**
 - Extends vanilla UI instead of replacing large chunks of it
 - Uses the game’s native input system for LMB / RMB behavior
 - Only appears for **zonable roads**  

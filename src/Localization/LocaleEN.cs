@@ -86,7 +86,8 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<New Road>\n" +
                     "1. Open Roads panel (pick a road).\n" +
-                    "2. At bottom of the road tool panel: pick one of the 3 zone icons.\n" +
+                    "2. At bottom of the road tool panel: use the 3 EZ buttons for Both / Left / Right.\n" +
+                    "   Click the selected button again for None.\n" +
                     "3. Draw as usual.\n\n" +
                     "-----------------------------------------\n" +
                     "  RMB = right-click, LMB = left-click\n" +
@@ -94,7 +95,8 @@ namespace EasyZoning
                     "<Existing Road>\n" +
                     "1. Open EZ Update panel: click <Ctrl+V> to turn the panel On/Off\n" +
                     "   (or <top-left icon> does the same).\n" +
-                    "2. Select a zone icon from the bottom panel.\n" +
+                    "2. Use the 3 EZ buttons for Both / Left / Right.\n" +
+                    "   Click the selected button again for None.\n" +
                     "3. Hover + preview a road.\n" +
                     "4. <RMB cycles>: Both → Left → Right → None → ...\n" +
                     "5. <LMB one time>: applies (locks it in).\n" +
