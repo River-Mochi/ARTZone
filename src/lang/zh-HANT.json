@@ -4,12 +4,12 @@
 
   "EasyZoning.NewRoads.SectionTitle": "分區變更",
 
-  "EasyZoning.NewRoads.Tooltip.Both": "雙側。全部關閉即為無。",
-  "EasyZoning.NewRoads.Tooltip.Left": "僅左側。",
-  "EasyZoning.NewRoads.Tooltip.Right": "僅右側。",
+  "EasyZoning.NewRoads.Tooltip.Both": "雙側。再次點擊可設為無。",
+  "EasyZoning.NewRoads.Tooltip.Left": "僅左側。再次點擊可設為無。",
+  "EasyZoning.NewRoads.Tooltip.Right": "僅右側。再次點擊可設為無。",
 
-  "EasyZoning.ExistingRoads.Tooltip.Both": "雙側。點兩下可設為無。",
-  "EasyZoning.ExistingRoads.Tooltip.Left": "僅左側。右鍵循環切換分區。",
-  "EasyZoning.ExistingRoads.Tooltip.Right": "僅右側。右鍵循環切換分區。",
+  "EasyZoning.ExistingRoads.Tooltip.Both": "雙側。再次點擊可設為無。",
+  "EasyZoning.ExistingRoads.Tooltip.Left": "僅左側。再次點擊可設為無。右鍵循環切換分區。",
+  "EasyZoning.ExistingRoads.Tooltip.Right": "僅右側。再次點擊可設為無。右鍵循環切換分區。",
   "EasyZoning.ExistingRoads.Tooltip.Contour": "顯示地形等高線。"
 }

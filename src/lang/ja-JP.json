@@ -4,12 +4,12 @@
 
   "EasyZoning.NewRoads.SectionTitle": "ゾーン変更",
 
-  "EasyZoning.NewRoads.Tooltip.Both": "両側です。すべてオフでなしになります。",
-  "EasyZoning.NewRoads.Tooltip.Left": "左側のみです。",
-  "EasyZoning.NewRoads.Tooltip.Right": "右側のみです。",
+  "EasyZoning.NewRoads.Tooltip.Both": "両側。もう一度クリックでなし。",
+  "EasyZoning.NewRoads.Tooltip.Left": "左側のみ。もう一度クリックでなし。",
+  "EasyZoning.NewRoads.Tooltip.Right": "右側のみ。もう一度クリックでなし。",
 
-  "EasyZoning.ExistingRoads.Tooltip.Both": "両側です。2回クリックでなしになります。",
-  "EasyZoning.ExistingRoads.Tooltip.Left": "左側のみです。右クリックでゾーンを切り替えます。",
-  "EasyZoning.ExistingRoads.Tooltip.Right": "右側のみです。右クリックでゾーンを切り替えます。",
+  "EasyZoning.ExistingRoads.Tooltip.Both": "両側。もう一度クリックでなし。",
+  "EasyZoning.ExistingRoads.Tooltip.Left": "左側のみ。もう一度クリックでなし。右クリックでゾーンを切り替えます。",
+  "EasyZoning.ExistingRoads.Tooltip.Right": "右側のみ。もう一度クリックでなし。右クリックでゾーンを切り替えます。",
   "EasyZoning.ExistingRoads.Tooltip.Contour": "地形の等高線を表示します。"
 }

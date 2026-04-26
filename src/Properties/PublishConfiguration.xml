@@ -103,6 +103,7 @@ No outline means it's already changed to the current selected option.
 <!-- Changelog -->
 <ChangeLog>
 - Align EZ with 1.5.6f1 road zoning
+- Now both > none is not only option. Left or right-only icons can be toggled off to be none mode.
 </ChangeLog>
 	<!-- External links -->
 	<ExternalLink Type="discord" Url="https://discord.gg/HTav7ARPs2" />

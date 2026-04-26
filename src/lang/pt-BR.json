@@ -4,12 +4,12 @@
 
   "EasyZoning.NewRoads.SectionTitle": "Alterar zoneamento",
 
-  "EasyZoning.NewRoads.Tooltip.Both": "Ambos os lados. Desligue tudo para nenhum.",
-  "EasyZoning.NewRoads.Tooltip.Left": "Somente lado esquerdo.",
-  "EasyZoning.NewRoads.Tooltip.Right": "Somente lado direito.",
+  "EasyZoning.NewRoads.Tooltip.Both": "Ambos os lados. Clique novamente para Nenhum.",
+  "EasyZoning.NewRoads.Tooltip.Left": "Somente lado esquerdo. Clique novamente para Nenhum.",
+  "EasyZoning.NewRoads.Tooltip.Right": "Somente lado direito. Clique novamente para Nenhum.",
 
-  "EasyZoning.ExistingRoads.Tooltip.Both": "Ambos os lados. Clique duas vezes para Nenhum.",
-  "EasyZoning.ExistingRoads.Tooltip.Left": "Somente lado esquerdo. Clique com o botão direito para alternar as zonas.",
-  "EasyZoning.ExistingRoads.Tooltip.Right": "Somente lado direito. Clique com o botão direito para alternar as zonas.",
+  "EasyZoning.ExistingRoads.Tooltip.Both": "Ambos os lados. Clique novamente para Nenhum.",
+  "EasyZoning.ExistingRoads.Tooltip.Left": "Somente lado esquerdo. Clique novamente para Nenhum. O clique direito percorre as zonas.",
+  "EasyZoning.ExistingRoads.Tooltip.Right": "Somente lado direito. Clique novamente para Nenhum. O clique direito percorre as zonas.",
   "EasyZoning.ExistingRoads.Tooltip.Contour": "Mostrar linhas de contorno do terreno."
 }

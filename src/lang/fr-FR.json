@@ -4,12 +4,12 @@
 
   "EasyZoning.NewRoads.SectionTitle": "Changement de zonage",
 
-  "EasyZoning.NewRoads.Tooltip.Both": "Deux côtés. Tout désactivé = aucun côté.",
-  "EasyZoning.NewRoads.Tooltip.Left": "Côté gauche uniquement.",
-  "EasyZoning.NewRoads.Tooltip.Right": "Côté droit uniquement.",
+  "EasyZoning.NewRoads.Tooltip.Both": "Deux côtés. Cliquer à nouveau pour Aucun.",
+  "EasyZoning.NewRoads.Tooltip.Left": "Côté gauche uniquement. Cliquer à nouveau pour Aucun.",
+  "EasyZoning.NewRoads.Tooltip.Right": "Côté droit uniquement. Cliquer à nouveau pour Aucun.",
 
-  "EasyZoning.ExistingRoads.Tooltip.Both": "Deux côtés. Cliquer deux fois pour Aucun.",
-  "EasyZoning.ExistingRoads.Tooltip.Left": "Côté gauche uniquement. Le clic droit fait défiler les modes.",
-  "EasyZoning.ExistingRoads.Tooltip.Right": "Côté droit uniquement. Le clic droit fait défiler les modes.",
+  "EasyZoning.ExistingRoads.Tooltip.Both": "Deux côtés. Cliquer à nouveau pour Aucun.",
+  "EasyZoning.ExistingRoads.Tooltip.Left": "Côté gauche uniquement. Cliquer à nouveau pour Aucun. Le clic droit fait défiler les zones.",
+  "EasyZoning.ExistingRoads.Tooltip.Right": "Côté droit uniquement. Cliquer à nouveau pour Aucun. Le clic droit fait défiler les zones.",
   "EasyZoning.ExistingRoads.Tooltip.Contour": "Afficher les courbes de niveau du terrain."
 }

@@ -4,12 +4,12 @@
 
   "EasyZoning.NewRoads.SectionTitle": "Zmiana stref",
 
-  "EasyZoning.NewRoads.Tooltip.Both": "Obie strony. Wyłącz wszystko, aby ustawić brak.",
-  "EasyZoning.NewRoads.Tooltip.Left": "Tylko lewa strona.",
-  "EasyZoning.NewRoads.Tooltip.Right": "Tylko prawa strona.",
+  "EasyZoning.NewRoads.Tooltip.Both": "Obie strony. Kliknij ponownie, aby ustawić Brak.",
+  "EasyZoning.NewRoads.Tooltip.Left": "Tylko lewa strona. Kliknij ponownie, aby ustawić Brak.",
+  "EasyZoning.NewRoads.Tooltip.Right": "Tylko prawa strona. Kliknij ponownie, aby ustawić Brak.",
 
-  "EasyZoning.ExistingRoads.Tooltip.Both": "Obie strony. Kliknij dwa razy, aby ustawić brak.",
-  "EasyZoning.ExistingRoads.Tooltip.Left": "Tylko lewa strona. Prawy przycisk myszy przełącza strefy.",
-  "EasyZoning.ExistingRoads.Tooltip.Right": "Tylko prawa strona. Prawy przycisk myszy przełącza strefy.",
+  "EasyZoning.ExistingRoads.Tooltip.Both": "Obie strony. Kliknij ponownie, aby ustawić Brak.",
+  "EasyZoning.ExistingRoads.Tooltip.Left": "Tylko lewa strona. Kliknij ponownie, aby ustawić Brak. Prawy przycisk myszy przełącza strefy.",
+  "EasyZoning.ExistingRoads.Tooltip.Right": "Tylko prawa strona. Kliknij ponownie, aby ustawić Brak. Prawy przycisk myszy przełącza strefy.",
   "EasyZoning.ExistingRoads.Tooltip.Contour": "Pokaż linie poziomic terenu."
 }
