@@ -12,11 +12,11 @@
 
 	<!-- Long description (minimal markdown supported) -->
 	<LongDescription>
-# Easy Zoning
+### Easy Zoning
 
 Custom zoning for new and existing roads. New alternative to Zone Tools.
 
-## How to use
+### How to use
 
 **New Road**
 1. Open Roads panel (i.e., pick small roads)
@@ -33,7 +33,7 @@ Custom zoning for new and existing roads. New alternative to Zone Tools.
 7. To Cancel, just move mouse away and release LMB.
 8. Optional: **Contour Lines** terrain toggle
 
-Options Menu
+**Options Menu**
 - ✅ Protect occupied cells (buildings).
 - ✅ Protect zoned-but-empty cells.
 - ✅ Default **Ctrl +Z** short-cut can be changed (it opens/closes EZ panel fast)
@@ -49,7 +49,7 @@ Options Menu
 Power Trick: if you have existing roads and do not want a new road intersecting it to alter zoning,
 pick **none**, then draw the new road. Your existing road should keep zoning facing the same original direction you set.
 
-## Compatibility
+### Compatibility
 - Does not use Harmony patch; extends vanilla tools (means more stable on patch days, and compatibility).
 - Safe to remove any time. Road you zoned will keep their zoning.
 - Should work with Platter mod.
@@ -59,7 +59,7 @@ pick **none**, then draw the new road. Your existing road should keep zoning fac
 ZT is older, has a moveable panel; EZ is the newest mod + uses vanilla tool panel + sounds, and tidy as it's in same place as vanilla tool panel.
 
 
-## Tech notes
+### Tech notes
 - For newly drawn roads, “Left/Right” is relative to the segment’s orientation.
 At some diagonal angles  ↖||↗ it may apply flipped from what you want — use RMB to swap.
 - Highlight outline color on the road indicates the section could be changed.
@@ -67,7 +67,7 @@ No outline means it's already changed to the current selected option.
 - Transparent panel does not use blur filter for better performance.
 
 
-## Credits
+### Credits
 
 - River-mochi - author
 - thanks to Kemorno (original ART mod, retired) and zeeshanabid 94 (zoning toolkit, retired)
@@ -77,38 +77,38 @@ No outline means it's already changed to the current selected option.
 
 
 </LongDescription>
-	
-	<!-- Assets -->
-	  <!--Thumbnail-->
-	<Thumbnail Value="Properties/EZthumbnail01.jpg" />
-	<Screenshot Value="Properties/10-image-EZ-Actions.jpg" />
-	<Screenshot Value="Properties/20-image-EZ-ExistingRoads.jpg" />
-    <Screenshot Value="Properties/30-image-EZ-Options.jpg" />
-    <Screenshot Value="Properties/50-image-EZ-Instructions.jpg" />
-    <Screenshot Value="Properties/60-image-EZ-CN.jpg" />
-	<!--Tag, can be set multiple times-->
-	<Tag Value="Code Mod" />
+    <!--Thumbnail-->
+<Thumbnail Value="Properties/EZthumbnail01.jpg" />
+    <!--Screenshot, can be set multiple times-->
+<Screenshot Value="Properties/10-image-EZ-Actions.jpg" />
+<Screenshot Value="Properties/20-image-EZ-ExistingRoads.jpg" />
+<Screenshot Value="Properties/30-image-EZ-Options.jpg" />
+<Screenshot Value="Properties/50-image-EZ-Instructions.jpg" />
+<Screenshot Value="Properties/60-image-EZ-CN.jpg" />
+<!--Tag, can be set multiple times-->
+<Tag Value="Code Mod" />
 
-	<!--Link to the forum post where the mod can be discussed-->
-	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/easy-zoning.1905089/" />
+<!--Link to the forum post where the mod can be discussed-->
+<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/easy-zoning.1905089/" />
 
-	<!-- Versioning of mod and base game-->
-	<ModVersion Value="1.2.0" />
-	<GameVersion Value="1.5.*" />
+<!-- Versioning of mod and base game-->
+<ModVersion Value="1.2.0" />
+<GameVersion Value="1.5.*" />
 
-	<!-- Dependencies / DLC (optional) -->
-	<Dependency Id="" />
-	<RequiredDLC Value="" />
+<!-- Dependencies / DLC (optional) -->
+<Dependency Id="" />
 
-<!-- Changelog -->
+<!-- Changelog for new version. Single or multi line. Supports minimal markdown subset-->
 <ChangeLog>
 - Align EZ with 1.5.6f1 road zoning
 - Now both > none is not only option. Left or right-only icons can be toggled off to be none mode.
 </ChangeLog>
-	<!-- External links -->
-	<ExternalLink Type="discord" Url="https://discord.gg/HTav7ARPs2" />
-	<ExternalLink Type="github"  Url="https://github.com/River-Mochi/EasyZoning" />
 
-	<!--Supported values Public, Private, Unlisted-->
-	<AccessLevel Value="Public" />
+<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
+<ExternalLink Type="discord" Url="https://discord.gg/HTav7ARPs2" />
+<ExternalLink Type="github"  Url="https://github.com/River-Mochi/EasyZoning" />
+
+<!--Supported values Public, Private, Unlisted-->
+<AccessLevel Value="Public" />
+
 </Publish>
