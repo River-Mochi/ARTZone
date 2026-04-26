@@ -142,6 +142,11 @@ namespace EasyZoning.Tools
                 if ((temp.m_Flags & TempFlags.Create) != TempFlags.Create)
                     return;
 
+                // Existing-road vanilla upgrades also use temp/create clones.
+                // Only touch true freshly drawn roads that do not mirror an original edge.
+                if (temp.m_Original != Entity.Null)
+                    return;
+
                 bool useVanillaDepths = math.all(Depths == kVanillaDepths);
 
                 // Created entities can persist across frames; keep the temp state in sync

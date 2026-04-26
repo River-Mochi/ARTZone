@@ -8,7 +8,7 @@ namespace EasyZoning.Tools
     using Game;
     using Game.Common;              // Owner, Updated (dirty marker pattern)
     using Game.Net;                 // Curve, Upgraded
-    using Game.Tools;               // ToolSystem, UpgradeToolSystem
+    using Game.Tools;               // Temp
     using Game.Zones;               // Block, ValidArea, Cell, ZoneType
     using System;                   // InvalidOperationException (DEBUG guard)
     using Unity.Collections;        // NativeArray
@@ -20,8 +20,6 @@ namespace EasyZoning.Tools
     {
         private EntityQuery m_UpdatedBlocksQuery;
         private ModificationBarrier4B m_ModificationBarrier = null!;
-        private ToolSystem m_ToolSystem = null!;
-
 #if DEBUG
         private int m_LogTick;
         private int m_LastCount;
@@ -37,7 +35,6 @@ namespace EasyZoning.Tools
                 .Build(this);
 
             m_ModificationBarrier = World.GetOrCreateSystemManaged<ModificationBarrier4B>();
-            m_ToolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
 
 #if DEBUG
             m_LogTick = 0;
@@ -86,7 +83,6 @@ namespace EasyZoning.Tools
                 ZoningDepthLookup = GetComponentLookup<ZoningDepthComponent>(isReadOnly: true),
                 ZoningPreviewLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true),
                 ZoningRestoreLookup = GetComponentLookup<ZoningRestoreComponent>(isReadOnly: true),
-                SuppressTempRoads = m_ToolSystem != null && m_ToolSystem.activeTool is UpgradeToolSystem,
                 RemoveOccupiedCells = removeOccupied,
                 RemoveZonedCells = removeZoned,
             }.Schedule(updatedBlocks.Length, 32, Dependency);
@@ -113,7 +109,6 @@ namespace EasyZoning.Tools
             [ReadOnly] public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
             [ReadOnly] public ComponentLookup<ZoningRestoreComponent> ZoningRestoreLookup;
 
-            public bool SuppressTempRoads;
             public bool RemoveOccupiedCells;
             public bool RemoveZonedCells;
 
@@ -135,9 +130,9 @@ namespace EasyZoning.Tools
 
                 Entity roadEntity = owner.m_Owner;
 
-                if (SuppressTempRoads &&
-                    TempLookup.HasComponent(roadEntity) &&
-                    !ZoningPreviewLookup.HasComponent(roadEntity))
+                if (!ZoningPreviewLookup.HasComponent(roadEntity) &&
+                    TempLookup.TryGetComponent(roadEntity, out Temp roadTemp) &&
+                    roadTemp.m_Original != Entity.Null)
                 {
                     return;
                 }
