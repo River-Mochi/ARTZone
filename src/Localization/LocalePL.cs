@@ -32,7 +32,7 @@ namespace EasyZoning
 
                 // Tabs
                 { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "Akcje" },
-                { m_Settings.GetOptionTabLocaleID(Setting.kLegacyTab),  "Legacy" },
+                { m_Settings.GetOptionTabLocaleID(Setting.kLegacyTab), "Klasyczne" },
                 { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "Informacje" },
 
                 // Groups
@@ -50,7 +50,7 @@ namespace EasyZoning
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
                 // Zone options
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Nie resetuj istniejących wyznaczonych pól stref" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Nie resetuj już wyznaczonych pól strefowych" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
                     "Nie resetuje komórek już oznaczonych strefą podczas podglądu/stosowania.\n\n" +
                     "**[ ✓ ] Zalecane włączenie.**" },
@@ -108,7 +108,7 @@ namespace EasyZoning
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Legacy cykl prawym przyciskiem" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Klasyczny cykl prawym przyciskiem" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
                     "**Zalecane OFF**, aby RMB przełączał wszystkie 4 tryby:\n" +
                     "**Obie strony → Lewa → Prawa → Brak → ...**\n\n" +

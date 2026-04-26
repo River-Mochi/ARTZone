@@ -81,8 +81,8 @@ No outline means it's already changed to the current selected option.
 <Thumbnail Value="Properties/EZthumbnail01.jpg" />
     <!--Screenshot, can be set multiple times-->
 <Screenshot Value="Properties/10-image-EZ-Actions.jpg" />
-<Screenshot Value="Properties/20-image-EZ-ExistingRoads.jpg" />
-<Screenshot Value="Properties/30-image-EZ-Options.jpg" />
+<Screenshot Value="Properties/20-image-EZ-Options.jpg" />
+<Screenshot Value="Properties/30-image-EZ-ExistingRoads.jpg" />
 <Screenshot Value="Properties/50-image-EZ-Instructions.jpg" />
 <Screenshot Value="Properties/60-image-EZ-CN.jpg" />
 <!--Tag, can be set multiple times-->
