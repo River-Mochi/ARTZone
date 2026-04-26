@@ -86,7 +86,8 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<Neue Straße>\n" +
                     "1. Straßenmenü öffnen (eine Straße auswählen).\n" +
-                    "2. Unten im Straßenwerkzeug-Menü eines der 3 Zonen-Symbole auswählen.\n" +
+                    "2. Unten im Straßenwerkzeug-Menü die 3 EZ-Schaltflächen für Beide Seiten / Links / Rechts verwenden.\n" +
+                    "   Erneut auf die gewählte Schaltfläche klicken für Keine.\n" +
                     "3. Straße wie gewohnt zeichnen.\n\n" +
                     "-----------------------------------------\n" +
                     "  RMB = Rechtsklick, LMB = Linksklick\n" +
@@ -94,7 +95,8 @@ namespace EasyZoning
                     "<Bestehende Straße>\n" +
                     "1. EZ-Aktualisierungspanel öffnen: <Strg+V> drücken, um das Panel ein-/auszublenden\n" +
                     "   (oder <das Symbol oben links> macht dasselbe).\n" +
-                    "2. Ein Zonen-Symbol im unteren Panel auswählen.\n" +
+                    "2. Die 3 EZ-Schaltflächen für Beide Seiten / Links / Rechts verwenden.\n" +
+                    "   Erneut auf die gewählte Schaltfläche klicken für Keine.\n" +
                     "3. Eine Straße überfahren + Vorschau ansehen.\n" +
                     "4. <RMB wechselt>: Beide Seiten → Links → Rechts → Keine → ...\n" +
                     "5. <LMB einmal>: anwenden (festlegen).\n" +

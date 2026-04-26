@@ -86,7 +86,8 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<Nova estrada>\n" +
                     "1. Abra o painel de Estradas (escolha uma estrada).\n" +
-                    "2. Na parte inferior do painel da ferramenta de estrada: escolha um dos 3 ícones de zona.\n" +
+                    "2. Na parte inferior do painel da ferramenta de estrada: use os 3 botões EZ para Ambos os lados / Esquerda / Direita.\n" +
+                    "   Clique novamente no botão selecionado para Nenhum.\n" +
                     "3. Desenhe normalmente.\n\n" +
                     "-----------------------------------------\n" +
                     "  RMB = clique direito, LMB = clique esquerdo\n" +
@@ -94,7 +95,8 @@ namespace EasyZoning
                     "<Estrada existente>\n" +
                     "1. Abra o painel EZ Update: clique <Ctrl+V> para ligar/desligar o painel\n" +
                     "   (ou o <ícone no canto superior esquerdo> faz o mesmo).\n" +
-                    "2. Selecione um ícone de zona no painel inferior.\n" +
+                    "2. Use os 3 botões EZ para Ambos os lados / Esquerda / Direita.\n" +
+                    "   Clique novamente no botão selecionado para Nenhum.\n" +
                     "3. Passe o mouse sobre uma estrada + veja a prévia.\n" +
                     "4. <RMB alterna>: Ambos os lados → Esquerda → Direita → Nenhum → ...\n" +
                     "5. <LMB uma vez>: aplica (confirma).\n" +

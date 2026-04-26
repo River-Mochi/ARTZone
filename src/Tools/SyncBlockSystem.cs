@@ -4,21 +4,23 @@
 
 namespace EasyZoning.Tools
 {
-    using EasyZoning.Components;    // ZoningDepthComponent, ZoningPreviewComponent
+    using EasyZoning.Components;    // ZoningDepthComponent, ZoningPreviewComponent, ZoningRestoreComponent
     using Game;
     using Game.Common;              // Owner, Updated (dirty marker pattern)
+    using Game.Net;                 // Curve, Upgraded
+    using Game.Tools;               // Temp, ToolSystem
     using Game.Zones;               // Block, ValidArea, Cell, ZoneType
     using System;                   // InvalidOperationException (DEBUG guard)
     using Unity.Collections;        // NativeArray
-    using Unity.Entities;           // EntityQuery, ComponentLookup, BufferLookup, ECB
+    using Unity.Entities;           // DynamicBuffer, EntityQuery, ComponentLookup, BufferLookup, ECB
     using Unity.Jobs;               // IJobParallelFor, JobHandle
-    using Unity.Mathematics;        // math.clamp
+    using Unity.Mathematics;        // int2, math.clamp
 
     public partial class SyncBlockSystem : GameSystemBase
     {
         private EntityQuery m_UpdatedBlocksQuery;
         private ModificationBarrier4B m_ModificationBarrier = null!;
-
+        private ToolSystem m_ToolSystem = null!;
 #if DEBUG
         private int m_LogTick;
         private int m_LastCount;
@@ -34,6 +36,7 @@ namespace EasyZoning.Tools
                 .Build(this);
 
             m_ModificationBarrier = World.GetOrCreateSystemManaged<ModificationBarrier4B>();
+            m_ToolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
 
 #if DEBUG
             m_LogTick = 0;
@@ -66,6 +69,7 @@ namespace EasyZoning.Tools
 
             EntityCommandBuffer ecb = m_ModificationBarrier.CreateCommandBuffer();
             NativeArray<Entity> updatedBlocks = m_UpdatedBlocksQuery.ToEntityArray(Allocator.TempJob);
+            bool allowExistingRoadSync = m_ToolSystem != null && m_ToolSystem.activeTool is ZoningControllerToolSystem;
 
             JobHandle syncBlockJob = new SyncBlockJob
             {
@@ -74,11 +78,17 @@ namespace EasyZoning.Tools
                 BlockLookup = GetComponentLookup<Block>(isReadOnly: true),
                 ValidAreaLookup = GetComponentLookup<ValidArea>(isReadOnly: true),
                 OwnerLookup = GetComponentLookup<Owner>(isReadOnly: true),
+                CurveLookup = GetComponentLookup<Curve>(isReadOnly: true),
                 CellLookup = GetBufferLookup<Cell>(isReadOnly: true),
+                SubBlockLookup = GetBufferLookup<SubBlock>(isReadOnly: true),
+                TempLookup = GetComponentLookup<Temp>(isReadOnly: true),
+                UpgradedLookup = GetComponentLookup<Upgraded>(isReadOnly: true),
                 ZoningDepthLookup = GetComponentLookup<ZoningDepthComponent>(isReadOnly: true),
                 ZoningPreviewLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true),
+                ZoningRestoreLookup = GetComponentLookup<ZoningRestoreComponent>(isReadOnly: true),
                 RemoveOccupiedCells = removeOccupied,
                 RemoveZonedCells = removeZoned,
+                AllowExistingRoadSync = allowExistingRoadSync,
             }.Schedule(updatedBlocks.Length, 32, Dependency);
 
             updatedBlocks.Dispose(syncBlockJob);
@@ -95,11 +105,17 @@ namespace EasyZoning.Tools
             [ReadOnly] public ComponentLookup<ValidArea> ValidAreaLookup;
             [ReadOnly] public BufferLookup<Cell> CellLookup;
             [ReadOnly] public ComponentLookup<Owner> OwnerLookup;
+            [ReadOnly] public ComponentLookup<Curve> CurveLookup;
+            [ReadOnly] public BufferLookup<SubBlock> SubBlockLookup;
+            [ReadOnly] public ComponentLookup<Temp> TempLookup;
+            [ReadOnly] public ComponentLookup<Upgraded> UpgradedLookup;
             [ReadOnly] public ComponentLookup<ZoningDepthComponent> ZoningDepthLookup;
             [ReadOnly] public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
+            [ReadOnly] public ComponentLookup<ZoningRestoreComponent> ZoningRestoreLookup;
 
             public bool RemoveOccupiedCells;
             public bool RemoveZonedCells;
+            public bool AllowExistingRoadSync;
 
             public void Execute(int index)
             {
@@ -118,24 +134,36 @@ namespace EasyZoning.Tools
                 }
 
                 Entity roadEntity = owner.m_Owner;
+                bool hasPreview = ZoningPreviewLookup.HasComponent(roadEntity);
+                bool hasRestore = ZoningRestoreLookup.HasComponent(roadEntity);
+                bool isTempRoad = TempLookup.HasComponent(roadEntity);
 
-                bool left = IsLeftSide(block);
-
-                int depth;
-                if (ZoningPreviewLookup.TryGetComponent(roadEntity, out ZoningPreviewComponent zoningPreview))
-                {
-                    // Mod convention: Depths.x = LEFT, Depths.y = RIGHT.
-                    depth = left ? zoningPreview.Depths.x : zoningPreview.Depths.y;
-                }
-                else if (ZoningDepthLookup.TryGetComponent(roadEntity, out ZoningDepthComponent data))
-                {
-                    // Mod convention: Depths.x = LEFT, Depths.y = RIGHT.
-                    depth = left ? data.Depths.x : data.Depths.y;
-                }
-                else
+                // Vanilla 1.5.6f1 existing-road zone FAB highlights original road sub-blocks
+                // through temp preview entities, which marks those real blocks Updated.
+                // When EZ is not the active existing-road tool, leave normal existing roads
+                // alone so vanilla can own its preview/add/remove workflow.
+                if (!hasPreview && !hasRestore && !isTempRoad && !AllowExistingRoadSync)
                 {
                     return;
                 }
+
+                if (!hasPreview &&
+                    TempLookup.TryGetComponent(roadEntity, out Temp roadTemp) &&
+                    roadTemp.m_Original != Entity.Null)
+                {
+                    return;
+                }
+
+                bool left = CurveLookup.TryGetComponent(roadEntity, out Curve curve)
+                    ? RoadZoneCompatibility.IsBlockOnLeft(block, curve)
+                    : IsLeftSideFallback(block);
+
+                if (!TryGetEffectiveRoadDepths(roadEntity, out int2 depths))
+                {
+                    return;
+                }
+
+                int depth = left ? depths.x : depths.y;
 
                 DynamicBuffer<Cell> cells = CellLookup[blockEntity];
 
@@ -154,9 +182,103 @@ namespace EasyZoning.Tools
 
                 validArea.m_Area.w = depth;
                 ECB.SetComponent(index, blockEntity, validArea);
+
+                if (ZoningRestoreLookup.HasComponent(roadEntity))
+                    ECB.RemoveComponent<ZoningRestoreComponent>(index, roadEntity);
             }
 
-            private static bool IsLeftSide(Block block)
+            private bool TryGetEffectiveRoadDepths(Entity roadEntity, out int2 depths)
+            {
+                if (ZoningPreviewLookup.TryGetComponent(roadEntity, out ZoningPreviewComponent zoningPreview))
+                {
+                    depths = zoningPreview.Depths;
+                    return true;
+                }
+
+                if (ZoningRestoreLookup.TryGetComponent(roadEntity, out ZoningRestoreComponent zoningRestore))
+                {
+                    depths = zoningRestore.Depths;
+                    return true;
+                }
+
+                if (UpgradedLookup.TryGetComponent(roadEntity, out Upgraded upgraded) &&
+                    RoadZoneCompatibility.TryGetDepthsFromFlags(upgraded.m_Flags, out int2 flaggedDepths))
+                {
+                    depths = flaggedDepths;
+                    return true;
+                }
+
+                if (TryGetDepthsFromBlockLayout(roadEntity, out int2 blockLayoutDepths))
+                {
+                    depths = blockLayoutDepths;
+                    return true;
+                }
+
+                if (ZoningDepthLookup.TryGetComponent(roadEntity, out ZoningDepthComponent data))
+                {
+                    depths = data.Depths;
+                    return true;
+                }
+
+                depths = default;
+                return false;
+            }
+
+            private bool TryGetDepthsFromBlockLayout(Entity roadEntity, out int2 depths)
+            {
+                depths = RoadZoneCompatibility.VanillaDepths;
+
+                if (!CurveLookup.TryGetComponent(roadEntity, out Curve curve) ||
+                    !SubBlockLookup.TryGetBuffer(roadEntity, out DynamicBuffer<SubBlock> subBlocks))
+                {
+                    return false;
+                }
+
+                bool sawLeft = false;
+                bool sawRight = false;
+                bool leftEnabled = false;
+                bool leftDisabled = false;
+                bool rightEnabled = false;
+                bool rightDisabled = false;
+
+                for (int i = 0; i < subBlocks.Length; i++)
+                {
+                    Entity subBlockEntity = subBlocks[i].m_SubBlock;
+                    if (!BlockLookup.TryGetComponent(subBlockEntity, out Block subBlock) ||
+                        !ValidAreaLookup.TryGetComponent(subBlockEntity, out ValidArea subArea))
+                    {
+                        continue;
+                    }
+
+                    bool enabled = subBlock.m_Size.y > 0 && subArea.m_Area.w > 0;
+                    bool isLeft = RoadZoneCompatibility.IsBlockOnLeft(subBlock, curve);
+
+                    if (isLeft)
+                    {
+                        sawLeft = true;
+                        leftEnabled |= enabled;
+                        leftDisabled |= !enabled;
+                    }
+                    else
+                    {
+                        sawRight = true;
+                        rightEnabled |= enabled;
+                        rightDisabled |= !enabled;
+                    }
+                }
+
+                if (!sawLeft || !sawRight ||
+                    (leftEnabled && leftDisabled) ||
+                    (rightEnabled && rightDisabled))
+                {
+                    return false;
+                }
+
+                depths = RoadZoneCompatibility.DepthsFromDisabledSides(leftDisabled, rightDisabled);
+                return true;
+            }
+
+            private static bool IsLeftSideFallback(Block block)
             {
                 // ART behavior: use block direction sign as the left/right discriminator.
                 // (float2(1,1) matches ART's implicit math.dot(1, dir) usage.)

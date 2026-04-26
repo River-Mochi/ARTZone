@@ -4,12 +4,12 @@
 
   "EasyZoning.NewRoads.SectionTitle": "Zonen ändern",
 
-  "EasyZoning.NewRoads.Tooltip.Both": "Beide Seiten. Alles aus = keine Seite.",
-  "EasyZoning.NewRoads.Tooltip.Left": "Nur linke Seite.",
-  "EasyZoning.NewRoads.Tooltip.Right": "Nur rechte Seite.",
+  "EasyZoning.NewRoads.Tooltip.Both": "Beide Seiten. Erneut klicken für Keine.",
+  "EasyZoning.NewRoads.Tooltip.Left": "Nur linke Seite. Erneut klicken für Keine.",
+  "EasyZoning.NewRoads.Tooltip.Right": "Nur rechte Seite. Erneut klicken für Keine.",
 
-  "EasyZoning.ExistingRoads.Tooltip.Both": "Beide Seiten. Zweimal klicken für Keine.",
-  "EasyZoning.ExistingRoads.Tooltip.Left": "Nur linke Seite. Rechtsklick wechselt durch die Modi.",
-  "EasyZoning.ExistingRoads.Tooltip.Right": "Nur rechte Seite. Rechtsklick wechselt durch die Modi.",
-  "EasyZoning.ExistingRoads.Tooltip.Contour": "Höhenlinien des Geländes anzeigen."
+  "EasyZoning.ExistingRoads.Tooltip.Both": "Beide Seiten. Erneut klicken für Keine.",
+  "EasyZoning.ExistingRoads.Tooltip.Left": "Nur linke Seite. Erneut klicken für Keine. Rechtsklick wechselt die Zonen.",
+  "EasyZoning.ExistingRoads.Tooltip.Right": "Nur rechte Seite. Erneut klicken für Keine. Rechtsklick wechselt die Zonen.",
+  "EasyZoning.ExistingRoads.Tooltip.Contour": "Geländehöhenlinien anzeigen."
 }

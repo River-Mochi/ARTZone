@@ -6,15 +6,27 @@
 namespace EasyZoning.Components
 {
     using Colossal.Serialization.Entities; // ISerializable, IWriter/IReader for save/load
+    using Game.Prefabs;                    // CompositionFlags
     using System;                          // IEquatable
     using Unity.Entities;                  // IComponentData
     using Unity.Mathematics;               // int2
 
     /// <summary>
     /// Live preview depths (hover/flip) for a road entity.
-    /// Depths.x = left, Depths.y = right (cells).
+    /// Depths = temporary preview, CommittedDepths = road state to restore when preview ends.
     /// </summary>
     public struct ZoningPreviewComponent : IComponentData
+    {
+        public int2 Depths;          // x = left, y = right
+        public int2 CommittedDepths; // x = left, y = right
+        public CompositionFlags CommittedFlags;
+        public bool HasCommittedUpgraded;
+    }
+
+    /// <summary>
+    /// One-frame restore target used when a hover preview is removed without applying.
+    /// </summary>
+    public struct ZoningRestoreComponent : IComponentData
     {
         public int2 Depths; // x = left, y = right
     }

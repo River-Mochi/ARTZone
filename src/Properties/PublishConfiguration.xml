@@ -93,7 +93,7 @@ No outline means it's already changed to the current selected option.
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/easy-zoning.1905089/" />
 
 	<!-- Versioning of mod and base game-->
-	<ModVersion Value="1.0.7" />
+	<ModVersion Value="1.2.0" />
 	<GameVersion Value="1.5.*" />
 
 	<!-- Dependencies / DLC (optional) -->
@@ -102,11 +102,8 @@ No outline means it's already changed to the current selected option.
 
 <!-- Changelog -->
 <ChangeLog>
-- UI new design: transparent, smaller panel (does not use blur filter for better performance).
-- Options menu choice: Glass or Gray panel (design only, no behavior change).
-- Contour button enabled/disabled. off for smaller panel or for compatibility with another topography mod.
-- Control + V hotkey for better compatibility with other mods (you can change in Options menu).
-- Internal refactor and error checking.
+- Align EZ with 1.5.6f1 road zoning
+- Now both > none is not only option. Left or right-only icons can be toggled off to be none mode.
 </ChangeLog>
 	<!-- External links -->
 	<ExternalLink Type="discord" Url="https://discord.gg/HTav7ARPs2" />

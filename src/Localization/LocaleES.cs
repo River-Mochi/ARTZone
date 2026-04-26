@@ -86,7 +86,8 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<Carretera nueva>\n" +
                     "1. Abrir el panel de carreteras (elige una carretera).\n" +
-                    "2. En la parte inferior del panel de la herramienta de carretera: elegir uno de los 3 iconos de zona.\n" +
+                    "2. En la parte inferior del panel de la herramienta de carretera: usa los 3 botones EZ para Ambos / Izquierda / Derecha.\n" +
+                    "   Haz clic de nuevo en el botón seleccionado para Ninguno.\n" +
                     "3. Dibujar como siempre.\n\n" +
                     "-----------------------------------------\n" +
                     "  RMB = clic derecho, LMB = clic izquierdo\n" +
@@ -94,7 +95,8 @@ namespace EasyZoning
                     "<Carretera existente>\n" +
                     "1. Abrir el panel EZ de actualización: pulsar <Ctrl+V> para mostrar/ocultar el panel\n" +
                     "   (o <el icono superior izquierdo> hace lo mismo).\n" +
-                    "2. Seleccionar un icono de zona en el panel inferior.\n" +
+                    "2. Usa los 3 botones EZ para Ambos / Izquierda / Derecha.\n" +
+                    "   Haz clic de nuevo en el botón seleccionado para Ninguno.\n" +
                     "3. Pasar el cursor + previsualizar una carretera.\n" +
                     "4. <RMB recorre>: Ambos lados → Izquierda → Derecha → Ninguno → ...\n" +
                     "5. <LMB una vez>: aplica (lo fija).\n" +

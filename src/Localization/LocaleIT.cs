@@ -86,7 +86,8 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<Nuova strada>\n" +
                     "1. Aprire il pannello Strade (scegliere una strada).\n" +
-                    "2. In fondo al pannello dello strumento strada: scegliere una delle 3 icone zona.\n" +
+                    "2. In fondo al pannello dello strumento strada: usa i 3 pulsanti EZ per Entrambi / Sinistra / Destra.\n" +
+                    "   Fai clic di nuovo sul pulsante selezionato per Nessuno.\n" +
                     "3. Disegnare normalmente.\n\n" +
                     "-----------------------------------------\n" +
                     "  RMB = clic destro, LMB = clic sinistro\n" +
@@ -94,7 +95,8 @@ namespace EasyZoning
                     "<Strada esistente>\n" +
                     "1. Aprire il pannello EZ Update: fare clic su <Ctrl+V> per attivare/disattivare il pannello\n" +
                     "   (oppure <l'icona in alto a sinistra> fa la stessa cosa).\n" +
-                    "2. Selezionare un'icona zona dal pannello in basso.\n" +
+                    "2. Usa i 3 pulsanti EZ per Entrambi / Sinistra / Destra.\n" +
+                    "   Fai clic di nuovo sul pulsante selezionato per Nessuno.\n" +
                     "3. Passare sopra una strada + vedere l'anteprima.\n" +
                     "4. <RMB cambia modalità>: Entrambi → Sinistra → Destra → Nessuno → ...\n" +
                     "5. <LMB una volta>: applica (blocca la scelta).\n" +

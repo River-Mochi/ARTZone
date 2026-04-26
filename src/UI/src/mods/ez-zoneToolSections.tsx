@@ -218,13 +218,13 @@ export const ZoningToolController: ModuleRegistryExtend = (Component: any) => {
 
             const onLeft = () =>
                 usingRoadState
-                    ? setRoadZoningMode(ZoningMode.Left)
-                    : setToolZoningMode(ZoningMode.Left);
+                    ? setRoadZoningMode(selectedMode === ZoningMode.Left ? ZoningMode.None : ZoningMode.Left)
+                    : setToolZoningMode(selectedMode === ZoningMode.Left ? ZoningMode.None : ZoningMode.Left);
 
             const onRight = () =>
                 usingRoadState
-                    ? setRoadZoningMode(ZoningMode.Right)
-                    : setToolZoningMode(ZoningMode.Right);
+                    ? setRoadZoningMode(selectedMode === ZoningMode.Right ? ZoningMode.None : ZoningMode.Right)
+                    : setToolZoningMode(selectedMode === ZoningMode.Right ? ZoningMode.None : ZoningMode.Right);
 
             const onBoth = () =>
                 usingRoadState

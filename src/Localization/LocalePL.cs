@@ -86,7 +86,8 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<Nowa droga>\n" +
                     "1. Otwórz panel Dróg (wybierz drogę).\n" +
-                    "2. Na dole panelu narzędzia dróg wybierz jedną z 3 ikon stref.\n" +
+                    "2. Na dole panelu narzędzia dróg użyj 3 przycisków EZ dla Obie strony / Lewa / Prawa.\n" +
+                    "   Kliknij ponownie wybrany przycisk, aby ustawić Brak.\n" +
                     "3. Rysuj jak zwykle.\n\n" +
                     "-----------------------------------------\n" +
                     "  RMB = prawy przycisk myszy, LMB = lewy przycisk myszy\n" +
@@ -94,7 +95,8 @@ namespace EasyZoning
                     "<Istniejąca droga>\n" +
                     "1. Otwórz panel EZ Update: kliknij <Ctrl+V>, aby włączyć/wyłączyć panel\n" +
                     "   (lub <ikona w lewym górnym rogu> robi to samo).\n" +
-                    "2. Wybierz ikonę strefy z dolnego panelu.\n" +
+                    "2. Użyj 3 przycisków EZ dla Obie strony / Lewa / Prawa.\n" +
+                    "   Kliknij ponownie wybrany przycisk, aby ustawić Brak.\n" +
                     "3. Najedź na drogę + zobacz podgląd.\n" +
                     "4. <RMB przełącza>: Obie strony → Lewa → Prawa → Brak → ...\n" +
                     "5. <Jedno kliknięcie LMB>: zastosowuje (zatwierdza).\n" +

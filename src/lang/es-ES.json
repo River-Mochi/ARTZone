@@ -1,15 +1,15 @@
 {
   "EasyZoning.Zone_Controller.ToolName": "Easy Zoning",
-  "EasyZoning.Zone_Controller.ToolDescription": "Abre el panel EZ para actualizar carreteras.\nAtajo predeterminado: Ctrl+V (ver menú Opciones).",
+  "EasyZoning.Zone_Controller.ToolDescription": "Abre el panel EZ de actualización de carreteras.\nAtajo predeterminado: Ctrl+V (ver menú Opciones).",
 
   "EasyZoning.NewRoads.SectionTitle": "Cambio de zonificación",
 
-  "EasyZoning.NewRoads.Tooltip.Both": "Ambos lados. Todo apagado = ninguno.",
-  "EasyZoning.NewRoads.Tooltip.Left": "Solo lado izquierdo.",
-  "EasyZoning.NewRoads.Tooltip.Right": "Solo lado derecho.",
+  "EasyZoning.NewRoads.Tooltip.Both": "Ambos lados. Haz clic otra vez para Ninguno.",
+  "EasyZoning.NewRoads.Tooltip.Left": "Solo lado izquierdo. Haz clic otra vez para Ninguno.",
+  "EasyZoning.NewRoads.Tooltip.Right": "Solo lado derecho. Haz clic otra vez para Ninguno.",
 
-  "EasyZoning.ExistingRoads.Tooltip.Both": "Ambos lados. Haz clic dos veces para Ninguno.",
-  "EasyZoning.ExistingRoads.Tooltip.Left": "Solo lado izquierdo. El clic derecho recorre los modos.",
-  "EasyZoning.ExistingRoads.Tooltip.Right": "Solo lado derecho. El clic derecho recorre los modos.",
+  "EasyZoning.ExistingRoads.Tooltip.Both": "Ambos lados. Haz clic otra vez para Ninguno.",
+  "EasyZoning.ExistingRoads.Tooltip.Left": "Solo lado izquierdo. Haz clic otra vez para Ninguno. El clic derecho recorre las zonas.",
+  "EasyZoning.ExistingRoads.Tooltip.Right": "Solo lado derecho. Haz clic otra vez para Ninguno. El clic derecho recorre las zonas.",
   "EasyZoning.ExistingRoads.Tooltip.Contour": "Mostrar líneas de contorno del terreno."
 }
