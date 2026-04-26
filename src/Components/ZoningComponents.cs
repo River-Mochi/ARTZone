@@ -5,8 +5,8 @@
 
 namespace EasyZoning.Components
 {
-    using Game.Prefabs;                    // CompositionFlags
     using Colossal.Serialization.Entities; // ISerializable, IWriter/IReader for save/load
+    using Game.Prefabs;                    // CompositionFlags
     using System;                          // IEquatable
     using Unity.Entities;                  // IComponentData
     using Unity.Mathematics;               // int2
