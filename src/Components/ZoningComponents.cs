@@ -12,9 +12,18 @@ namespace EasyZoning.Components
 
     /// <summary>
     /// Live preview depths (hover/flip) for a road entity.
-    /// Depths.x = left, Depths.y = right (cells).
+    /// Depths = temporary preview, CommittedDepths = road state to restore when preview ends.
     /// </summary>
     public struct ZoningPreviewComponent : IComponentData
+    {
+        public int2 Depths;          // x = left, y = right
+        public int2 CommittedDepths; // x = left, y = right
+    }
+
+    /// <summary>
+    /// One-frame restore target used when a hover preview is removed without applying.
+    /// </summary>
+    public struct ZoningRestoreComponent : IComponentData
     {
         public int2 Depths; // x = left, y = right
     }
