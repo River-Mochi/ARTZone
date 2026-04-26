@@ -7,6 +7,7 @@ namespace EasyZoning.Tools
     using EasyZoning.Components;    // ZoningDepthComponent, ZoningPreviewComponent
     using Game;
     using Game.Common;              // Owner, Updated (dirty marker pattern)
+    using Game.Net;                 // Curve
     using Game.Zones;               // Block, ValidArea, Cell, ZoneType
     using System;                   // InvalidOperationException (DEBUG guard)
     using Unity.Collections;        // NativeArray
@@ -74,6 +75,7 @@ namespace EasyZoning.Tools
                 BlockLookup = GetComponentLookup<Block>(isReadOnly: true),
                 ValidAreaLookup = GetComponentLookup<ValidArea>(isReadOnly: true),
                 OwnerLookup = GetComponentLookup<Owner>(isReadOnly: true),
+                CurveLookup = GetComponentLookup<Curve>(isReadOnly: true),
                 CellLookup = GetBufferLookup<Cell>(isReadOnly: true),
                 ZoningDepthLookup = GetComponentLookup<ZoningDepthComponent>(isReadOnly: true),
                 ZoningPreviewLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true),
@@ -95,6 +97,7 @@ namespace EasyZoning.Tools
             [ReadOnly] public ComponentLookup<ValidArea> ValidAreaLookup;
             [ReadOnly] public BufferLookup<Cell> CellLookup;
             [ReadOnly] public ComponentLookup<Owner> OwnerLookup;
+            [ReadOnly] public ComponentLookup<Curve> CurveLookup;
             [ReadOnly] public ComponentLookup<ZoningDepthComponent> ZoningDepthLookup;
             [ReadOnly] public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
 
@@ -119,7 +122,9 @@ namespace EasyZoning.Tools
 
                 Entity roadEntity = owner.m_Owner;
 
-                bool left = IsLeftSide(block);
+                bool left = CurveLookup.TryGetComponent(roadEntity, out Curve curve)
+                    ? RoadZoneCompatibility.IsBlockOnLeft(block, curve)
+                    : IsLeftSideFallback(block);
 
                 int depth;
                 if (ZoningPreviewLookup.TryGetComponent(roadEntity, out ZoningPreviewComponent zoningPreview))
@@ -156,7 +161,7 @@ namespace EasyZoning.Tools
                 ECB.SetComponent(index, blockEntity, validArea);
             }
 
-            private static bool IsLeftSide(Block block)
+            private static bool IsLeftSideFallback(Block block)
             {
                 // ART behavior: use block direction sign as the left/right discriminator.
                 // (float2(1,1) matches ART's implicit math.dot(1, dir) usage.)

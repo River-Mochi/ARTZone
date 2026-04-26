@@ -15,11 +15,11 @@ namespace EasyZoning.Tools
     using EasyZoning.Components;     // ZoningPreviewComponent, ZoningDepthComponent
     using Game.Audio;                // ToolUXSoundSettingsData, AudioManager UI sounds
     using Game.Common;               // Updated marker (dirty flag)
-    using Game.Net;                  // Layer
+    using Game.Net;                  // Curve, Layer, Upgraded
     using Game.Prefabs;              // PrefabBase
     using Game.Rendering;            // PhotoModeRenderSystem
     using Game.Tools;                // ToolBaseSystem, ToolSystem, RaycastHit, ToolOutputBarrier
-    using Game.Zones;                // SubBlock (zone blocks buffer on road net entities)
+    using Game.Zones;                // Block, SubBlock, ValidArea
     using System;                    // Exception (WarnOnce guard)
     using Unity.Collections;         // NativeArray, NativeList, Allocator
     using Unity.Entities;            // Entity, EntityQuery, ComponentLookup, BufferLookup, ECB
@@ -33,7 +33,7 @@ namespace EasyZoning.Tools
 
         // Vanilla zoning depth baseline (cells). If road has no ZoningDepthComponent,
         // treat it as vanilla (6,6).
-        private static readonly int2 kVanillaDepths = new int2(6, 6);
+        private static readonly int2 kVanillaDepths = RoadZoneCompatibility.VanillaDepths;
 
         private ToolOutputBarrier m_ToolOutputBarrier = null!;
         private ZoneControlBridgeUI m_UISystem = null!;
@@ -41,7 +41,12 @@ namespace EasyZoning.Tools
         private PhotoModeRenderSystem m_PhotoModeSystem = null!;
 
         private BufferLookup<SubBlock> m_SubBlockLookup;
+        private ComponentLookup<Block> m_BlockLookup;
+        private ComponentLookup<Curve> m_CurveLookup;
+        private ComponentLookup<Upgraded> m_UpgradedLookup;
+        private ComponentLookup<ValidArea> m_ValidAreaLookup;
         private ComponentLookup<ZoningDepthComponent> m_ZoningDepthLookup;
+        private ComponentLookup<ZoningPreviewComponent> m_ZoningPreviewLookup;
 
         private EntityQuery m_ZoningPreviewQuery;
         private EntityQuery m_SoundbankQuery;
@@ -122,7 +127,12 @@ namespace EasyZoning.Tools
 
             // Lookups updated per-frame in OnUpdate.
             m_SubBlockLookup = GetBufferLookup<SubBlock>(isReadOnly: true);
+            m_BlockLookup = GetComponentLookup<Block>(isReadOnly: true);
+            m_CurveLookup = GetComponentLookup<Curve>(isReadOnly: true);
+            m_UpgradedLookup = GetComponentLookup<Upgraded>(isReadOnly: true);
+            m_ValidAreaLookup = GetComponentLookup<ValidArea>(isReadOnly: true);
             m_ZoningDepthLookup = GetComponentLookup<ZoningDepthComponent>(isReadOnly: true);
+            m_ZoningPreviewLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true);
 
             m_SelectedEntities = new NativeList<Entity>(Allocator.Persistent);
         }
@@ -220,7 +230,12 @@ namespace EasyZoning.Tools
 
             // Update lookups used by filtering and apply logic.
             m_SubBlockLookup.Update(this);
+            m_BlockLookup.Update(this);
+            m_CurveLookup.Update(this);
+            m_UpgradedLookup.Update(this);
+            m_ValidAreaLookup.Update(this);
             m_ZoningDepthLookup.Update(this);
+            m_ZoningPreviewLookup.Update(this);
 
             // Hit-test + filter: only “true” when hit is a road and it would actually change.
             bool hasRoad = TryGetRoadUnderCursor(out Entity hitEntity, out RaycastHit _);
@@ -335,6 +350,7 @@ namespace EasyZoning.Tools
                             Entities = m_SelectedEntities.AsArray().AsReadOnly(),
                             ZoningPreviewLookup = previewLookup,
                             DepthLookup = depthLookup,
+                            UpgradedLookup = GetComponentLookup<Upgraded>(isReadOnly: true),
                             UpdatedLookup = updatedLookup,
                             ToolDepths = Depths,
                             ECB = ecb
@@ -483,14 +499,87 @@ namespace EasyZoning.Tools
         private bool WouldChange(Entity entity)
         {
             int2 desired = Depths;
-
-            int2 current;
-            if (m_ZoningDepthLookup.TryGetComponent(entity, out ZoningDepthComponent depth))
-                current = depth.Depths;
-            else
-                current = kVanillaDepths;
-
+            int2 current = GetCommittedRoadDepths(entity);
             return math.any(desired != current);
+        }
+
+        private int2 GetCommittedRoadDepths(Entity roadEntity)
+        {
+            if (roadEntity == Entity.Null)
+                return kVanillaDepths;
+
+            if (m_UpgradedLookup.TryGetComponent(roadEntity, out Upgraded upgraded) &&
+                RoadZoneCompatibility.TryGetDepthsFromFlags(upgraded.m_Flags, out int2 flaggedDepths))
+            {
+                return flaggedDepths;
+            }
+
+            // Preview roads temporarily resize the live blocks, so ignore layout fallback
+            // while our preview component is present and use only committed state.
+            if (!m_ZoningPreviewLookup.HasComponent(roadEntity) &&
+                TryGetDepthsFromBlockLayout(roadEntity, out int2 blockDepths))
+            {
+                return blockDepths;
+            }
+
+            if (m_ZoningDepthLookup.TryGetComponent(roadEntity, out ZoningDepthComponent depth))
+                return depth.Depths;
+
+            return kVanillaDepths;
+        }
+
+        private bool TryGetDepthsFromBlockLayout(Entity roadEntity, out int2 depths)
+        {
+            depths = kVanillaDepths;
+
+            if (!m_CurveLookup.TryGetComponent(roadEntity, out Curve curve) ||
+                !m_SubBlockLookup.TryGetBuffer(roadEntity, out DynamicBuffer<SubBlock> subBlocks))
+            {
+                return false;
+            }
+
+            bool sawLeft = false;
+            bool sawRight = false;
+            bool leftEnabled = false;
+            bool leftDisabled = false;
+            bool rightEnabled = false;
+            bool rightDisabled = false;
+
+            for (int i = 0; i < subBlocks.Length; i++)
+            {
+                Entity blockEntity = subBlocks[i].m_SubBlock;
+                if (!m_BlockLookup.TryGetComponent(blockEntity, out Block block) ||
+                    !m_ValidAreaLookup.TryGetComponent(blockEntity, out ValidArea validArea))
+                {
+                    continue;
+                }
+
+                bool enabled = block.m_Size.y > 0 && validArea.m_Area.w > 0;
+                bool left = RoadZoneCompatibility.IsBlockOnLeft(block, curve);
+
+                if (left)
+                {
+                    sawLeft = true;
+                    leftEnabled |= enabled;
+                    leftDisabled |= !enabled;
+                }
+                else
+                {
+                    sawRight = true;
+                    rightEnabled |= enabled;
+                    rightDisabled |= !enabled;
+                }
+            }
+
+            if (!sawLeft || !sawRight ||
+                (leftEnabled && leftDisabled) ||
+                (rightEnabled && rightDisabled))
+            {
+                return false;
+            }
+
+            depths = RoadZoneCompatibility.DepthsFromDisabledSides(leftDisabled, rightDisabled);
+            return true;
         }
 
         public override PrefabBase GetPrefab( ) => m_ToolPrefab;
@@ -607,6 +696,7 @@ namespace EasyZoning.Tools
 
             [ReadOnly] public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
             [ReadOnly] public ComponentLookup<ZoningDepthComponent> DepthLookup;
+            [ReadOnly] public ComponentLookup<Upgraded> UpgradedLookup;
             [ReadOnly] public ComponentLookup<Updated> UpdatedLookup;
 
             public int2 ToolDepths;
@@ -623,6 +713,29 @@ namespace EasyZoning.Tools
                         ECB.SetComponent(e, new ZoningDepthComponent { Depths = ToolDepths });
                     else
                         ECB.AddComponent(e, new ZoningDepthComponent { Depths = ToolDepths });
+
+                    bool hasUpgraded = UpgradedLookup.TryGetComponent(e, out Upgraded upgraded);
+                    CompositionFlags nextFlags = RoadZoneCompatibility.ApplyDepthsToFlags(
+                        hasUpgraded ? upgraded.m_Flags : default,
+                        ToolDepths);
+
+                    if (RoadZoneCompatibility.HasAnyFlags(nextFlags))
+                    {
+                        Upgraded nextUpgraded = new Upgraded { m_Flags = nextFlags };
+                        if (hasUpgraded)
+                        {
+                            if (upgraded.m_Flags != nextFlags)
+                                ECB.SetComponent(e, nextUpgraded);
+                        }
+                        else
+                        {
+                            ECB.AddComponent(e, nextUpgraded);
+                        }
+                    }
+                    else if (hasUpgraded)
+                    {
+                        ECB.RemoveComponent<Upgraded>(e);
+                    }
 
                     if (!UpdatedLookup.HasComponent(e))
                         ECB.AddComponent<Updated>(e);
