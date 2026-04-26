@@ -119,7 +119,7 @@ namespace EasyZoning
                     "Entrambi ↔ Nessuno" },
 
                 // Keybinding dialog title
-                { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Attiva/disattiva pannello Easy Zoning Update" },
+                { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Attiva/disattiva pannello EZ" },
 
                 // About tab
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Nome mod" },
