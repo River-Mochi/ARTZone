@@ -50,7 +50,7 @@ namespace EasyZoning.Tools
             base.OnCreate();
 
             m_NewCreatedRoadsQuery = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<Road, Temp, SubBlock, Updated>()
+                .WithAll<Road, Temp, SubBlock>()
                 .WithAll<Created>()
                 .Build(this);
 

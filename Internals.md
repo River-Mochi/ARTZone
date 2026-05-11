@@ -2,6 +2,11 @@
 
 This file is a quick-reference for how `EasyZoning` works after the `1.5.6f1` game patch.
 
+Version note:
+
+- The vanilla road-side zoning FAB / `ZonesDisabled` compatibility issue in this file refers to `1.5.6f1`.
+- If older notes mention another `1.5.x` patch number, re-check against the decompiled game files before assuming the road-zone behavior changed there.
+
 It is meant to answer these questions fast:
 
 - How does the vanilla existing-road zone FAB behave?
@@ -156,6 +161,20 @@ This is the dirty marker that tells downstream game systems something changed.
 
 If the road or sub-blocks are changed without the right `Updated` markers, previews or restores may not refresh when expected.
 
+### `Game.Common.Created`
+
+This matters for new roads.
+
+Freshly placed roads and their zone blocks can still carry `Created` when EZ needs to apply the chosen side.
+
+Do not make new-road sync depend only on `Updated`. A road/block can be fresh work that needs EZ sizing even when the specific `Updated` marker is not present at the moment our system runs.
+
+### `Game.Common.Applied`
+
+Vanilla apply systems add `Applied`, `Created`, and `Updated` when temp work is committed.
+
+This is useful context when debugging timing bugs, but EZ's new-road side selection should not rely on `Applied` alone. The practical marker EZ currently needs for final fresh-road sizing is `Created` on the road or block, plus EZ's own stored `ZoningDepthComponent`.
+
 ## Important Decompiled Vanilla Jobs
 
 These are worth remembering in the local decompile repo at:
@@ -234,12 +253,20 @@ Responsibilities:
 - read effective road-side state
 - update block depth and valid area
 - skip temp roads that belong to vanilla existing-road upgrade previews
+- finish applying EZ-selected side depth to freshly created new-road blocks
 
 Current important rule:
 
 - if a temp road has `Temp.m_Original != Entity.Null` and EZ is not actively previewing it, EZ should leave it alone
 
 That rule is one of the main protections against vanilla FAB interference.
+
+New-road rule:
+
+- allow block sync for freshly created roads only when a zonable vanilla `NetToolSystem` road-build tool is active
+- the road must carry EZ's `ZoningDepthComponent`
+- either the road or block should still carry `Created`
+- this keeps new-road side selection working without letting EZ side mode affect vanilla existing-road FAB previews
 
 ### `src/Tools/SyncNewRoadsSystem.cs`
 
@@ -254,8 +281,17 @@ Responsibilities:
 Current important rule:
 
 - only treat temp roads as "new roads" if they are true created roads and `Temp.m_Original == Entity.Null`
+- do not require `Updated` on the new-road temp query; `Created` + `TempFlags.Create` + `Temp.m_Original == Entity.Null` is the important true-new-road signal
 
 That prevents existing-road vanilla preview clones from being mistaken for fresh road placement.
+
+Important pipeline:
+
+1. UI writes the selected new-road mode to `RoadZoningMode`.
+2. `SyncNewRoadsSystem` converts that to `(leftDepth, rightDepth)`.
+3. True new-road temp entities get `ZoningDepthComponent` when the selected mode is not vanilla `Both`.
+4. True new-road temp entities also get compatible `Upgraded.m_Flags` / `ZonesDisabled` so vanilla state stays aligned.
+5. `SyncBlockSystem` finishes the actual block sizing on fresh created blocks.
 
 ### `src/Tools/RoadZoneCompatibility.cs`
 
@@ -323,6 +359,16 @@ The mod already places the correct final side for new roads.
 
 Showing side-aware zone-cell preview while dragging is possible, but it is separate work because it needs a live temp-road preview path rather than just final apply sync.
 
+### 6. New-road final apply needs both systems
+
+`SyncNewRoadsSystem` stores the selected side mode on the new road, but `SyncBlockSystem` does the final zone-block depth sizing.
+
+If left/right/none icons stop working for new roads, check both systems together.
+
+The bug fixed on `fix/new-roads` happened because EZ correctly stored the new-road mode, but the block sync safety gate was too strict after the vanilla FAB compatibility work.
+
+The safety gate must protect vanilla existing-road upgrade previews while still allowing fresh created new-road blocks to sync.
+
 ## Good Debug Checklist
 
 If something feels wrong, check these in order:
@@ -332,6 +378,9 @@ If something feels wrong, check these in order:
 3. Is EZ accidentally reading preview state instead of committed state?
 4. Are `Block.m_Size.y` and `ValidArea.m_Area.w` aligned?
 5. Were `Updated` markers added to the road and its sub-blocks?
+6. For new roads, did `SyncNewRoadsSystem` add/update `ZoningDepthComponent` before `SyncBlockSystem` tried to size blocks?
+7. For new roads, is `SyncBlockSystem` allowed because a zonable `NetToolSystem` road-build tool is active and the road/block is `Created`?
+8. For vanilla FAB interop, is EZ staying out of `UpgradeToolSystem` temp previews?
 
 ## Handy File List
 

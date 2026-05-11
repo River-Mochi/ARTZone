@@ -92,7 +92,7 @@ No outline means it's already changed to the current selected option.
 <ForumLink Value="https://forum.paradoxplaza.com/forum/threads/easy-zoning.1905089/" />
 
 <!-- Versioning of mod and base game-->
-<ModVersion Value="1.2.0" />
+<ModVersion Value="1.2.1" />
 <GameVersion Value="1.5.*" />
 
 <!-- Dependencies / DLC (optional) -->
@@ -100,8 +100,7 @@ No outline means it's already changed to the current selected option.
 
 <!-- Changelog for new version. Single or multi line. Supports minimal markdown subset-->
 <ChangeLog>
-- Align EZ with 1.5.6f1 road zoning
-- Now both > none is not only option. Left or right-only icons can be toggled off to be none mode.
+- Fix: now works for NEW roads again. works for both new roads and existing roads.
 </ChangeLog>
 
 <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
