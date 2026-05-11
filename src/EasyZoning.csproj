@@ -88,6 +88,7 @@
 		<Folder Include="..\research\" />
 	</ItemGroup>
 
+
 	<!-- AUTO UPDATE PublishConfiguration ModVersion using CSPROJ Version number
 		 remove bom, make EOL=CRLF, and left-align text -->
 	<Target Name="UpdatePublishConfigVersion" BeforeTargets="Build" Condition="'$(Configuration)' == 'Release'&#xD;&#xA;                  AND Exists('$(MSBuildProjectDirectory)\Scripts\Update-PublishConfig.ps1')&#xD;&#xA;                  AND Exists('$(MSBuildProjectDirectory)\$(PublishConfigurationPath)')">
