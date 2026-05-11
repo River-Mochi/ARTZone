@@ -72,21 +72,24 @@
 		</Content>
 	</ItemGroup>
 
-	<!-- Show Utilities/ in Solution Explorer but do NOT copy it -->
-	<ItemGroup>
-		<None Include="Utilities\**\*.*">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</None>
-		<Folder Include="docs\" />
-		<Folder Include="Utilities\" />
-	</ItemGroup>
+    <!-- Show docs/ and Utilities/ in Solution Explorer but do NOT copy them. -->
+    <ItemGroup>
+        <None Update="docs\**\*.*">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </None>
 
-	<ItemGroup>
-		<None Include="..\research\**\*.*">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</None>
-		<Folder Include="..\research\" />
-	</ItemGroup>
+        <None Include="Utilities\**\*.*">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </None>
+
+        <Content Remove="docs\**\*.*" />
+        <EmbeddedResource Remove="docs\**\*.*" />
+
+        <Folder Include="docs\" />
+        <Folder Include="Utilities\" />
+    </ItemGroup>
 
 
 	<!-- AUTO UPDATE PublishConfiguration ModVersion using CSPROJ Version number
