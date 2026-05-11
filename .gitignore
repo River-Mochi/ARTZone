@@ -441,3 +441,6 @@ MemoryCaptures/
 # --- Project-specific ignores ---
 # keep docs local only
 docs/
+
+# CS2 publish config script backup
+src/Properties/PublishConfiguration.xml.bak
