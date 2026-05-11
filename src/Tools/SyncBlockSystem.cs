@@ -6,9 +6,10 @@ namespace EasyZoning.Tools
 {
     using EasyZoning.Components;    // ZoningDepthComponent, ZoningPreviewComponent, ZoningRestoreComponent
     using Game;
-    using Game.Common;              // Owner, Updated (dirty marker pattern)
+    using Game.Common;              // Created, Owner, Updated (dirty marker pattern)
     using Game.Net;                 // Curve, Upgraded
-    using Game.Tools;               // Temp, ToolSystem
+    using Game.Prefabs;             // PrefabBase, RoadPrefab
+    using Game.Tools;               // NetToolSystem, Temp, ToolSystem
     using Game.Zones;               // Block, ValidArea, Cell, ZoneType
     using System;                   // InvalidOperationException (DEBUG guard)
     using Unity.Collections;        // NativeArray
@@ -30,10 +31,20 @@ namespace EasyZoning.Tools
         {
             base.OnCreate();
 
-            m_UpdatedBlocksQuery = new EntityQueryBuilder(Allocator.Temp)
-                .WithAllRW<Block, ValidArea>()
-                .WithAll<Owner, Updated>()
-                .Build(this);
+            m_UpdatedBlocksQuery = GetEntityQuery(new EntityQueryDesc
+            {
+                All = new[]
+                {
+                    ComponentType.ReadWrite<Block>(),
+                    ComponentType.ReadWrite<ValidArea>(),
+                    ComponentType.ReadOnly<Owner>()
+                },
+                Any = new[]
+                {
+                    ComponentType.ReadOnly<Created>(),
+                    ComponentType.ReadOnly<Updated>()
+                }
+            });
 
             m_ModificationBarrier = World.GetOrCreateSystemManaged<ModificationBarrier4B>();
             m_ToolSystem = World.GetOrCreateSystemManaged<ToolSystem>();
@@ -70,6 +81,7 @@ namespace EasyZoning.Tools
             EntityCommandBuffer ecb = m_ModificationBarrier.CreateCommandBuffer();
             NativeArray<Entity> updatedBlocks = m_UpdatedBlocksQuery.ToEntityArray(Allocator.TempJob);
             bool allowExistingRoadSync = m_ToolSystem != null && m_ToolSystem.activeTool is ZoningControllerToolSystem;
+            bool allowNewRoadSync = IsZonableRoadBuildToolActive();
 
             JobHandle syncBlockJob = new SyncBlockJob
             {
@@ -78,6 +90,7 @@ namespace EasyZoning.Tools
                 BlockLookup = GetComponentLookup<Block>(isReadOnly: true),
                 ValidAreaLookup = GetComponentLookup<ValidArea>(isReadOnly: true),
                 OwnerLookup = GetComponentLookup<Owner>(isReadOnly: true),
+                CreatedLookup = GetComponentLookup<Created>(isReadOnly: true),
                 CurveLookup = GetComponentLookup<Curve>(isReadOnly: true),
                 CellLookup = GetBufferLookup<Cell>(isReadOnly: true),
                 SubBlockLookup = GetBufferLookup<SubBlock>(isReadOnly: true),
@@ -89,11 +102,34 @@ namespace EasyZoning.Tools
                 RemoveOccupiedCells = removeOccupied,
                 RemoveZonedCells = removeZoned,
                 AllowExistingRoadSync = allowExistingRoadSync,
+                AllowNewRoadSync = allowNewRoadSync,
             }.Schedule(updatedBlocks.Length, 32, Dependency);
 
             updatedBlocks.Dispose(syncBlockJob);
             Dependency = JobHandle.CombineDependencies(Dependency, syncBlockJob);
             m_ModificationBarrier.AddJobHandleForProducer(Dependency);
+        }
+
+        private bool IsZonableRoadBuildToolActive( )
+        {
+            if (m_ToolSystem == null || m_ToolSystem.activeTool is not NetToolSystem netTool)
+                return false;
+
+            return IsZonableRoadPrefab(netTool.GetPrefab());
+        }
+
+        private static bool IsZonableRoadPrefab(PrefabBase? prefab)
+        {
+            if (prefab is not RoadPrefab road)
+                return false;
+
+            if (road.m_ZoneBlock == null)
+                return false;
+
+            if (road.m_HighwayRules)
+                return false;
+
+            return true;
         }
 
         public struct SyncBlockJob : IJobParallelFor
@@ -105,6 +141,7 @@ namespace EasyZoning.Tools
             [ReadOnly] public ComponentLookup<ValidArea> ValidAreaLookup;
             [ReadOnly] public BufferLookup<Cell> CellLookup;
             [ReadOnly] public ComponentLookup<Owner> OwnerLookup;
+            [ReadOnly] public ComponentLookup<Created> CreatedLookup;
             [ReadOnly] public ComponentLookup<Curve> CurveLookup;
             [ReadOnly] public BufferLookup<SubBlock> SubBlockLookup;
             [ReadOnly] public ComponentLookup<Temp> TempLookup;
@@ -116,6 +153,7 @@ namespace EasyZoning.Tools
             public bool RemoveOccupiedCells;
             public bool RemoveZonedCells;
             public bool AllowExistingRoadSync;
+            public bool AllowNewRoadSync;
 
             public void Execute(int index)
             {
@@ -137,12 +175,16 @@ namespace EasyZoning.Tools
                 bool hasPreview = ZoningPreviewLookup.HasComponent(roadEntity);
                 bool hasRestore = ZoningRestoreLookup.HasComponent(roadEntity);
                 bool isTempRoad = TempLookup.HasComponent(roadEntity);
+                bool isFreshEzRoad =
+                    AllowNewRoadSync &&
+                    ZoningDepthLookup.HasComponent(roadEntity) &&
+                    (CreatedLookup.HasComponent(roadEntity) || CreatedLookup.HasComponent(blockEntity));
 
                 // Vanilla 1.5.6f1 existing-road zone FAB highlights original road sub-blocks
                 // through temp preview entities, which marks those real blocks Updated.
                 // When EZ is not the active existing-road tool, leave normal existing roads
                 // alone so vanilla can own its preview/add/remove workflow.
-                if (!hasPreview && !hasRestore && !isTempRoad && !AllowExistingRoadSync)
+                if (!hasPreview && !hasRestore && !isTempRoad && !AllowExistingRoadSync && !isFreshEzRoad)
                 {
                     return;
                 }

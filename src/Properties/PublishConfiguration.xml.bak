@@ -92,7 +92,7 @@ No outline means it's already changed to the current selected option.
 <ForumLink Value="https://forum.paradoxplaza.com/forum/threads/easy-zoning.1905089/" />
 
 <!-- Versioning of mod and base game-->
-<ModVersion Value="1.2.1" />
+<ModVersion Value="1.2.0" />
 <GameVersion Value="1.5.*" />
 
 <!-- Dependencies / DLC (optional) -->
