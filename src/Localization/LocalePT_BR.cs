@@ -78,6 +78,17 @@ namespace EasyZoning
                     "**[   ] desativado**, usa um painel mais escuro no estilo vanilla.\n\n" +
                     "Apenas estilo visual. Nenhum blur é usado." },
 
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseOrangeRemovePreviewEdge)), "◉ Orange remove-preview edge" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseOrangeRemovePreviewEdge)),
+                    "**[ ✓ ] enabled**, use a brighter orange border for cells that will be removed.\n" +
+                    "**[   ] disabled**, keep the vanilla red border.\n\n" +
+                    "Only changes the remove-preview border. Fill stays vanilla for now." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Remove-preview edge opacity" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
+                    "Adjusts only the orange remove-preview border opacity.\n\n" +
+                    "Does not change normal zoning colors or the white add-preview cells." },
+
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Mostrar instruções" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),

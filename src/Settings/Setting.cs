@@ -73,6 +73,14 @@ namespace EasyZoning
         [SettingsUISection(kActionsTab, kUiGroup)]
         public bool UseGlassPanel { get; set; } = true;
 
+        // Default ON.
+        [SettingsUISection(kActionsTab, kUiGroup)]
+        public bool UseOrangeRemovePreviewEdge { get; set; } = true;
+
+        [SettingsUISlider(min = 20, max = 100, step = 5, scalarMultiplier = 1, unit = "percentage")]
+        [SettingsUISection(kActionsTab, kUiGroup)]
+        public int RemovePreviewEdgeOpacityPercent { get; set; } = 100;
+
         // --- Usage (Actions tab) ---
 
         // Default OFF.
@@ -149,6 +157,8 @@ namespace EasyZoning
             RemoveZonedCells = true;
             ShowContourButton = true;
             UseGlassPanel = true;
+            UseOrangeRemovePreviewEdge = true;
+            RemovePreviewEdgeOpacityPercent = 100;
             ShowUsage = false;
             LegacyRightClickCycle = false;
         }
