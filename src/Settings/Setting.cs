@@ -46,6 +46,8 @@ namespace EasyZoning
         public const string kRemovePreviewFillWhite = "white";
         public const string kRemovePreviewFillOrange = "orange";
         public const string kRemovePreviewFillNone = "none";
+        public const string kRemovePreviewBorderOrange = "orange";
+        public const string kRemovePreviewBorderVanillaRed = "vanilla-red";
 
         public Setting(IMod mod) : base(mod)
         {
@@ -80,12 +82,20 @@ namespace EasyZoning
         [SettingsUISection(kActionsTab, kUiGroup)]
         public bool UseGlassPanel { get; set; } = true;
 
-        // Default ON.
         [SettingsUISection(kActionsTab, kUiGroup)]
-        public bool UseOrangeRemovePreviewEdge { get; set; } = true;
+        [SettingsUIDropdown(typeof(Setting), nameof(GetRemovePreviewBorderStyleValues))]
+        public string RemovePreviewBorderStyle { get; set; } = kRemovePreviewBorderOrange;
+
+        // Compatibility shim for older locale keys / saved settings.
+        // Intentionally ignored so updated installs default to the new orange-border mode.
+        [SettingsUIHidden]
+        public bool UseOrangeRemovePreviewEdge
+        {
+            get => RemovePreviewBorderStyle == kRemovePreviewBorderOrange;
+            set { }
+        }
 
         [SettingsUISlider(min = 20, max = 100, step = 5, scalarMultiplier = 1, unit = "percentage")]
-        [SettingsUIDisableByCondition(typeof(Setting), nameof(IsRemovePreviewEdgeOpacityDisabled))]
         [SettingsUISection(kActionsTab, kUiGroup)]
         public int RemovePreviewEdgeOpacityPercent { get; set; } = 100;
 
@@ -110,8 +120,21 @@ namespace EasyZoning
         public string UsageText => string.Empty;
 
         private bool HideUsageText( ) => !ShowUsage;
-        private bool IsRemovePreviewEdgeOpacityDisabled( ) => !UseOrangeRemovePreviewEdge;
         private bool IsRemovePreviewFillOpacityDisabled( ) => RemovePreviewFillStyle == kRemovePreviewFillNone;
+
+        public static DropdownItem<string>[] GetRemovePreviewBorderStyleValues( ) => new[]
+        {
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewBorderOrange,
+                displayName = LocalizedString.Value("Orange"),
+            },
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewBorderVanillaRed,
+                displayName = LocalizedString.Value("Vanilla red"),
+            },
+        };
 
         public static DropdownItem<string>[] GetRemovePreviewFillStyleValues( ) => new[]
         {
@@ -200,7 +223,7 @@ namespace EasyZoning
             RemoveZonedCells = true;
             ShowContourButton = true;
             UseGlassPanel = true;
-            UseOrangeRemovePreviewEdge = true;
+            RemovePreviewBorderStyle = kRemovePreviewBorderOrange;
             RemovePreviewEdgeOpacityPercent = 100;
             RemovePreviewFillStyle = kRemovePreviewFillVanillaRed;
             RemovePreviewFillOpacityPercent = 100;

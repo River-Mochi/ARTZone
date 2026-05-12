@@ -79,15 +79,16 @@ namespace EasyZoning
                     "**[   ] disabled**, use a gray panel.\n\n" +
                     "Visual style only." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseOrangeRemovePreviewEdge)), "◉ Orange preview borders" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseOrangeRemovePreviewEdge)),
-                    "**[ ✓ ] enabled**, use a brighter orange border for <Remove Cells Preview>.\n" +
-                    "**[   ] disabled**, keep the vanilla red border.\n\n" +
-                    "Only changes the border; easier to see." },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Remove cells border" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
+                    "Border color for cells to be removed preview.\n\n" +
+                    "<Orange> = brighter and easier to see.\n" +
+                    "<Vanilla red> = match the game's default look." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Border opacity" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
-                    "Adjusts only the <orange border opacity> for cells to remove." },
+                    "Adjusts the remove-preview border opacity.\n\n" +
+                    "<100%> keeps the preview's normal translucency." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "Remove cells fill" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
@@ -100,6 +101,7 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Fill opacity" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)),
                     "Adjusts the fill opacity for preview of removeable cells.\n\n" +
+                    "<100%> keeps the preview's normal translucency.\n" +
                     "Ignored if <Remove fill> is set to <None>." },
 
                 // Usage toggle + multiline block

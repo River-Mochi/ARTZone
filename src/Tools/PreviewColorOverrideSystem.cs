@@ -89,7 +89,7 @@ namespace EasyZoning.Tools
             if (edgeColors == null && fillColors == null)
                 return;
 
-            bool useOrangeEdge = Mod.Settings?.UseOrangeRemovePreviewEdge ?? true;
+            string borderStyle = Mod.Settings?.RemovePreviewBorderStyle ?? Setting.kRemovePreviewBorderOrange;
             float edgeAlpha = math.saturate((Mod.Settings?.RemovePreviewEdgeOpacityPercent ?? 100) / 100f);
             string fillStyle = Mod.Settings?.RemovePreviewFillStyle ?? Setting.kRemovePreviewFillVanillaRed;
             float fillAlpha = math.saturate((Mod.Settings?.RemovePreviewFillOpacityPercent ?? 100) / 100f);
@@ -110,9 +110,7 @@ namespace EasyZoning.Tools
 
                     if (edgeColors != null && (uint) colorIndex < (uint) edgeColors.Length)
                     {
-                        Color desiredEdge = useOrangeEdge
-                            ? BuildOrangeHighlightEdge(edgeAlpha)
-                            : BuildVanillaHighlightEdge(zonePrefab.m_Edge);
+                        Color desiredEdge = BuildHighlightEdge(borderStyle, zonePrefab.m_Edge, edgeAlpha);
 
                         if (!Approximately(edgeColors[colorIndex], desiredEdge))
                         {
@@ -151,6 +149,22 @@ namespace EasyZoning.Tools
             Color color = Color.HSVToRGB(kOrangeHue, kOrangeSaturation, kOrangeValue);
             color.a = alpha;
             return color;
+        }
+
+        private static Color BuildHighlightEdge(string borderStyle, Color edgeColor, float opacityPercent)
+        {
+            switch (borderStyle)
+            {
+                case Setting.kRemovePreviewBorderVanillaRed:
+                {
+                    Color vanilla = BuildVanillaHighlightEdge(edgeColor);
+                    vanilla.a *= opacityPercent;
+                    return vanilla;
+                }
+
+                default:
+                    return BuildOrangeHighlightEdge(opacityPercent);
+            }
         }
 
         private static Color BuildVanillaHighlightEdge(Color edgeColor)
