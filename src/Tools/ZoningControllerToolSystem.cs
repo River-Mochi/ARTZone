@@ -997,6 +997,7 @@ namespace EasyZoning.Tools
                 int2 current = hasPreview ? data.CommittedDepths : GetCommittedRoadDepths(e);
                 int2 requested = index < DesiredDepths.Length ? DesiredDepths[index] : ToolDepths;
                 int2 preview = ConstrainDepthsForProtectedCells(e, current, requested);
+                bool changed = false;
 
                 if (hasPreview)
                 {
@@ -1009,12 +1010,14 @@ namespace EasyZoning.Tools
                             CommittedFlags = data.CommittedFlags,
                             HasCommittedUpgraded = data.HasCommittedUpgraded
                         });
+                        changed = true;
                     }
                 }
                 else
                 {
                     ZoningPreviewComponent previewData = CreatePreviewData(e, preview);
                     ECB.AddComponent(index, e, previewData);
+                    changed = true;
                 }
 
                 ApplyPreviewHighlights(index, e, current, preview);
@@ -1022,6 +1025,12 @@ namespace EasyZoning.Tools
                 if (ZoningRestoreLookup.HasComponent(e))
                 {
                     ECB.RemoveComponent<ZoningRestoreComponent>(index, e);
+                    changed = true;
+                }
+
+                if (changed)
+                {
+                    MarkRoadAndSubBlocksUpdated(index, e);
                 }
             }
 
@@ -1208,6 +1217,24 @@ namespace EasyZoning.Tools
                 }
 
                 return changed;
+            }
+
+            private void MarkRoadAndSubBlocksUpdated(int index, Entity roadEntity)
+            {
+                if (!UpdatedLookup.HasComponent(roadEntity))
+                    ECB.AddComponent<Updated>(index, roadEntity);
+
+                if (!SubBlockLookup.TryGetBuffer(roadEntity, out DynamicBuffer<SubBlock> subBlocks))
+                    return;
+
+                for (int i = 0; i < subBlocks.Length; i++)
+                {
+                    Entity subBlock = subBlocks[i].m_SubBlock;
+                    if (subBlock != Entity.Null && !UpdatedLookup.HasComponent(subBlock))
+                    {
+                        ECB.AddComponent<Updated>(index, subBlock);
+                    }
+                }
             }
 
         }
