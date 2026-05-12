@@ -1208,8 +1208,7 @@ namespace EasyZoning.Tools
                     if (hasPreview)
                         ECB.RemoveComponent<ZoningPreviewComponent>(e);
 
-                    if (ZoningRestoreLookup.HasComponent(e))
-                        ECB.RemoveComponent<ZoningRestoreComponent>(e);
+                    bool hasRestore = ZoningRestoreLookup.HasComponent(e);
 
                     bool useVanillaDepths = math.all(desired == kVanillaDepths);
                     if (DepthLookup.HasComponent(e))
@@ -1250,6 +1249,23 @@ namespace EasyZoning.Tools
                     else if (hasUpgraded)
                     {
                         ECB.RemoveComponent<Upgraded>(e);
+                    }
+
+                    // Both is represented by vanilla/default state, so the stored EZ
+                    // depth component and ZonesDisabled flags are removed. Keep a
+                    // one-frame depth sync target so SyncBlockSystem restores blocks
+                    // from old 0-depth/None layout back to normal 6/6.
+                    if (useVanillaDepths && !math.all(current == desired))
+                    {
+                        ZoningRestoreComponent syncDepths = new ZoningRestoreComponent { Depths = desired };
+                        if (hasRestore)
+                            ECB.SetComponent(e, syncDepths);
+                        else
+                            ECB.AddComponent(e, syncDepths);
+                    }
+                    else if (hasRestore)
+                    {
+                        ECB.RemoveComponent<ZoningRestoreComponent>(e);
                     }
 
                     if (!UpdatedLookup.HasComponent(e))
