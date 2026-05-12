@@ -17,11 +17,11 @@ namespace EasyZoning
     [FileLocation("ModsSettings/EasyZoning/EasyZoning")]
     [SettingsUITabOrder(kActionsTab, kLegacyTab, kAboutTab)]
     [SettingsUIGroupOrder(
-        kToggleGroup, kKeybindingGroup, kCompatibilityGroup, kUiGroup, kUsageGroup,
+        kProtectGroup, kKeybindingGroup, kCompatibilityGroup, kUiGroup, kUsageGroup,
         kLegacyGroup,
         kAboutInfoGroup, kAboutLinksGroup)]
     [SettingsUIShowGroupName(
-        kToggleGroup, kUsageGroup)] // kLegacyGroup and other names omitted on purpose.
+        kProtectGroup, kUiGroup, kUsageGroup)] // kLegacyGroup and other names omitted on purpose so they don't show in UI.
     [SettingsUIKeyboardAction(Mod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
     public sealed class Setting : ModSetting
     {
@@ -31,10 +31,10 @@ namespace EasyZoning
         public const string kAboutTab = "About";
 
         // Groups
-        public const string kToggleGroup = "Zoning Tools";
+        public const string kProtectGroup = "Zoning Tools";
         public const string kKeybindingGroup = "Key bindings";
         public const string kCompatibilityGroup = "Compatibility";
-        public const string kUiGroup = "UI";
+        public const string kUiGroup = "Better UI";
         public const string kUsageGroup = "Usage";
         public const string kLegacyGroup = "Legacy Tool";
         public const string kAboutInfoGroup = "Info";
@@ -46,10 +46,10 @@ namespace EasyZoning
 
         // --- Zone Options ---
 
-        [SettingsUISection(kActionsTab, kToggleGroup)]
+        [SettingsUISection(kActionsTab, kProtectGroup)]
         public bool RemoveOccupiedCells { get; set; } = true;
 
-        [SettingsUISection(kActionsTab, kToggleGroup)]
+        [SettingsUISection(kActionsTab, kProtectGroup)]
         public bool RemoveZonedCells { get; set; } = true;
 
         // --- Key bindings ---

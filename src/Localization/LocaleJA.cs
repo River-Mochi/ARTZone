@@ -36,7 +36,7 @@ namespace EasyZoning
                 { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "概要" },
 
                 // Groups
-                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),         "ゾーン設定" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kProtectGroup),         "ゾーン設定" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup),     "キー割り当て" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup),  "互換性" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "UI" },
