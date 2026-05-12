@@ -86,7 +86,7 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<Nouvelle route>\n" +
                     "1. Ouvrir le panneau Routes (choisir une route).\n" +
-                    "2. En bas du panneau d'outil route : utilisez les 3 boutons EZ pour Deux côtés / Gauche / Droite.\n" +
+                    "2. En bas du panneau d'outil route : utilisez les 3 icônes EZ pour Deux côtés / Gauche / Droite.\n" +
                     "   Cliquez à nouveau sur le bouton sélectionné pour Aucun.\n" +
                     "3. Tracer la route normalement.\n\n" +
                     "-----------------------------------------\n" +
@@ -95,13 +95,14 @@ namespace EasyZoning
                     "<Route existante>\n" +
                     "1. Ouvrir le panneau EZ de mise à jour : cliquer sur <Ctrl+V> pour afficher/masquer le panneau\n" +
                     "   (ou <l'icône en haut à gauche> fait la même chose).\n" +
-                    "2. Utilisez les 3 boutons EZ pour Deux côtés / Gauche / Droite.\n" +
+                    "2. Utilisez les 3 icônes EZ pour Deux côtés / Gauche / Droite.\n" +
                     "   Cliquez à nouveau sur le bouton sélectionné pour Aucun.\n" +
                     "3. Survoler + prévisualiser une route.\n" +
-                    "4. <RMB fait défiler> : Deux côtés → Gauche → Droite → Aucun → ...\n" +
-                    "5. <LMB une fois> : applique (valide).\n" +
-                    "6. <Maintenir LMB + glisser> sur plusieurs segments de route, puis relâcher pour appliquer.\n" +
-                    "7. <Annuler :> éloigner la souris et relâcher **LMB**.\n\n" +
+                    "4. L'aperçu rouge = cellules qui seront supprimées.\n" +
+                    "5. <RMB fait défiler> : Deux côtés → Gauche → Droite → Aucun → ...\n" +
+                    "6. <LMB une fois> : applique (valide).\n" +
+                    "7. <Maintenir LMB + glisser> sur plusieurs segments de route, puis relâcher pour appliquer.\n" +
+                    "8. <Annuler :> éloigner la souris et relâcher **LMB**.\n\n" +
                     "-------------------------------------------\n" +
                     "<BOUTON OPTIONNEL>\n" +
                     "• <Contour> affiche les lignes d'altitude du terrain." },

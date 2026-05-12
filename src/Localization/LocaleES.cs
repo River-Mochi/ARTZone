@@ -86,7 +86,7 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<Carretera nueva>\n" +
                     "1. Abrir el panel de carreteras (elige una carretera).\n" +
-                    "2. En la parte inferior del panel de la herramienta de carretera: usa los 3 botones EZ para Ambos / Izquierda / Derecha.\n" +
+                    "2. En la parte inferior del panel de la herramienta de carretera: usa los 3 iconos EZ para Ambos / Izquierda / Derecha.\n" +
                     "   Haz clic de nuevo en el botón seleccionado para Ninguno.\n" +
                     "3. Dibujar como siempre.\n\n" +
                     "-----------------------------------------\n" +
@@ -95,13 +95,14 @@ namespace EasyZoning
                     "<Carretera existente>\n" +
                     "1. Abrir el panel EZ de actualización: pulsar <Ctrl+V> para mostrar/ocultar el panel\n" +
                     "   (o <el icono superior izquierdo> hace lo mismo).\n" +
-                    "2. Usa los 3 botones EZ para Ambos / Izquierda / Derecha.\n" +
+                    "2. Usa los 3 iconos EZ para Ambos / Izquierda / Derecha.\n" +
                     "   Haz clic de nuevo en el botón seleccionado para Ninguno.\n" +
                     "3. Pasar el cursor + previsualizar una carretera.\n" +
-                    "4. <RMB recorre>: Ambos lados → Izquierda → Derecha → Ninguno → ...\n" +
-                    "5. <LMB una vez>: aplica (lo fija).\n" +
-                    "6. <Mantener LMB + arrastrar> por varios segmentos de carretera y soltar para aplicar.\n" +
-                    "7. <Cancelar:> alejar el ratón y soltar **LMB**.\n\n" +
+                    "4. La vista previa roja = celdas que se eliminarán.\n" +
+                    "5. <RMB recorre>: Ambos lados → Izquierda → Derecha → Ninguno → ...\n" +
+                    "6. <LMB una vez>: aplica (lo fija).\n" +
+                    "7. <Mantener LMB + arrastrar> por varios segmentos de carretera y soltar para aplicar.\n" +
+                    "8. <Cancelar:> alejar el ratón y soltar **LMB**.\n\n" +
                     "-------------------------------------------\n" +
                     "<BOTÓN OPCIONAL>\n" +
                     "• <Contorno> muestra líneas de elevación del terreno." },
