@@ -4,7 +4,7 @@
 
 namespace EasyZoning.Tools
 {
-    using EasyZoning.Components;    // ZoningDepthComponent, ZoningRestoreComponent
+    using EasyZoning.Components;    // ZoningDepthComponent, ZoningPreviewComponent, ZoningRestoreComponent
     using Game;
     using Game.Common;              // Created, Owner, Updated (dirty marker pattern)
     using Game.Net;                 // Curve, Upgraded
@@ -96,6 +96,7 @@ namespace EasyZoning.Tools
                 TempLookup = GetComponentLookup<Temp>(isReadOnly: true),
                 UpgradedLookup = GetComponentLookup<Upgraded>(isReadOnly: true),
                 ZoningDepthLookup = GetComponentLookup<ZoningDepthComponent>(isReadOnly: true),
+                ZoningPreviewLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true),
                 ZoningRestoreLookup = GetComponentLookup<ZoningRestoreComponent>(isReadOnly: true),
                 RemoveZonedCells = removeZoned,
                 AllowExistingRoadSync = allowExistingRoadSync,
@@ -144,6 +145,7 @@ namespace EasyZoning.Tools
             [ReadOnly] public ComponentLookup<Temp> TempLookup;
             [ReadOnly] public ComponentLookup<Upgraded> UpgradedLookup;
             [ReadOnly] public ComponentLookup<ZoningDepthComponent> ZoningDepthLookup;
+            [ReadOnly] public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
             [ReadOnly] public ComponentLookup<ZoningRestoreComponent> ZoningRestoreLookup;
 
             public bool RemoveZonedCells;
@@ -168,6 +170,7 @@ namespace EasyZoning.Tools
 
                 Entity roadEntity = owner.m_Owner;
                 bool hasRestore = ZoningRestoreLookup.HasComponent(roadEntity);
+                bool hasPreview = ZoningPreviewLookup.HasComponent(roadEntity);
                 bool isTempRoad = TempLookup.HasComponent(roadEntity);
                 bool isFreshEzRoad =
                     AllowNewRoadSync &&
@@ -178,7 +181,7 @@ namespace EasyZoning.Tools
                 // through temp preview entities, which marks those real blocks Updated.
                 // When EZ is not the active existing-road tool, leave normal existing roads
                 // alone so vanilla can own its preview/add/remove workflow.
-                if (!hasRestore && !isTempRoad && !AllowExistingRoadSync && !isFreshEzRoad)
+                if (!hasRestore && !hasPreview && !isTempRoad && !AllowExistingRoadSync && !isFreshEzRoad)
                 {
                     return;
                 }
@@ -205,7 +208,7 @@ namespace EasyZoning.Tools
                 int currentDepth = math.max(block.m_Size.y, validArea.m_Area.w);
                 bool reducingDepth = depth < currentDepth;
 
-                if (reducingDepth && RemoveZonedCells && IsAnyCellZoned(cells, block, validArea))
+                if (!hasRestore && reducingDepth && RemoveZonedCells && IsAnyCellZoned(cells, block, validArea))
                 {
                     return;
                 }
@@ -225,6 +228,16 @@ namespace EasyZoning.Tools
                 if (ZoningRestoreLookup.TryGetComponent(roadEntity, out ZoningRestoreComponent zoningRestore))
                 {
                     depths = zoningRestore.Depths;
+                    return true;
+                }
+
+                if (ZoningPreviewLookup.TryGetComponent(roadEntity, out ZoningPreviewComponent preview))
+                {
+                    // Preview may safely expand blocks to show newly added cells, but
+                    // it must not shrink blocks on hover. Removals are shown with
+                    // CellFlags.Highlight so vanilla systems do not treat preview as
+                    // an applied side disable.
+                    depths = math.max(preview.Depths, preview.CommittedDepths);
                     return true;
                 }
 

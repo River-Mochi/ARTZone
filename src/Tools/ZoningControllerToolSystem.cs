@@ -24,6 +24,7 @@ namespace EasyZoning.Tools
     using ObjectTransform = Game.Objects.Transform;
     using System;                    // Exception (WarnOnce guard)
     using Unity.Collections;         // NativeArray, NativeList, Allocator
+    using Unity.Collections.LowLevel.Unsafe; // Allows preview highlight writes by road-side job
     using Unity.Entities;            // Entity, EntityQuery, ComponentLookup, BufferLookup, ECB
     using Unity.Jobs;                // JobHandle, IJob, IJobParallelFor
     using Unity.Mathematics;         // int2, math
@@ -444,16 +445,18 @@ namespace EasyZoning.Tools
             // - Add/Update ZoningPreviewComponent for currently selected entities
             // - Remove ZoningPreviewComponent from entities no longer selected
             //
-            // Important: hover preview must not write vanilla ZonesDisabled flags or mark
-            // zone blocks Updated. Vanilla treats those as real zone removals and can
-            // condemn buildings / clear painted zoning before the player clicks Apply.
+            // Important: hover preview must not write vanilla ZonesDisabled flags.
+            // Vanilla treats those as real zone removals and can condemn buildings /
+            // clear painted zoning before the player clicks Apply. We only use
+            // temporary block expansion for added sides and CellFlags.Highlight for
+            // sides that would be removed.
             ComponentLookup<ZoningPreviewComponent> previewReadLookup =
                 GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true);
 
             JobHandle syncTempJob = new SyncTempJob
             {
                 ECB = m_ToolOutputBarrier.CreateCommandBuffer().AsParallelWriter(),
-                CellLookup = GetBufferLookup<Cell>(isReadOnly: true),
+                CellLookup = GetBufferLookup<Cell>(isReadOnly: false),
                 BlockLookup = GetComponentLookup<Block>(isReadOnly: true),
                 CurveLookup = GetComponentLookup<Curve>(isReadOnly: true),
                 ValidAreaLookup = GetComponentLookup<ValidArea>(isReadOnly: true),
@@ -462,6 +465,7 @@ namespace EasyZoning.Tools
                 ZoningRestoreLookup = GetComponentLookup<ZoningRestoreComponent>(isReadOnly: true),
                 UpgradedLookup = GetComponentLookup<Upgraded>(isReadOnly: true),
                 SubBlockLookup = GetBufferLookup<SubBlock>(isReadOnly: true),
+                UpdatedLookup = GetComponentLookup<Updated>(isReadOnly: true),
                 SelectedEntities = syncSelectedReadOnly,
                 ToolDepths = Depths,
                 DesiredDepths = selectedDepthsReadOnly,
@@ -478,6 +482,12 @@ namespace EasyZoning.Tools
             {
                 ECB = m_ToolOutputBarrier.CreateCommandBuffer().AsParallelWriter(),
                 ZoningPreviewLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true),
+                ZoningRestoreLookup = GetComponentLookup<ZoningRestoreComponent>(isReadOnly: true),
+                CellLookup = GetBufferLookup<Cell>(isReadOnly: false),
+                BlockLookup = GetComponentLookup<Block>(isReadOnly: true),
+                CurveLookup = GetComponentLookup<Curve>(isReadOnly: true),
+                SubBlockLookup = GetBufferLookup<SubBlock>(isReadOnly: true),
+                UpdatedLookup = GetComponentLookup<Updated>(isReadOnly: true),
                 SelectedEntities = selectedReadOnly,
                 Entities = zoningPreviewEntities.AsReadOnly()
             }.Schedule(zoningPreviewEntities.Length, 32, inputDeps);
@@ -957,13 +967,13 @@ namespace EasyZoning.Tools
 
 
         // Keep preview metadata in sync for selected entities.
-        // This intentionally does not mutate Upgraded/Updated/block state: preview must
-        // never let vanilla zone systems treat a hover as a committed side removal.
+        // This intentionally does not mutate Upgraded flags: preview must never let
+        // vanilla zone systems treat a hover as a committed side removal.
         public struct SyncTempJob : IJobParallelFor
         {
             public EntityCommandBuffer.ParallelWriter ECB;
 
-            [ReadOnly] public BufferLookup<Cell> CellLookup;
+            [NativeDisableParallelForRestriction] public BufferLookup<Cell> CellLookup;
             [ReadOnly] public ComponentLookup<Block> BlockLookup;
             [ReadOnly] public ComponentLookup<Curve> CurveLookup;
             [ReadOnly] public ComponentLookup<ValidArea> ValidAreaLookup;
@@ -972,6 +982,7 @@ namespace EasyZoning.Tools
             [ReadOnly] public ComponentLookup<ZoningRestoreComponent> ZoningRestoreLookup;
             [ReadOnly] public ComponentLookup<Upgraded> UpgradedLookup;
             [ReadOnly] public BufferLookup<SubBlock> SubBlockLookup;
+            [ReadOnly] public ComponentLookup<Updated> UpdatedLookup;
 
             public NativeArray<Entity>.ReadOnly SelectedEntities;
             public int2 ToolDepths;
@@ -982,11 +993,12 @@ namespace EasyZoning.Tools
             public void Execute(int index)
             {
                 Entity e = SelectedEntities[index];
-                int2 current = GetCommittedRoadDepths(e);
+                bool hasPreview = ZoningPreviewLookup.TryGetComponent(e, out ZoningPreviewComponent data);
+                int2 current = hasPreview ? data.CommittedDepths : GetCommittedRoadDepths(e);
                 int2 requested = index < DesiredDepths.Length ? DesiredDepths[index] : ToolDepths;
                 int2 preview = ConstrainDepthsForProtectedCells(e, current, requested);
 
-                if (ZoningPreviewLookup.TryGetComponent(e, out ZoningPreviewComponent data))
+                if (hasPreview)
                 {
                     if (!math.all(data.Depths == preview))
                     {
@@ -1004,6 +1016,8 @@ namespace EasyZoning.Tools
                     ZoningPreviewComponent previewData = CreatePreviewData(e, preview);
                     ECB.AddComponent(index, e, previewData);
                 }
+
+                ApplyPreviewHighlights(index, e, current, preview);
 
                 if (ZoningRestoreLookup.HasComponent(e))
                 {
@@ -1145,6 +1159,57 @@ namespace EasyZoning.Tools
                 return true;
             }
 
+            private void ApplyPreviewHighlights(int jobIndex, Entity roadEntity, int2 current, int2 preview)
+            {
+                if (!CurveLookup.TryGetComponent(roadEntity, out Curve curve) ||
+                    !SubBlockLookup.TryGetBuffer(roadEntity, out DynamicBuffer<SubBlock> subBlocks))
+                {
+                    return;
+                }
+
+                bool removeLeft = preview.x < current.x;
+                bool removeRight = preview.y < current.y;
+
+                for (int i = 0; i < subBlocks.Length; i++)
+                {
+                    Entity blockEntity = subBlocks[i].m_SubBlock;
+                    if (!BlockLookup.TryGetComponent(blockEntity, out Block block) ||
+                        !CellLookup.TryGetBuffer(blockEntity, out DynamicBuffer<Cell> cells))
+                    {
+                        continue;
+                    }
+
+                    bool leftSide = RoadZoneCompatibility.IsBlockOnLeft(block, curve);
+                    bool shouldHighlight = leftSide ? removeLeft : removeRight;
+                    bool changed = SetHighlight(cells, shouldHighlight);
+                    if (changed && !UpdatedLookup.HasComponent(blockEntity))
+                    {
+                        ECB.AddComponent<Updated>(jobIndex, blockEntity);
+                    }
+                }
+            }
+
+            private static bool SetHighlight(DynamicBuffer<Cell> cells, bool highlighted)
+            {
+                bool changed = false;
+                for (int i = 0; i < cells.Length; i++)
+                {
+                    Cell cell = cells[i];
+                    CellFlags state = highlighted
+                        ? cell.m_State | CellFlags.Highlight
+                        : cell.m_State & ~CellFlags.Highlight;
+
+                    if (state == cell.m_State)
+                        continue;
+
+                    cell.m_State = state;
+                    cells[i] = cell;
+                    changed = true;
+                }
+
+                return changed;
+            }
+
         }
 
         // Remove preview components from entities not currently selected.
@@ -1153,6 +1218,12 @@ namespace EasyZoning.Tools
             public EntityCommandBuffer.ParallelWriter ECB;
 
             [ReadOnly] public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
+            [ReadOnly] public ComponentLookup<ZoningRestoreComponent> ZoningRestoreLookup;
+            [NativeDisableParallelForRestriction] public BufferLookup<Cell> CellLookup;
+            [ReadOnly] public ComponentLookup<Block> BlockLookup;
+            [ReadOnly] public ComponentLookup<Curve> CurveLookup;
+            [ReadOnly] public BufferLookup<SubBlock> SubBlockLookup;
+            [ReadOnly] public ComponentLookup<Updated> UpdatedLookup;
 
             public NativeArray<Entity>.ReadOnly SelectedEntities;
             public NativeArray<Entity>.ReadOnly Entities;
@@ -1163,10 +1234,84 @@ namespace EasyZoning.Tools
                 if (SelectedEntities.Contains(e))
                     return;
 
-                if (!ZoningPreviewLookup.HasComponent(e))
+                if (!ZoningPreviewLookup.TryGetComponent(e, out ZoningPreviewComponent preview))
                     return;
 
+                bool needsRestore = math.any(preview.Depths > preview.CommittedDepths);
+                ClearPreviewHighlights(index, e, markUpdated: !needsRestore);
+
+                if (needsRestore)
+                {
+                    ZoningRestoreComponent restore = new ZoningRestoreComponent { Depths = preview.CommittedDepths };
+                    if (ZoningRestoreLookup.HasComponent(e))
+                        ECB.SetComponent(index, e, restore);
+                    else
+                        ECB.AddComponent(index, e, restore);
+
+                    MarkRoadAndSubBlocksUpdated(index, e);
+                }
+
                 ECB.RemoveComponent<ZoningPreviewComponent>(index, e);
+            }
+
+            private void ClearPreviewHighlights(int jobIndex, Entity roadEntity, bool markUpdated)
+            {
+                if (!SubBlockLookup.TryGetBuffer(roadEntity, out DynamicBuffer<SubBlock> subBlocks))
+                    return;
+
+                for (int i = 0; i < subBlocks.Length; i++)
+                {
+                    Entity blockEntity = subBlocks[i].m_SubBlock;
+                    if (!CellLookup.TryGetBuffer(blockEntity, out DynamicBuffer<Cell> cells))
+                        continue;
+
+                    bool changed = SetHighlight(cells, false);
+                    if (markUpdated && changed && !UpdatedLookup.HasComponent(blockEntity))
+                    {
+                        ECB.AddComponent<Updated>(jobIndex, blockEntity);
+                    }
+                }
+            }
+
+            private void MarkRoadAndSubBlocksUpdated(int jobIndex, Entity roadEntity)
+            {
+                if (!UpdatedLookup.HasComponent(roadEntity))
+                {
+                    ECB.AddComponent<Updated>(jobIndex, roadEntity);
+                }
+
+                if (!SubBlockLookup.TryGetBuffer(roadEntity, out DynamicBuffer<SubBlock> subBlocks))
+                    return;
+
+                for (int i = 0; i < subBlocks.Length; i++)
+                {
+                    Entity blockEntity = subBlocks[i].m_SubBlock;
+                    if (blockEntity != Entity.Null && !UpdatedLookup.HasComponent(blockEntity))
+                    {
+                        ECB.AddComponent<Updated>(jobIndex, blockEntity);
+                    }
+                }
+            }
+
+            private static bool SetHighlight(DynamicBuffer<Cell> cells, bool highlighted)
+            {
+                bool changed = false;
+                for (int i = 0; i < cells.Length; i++)
+                {
+                    Cell cell = cells[i];
+                    CellFlags state = highlighted
+                        ? cell.m_State | CellFlags.Highlight
+                        : cell.m_State & ~CellFlags.Highlight;
+
+                    if (state == cell.m_State)
+                        continue;
+
+                    cell.m_State = state;
+                    cells[i] = cell;
+                    changed = true;
+                }
+
+                return changed;
             }
         }
 
