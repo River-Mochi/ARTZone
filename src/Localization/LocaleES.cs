@@ -32,15 +32,15 @@ namespace EasyZoning
 
                 // Tabs
                 { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "Acciones" },
-                { m_Settings.GetOptionTabLocaleID(Setting.kLegacyTab),  "Clásico" },
-                { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "Acerca de" },
+                { m_Settings.GetOptionTabLocaleID(Setting.kLegacyTab), "Clásico" },
+                { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab), "Acerca de" },
 
                 // Groups
-                { m_Settings.GetOptionGroupLocaleID(Setting.kProtectGroup),         "Opciones de zonificación" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup),     "Atajos de teclado" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup),  "Compatibilidad" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "Interfaz" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup),          "USO" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kProtectGroup), "Protecciones" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Atajos de teclado" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup), "Compatibilidad" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup), "Visuales" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup), "USO" },
 
                 // Legacy group header hidden
                 { m_Settings.GetOptionGroupLocaleID(Setting.kLegacyGroup), "" },
@@ -49,71 +49,96 @@ namespace EasyZoning
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
-                // Zone options
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "No restablecer casillas ya zonificadas" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
-                    "No restablece las celdas ya zonificadas durante la vista previa/aplicación.\n\n" +
-                    "**[ ✓ ] Activado recomendado.**" },
-
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Evitar que se eliminen edificios" },
+                // Protections
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "● Evitar la eliminación de edificios" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
-                    "**Los edificios = celdas ocupadas**. Evita que la vista previa/aplicación de nuevas zonas convierta edificios existentes en edificios condenados.\n\n" +
-                    "**[ ✓ ] Activado recomendado.**" },
+                    "**Edificios = celdas ocupadas**. Evita que la vista previa/aplicación de nuevas zonas deje edificios existentes como condenados.\n" +
+                    "\n" +
+                    "**[ ✓ ] Se recomienda activarlo.**" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● Evitar reiniciar cuadros ya pintados/zonificados" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
+                    "No reinicia celdas ya zonificadas durante la vista previa/aplicación.\n" +
+                    "\n" +
+                    "**[ ✓ ] Se recomienda activarlo.**" },
 
                 // Keybind
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Mostrar/Ocultar panel de actualización" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Panel de actualización On/Off" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "Mostrar el panel Easy Zoning (**Ctrl+V por defecto**)." },
+                    "**Atajo de teclado** para mostrar rápido el panel de Easy Zoning\n" +
+                    "**predeterminado Ctrl+V**" },
 
                 // Compatibility
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ Botón de contorno" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
-                    "**[ ✓ ] activado**, muestra el botón Contorno en el panel Easy Zoning para carreteras existentes.\n\n" +
-                    "Desactívalo si otro mod ya maneja las líneas de contorno del terreno." },
+                    "**[ ✓ ] activado**, muestra el botón de terreno Contour en el panel de actualización de carreteras existentes del mod.\n" +
+                    "\n" +
+                    "● Desactívalo si prefieres un panel más pequeño o si otro mod maneja las líneas del terreno." },
 
                 // UI
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Estilo de panel translúcido" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Panel de cristal" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
-                    "**[ ✓ ] activado**, usa un panel translúcido más claro.\n" +
-                    "**[   ] desactivado**, usa un panel más oscuro de estilo vanilla.\n\n" +
-                    "Solo estilo visual. No se usa desenfoque." },
+                    "**[ ✓ ] activado**, usa un estilo claro y translúcido para el panel.\n" +
+                    "**[   ] desactivado**, usa un panel gris.\n" +
+                    "\n" +
+                    "Solo cambia el estilo visual." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseOrangeRemovePreviewEdge)), "◉ Orange remove-preview edge" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseOrangeRemovePreviewEdge)),
-                    "**[ ✓ ] enabled**, use a brighter orange border for cells that will be removed.\n" +
-                    "**[   ] disabled**, keep the vanilla red border.\n\n" +
-                    "Only changes the remove-preview border. Fill stays vanilla for now." },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Borde de celdas eliminadas" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
+                    "Color del borde para la vista previa de las celdas que se eliminarán.\n" +
+                    "\n" +
+                    "<Naranja> = más brillante y fácil de ver.\n" +
+                    "<Rojo vanilla> = coincide con el aspecto predeterminado del juego." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Remove-preview edge opacity" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Opacidad del borde" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
-                    "Adjusts only the orange remove-preview border opacity.\n\n" +
-                    "Does not change normal zoning colors or the white add-preview cells." },
+                    "Ajusta la opacidad del borde de la vista previa de eliminación.\n" +
+                    "\n" +
+                    "<100%> conserva la translucidez normal de la vista previa." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "Relleno de celdas eliminadas" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
+                    "Estilo de relleno para la superposición de vista previa de celdas que se eliminarán.\n" +
+                    "\n" +
+                    "<Rojo vanilla> = aspecto actual del juego.\n" +
+                    "<Blanco> = contraste más limpio.\n" +
+                    "<Naranja> = coincide con el borde naranja.\n" +
+                    "<Ninguno> = solo borde." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Opacidad del relleno" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)),
+                    "Ajusta la opacidad del relleno para la vista previa de celdas eliminables.\n" +
+                    "\n" +
+                    "<100%> conserva la translucidez normal de la vista previa.\n" +
+                    "Se ignora si <Relleno de eliminación> está en <Ninguno>." },
 
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Mostrar instrucciones" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),
-                    "Mostrar u ocultar las **instrucciones de uso** de abajo." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)), "Mostrar u ocultar las **instrucciones de uso** debajo." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<Carretera nueva>\n" +
-                    "1. Abrir el panel de carreteras (elige una carretera).\n" +
-                    "2. En la parte inferior del panel de la herramienta de carretera: usa los 3 iconos EZ para Ambos / Izquierda / Derecha.\n" +
-                    "   Haz clic de nuevo en el botón seleccionado para Ninguno.\n" +
-                    "3. Dibujar como siempre.\n\n" +
+                    "1. Abre el panel de Carreteras (elige una carretera).\n" +
+                    "2. Abajo del panel de la herramienta de carretera: usa los 3 iconos EZ para Ambos / Izquierda / Derecha.\n" +
+                    "   Haz clic otra vez en el botón seleccionado para Ninguno.\n" +
+                    "3. Dibuja como siempre.\n" +
+                    "\n" +
                     "-----------------------------------------\n" +
-                    "  RMB = clic derecho, LMB = clic izquierdo\n" +
-                    "-----------------------------------------\n\n" +
+                    "  <RMB> = clic derecho, <LMB> = clic izquierdo\n" +
+                    "-----------------------------------------\n" +
+                    "\n" +
                     "<Carretera existente>\n" +
-                    "1. Abrir el panel EZ de actualización: pulsar <Ctrl+V> para mostrar/ocultar el panel\n" +
-                    "   (o <el icono superior izquierdo> hace lo mismo).\n" +
+                    "1. Abre el panel EZ Update: haz clic en <Ctrl+V> para activar/desactivar el panel\n" +
+                    "   (<icono de arriba a la izquierda> hace lo mismo).\n" +
                     "2. Usa los 3 iconos EZ para Ambos / Izquierda / Derecha.\n" +
-                    "   Haz clic de nuevo en el botón seleccionado para Ninguno.\n" +
-                    "3. Pasar el cursor + previsualizar una carretera.\n" +
-                    "4. La vista previa roja = celdas que se eliminarán.\n" +
-                    "5. <RMB recorre>: Ambos lados → Izquierda → Derecha → Ninguno → ...\n" +
-                    "6. <LMB una vez>: aplica (lo fija).\n" +
-                    "7. <Mantener LMB + arrastrar> por varios segmentos de carretera y soltar para aplicar.\n" +
-                    "8. <Cancelar:> alejar el ratón y soltar **LMB**.\n\n" +
+                    "   Haz clic otra vez en el botón para Ninguno.\n" +
+                    "3. Pasa el cursor y previsualiza una carretera.\n" +
+                    "4. Vista previa roja = celdas que se eliminarán.\n" +
+                    "5. <RMB alterna>: Ambos → Izquierda → Derecha → Ninguno → ...\n" +
+                    "6. <LMB una vez>: aplica (lo deja fijo).\n" +
+                    "7. <Mantener LMB + arrastrar> por varias secciones de carretera, soltar para aplicar.\n" +
+                    "8. <Cancelar:> aleja el ratón y suelta **LMB**.\n" +
+                    "\n" +
                     "-------------------------------------------\n" +
                     "<BOTÓN OPCIONAL>\n" +
                     "• <Contorno> muestra líneas de elevación del terreno." },
@@ -122,27 +147,29 @@ namespace EasyZoning
                 // Legacy
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Ciclo clásico con clic derecho" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
-                    "**Recomendado OFF** para que RMB recorra los 4 modos:\n" +
-                    "**Ambos lados → Izquierda → Derecha → Ninguno → ...**\n\n" +
-                    "Ventaja: menos necesidad de mover el ratón de vuelta al panel de herramientas.\n\n" +
+                    "**Se recomienda OFF**\n" +
+                    "Off significa que RMB alterna los 4 modos: **Ambos → Izquierda → Derecha → Ninguno → ...**\n" +
+                    "\n" +
+                    "Ventaja al estar desactivado: menos necesidad de mover el ratón de vuelta al panel de herramientas.\n" +
+                    "\n" +
                     "--------------------------------------\n" +
-                    "Si el modo clásico está ON: RMB alterna entre dos grupos separados:\n" +
-                    "Izquierda ↔ Derecha\n" +
-                    "Ambos lados ↔ Ninguno" },
+                    "Si Clásico está ON: RMB alterna en dos grupos separados:\n" +
+                    "Solo Izquierda ↔ Derecha\n" +
+                    "Solo Ambos ↔ Ninguno" },
 
                 // Keybinding dialog title
-                { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Mostrar/Ocultar panel Easy Zoning de actualización" },
+                { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Alternar panel de actualización de Easy Zoning" },
 
                 // About tab
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Nombre del mod" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Nombre visible de este mod." },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)), "Nombre del mod" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)), "Nombre mostrado de este mod." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "Versión" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "Versión actual del mod." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)), "Versión actual del mod." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadox)), "Paradox Mods" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),  "Abrir la página Paradox Mods del autor." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)), "Abrir la página del autor en Paradox Mods." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Unirse al Discord del mod." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)), "Unirse al Discord del mod." },
             };
 
             return d;
