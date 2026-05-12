@@ -19,15 +19,20 @@ namespace EasyZoning.Tools
         private const float kOrangeHue = 0.08f;
         private const float kOrangeSaturation = 0.95f;
         private const float kOrangeValue = 1.00f;
+        private const float kOrangeFillSaturation = 0.70f;
         private const string kZoneEdgeShaderProperty = "colossal_ZoneEdgeColors";
+        private const string kZoneFillShaderProperty = "colossal_ZoneFillColors";
 
         private PrefabSystem m_PrefabSystem = null!;
         private ZoneSystem m_ZoneSystem = null!;
         private EntityQuery m_ZoneQuery;
 
         private FieldInfo? m_EdgeColorArrayField;
+        private FieldInfo? m_FillColorArrayField;
         private int m_ZoneEdgeShaderId;
-        private bool m_MissingFieldWarned;
+        private int m_ZoneFillShaderId;
+        private bool m_MissingEdgeFieldWarned;
+        private bool m_MissingFillFieldWarned;
 
         protected override void OnCreate( )
         {
@@ -44,7 +49,11 @@ namespace EasyZoning.Tools
             m_EdgeColorArrayField = typeof(ZoneSystem).GetField(
                 "m_EdgeColorArray",
                 BindingFlags.Instance | BindingFlags.NonPublic);
+            m_FillColorArrayField = typeof(ZoneSystem).GetField(
+                "m_FillColorArray",
+                BindingFlags.Instance | BindingFlags.NonPublic);
             m_ZoneEdgeShaderId = Shader.PropertyToID(kZoneEdgeShaderProperty);
+            m_ZoneFillShaderId = Shader.PropertyToID(kZoneFillShaderProperty);
         }
 
         protected override void OnUpdate( )
@@ -52,22 +61,40 @@ namespace EasyZoning.Tools
             if (m_ZoneQuery.IsEmptyIgnoreFilter)
                 return;
 
-            if (m_EdgeColorArrayField?.GetValue(m_ZoneSystem) is not Vector4[] edgeColors)
+            Vector4[]? edgeColors = m_EdgeColorArrayField?.GetValue(m_ZoneSystem) as Vector4[];
+            Vector4[]? fillColors = m_FillColorArrayField?.GetValue(m_ZoneSystem) as Vector4[];
+
+            if (edgeColors == null)
             {
-                if (!m_MissingFieldWarned)
+                if (!m_MissingEdgeFieldWarned)
                 {
-                    m_MissingFieldWarned = true;
+                    m_MissingEdgeFieldWarned = true;
                     Mod.WarnOnce(
                         "PreviewColorOverrideSystem.EdgeArrayMissing",
                         ( ) => "[EZ] PreviewColorOverrideSystem could not read ZoneSystem edge color array.");
                 }
-
-                return;
             }
+
+            if (fillColors == null)
+            {
+                if (!m_MissingFillFieldWarned)
+                {
+                    m_MissingFillFieldWarned = true;
+                    Mod.WarnOnce(
+                        "PreviewColorOverrideSystem.FillArrayMissing",
+                        ( ) => "[EZ] PreviewColorOverrideSystem could not read ZoneSystem fill color array.");
+                }
+            }
+
+            if (edgeColors == null && fillColors == null)
+                return;
 
             bool useOrangeEdge = Mod.Settings?.UseOrangeRemovePreviewEdge ?? true;
             float edgeAlpha = math.saturate((Mod.Settings?.RemovePreviewEdgeOpacityPercent ?? 100) / 100f);
-            bool changed = false;
+            string fillStyle = Mod.Settings?.RemovePreviewFillStyle ?? Setting.kRemovePreviewFillVanillaRed;
+            float fillAlpha = math.saturate((Mod.Settings?.RemovePreviewFillOpacityPercent ?? 100) / 100f);
+            bool edgeChanged = false;
+            bool fillChanged = false;
 
             NativeArray<PrefabData> prefabs = m_ZoneQuery.ToComponentDataArray<PrefabData>(Allocator.Temp);
             NativeArray<ZoneData> zones = m_ZoneQuery.ToComponentDataArray<ZoneData>(Allocator.Temp);
@@ -81,17 +108,28 @@ namespace EasyZoning.Tools
                         CellFlags.Visible | CellFlags.Highlight,
                         zones[i].m_ZoneType);
 
-                    if ((uint) colorIndex >= (uint) edgeColors.Length)
-                        continue;
-
-                    Color desired = useOrangeEdge
-                        ? BuildOrangeHighlightEdge(edgeAlpha)
-                        : BuildVanillaHighlightEdge(zonePrefab.m_Edge);
-
-                    if (!Approximately(edgeColors[colorIndex], desired))
+                    if (edgeColors != null && (uint) colorIndex < (uint) edgeColors.Length)
                     {
-                        edgeColors[colorIndex] = desired;
-                        changed = true;
+                        Color desiredEdge = useOrangeEdge
+                            ? BuildOrangeHighlightEdge(edgeAlpha)
+                            : BuildVanillaHighlightEdge(zonePrefab.m_Edge);
+
+                        if (!Approximately(edgeColors[colorIndex], desiredEdge))
+                        {
+                            edgeColors[colorIndex] = desiredEdge;
+                            edgeChanged = true;
+                        }
+                    }
+
+                    if (fillColors != null && (uint) colorIndex < (uint) fillColors.Length)
+                    {
+                        Color desiredFill = BuildHighlightFill(fillStyle, zonePrefab.m_Color, fillAlpha);
+
+                        if (!Approximately(fillColors[colorIndex], desiredFill))
+                        {
+                            fillColors[colorIndex] = desiredFill;
+                            fillChanged = true;
+                        }
                     }
                 }
             }
@@ -101,8 +139,11 @@ namespace EasyZoning.Tools
                 zones.Dispose();
             }
 
-            if (changed)
+            if (edgeChanged && edgeColors != null)
                 Shader.SetGlobalVectorArray(m_ZoneEdgeShaderId, edgeColors);
+
+            if (fillChanged && fillColors != null)
+                Shader.SetGlobalVectorArray(m_ZoneFillShaderId, fillColors);
         }
 
         private static Color BuildOrangeHighlightEdge(float alpha)
@@ -117,6 +158,46 @@ namespace EasyZoning.Tools
             Color.RGBToHSV(edgeColor, out _, out _, out float value);
             Color highlight = Color.HSVToRGB(0f, 0.85f, value);
             highlight.a = math.min(1f, edgeColor.a * 1.25f);
+            return highlight;
+        }
+
+        private static Color BuildHighlightFill(string fillStyle, Color baseFillColor, float opacityPercent)
+        {
+            Color vanillaFill = BuildVanillaHighlightFill(baseFillColor);
+
+            switch (fillStyle)
+            {
+                case Setting.kRemovePreviewFillWhite:
+                {
+                    Color white = Color.white;
+                    white.a = vanillaFill.a * opacityPercent;
+                    return white;
+                }
+
+                case Setting.kRemovePreviewFillOrange:
+                {
+                    Color orange = Color.HSVToRGB(kOrangeHue, kOrangeFillSaturation, kOrangeValue);
+                    orange.a = vanillaFill.a * opacityPercent;
+                    return orange;
+                }
+
+                case Setting.kRemovePreviewFillNone:
+                {
+                    vanillaFill.a = 0f;
+                    return vanillaFill;
+                }
+
+                default:
+                    vanillaFill.a *= opacityPercent;
+                    return vanillaFill;
+            }
+        }
+
+        private static Color BuildVanillaHighlightFill(Color fillColor)
+        {
+            Color.RGBToHSV(fillColor, out _, out _, out float value);
+            Color highlight = Color.HSVToRGB(0f, 0.85f, value);
+            highlight.a = math.min(1f, fillColor.a * 1.25f);
             return highlight;
         }
 

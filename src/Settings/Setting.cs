@@ -11,6 +11,8 @@ namespace EasyZoning
     using Game.Input;                // ProxyBinding, BindingKeyboard, ActionType
     using Game.Modding;              // IMod, ModSetting base
     using Game.Settings;             // Settings UI attributes
+    using Game.UI.Localization;      // LocalizedString.Value for dropdown labels
+    using Game.UI.Widgets;           // DropdownItem<T>
     using System;                    // Exception in URL open handlers
     using UnityEngine;               // Application.OpenURL
 
@@ -31,14 +33,19 @@ namespace EasyZoning
         public const string kAboutTab = "About";
 
         // Groups
-        public const string kProtectGroup = "Zoning Tools";
+        public const string kProtectGroup = "Protections";
         public const string kKeybindingGroup = "Key bindings";
         public const string kCompatibilityGroup = "Compatibility";
-        public const string kUiGroup = "Better UI";
+        public const string kUiGroup = "Visuals";
         public const string kUsageGroup = "Usage";
         public const string kLegacyGroup = "Legacy Tool";
         public const string kAboutInfoGroup = "Info";
         public const string kAboutLinksGroup = "Links";
+
+        public const string kRemovePreviewFillVanillaRed = "vanilla-red";
+        public const string kRemovePreviewFillWhite = "white";
+        public const string kRemovePreviewFillOrange = "orange";
+        public const string kRemovePreviewFillNone = "none";
 
         public Setting(IMod mod) : base(mod)
         {
@@ -78,8 +85,18 @@ namespace EasyZoning
         public bool UseOrangeRemovePreviewEdge { get; set; } = true;
 
         [SettingsUISlider(min = 20, max = 100, step = 5, scalarMultiplier = 1, unit = "percentage")]
+        [SettingsUIDisableByCondition(typeof(Setting), nameof(IsRemovePreviewEdgeOpacityDisabled))]
         [SettingsUISection(kActionsTab, kUiGroup)]
         public int RemovePreviewEdgeOpacityPercent { get; set; } = 100;
+
+        [SettingsUISection(kActionsTab, kUiGroup)]
+        [SettingsUIDropdown(typeof(Setting), nameof(GetRemovePreviewFillStyleValues))]
+        public string RemovePreviewFillStyle { get; set; } = kRemovePreviewFillVanillaRed;
+
+        [SettingsUISlider(min = 0, max = 100, step = 5, scalarMultiplier = 1, unit = "percentage")]
+        [SettingsUIDisableByCondition(typeof(Setting), nameof(IsRemovePreviewFillOpacityDisabled))]
+        [SettingsUISection(kActionsTab, kUiGroup)]
+        public int RemovePreviewFillOpacityPercent { get; set; } = 100;
 
         // --- Usage (Actions tab) ---
 
@@ -93,6 +110,32 @@ namespace EasyZoning
         public string UsageText => string.Empty;
 
         private bool HideUsageText( ) => !ShowUsage;
+        private bool IsRemovePreviewEdgeOpacityDisabled( ) => !UseOrangeRemovePreviewEdge;
+        private bool IsRemovePreviewFillOpacityDisabled( ) => RemovePreviewFillStyle == kRemovePreviewFillNone;
+
+        public static DropdownItem<string>[] GetRemovePreviewFillStyleValues( ) => new[]
+        {
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewFillVanillaRed,
+                displayName = LocalizedString.Value("Vanilla red"),
+            },
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewFillWhite,
+                displayName = LocalizedString.Value("White"),
+            },
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewFillOrange,
+                displayName = LocalizedString.Value("Orange"),
+            },
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewFillNone,
+                displayName = LocalizedString.Value("None (border only)"),
+            },
+        };
 
         // --- Legacy (Legacy tab) ---
 
@@ -159,6 +202,8 @@ namespace EasyZoning
             UseGlassPanel = true;
             UseOrangeRemovePreviewEdge = true;
             RemovePreviewEdgeOpacityPercent = 100;
+            RemovePreviewFillStyle = kRemovePreviewFillVanillaRed;
+            RemovePreviewFillOpacityPercent = 100;
             ShowUsage = false;
             LegacyRightClickCycle = false;
         }

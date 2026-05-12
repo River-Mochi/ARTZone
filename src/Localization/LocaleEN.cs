@@ -39,7 +39,7 @@ namespace EasyZoning
                 { m_Settings.GetOptionGroupLocaleID(Setting.kProtectGroup),         "Protections" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup),     "Key bindings" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup),  "Compatibility" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "Visual UI" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "Visuals" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup),          "USAGE" },
 
                 // Legacy group header hidden
@@ -49,13 +49,13 @@ namespace EasyZoning
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
-                // Zone options
+                // Protections
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "● Prevent removal of buildings" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
                     "**Buildings = occupied cells**. Prevents preview/apply of new zones from turning existing buildings into condemned.\n\n" +
                     "**[ ✓ ] Enabled recommended.**" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● Prevent reset of alrady painted/zoned squares" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● Prevent reset of already painted/zoned squares" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
                     "Do not reset already zoned cells during preview/apply.\n\n" +
                     "**[ ✓ ] Enabled recommended.**" },
@@ -81,14 +81,26 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseOrangeRemovePreviewEdge)), "◉ Orange preview borders" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseOrangeRemovePreviewEdge)),
-                    "**[ ✓ ] enabled**, use a brighter orange border to highlight the <Remove Cells Preview>.\n" +
+                    "**[ ✓ ] enabled**, use a brighter orange border for the <Remove Cells Preview>.\n" +
                     "**[   ] disabled**, keep the vanilla red border.\n\n" +
-                    "Only changes the preview for cells to remove. Fill color is game's default red for now." },
+                    "Only changes the border." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Border opacity" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
-                    "Adjusts only the <orange border opacity> for remove zone cells preview.\n\n" +
-                    "Does not change normal zoning colors or the white add cells preview." },
+                    "Adjusts only the <orange border opacity> for cells to remove." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "Remove fill" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
+                    "Choose the fill style for cells to be removed.\n\n" +
+                    "<Vanilla red> = current game look.\n" +
+                    "<White> = cleaner contrast.\n" +
+                    "<Orange> = matches the orange border.\n" +
+                    "<None> = border only." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Fill opacity" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)),
+                    "Adjusts the remove-preview fill opacity.\n\n" +
+                    "Ignored if <Remove fill> is set to <None>." },
 
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Show Instructions" },
