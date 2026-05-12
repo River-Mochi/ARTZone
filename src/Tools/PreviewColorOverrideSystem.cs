@@ -20,6 +20,9 @@ namespace EasyZoning.Tools
         private const float kOrangeSaturation = 0.95f;
         private const float kOrangeValue = 1.00f;
         private const float kOrangeFillSaturation = 0.70f;
+        private const float kRedHue = 0.00f;
+        private const float kRedSaturation = 0.95f;
+        private const float kRedValue = 1.00f;
         private const string kZoneEdgeShaderProperty = "colossal_ZoneEdgeColors";
         private const string kZoneFillShaderProperty = "colossal_ZoneFillColors";
 
@@ -151,10 +154,20 @@ namespace EasyZoning.Tools
             return color;
         }
 
+        private static Color BuildRedHighlightEdge(float alpha)
+        {
+            Color color = Color.HSVToRGB(kRedHue, kRedSaturation, kRedValue);
+            color.a = alpha;
+            return color;
+        }
+
         private static Color BuildHighlightEdge(string borderStyle, Color edgeColor, float opacityPercent)
         {
             switch (borderStyle)
             {
+                case Setting.kRemovePreviewBorderRed:
+                    return BuildRedHighlightEdge(opacityPercent);
+
                 case Setting.kRemovePreviewBorderVanillaRed:
                 {
                     Color vanilla = BuildVanillaHighlightEdge(edgeColor);

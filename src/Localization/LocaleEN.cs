@@ -83,6 +83,7 @@ namespace EasyZoning
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
                     "Border color for cells to be removed preview.\n\n" +
                     "<Orange> = brighter and easier to see.\n" +
+                    "<Red> = stronger red border for grass/trees.\n" +
                     "<Vanilla red> = match the game's default look." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Border opacity" },

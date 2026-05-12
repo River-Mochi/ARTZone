@@ -47,6 +47,7 @@ namespace EasyZoning
         public const string kRemovePreviewFillOrange = "orange";
         public const string kRemovePreviewFillNone = "none";
         public const string kRemovePreviewBorderOrange = "orange";
+        public const string kRemovePreviewBorderRed = "red";
         public const string kRemovePreviewBorderVanillaRed = "vanilla-red";
 
         public Setting(IMod mod) : base(mod)
@@ -128,6 +129,11 @@ namespace EasyZoning
             {
                 value = kRemovePreviewBorderOrange,
                 displayName = LocalizedString.Value("Orange"),
+            },
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewBorderRed,
+                displayName = LocalizedString.Value("Red"),
             },
             new DropdownItem<string>
             {
