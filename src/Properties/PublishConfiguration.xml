@@ -102,6 +102,7 @@ No outline means it's already changed to the current selected option.
 <ChangeLog>
 - Fix: toggles for Protect buildings and Protect Zoned but empty cells.
 - Preview why cycling right click now shows vanilla colors; RED for the side that will be deleted, and white for the side to be added or remains.
+- update all locale files and in game instructions.
 </ChangeLog>
 
 <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
