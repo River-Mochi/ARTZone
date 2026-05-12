@@ -63,8 +63,8 @@ namespace EasyZoning.Tools
             }
 
             // Read settings once per update.
-            bool removeOccupied = Mod.Settings != null && Mod.Settings.RemoveOccupiedCells;
-            bool removeZoned = Mod.Settings != null && Mod.Settings.RemoveZonedCells;
+            bool removeOccupied = Mod.Settings?.RemoveOccupiedCells ?? true;
+            bool removeZoned = Mod.Settings?.RemoveZonedCells ?? true;
 
 #if DEBUG
             int count = m_UpdatedBlocksQuery.CalculateEntityCount();
@@ -209,12 +209,15 @@ namespace EasyZoning.Tools
 
                 DynamicBuffer<Cell> cells = CellLookup[blockEntity];
 
-                if (RemoveOccupiedCells && IsAnyCellOccupied(cells, block, validArea))
+                int currentDepth = math.max(block.m_Size.y, validArea.m_Area.w);
+                bool reducingDepth = depth < currentDepth;
+
+                if (reducingDepth && RemoveOccupiedCells && IsAnyCellOccupied(cells, block, validArea))
                 {
                     return;
                 }
 
-                if (RemoveZonedCells && IsAnyCellZoned(cells, block, validArea))
+                if (reducingDepth && RemoveZonedCells && IsAnyCellZoned(cells, block, validArea))
                 {
                     return;
                 }
