@@ -86,7 +86,7 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<Nuova strada>\n" +
                     "1. Aprire il pannello Strade (scegliere una strada).\n" +
-                    "2. In fondo al pannello dello strumento strada: usa i 3 pulsanti EZ per Entrambi / Sinistra / Destra.\n" +
+                    "2. In fondo al pannello dello strumento strada: usa le 3 icone EZ per Entrambi / Sinistra / Destra.\n" +
                     "   Fai clic di nuovo sul pulsante selezionato per Nessuno.\n" +
                     "3. Disegnare normalmente.\n\n" +
                     "-----------------------------------------\n" +
@@ -95,13 +95,14 @@ namespace EasyZoning
                     "<Strada esistente>\n" +
                     "1. Aprire il pannello EZ Update: fare clic su <Ctrl+V> per attivare/disattivare il pannello\n" +
                     "   (oppure <l'icona in alto a sinistra> fa la stessa cosa).\n" +
-                    "2. Usa i 3 pulsanti EZ per Entrambi / Sinistra / Destra.\n" +
+                    "2. Usa le 3 icone EZ per Entrambi / Sinistra / Destra.\n" +
                     "   Fai clic di nuovo sul pulsante selezionato per Nessuno.\n" +
                     "3. Passare sopra una strada + vedere l'anteprima.\n" +
-                    "4. <RMB cambia modalità>: Entrambi → Sinistra → Destra → Nessuno → ...\n" +
-                    "5. <LMB una volta>: applica (blocca la scelta).\n" +
-                    "6. <Tenere premuto LMB + trascinare> lungo più segmenti di strada, poi rilasciare per applicare.\n" +
-                    "7. <Annulla:> spostare il mouse via e rilasciare **LMB**.\n\n" +
+                    "4. Anteprima rossa = celle che verranno rimosse.\n" +
+                    "5. <RMB cambia modalità>: Entrambi → Sinistra → Destra → Nessuno → ...\n" +
+                    "6. <LMB una volta>: applica (blocca la scelta).\n" +
+                    "7. <Tenere premuto LMB + trascinare> lungo più segmenti di strada, poi rilasciare per applicare.\n" +
+                    "8. <Annulla:> spostare il mouse via e rilasciare **LMB**.\n\n" +
                     "-------------------------------------------\n" +
                     "<PULSANTE OPZIONALE>\n" +
                     "• <Contorni> mostra le linee di elevazione del terreno." },

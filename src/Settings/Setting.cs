@@ -47,10 +47,10 @@ namespace EasyZoning
         // --- Zone Options ---
 
         [SettingsUISection(kActionsTab, kToggleGroup)]
-        public bool RemoveZonedCells { get; set; } = true;
+        public bool RemoveOccupiedCells { get; set; } = true;
 
         [SettingsUISection(kActionsTab, kToggleGroup)]
-        public bool RemoveOccupiedCells { get; set; } = true;
+        public bool RemoveZonedCells { get; set; } = true;
 
         // --- Key bindings ---
 
@@ -145,8 +145,8 @@ namespace EasyZoning
 
         public override void SetDefaults( )
         {
-            RemoveZonedCells = true;
             RemoveOccupiedCells = true;
+            RemoveZonedCells = true;
             ShowContourButton = true;
             UseGlassPanel = true;
             ShowUsage = false;

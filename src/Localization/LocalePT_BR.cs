@@ -86,7 +86,7 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<Nova estrada>\n" +
                     "1. Abra o painel de Estradas (escolha uma estrada).\n" +
-                    "2. Na parte inferior do painel da ferramenta de estrada: use os 3 botões EZ para Ambos os lados / Esquerda / Direita.\n" +
+                    "2. Na parte inferior do painel da ferramenta de estrada: use os 3 ícones EZ para Ambos os lados / Esquerda / Direita.\n" +
                     "   Clique novamente no botão selecionado para Nenhum.\n" +
                     "3. Desenhe normalmente.\n\n" +
                     "-----------------------------------------\n" +
@@ -95,13 +95,14 @@ namespace EasyZoning
                     "<Estrada existente>\n" +
                     "1. Abra o painel EZ Update: clique <Ctrl+V> para ligar/desligar o painel\n" +
                     "   (ou o <ícone no canto superior esquerdo> faz o mesmo).\n" +
-                    "2. Use os 3 botões EZ para Ambos os lados / Esquerda / Direita.\n" +
+                    "2. Use os 3 ícones EZ para Ambos os lados / Esquerda / Direita.\n" +
                     "   Clique novamente no botão selecionado para Nenhum.\n" +
                     "3. Passe o mouse sobre uma estrada + veja a prévia.\n" +
-                    "4. <RMB alterna>: Ambos os lados → Esquerda → Direita → Nenhum → ...\n" +
-                    "5. <LMB uma vez>: aplica (confirma).\n" +
-                    "6. <Segure LMB + arraste> por vários trechos de estrada, solte para aplicar.\n" +
-                    "7. <Cancelar:> mova o mouse para fora e solte **LMB**.\n\n" +
+                    "4. Prévia vermelha = células que serão removidas.\n" +
+                    "5. <RMB alterna>: Ambos os lados → Esquerda → Direita → Nenhum → ...\n" +
+                    "6. <LMB uma vez>: aplica (confirma).\n" +
+                    "7. <Segure LMB + arraste> por vários trechos de estrada, solte para aplicar.\n" +
+                    "8. <Cancelar:> mova o mouse para fora e solte **LMB**.\n\n" +
                     "-------------------------------------------\n" +
                     "<BOTÃO OPCIONAL>\n" +
                     "• <Contour> mostra linhas de elevação do terreno." },

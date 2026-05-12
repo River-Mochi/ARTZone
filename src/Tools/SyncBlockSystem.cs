@@ -1,6 +1,6 @@
 // File: src/Tools/SyncBlockSystem.cs
 // Purpose: Applies the preview/committed zoning depth to zone blocks
-// respecting settings (RemoveZonedCells / RemoveOccupiedCells). Tool will not function without it.
+// while respecting the painted-zone protection setting. Tool will not function without it.
 
 namespace EasyZoning.Tools
 {
@@ -63,8 +63,7 @@ namespace EasyZoning.Tools
             }
 
             // Read settings once per update.
-            bool removeOccupied = Mod.Settings != null && Mod.Settings.RemoveOccupiedCells;
-            bool removeZoned = Mod.Settings != null && Mod.Settings.RemoveZonedCells;
+            bool removeZoned = Mod.Settings?.RemoveZonedCells ?? true;
 
 #if DEBUG
             int count = m_UpdatedBlocksQuery.CalculateEntityCount();
@@ -73,7 +72,7 @@ namespace EasyZoning.Tools
             {
                 Mod.s_Log.Info(
                     $"[EZ][SyncBlock] scan Updated blocks={count} (game-driven dirty flags are normal after load)\n " +
-                    $"settings: removeOcc={removeOccupied} removeZoned={removeZoned}");
+                    $"settings: removeZoned={removeZoned}");
                 m_LastCount = count;
             }
 #endif
@@ -99,7 +98,6 @@ namespace EasyZoning.Tools
                 ZoningDepthLookup = GetComponentLookup<ZoningDepthComponent>(isReadOnly: true),
                 ZoningPreviewLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true),
                 ZoningRestoreLookup = GetComponentLookup<ZoningRestoreComponent>(isReadOnly: true),
-                RemoveOccupiedCells = removeOccupied,
                 RemoveZonedCells = removeZoned,
                 AllowExistingRoadSync = allowExistingRoadSync,
                 AllowNewRoadSync = allowNewRoadSync,
@@ -150,7 +148,6 @@ namespace EasyZoning.Tools
             [ReadOnly] public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
             [ReadOnly] public ComponentLookup<ZoningRestoreComponent> ZoningRestoreLookup;
 
-            public bool RemoveOccupiedCells;
             public bool RemoveZonedCells;
             public bool AllowExistingRoadSync;
             public bool AllowNewRoadSync;
@@ -172,8 +169,8 @@ namespace EasyZoning.Tools
                 }
 
                 Entity roadEntity = owner.m_Owner;
-                bool hasPreview = ZoningPreviewLookup.HasComponent(roadEntity);
                 bool hasRestore = ZoningRestoreLookup.HasComponent(roadEntity);
+                bool hasPreview = ZoningPreviewLookup.HasComponent(roadEntity);
                 bool isTempRoad = TempLookup.HasComponent(roadEntity);
                 bool isFreshEzRoad =
                     AllowNewRoadSync &&
@@ -184,13 +181,12 @@ namespace EasyZoning.Tools
                 // through temp preview entities, which marks those real blocks Updated.
                 // When EZ is not the active existing-road tool, leave normal existing roads
                 // alone so vanilla can own its preview/add/remove workflow.
-                if (!hasPreview && !hasRestore && !isTempRoad && !AllowExistingRoadSync && !isFreshEzRoad)
+                if (!hasRestore && !hasPreview && !isTempRoad && !AllowExistingRoadSync && !isFreshEzRoad)
                 {
                     return;
                 }
 
-                if (!hasPreview &&
-                    TempLookup.TryGetComponent(roadEntity, out Temp roadTemp) &&
+                if (TempLookup.TryGetComponent(roadEntity, out Temp roadTemp) &&
                     roadTemp.m_Original != Entity.Null)
                 {
                     return;
@@ -209,12 +205,10 @@ namespace EasyZoning.Tools
 
                 DynamicBuffer<Cell> cells = CellLookup[blockEntity];
 
-                if (RemoveOccupiedCells && IsAnyCellOccupied(cells, block, validArea))
-                {
-                    return;
-                }
+                int currentDepth = math.max(block.m_Size.y, validArea.m_Area.w);
+                bool reducingDepth = depth < currentDepth;
 
-                if (RemoveZonedCells && IsAnyCellZoned(cells, block, validArea))
+                if (!hasRestore && reducingDepth && RemoveZonedCells && IsAnyCellZoned(cells, block, validArea))
                 {
                     return;
                 }
@@ -231,15 +225,19 @@ namespace EasyZoning.Tools
 
             private bool TryGetEffectiveRoadDepths(Entity roadEntity, out int2 depths)
             {
-                if (ZoningPreviewLookup.TryGetComponent(roadEntity, out ZoningPreviewComponent zoningPreview))
-                {
-                    depths = zoningPreview.Depths;
-                    return true;
-                }
-
                 if (ZoningRestoreLookup.TryGetComponent(roadEntity, out ZoningRestoreComponent zoningRestore))
                 {
                     depths = zoningRestore.Depths;
+                    return true;
+                }
+
+                if (ZoningPreviewLookup.TryGetComponent(roadEntity, out ZoningPreviewComponent preview))
+                {
+                    // Preview may safely expand blocks to show newly added cells, but
+                    // it must not shrink blocks on hover. Removals are shown with
+                    // CellFlags.Highlight so vanilla systems do not treat preview as
+                    // an applied side disable.
+                    depths = math.max(preview.Depths, preview.CommittedDepths);
                     return true;
                 }
 
@@ -325,46 +323,6 @@ namespace EasyZoning.Tools
                 // ART behavior: use block direction sign as the left/right discriminator.
                 // (float2(1,1) matches ART's implicit math.dot(1, dir) usage.)
                 return math.dot(new float2(1f, 1f), block.m_Direction) < 0f;
-            }
-
-            private static bool IsAnyCellOccupied(DynamicBuffer<Cell> cells, Block block, ValidArea validArea)
-            {
-                int x0 = validArea.m_Area.x;
-                int x1 = validArea.m_Area.y;
-                int z0 = validArea.m_Area.z;
-                int z1 = validArea.m_Area.w;
-
-                // Empty or invalid ranges.
-                if (x1 <= x0 || z1 <= z0)
-                    return false;
-
-                // Clamp to block bounds.
-                x0 = math.clamp(x0, 0, block.m_Size.x);
-                x1 = math.clamp(x1, 0, block.m_Size.x);
-                z0 = math.clamp(z0, 0, block.m_Size.y);
-                z1 = math.clamp(z1, 0, block.m_Size.y);
-
-                if (x1 <= x0 || z1 <= z0)
-                    return false;
-
-                int stride = block.m_Size.x;
-
-                for (int z = z0; z < z1; z++)
-                {
-                    int row = z * stride;
-                    for (int x = x0; x < x1; x++)
-                    {
-                        int idx = row + x;
-                        if ((uint) idx >= (uint) cells.Length)
-                            continue;
-
-                        Cell cell = cells[idx];
-                        if ((cell.m_State & CellFlags.Occupied) != 0)
-                            return true;
-                    }
-                }
-
-                return false;
             }
 
             private static bool IsAnyCellZoned(DynamicBuffer<Cell> cells, Block block, ValidArea validArea)

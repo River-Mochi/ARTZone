@@ -86,7 +86,7 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<Nowa droga>\n" +
                     "1. Otwórz panel Dróg (wybierz drogę).\n" +
-                    "2. Na dole panelu narzędzia dróg użyj 3 przycisków EZ dla Obie strony / Lewa / Prawa.\n" +
+                    "2. Na dole panelu narzędzia dróg użyj 3 ikon EZ dla Obie strony / Lewa / Prawa.\n" +
                     "   Kliknij ponownie wybrany przycisk, aby ustawić Brak.\n" +
                     "3. Rysuj jak zwykle.\n\n" +
                     "-----------------------------------------\n" +
@@ -95,13 +95,14 @@ namespace EasyZoning
                     "<Istniejąca droga>\n" +
                     "1. Otwórz panel EZ Update: kliknij <Ctrl+V>, aby włączyć/wyłączyć panel\n" +
                     "   (lub <ikona w lewym górnym rogu> robi to samo).\n" +
-                    "2. Użyj 3 przycisków EZ dla Obie strony / Lewa / Prawa.\n" +
+                    "2. Użyj 3 ikon EZ dla Obie strony / Lewa / Prawa.\n" +
                     "   Kliknij ponownie wybrany przycisk, aby ustawić Brak.\n" +
                     "3. Najedź na drogę + zobacz podgląd.\n" +
-                    "4. <RMB przełącza>: Obie strony → Lewa → Prawa → Brak → ...\n" +
-                    "5. <Jedno kliknięcie LMB>: zastosowuje (zatwierdza).\n" +
-                    "6. <Przytrzymaj LMB + przeciągnij> po wielu odcinkach drogi, puść, aby zastosować.\n" +
-                    "7. <Anuluj:> odsuń mysz i puść **LMB**.\n\n" +
+                    "4. Czerwony podgląd = komórki, które zostaną usunięte.\n" +
+                    "5. <RMB przełącza>: Obie strony → Lewa → Prawa → Brak → ...\n" +
+                    "6. <Jedno kliknięcie LMB>: zastosowuje (zatwierdza).\n" +
+                    "7. <Przytrzymaj LMB + przeciągnij> po wielu odcinkach drogi, puść, aby zastosować.\n" +
+                    "8. <Anuluj:> odsuń mysz i puść **LMB**.\n\n" +
                     "-------------------------------------------\n" +
                     "<PRZYCISK OPCJONALNY>\n" +
                     "• <Contour> pokazuje linie wysokości terenu." },

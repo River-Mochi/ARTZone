@@ -8,7 +8,7 @@
   "EasyZoning.NewRoads.Tooltip.Left": "Left side only. Click again for None.",
   "EasyZoning.NewRoads.Tooltip.Right": "Right side only. Click again for None.",
 
-  "EasyZoning.ExistingRoads.Tooltip.Both": "Both sides. Click again for None.",
+  "EasyZoning.ExistingRoads.Tooltip.Both": "Both sides. Click again for None. Red preview = remove.",
   "EasyZoning.ExistingRoads.Tooltip.Left": "Left side only. Click again for None. Right-click cycles zones.",
   "EasyZoning.ExistingRoads.Tooltip.Right": "Right side only. Click again for None. Right-click cycles zones.",
   "EasyZoning.ExistingRoads.Tooltip.Contour": "Show terrain contour lines."
