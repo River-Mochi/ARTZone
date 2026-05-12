@@ -4,7 +4,7 @@
 
 namespace EasyZoning.Tools
 {
-    using EasyZoning.Components;    // ZoningDepthComponent, ZoningPreviewComponent, ZoningRestoreComponent
+    using EasyZoning.Components;    // ZoningDepthComponent, ZoningRestoreComponent
     using Game;
     using Game.Common;              // Created, Owner, Updated (dirty marker pattern)
     using Game.Net;                 // Curve, Upgraded
@@ -96,7 +96,6 @@ namespace EasyZoning.Tools
                 TempLookup = GetComponentLookup<Temp>(isReadOnly: true),
                 UpgradedLookup = GetComponentLookup<Upgraded>(isReadOnly: true),
                 ZoningDepthLookup = GetComponentLookup<ZoningDepthComponent>(isReadOnly: true),
-                ZoningPreviewLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true),
                 ZoningRestoreLookup = GetComponentLookup<ZoningRestoreComponent>(isReadOnly: true),
                 RemoveZonedCells = removeZoned,
                 AllowExistingRoadSync = allowExistingRoadSync,
@@ -145,7 +144,6 @@ namespace EasyZoning.Tools
             [ReadOnly] public ComponentLookup<Temp> TempLookup;
             [ReadOnly] public ComponentLookup<Upgraded> UpgradedLookup;
             [ReadOnly] public ComponentLookup<ZoningDepthComponent> ZoningDepthLookup;
-            [ReadOnly] public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
             [ReadOnly] public ComponentLookup<ZoningRestoreComponent> ZoningRestoreLookup;
 
             public bool RemoveZonedCells;
@@ -169,7 +167,6 @@ namespace EasyZoning.Tools
                 }
 
                 Entity roadEntity = owner.m_Owner;
-                bool hasPreview = ZoningPreviewLookup.HasComponent(roadEntity);
                 bool hasRestore = ZoningRestoreLookup.HasComponent(roadEntity);
                 bool isTempRoad = TempLookup.HasComponent(roadEntity);
                 bool isFreshEzRoad =
@@ -181,13 +178,12 @@ namespace EasyZoning.Tools
                 // through temp preview entities, which marks those real blocks Updated.
                 // When EZ is not the active existing-road tool, leave normal existing roads
                 // alone so vanilla can own its preview/add/remove workflow.
-                if (!hasPreview && !hasRestore && !isTempRoad && !AllowExistingRoadSync && !isFreshEzRoad)
+                if (!hasRestore && !isTempRoad && !AllowExistingRoadSync && !isFreshEzRoad)
                 {
                     return;
                 }
 
-                if (!hasPreview &&
-                    TempLookup.TryGetComponent(roadEntity, out Temp roadTemp) &&
+                if (TempLookup.TryGetComponent(roadEntity, out Temp roadTemp) &&
                     roadTemp.m_Original != Entity.Null)
                 {
                     return;
@@ -226,12 +222,6 @@ namespace EasyZoning.Tools
 
             private bool TryGetEffectiveRoadDepths(Entity roadEntity, out int2 depths)
             {
-                if (ZoningPreviewLookup.TryGetComponent(roadEntity, out ZoningPreviewComponent zoningPreview))
-                {
-                    depths = zoningPreview.Depths;
-                    return true;
-                }
-
                 if (ZoningRestoreLookup.TryGetComponent(roadEntity, out ZoningRestoreComponent zoningRestore))
                 {
                     depths = zoningRestore.Depths;
