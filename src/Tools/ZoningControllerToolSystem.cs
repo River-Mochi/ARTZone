@@ -79,6 +79,8 @@ namespace EasyZoning.Tools
 
         private Mode m_Mode;
         private Entity m_PreviewEntity;
+        private Entity m_VanillaRemovalPreviewEntity;
+        private Entity m_VanillaRemovalPreviewRoad;
 
         // Preview stability: intersections can flicker between candidates.
         // Require the same hit for N frames before switching the highlighted preview target.
@@ -163,10 +165,14 @@ namespace EasyZoning.Tools
             m_ZoneDataLookup = GetComponentLookup<ZoneData>(isReadOnly: true);
 
             m_SelectedEntities = new NativeList<Entity>(Allocator.Persistent);
+            m_VanillaRemovalPreviewEntity = Entity.Null;
+            m_VanillaRemovalPreviewRoad = Entity.Null;
         }
 
         protected override void OnDestroy( )
         {
+            ClearVanillaRemovalPreviewTemp();
+
             if (m_SelectedEntities.IsCreated)
                 m_SelectedEntities.Dispose();
 
@@ -275,18 +281,6 @@ namespace EasyZoning.Tools
             m_SignatureBuildingLookup.Update(this);
             m_ZoneDataLookup.Update(this);
 
-            // Hit-test + filter: only “true” when hit is a road and it would actually change.
-            bool hasRoad = TryGetRoadUnderCursor(out Entity hitEntity, out RaycastHit _);
-
-            // Load vanilla soundbank (if present).
-            bool haveSoundbank = m_SoundbankQuery.CalculateEntityCount() > 0;
-            ToolUXSoundSettingsData soundbank = default;
-            if (haveSoundbank)
-                soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
-
-            bool protectOccupiedCells = Mod.Settings?.RemoveOccupiedCells ?? true;
-            bool protectZonedCells = Mod.Settings?.RemoveZonedCells ?? true;
-
             // RMB cycle: use CS2 tool system (Secondary Apply).
             // This is Phase-2 migration away from Mouse.current polling.
             bool cyclePressed = false;
@@ -308,6 +302,24 @@ namespace EasyZoning.Tools
             if (cyclePressed)
             {
                 m_UISystem.CycleMode();
+            }
+
+            // Hit-test + filter: only “true” when hit is a road and it would actually change.
+            // This must run after RMB cycling so preview responds to the newly selected mode
+            // immediately instead of evaluating the hover against stale tool depths.
+            bool hasRoad = TryGetRoadUnderCursor(out Entity hitEntity, out RaycastHit _);
+
+            // Load vanilla soundbank (if present).
+            bool haveSoundbank = m_SoundbankQuery.CalculateEntityCount() > 0;
+            ToolUXSoundSettingsData soundbank = default;
+            if (haveSoundbank)
+                soundbank = m_SoundbankQuery.GetSingleton<ToolUXSoundSettingsData>();
+
+            bool protectOccupiedCells = Mod.Settings?.RemoveOccupiedCells ?? true;
+            bool protectZonedCells = Mod.Settings?.RemoveZonedCells ?? true;
+
+            if (cyclePressed)
+            {
                 if (haveSoundbank)
                     AudioManager.instance.PlayUISound(soundbank.m_SnapSound);
             }
@@ -407,6 +419,23 @@ namespace EasyZoning.Tools
                 : selectedEntities;
             NativeArray<Entity>.ReadOnly syncSelectedReadOnly = syncSelectedEntities.AsReadOnly();
 
+            bool wantsVanillaRemovalPreview =
+                m_Mode == Mode.Preview &&
+                !shouldApply &&
+                selectedEntities.Length == 1 &&
+                WouldPreviewRemoveCommittedSide(selectedEntities[0], selectedDepths[0]);
+
+            if (wantsVanillaRemovalPreview || m_VanillaRemovalPreviewEntity != Entity.Null)
+            {
+                inputDeps.Complete();
+                inputDeps = default;
+
+                if (wantsVanillaRemovalPreview)
+                    SyncVanillaRemovalPreviewTemp(selectedEntities[0], selectedDepths[0]);
+                else
+                    ClearVanillaRemovalPreviewTemp();
+            }
+
             if (shouldApply)
             {
                 ComponentLookup<ZoningPreviewComponent> previewLookup =
@@ -445,18 +474,16 @@ namespace EasyZoning.Tools
             // - Add/Update ZoningPreviewComponent for currently selected entities
             // - Remove ZoningPreviewComponent from entities no longer selected
             //
-            // Important: hover preview must not write vanilla ZonesDisabled flags.
-            // Vanilla treats those as real zone removals and can condemn buildings /
-            // clear painted zoning before the player clicks Apply. We only use
-            // temporary block expansion for added sides and CellFlags.Highlight for
-            // sides that would be removed.
+            // Important: hover preview only writes the "expanded" live road state so
+            // newly enabled sides can render. Remove-side preview is routed through a
+            // separate temp vanilla highlight entity.
             ComponentLookup<ZoningPreviewComponent> previewReadLookup =
                 GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true);
 
             JobHandle syncTempJob = new SyncTempJob
             {
                 ECB = m_ToolOutputBarrier.CreateCommandBuffer().AsParallelWriter(),
-                CellLookup = GetBufferLookup<Cell>(isReadOnly: false),
+                CellLookup = GetBufferLookup<Cell>(isReadOnly: true),
                 BlockLookup = GetComponentLookup<Block>(isReadOnly: true),
                 CurveLookup = GetComponentLookup<Curve>(isReadOnly: true),
                 ValidAreaLookup = GetComponentLookup<ValidArea>(isReadOnly: true),
@@ -483,10 +510,8 @@ namespace EasyZoning.Tools
                 ECB = m_ToolOutputBarrier.CreateCommandBuffer().AsParallelWriter(),
                 ZoningPreviewLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true),
                 ZoningRestoreLookup = GetComponentLookup<ZoningRestoreComponent>(isReadOnly: true),
-                CellLookup = GetBufferLookup<Cell>(isReadOnly: false),
-                BlockLookup = GetComponentLookup<Block>(isReadOnly: true),
-                CurveLookup = GetComponentLookup<Curve>(isReadOnly: true),
                 SubBlockLookup = GetBufferLookup<SubBlock>(isReadOnly: true),
+                UpgradedLookup = GetComponentLookup<Upgraded>(isReadOnly: true),
                 UpdatedLookup = GetComponentLookup<Updated>(isReadOnly: true),
                 SelectedEntities = selectedReadOnly,
                 Entities = zoningPreviewEntities.AsReadOnly()
@@ -967,13 +992,13 @@ namespace EasyZoning.Tools
 
 
         // Keep preview metadata in sync for selected entities.
-        // This intentionally does not mutate Upgraded flags: preview must never let
-        // vanilla zone systems treat a hover as a committed side removal.
+        // Preview only enables added sides on the live road so white cells can render.
+        // Side removals are previewed separately through a temp vanilla highlight entity.
         public struct SyncTempJob : IJobParallelFor
         {
             public EntityCommandBuffer.ParallelWriter ECB;
 
-            [NativeDisableParallelForRestriction] public BufferLookup<Cell> CellLookup;
+            [ReadOnly] public BufferLookup<Cell> CellLookup;
             [ReadOnly] public ComponentLookup<Block> BlockLookup;
             [ReadOnly] public ComponentLookup<Curve> CurveLookup;
             [ReadOnly] public ComponentLookup<ValidArea> ValidAreaLookup;
@@ -1003,24 +1028,27 @@ namespace EasyZoning.Tools
                 {
                     if (!math.all(data.Depths == preview))
                     {
-                        ECB.SetComponent(index, e, new ZoningPreviewComponent
+                        data = new ZoningPreviewComponent
                         {
                             Depths = preview,
                             CommittedDepths = data.CommittedDepths,
                             CommittedFlags = data.CommittedFlags,
                             HasCommittedUpgraded = data.HasCommittedUpgraded
-                        });
+                        };
+                        ECB.SetComponent(index, e, data);
                         changed = true;
                     }
+
+                    changed |= ApplyPreviewRoadUpgradedState(index, e, data);
                 }
                 else
                 {
                     ZoningPreviewComponent previewData = CreatePreviewData(e, preview);
                     ECB.AddComponent(index, e, previewData);
                     changed = true;
-                }
 
-                ApplyPreviewHighlights(index, e, current, preview);
+                    changed |= ApplyPreviewRoadUpgradedState(index, e, previewData);
+                }
 
                 if (ZoningRestoreLookup.HasComponent(e))
                 {
@@ -1168,55 +1196,36 @@ namespace EasyZoning.Tools
                 return true;
             }
 
-            private void ApplyPreviewHighlights(int jobIndex, Entity roadEntity, int2 current, int2 preview)
+            private bool ApplyPreviewRoadUpgradedState(int index, Entity roadEntity, ZoningPreviewComponent preview)
             {
-                if (!CurveLookup.TryGetComponent(roadEntity, out Curve curve) ||
-                    !SubBlockLookup.TryGetBuffer(roadEntity, out DynamicBuffer<SubBlock> subBlocks))
-                {
-                    return;
-                }
+                bool hasUpgraded = UpgradedLookup.TryGetComponent(roadEntity, out Upgraded upgraded);
+                CompositionFlags baseFlags = preview.HasCommittedUpgraded ? preview.CommittedFlags : default;
+                int2 expandedDepths = math.max(preview.Depths, preview.CommittedDepths);
+                CompositionFlags previewFlags = RoadZoneCompatibility.ApplyDepthsToFlags(baseFlags, expandedDepths);
 
-                bool removeLeft = preview.x < current.x;
-                bool removeRight = preview.y < current.y;
-
-                for (int i = 0; i < subBlocks.Length; i++)
+                if (RoadZoneCompatibility.HasAnyFlags(previewFlags) || preview.HasCommittedUpgraded)
                 {
-                    Entity blockEntity = subBlocks[i].m_SubBlock;
-                    if (!BlockLookup.TryGetComponent(blockEntity, out Block block) ||
-                        !CellLookup.TryGetBuffer(blockEntity, out DynamicBuffer<Cell> cells))
+                    Upgraded nextUpgraded = new Upgraded { m_Flags = previewFlags };
+                    if (hasUpgraded)
                     {
-                        continue;
+                        if (upgraded.m_Flags == previewFlags)
+                            return false;
+
+                        ECB.SetComponent(index, roadEntity, nextUpgraded);
+                        return true;
                     }
 
-                    bool leftSide = RoadZoneCompatibility.IsBlockOnLeft(block, curve);
-                    bool shouldHighlight = leftSide ? removeLeft : removeRight;
-                    bool changed = SetHighlight(cells, shouldHighlight);
-                    if (changed && !UpdatedLookup.HasComponent(blockEntity))
-                    {
-                        ECB.AddComponent<Updated>(jobIndex, blockEntity);
-                    }
+                    ECB.AddComponent(index, roadEntity, nextUpgraded);
+                    return true;
                 }
-            }
 
-            private static bool SetHighlight(DynamicBuffer<Cell> cells, bool highlighted)
-            {
-                bool changed = false;
-                for (int i = 0; i < cells.Length; i++)
+                if (hasUpgraded)
                 {
-                    Cell cell = cells[i];
-                    CellFlags state = highlighted
-                        ? cell.m_State | CellFlags.Highlight
-                        : cell.m_State & ~CellFlags.Highlight;
-
-                    if (state == cell.m_State)
-                        continue;
-
-                    cell.m_State = state;
-                    cells[i] = cell;
-                    changed = true;
+                    ECB.RemoveComponent<Upgraded>(index, roadEntity);
+                    return true;
                 }
 
-                return changed;
+                return false;
             }
 
             private void MarkRoadAndSubBlocksUpdated(int index, Entity roadEntity)
@@ -1246,10 +1255,8 @@ namespace EasyZoning.Tools
 
             [ReadOnly] public ComponentLookup<ZoningPreviewComponent> ZoningPreviewLookup;
             [ReadOnly] public ComponentLookup<ZoningRestoreComponent> ZoningRestoreLookup;
-            [NativeDisableParallelForRestriction] public BufferLookup<Cell> CellLookup;
-            [ReadOnly] public ComponentLookup<Block> BlockLookup;
-            [ReadOnly] public ComponentLookup<Curve> CurveLookup;
             [ReadOnly] public BufferLookup<SubBlock> SubBlockLookup;
+            [ReadOnly] public ComponentLookup<Upgraded> UpgradedLookup;
             [ReadOnly] public ComponentLookup<Updated> UpdatedLookup;
 
             public NativeArray<Entity>.ReadOnly SelectedEntities;
@@ -1264,9 +1271,8 @@ namespace EasyZoning.Tools
                 if (!ZoningPreviewLookup.TryGetComponent(e, out ZoningPreviewComponent preview))
                     return;
 
+                bool changed = RestoreCommittedUpgradedState(index, e, preview);
                 bool needsRestore = math.any(preview.Depths > preview.CommittedDepths);
-                ClearPreviewHighlights(index, e, markUpdated: !needsRestore);
-
                 if (needsRestore)
                 {
                     ZoningRestoreComponent restore = new ZoningRestoreComponent { Depths = preview.CommittedDepths };
@@ -1275,29 +1281,41 @@ namespace EasyZoning.Tools
                     else
                         ECB.AddComponent(index, e, restore);
 
-                    MarkRoadAndSubBlocksUpdated(index, e);
+                    changed = true;
                 }
+
+                if (changed)
+                    MarkRoadAndSubBlocksUpdated(index, e);
 
                 ECB.RemoveComponent<ZoningPreviewComponent>(index, e);
             }
 
-            private void ClearPreviewHighlights(int jobIndex, Entity roadEntity, bool markUpdated)
+            private bool RestoreCommittedUpgradedState(int index, Entity roadEntity, ZoningPreviewComponent preview)
             {
-                if (!SubBlockLookup.TryGetBuffer(roadEntity, out DynamicBuffer<SubBlock> subBlocks))
-                    return;
-
-                for (int i = 0; i < subBlocks.Length; i++)
+                bool hasUpgraded = UpgradedLookup.TryGetComponent(roadEntity, out Upgraded upgraded);
+                if (preview.HasCommittedUpgraded)
                 {
-                    Entity blockEntity = subBlocks[i].m_SubBlock;
-                    if (!CellLookup.TryGetBuffer(blockEntity, out DynamicBuffer<Cell> cells))
-                        continue;
-
-                    bool changed = SetHighlight(cells, false);
-                    if (markUpdated && changed && !UpdatedLookup.HasComponent(blockEntity))
+                    Upgraded committedUpgraded = new Upgraded { m_Flags = preview.CommittedFlags };
+                    if (hasUpgraded)
                     {
-                        ECB.AddComponent<Updated>(jobIndex, blockEntity);
+                        if (upgraded.m_Flags == preview.CommittedFlags)
+                            return false;
+
+                        ECB.SetComponent(index, roadEntity, committedUpgraded);
+                        return true;
                     }
+
+                    ECB.AddComponent(index, roadEntity, committedUpgraded);
+                    return true;
                 }
+
+                if (hasUpgraded)
+                {
+                    ECB.RemoveComponent<Upgraded>(index, roadEntity);
+                    return true;
+                }
+
+                return false;
             }
 
             private void MarkRoadAndSubBlocksUpdated(int jobIndex, Entity roadEntity)
@@ -1318,27 +1336,6 @@ namespace EasyZoning.Tools
                         ECB.AddComponent<Updated>(jobIndex, blockEntity);
                     }
                 }
-            }
-
-            private static bool SetHighlight(DynamicBuffer<Cell> cells, bool highlighted)
-            {
-                bool changed = false;
-                for (int i = 0; i < cells.Length; i++)
-                {
-                    Cell cell = cells[i];
-                    CellFlags state = highlighted
-                        ? cell.m_State | CellFlags.Highlight
-                        : cell.m_State & ~CellFlags.Highlight;
-
-                    if (state == cell.m_State)
-                        continue;
-
-                    cell.m_State = state;
-                    cells[i] = cell;
-                    changed = true;
-                }
-
-                return changed;
             }
         }
 
@@ -1580,8 +1577,123 @@ namespace EasyZoning.Tools
             }
         }
 
+        private bool WouldPreviewRemoveCommittedSide(Entity roadEntity, int2 desiredDepths)
+        {
+            int2 current = GetCommittedRoadDepths(roadEntity);
+            return desiredDepths.x < current.x || desiredDepths.y < current.y;
+        }
+
+        private void SyncVanillaRemovalPreviewTemp(Entity roadEntity, int2 previewDepths)
+        {
+            if (roadEntity == Entity.Null || !WouldPreviewRemoveCommittedSide(roadEntity, previewDepths))
+            {
+                ClearVanillaRemovalPreviewTemp();
+                return;
+            }
+
+            if (m_VanillaRemovalPreviewRoad != Entity.Null && m_VanillaRemovalPreviewRoad != roadEntity)
+            {
+                ClearRoadHighlightImmediate(m_VanillaRemovalPreviewRoad);
+            }
+
+            if (m_VanillaRemovalPreviewEntity == Entity.Null || !EntityManager.Exists(m_VanillaRemovalPreviewEntity))
+            {
+                m_VanillaRemovalPreviewEntity = EntityManager.CreateEntity();
+            }
+
+            bool hasCommittedUpgraded = m_UpgradedLookup.TryGetComponent(roadEntity, out Upgraded committedUpgraded);
+            CompositionFlags baseFlags = hasCommittedUpgraded ? committedUpgraded.m_Flags : default;
+            CompositionFlags previewFlags = RoadZoneCompatibility.ApplyDepthsToFlags(baseFlags, previewDepths);
+
+            DynamicBuffer<SubBlock> previewSubBlocks = EntityManager.HasBuffer<SubBlock>(m_VanillaRemovalPreviewEntity)
+                ? EntityManager.GetBuffer<SubBlock>(m_VanillaRemovalPreviewEntity)
+                : EntityManager.AddBuffer<SubBlock>(m_VanillaRemovalPreviewEntity);
+
+            if (m_SubBlockLookup.TryGetBuffer(roadEntity, out DynamicBuffer<SubBlock> sourceSubBlocks))
+            {
+                previewSubBlocks.CopyFrom(sourceSubBlocks);
+            }
+            else
+            {
+                previewSubBlocks.Clear();
+            }
+
+            Temp previewTemp = new Temp(roadEntity, TempFlags.Modify | TempFlags.Upgrade);
+            if (EntityManager.HasComponent<Temp>(m_VanillaRemovalPreviewEntity))
+                EntityManager.SetComponentData(m_VanillaRemovalPreviewEntity, previewTemp);
+            else
+                EntityManager.AddComponentData(m_VanillaRemovalPreviewEntity, previewTemp);
+
+            Upgraded previewUpgraded = new Upgraded { m_Flags = previewFlags };
+            if (EntityManager.HasComponent<Upgraded>(m_VanillaRemovalPreviewEntity))
+                EntityManager.SetComponentData(m_VanillaRemovalPreviewEntity, previewUpgraded);
+            else
+                EntityManager.AddComponentData(m_VanillaRemovalPreviewEntity, previewUpgraded);
+
+            if (EntityManager.HasComponent<Deleted>(m_VanillaRemovalPreviewEntity))
+                EntityManager.RemoveComponent<Deleted>(m_VanillaRemovalPreviewEntity);
+
+            if (!EntityManager.HasComponent<ZoneGridHighlighted>(m_VanillaRemovalPreviewEntity))
+                EntityManager.AddComponent<ZoneGridHighlighted>(m_VanillaRemovalPreviewEntity);
+
+            if (!EntityManager.HasComponent<Updated>(m_VanillaRemovalPreviewEntity))
+                EntityManager.AddComponent<Updated>(m_VanillaRemovalPreviewEntity);
+
+            m_VanillaRemovalPreviewRoad = roadEntity;
+        }
+
+        private void ClearVanillaRemovalPreviewTemp()
+        {
+            if (m_VanillaRemovalPreviewRoad != Entity.Null)
+            {
+                ClearRoadHighlightImmediate(m_VanillaRemovalPreviewRoad);
+            }
+
+            if (m_VanillaRemovalPreviewEntity != Entity.Null && EntityManager.Exists(m_VanillaRemovalPreviewEntity))
+            {
+                EntityManager.DestroyEntity(m_VanillaRemovalPreviewEntity);
+            }
+
+            m_VanillaRemovalPreviewEntity = Entity.Null;
+            m_VanillaRemovalPreviewRoad = Entity.Null;
+        }
+
+        private void ClearRoadHighlightImmediate(Entity roadEntity)
+        {
+            if (roadEntity == Entity.Null ||
+                !m_SubBlockLookup.TryGetBuffer(roadEntity, out DynamicBuffer<SubBlock> subBlocks))
+            {
+                return;
+            }
+
+            for (int i = 0; i < subBlocks.Length; i++)
+            {
+                Entity subBlock = subBlocks[i].m_SubBlock;
+                if (subBlock == Entity.Null || !m_CellLookup.TryGetBuffer(subBlock, out DynamicBuffer<Cell> cells))
+                    continue;
+
+                bool changed = false;
+                for (int j = 0; j < cells.Length; j++)
+                {
+                    Cell cell = cells[j];
+                    CellFlags nextState = cell.m_State & ~CellFlags.Highlight;
+                    if (nextState == cell.m_State)
+                        continue;
+
+                    cell.m_State = nextState;
+                    cells[j] = cell;
+                    changed = true;
+                }
+
+                if (changed && !EntityManager.HasComponent<Updated>(subBlock))
+                    EntityManager.AddComponent<Updated>(subBlock);
+            }
+        }
+
         private void ClearTransientPreviewState()
         {
+            ClearVanillaRemovalPreviewTemp();
+
             NativeArray<Entity> previewEntities = m_ZoningPreviewQuery.ToEntityArray(Allocator.Temp);
             try
             {
@@ -1591,12 +1703,74 @@ namespace EasyZoning.Tools
                     if (!EntityManager.HasComponent<ZoningPreviewComponent>(roadEntity))
                         continue;
 
+                    ZoningPreviewComponent preview = EntityManager.GetComponentData<ZoningPreviewComponent>(roadEntity);
+                    bool changed = RestoreCommittedUpgradedStateImmediate(roadEntity, preview);
+                    if (!math.all(preview.Depths == preview.CommittedDepths))
+                    {
+                        ZoningRestoreComponent restore = new ZoningRestoreComponent { Depths = preview.CommittedDepths };
+                        if (EntityManager.HasComponent<ZoningRestoreComponent>(roadEntity))
+                            EntityManager.SetComponentData(roadEntity, restore);
+                        else
+                            EntityManager.AddComponentData(roadEntity, restore);
+
+                        changed = true;
+                    }
+
+                    if (changed)
+                        MarkRoadAndSubBlocksUpdatedImmediate(roadEntity);
+
                     EntityManager.RemoveComponent<ZoningPreviewComponent>(roadEntity);
                 }
             }
             finally
             {
                 previewEntities.Dispose();
+            }
+        }
+
+        private bool RestoreCommittedUpgradedStateImmediate(Entity roadEntity, ZoningPreviewComponent preview)
+        {
+            bool hasUpgraded = EntityManager.HasComponent<Upgraded>(roadEntity);
+            if (preview.HasCommittedUpgraded)
+            {
+                Upgraded committedUpgraded = new Upgraded { m_Flags = preview.CommittedFlags };
+                if (hasUpgraded)
+                {
+                    Upgraded current = EntityManager.GetComponentData<Upgraded>(roadEntity);
+                    if (current.m_Flags == preview.CommittedFlags)
+                        return false;
+
+                    EntityManager.SetComponentData(roadEntity, committedUpgraded);
+                    return true;
+                }
+
+                EntityManager.AddComponentData(roadEntity, committedUpgraded);
+                return true;
+            }
+
+            if (hasUpgraded)
+            {
+                EntityManager.RemoveComponent<Upgraded>(roadEntity);
+                return true;
+            }
+
+            return false;
+        }
+
+        private void MarkRoadAndSubBlocksUpdatedImmediate(Entity roadEntity)
+        {
+            if (!EntityManager.HasComponent<Updated>(roadEntity))
+                EntityManager.AddComponent<Updated>(roadEntity);
+
+            if (!EntityManager.HasBuffer<SubBlock>(roadEntity))
+                return;
+
+            DynamicBuffer<SubBlock> subBlocks = EntityManager.GetBuffer<SubBlock>(roadEntity);
+            for (int i = 0; i < subBlocks.Length; i++)
+            {
+                Entity subBlock = subBlocks[i].m_SubBlock;
+                if (subBlock != Entity.Null && !EntityManager.HasComponent<Updated>(subBlock))
+                    EntityManager.AddComponent<Updated>(subBlock);
             }
         }
     }
