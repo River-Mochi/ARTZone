@@ -12,14 +12,16 @@
 
 namespace EasyZoning.Tools
 {
+    using Building = Game.Buildings.Building;
     using EasyZoning.Components;     // ZoningPreviewComponent, ZoningDepthComponent, ZoningRestoreComponent
     using Game.Audio;                // ToolUXSoundSettingsData, AudioManager UI sounds
     using Game.Common;               // Updated marker (dirty flag)
     using Game.Net;                  // Curve, Layer, Upgraded
-    using Game.Prefabs;              // PrefabBase
+    using Game.Prefabs;              // BuildingData, PrefabBase, PrefabRef, SpawnableBuildingData
     using Game.Rendering;            // PhotoModeRenderSystem
     using Game.Tools;                // ToolBaseSystem, ToolSystem, RaycastHit, ToolOutputBarrier
     using Game.Zones;                // Block, Cell, SubBlock, ValidArea, ZoneType
+    using ObjectTransform = Game.Objects.Transform;
     using System;                    // Exception (WarnOnce guard)
     using Unity.Collections;         // NativeArray, NativeList, Allocator
     using Unity.Entities;            // Entity, EntityQuery, ComponentLookup, BufferLookup, ECB
@@ -49,7 +51,14 @@ namespace EasyZoning.Tools
         private ComponentLookup<ZoningDepthComponent> m_ZoningDepthLookup;
         private ComponentLookup<ZoningPreviewComponent> m_ZoningPreviewLookup;
         private ComponentLookup<ZoningRestoreComponent> m_ZoningRestoreLookup;
+        private ComponentLookup<ObjectTransform> m_TransformLookup;
+        private ComponentLookup<PrefabRef> m_PrefabRefLookup;
+        private ComponentLookup<BuildingData> m_BuildingDataLookup;
+        private ComponentLookup<SpawnableBuildingData> m_SpawnableBuildingLookup;
+        private ComponentLookup<SignatureBuildingData> m_SignatureBuildingLookup;
+        private ComponentLookup<ZoneData> m_ZoneDataLookup;
 
+        private EntityQuery m_GrowableBuildingQuery;
         private EntityQuery m_ZoningPreviewQuery;
         private EntityQuery m_SoundbankQuery;
 
@@ -127,6 +136,14 @@ namespace EasyZoning.Tools
                 .WithAll<ToolUXSoundSettingsData>()
                 .Build(this);
 
+            // Real growable buildings, used by the "Prevent buildings" option.
+            // CellFlags.Occupied is too broad because CS2 can also set it for
+            // height/overlap blocked painted cells that are not actual buildings.
+            m_GrowableBuildingQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<Building, ObjectTransform, PrefabRef>()
+                .WithNone<Temp, Deleted, Destroyed>()
+                .Build(this);
+
             // Lookups updated per-frame in OnUpdate.
             m_SubBlockLookup = GetBufferLookup<SubBlock>(isReadOnly: true);
             m_CellLookup = GetBufferLookup<Cell>(isReadOnly: true);
@@ -137,6 +154,12 @@ namespace EasyZoning.Tools
             m_ZoningDepthLookup = GetComponentLookup<ZoningDepthComponent>(isReadOnly: true);
             m_ZoningPreviewLookup = GetComponentLookup<ZoningPreviewComponent>(isReadOnly: true);
             m_ZoningRestoreLookup = GetComponentLookup<ZoningRestoreComponent>(isReadOnly: true);
+            m_TransformLookup = GetComponentLookup<ObjectTransform>(isReadOnly: true);
+            m_PrefabRefLookup = GetComponentLookup<PrefabRef>(isReadOnly: true);
+            m_BuildingDataLookup = GetComponentLookup<BuildingData>(isReadOnly: true);
+            m_SpawnableBuildingLookup = GetComponentLookup<SpawnableBuildingData>(isReadOnly: true);
+            m_SignatureBuildingLookup = GetComponentLookup<SignatureBuildingData>(isReadOnly: true);
+            m_ZoneDataLookup = GetComponentLookup<ZoneData>(isReadOnly: true);
 
             m_SelectedEntities = new NativeList<Entity>(Allocator.Persistent);
         }
@@ -244,6 +267,12 @@ namespace EasyZoning.Tools
             m_ZoningDepthLookup.Update(this);
             m_ZoningPreviewLookup.Update(this);
             m_ZoningRestoreLookup.Update(this);
+            m_TransformLookup.Update(this);
+            m_PrefabRefLookup.Update(this);
+            m_BuildingDataLookup.Update(this);
+            m_SpawnableBuildingLookup.Update(this);
+            m_SignatureBuildingLookup.Update(this);
+            m_ZoneDataLookup.Update(this);
 
             // Hit-test + filter: only “true” when hit is a road and it would actually change.
             bool hasRoad = TryGetRoadUnderCursor(out Entity hitEntity, out RaycastHit _);
@@ -370,6 +399,8 @@ namespace EasyZoning.Tools
                 NativeArray<Entity>.Copy(m_SelectedEntities.AsArray(), selectedEntities, m_SelectedEntities.Length);
 
             NativeArray<Entity>.ReadOnly selectedReadOnly = selectedEntities.AsReadOnly();
+            NativeArray<int2> selectedDepths = BuildDesiredDepths(selectedEntities, protectOccupiedCells, protectZonedCells);
+            NativeArray<int2>.ReadOnly selectedDepthsReadOnly = selectedDepths.AsReadOnly();
             NativeArray<Entity> syncSelectedEntities = shouldApply
                 ? new NativeArray<Entity>(0, Allocator.TempJob)
                 : selectedEntities;
@@ -400,7 +431,8 @@ namespace EasyZoning.Tools
                     UpgradedLookup = GetComponentLookup<Upgraded>(isReadOnly: true),
                     UpdatedLookup = updatedLookup,
                     ToolDepths = Depths,
-                    ProtectOccupiedCells = protectOccupiedCells,
+                    DesiredDepths = selectedDepthsReadOnly,
+                    ProtectOccupiedCells = false,
                     ProtectZonedCells = protectZonedCells,
                     ECB = ecb
                 }.Schedule(inputDeps);
@@ -433,7 +465,8 @@ namespace EasyZoning.Tools
                 UpdatedLookup = updatedReadLookup2,
                 SelectedEntities = syncSelectedReadOnly,
                 ToolDepths = Depths,
-                ProtectOccupiedCells = protectOccupiedCells,
+                DesiredDepths = selectedDepthsReadOnly,
+                ProtectOccupiedCells = false,
                 ProtectZonedCells = protectZonedCells
             }.Schedule(syncSelectedEntities.Length, 32, inputDeps);
 
@@ -460,6 +493,7 @@ namespace EasyZoning.Tools
             inputDeps = JobHandle.CombineDependencies(inputDeps, cleanupTempJob);
             zoningPreviewEntities.Dispose(inputDeps);
             selectedEntities.Dispose(inputDeps);
+            selectedDepths.Dispose(inputDeps);
             if (shouldApply)
                 syncSelectedEntities.Dispose(inputDeps);
 
@@ -567,6 +601,27 @@ namespace EasyZoning.Tools
             return math.any(desired != current);
         }
 
+        private NativeArray<int2> BuildDesiredDepths(
+            NativeArray<Entity> entities,
+            bool protectOccupiedCells,
+            bool protectZonedCells)
+        {
+            NativeArray<int2> desiredDepths = new NativeArray<int2>(entities.Length, Allocator.TempJob);
+            for (int i = 0; i < entities.Length; i++)
+            {
+                Entity entity = entities[i];
+                int2 current = GetCommittedRoadDepths(entity);
+                desiredDepths[i] = ConstrainDepthsForProtectedCells(
+                    entity,
+                    current,
+                    Depths,
+                    protectOccupiedCells,
+                    protectZonedCells);
+            }
+
+            return desiredDepths;
+        }
+
         private int2 ConstrainDepthsForProtectedCells(
             Entity roadEntity,
             int2 current,
@@ -598,6 +653,12 @@ namespace EasyZoning.Tools
             bool protectOccupiedCells,
             bool protectZonedCells)
         {
+            if (protectOccupiedCells && HasGrowableBuildingOnSide(roadEntity, leftSide))
+                return true;
+
+            if (!protectZonedCells)
+                return false;
+
             if (roadEntity == Entity.Null ||
                 !m_CurveLookup.TryGetComponent(roadEntity, out Curve curve) ||
                 !m_SubBlockLookup.TryGetBuffer(roadEntity, out DynamicBuffer<SubBlock> subBlocks))
@@ -618,8 +679,107 @@ namespace EasyZoning.Tools
                 if (RoadZoneCompatibility.IsBlockOnLeft(block, curve) != leftSide)
                     continue;
 
-                if (HasProtectedCells(cells, block, validArea, protectOccupiedCells, protectZonedCells))
+                if (HasProtectedCells(cells, block, validArea, protectOccupiedCells: false, protectZonedCells: true))
                     return true;
+            }
+
+            return false;
+        }
+
+        private bool HasGrowableBuildingOnSide(Entity roadEntity, bool leftSide)
+        {
+            if (roadEntity == Entity.Null ||
+                !m_CurveLookup.TryGetComponent(roadEntity, out Curve curve) ||
+                !m_SubBlockLookup.TryGetBuffer(roadEntity, out DynamicBuffer<SubBlock> subBlocks))
+            {
+                return false;
+            }
+
+            NativeArray<Entity> buildings = m_GrowableBuildingQuery.ToEntityArray(Allocator.Temp);
+            try
+            {
+                for (int i = 0; i < subBlocks.Length; i++)
+                {
+                    Entity blockEntity = subBlocks[i].m_SubBlock;
+                    if (!m_BlockLookup.TryGetComponent(blockEntity, out Block block) ||
+                        !m_ValidAreaLookup.TryGetComponent(blockEntity, out ValidArea validArea) ||
+                        !m_CellLookup.TryGetBuffer(blockEntity, out DynamicBuffer<Cell> cells) ||
+                        RoadZoneCompatibility.IsBlockOnLeft(block, curve) != leftSide)
+                    {
+                        continue;
+                    }
+
+                    for (int j = 0; j < buildings.Length; j++)
+                    {
+                        if (GrowableBuildingLotUsesBlockCells(buildings[j], block, validArea, cells))
+                            return true;
+                    }
+                }
+            }
+            finally
+            {
+                buildings.Dispose();
+            }
+
+            return false;
+        }
+
+        private bool GrowableBuildingLotUsesBlockCells(
+            Entity buildingEntity,
+            Block block,
+            ValidArea validArea,
+            DynamicBuffer<Cell> cells)
+        {
+            if (!m_TransformLookup.TryGetComponent(buildingEntity, out ObjectTransform transform) ||
+                !m_PrefabRefLookup.TryGetComponent(buildingEntity, out PrefabRef prefabRef) ||
+                m_SignatureBuildingLookup.HasComponent(prefabRef.m_Prefab) ||
+                !m_SpawnableBuildingLookup.TryGetComponent(prefabRef.m_Prefab, out SpawnableBuildingData spawnableBuildingData) ||
+                !m_ZoneDataLookup.TryGetComponent(spawnableBuildingData.m_ZonePrefab, out ZoneData zoneData) ||
+                !m_BuildingDataLookup.TryGetComponent(prefabRef.m_Prefab, out BuildingData buildingData))
+            {
+                return false;
+            }
+
+            if (zoneData.m_ZoneType.Equals(ZoneType.None))
+                return false;
+
+            int2 lotSize = buildingData.m_LotSize;
+            if (lotSize.x <= 0 || lotSize.y <= 0)
+                return false;
+
+            float2 right = math.rotate(transform.m_Rotation, new float3(8f, 0f, 0f)).xz;
+            float2 forward = math.rotate(transform.m_Rotation, new float3(0f, 0f, 8f)).xz;
+            float2 rightOffset = right * ((float)lotSize.x * 0.5f - 0.5f);
+            float2 forwardOffset = forward * ((float)lotSize.y * 0.5f - 0.5f);
+            float2 rowStart = transform.m_Position.xz + forwardOffset + rightOffset;
+
+            int2 min = validArea.m_Area.xz;
+            int2 max = validArea.m_Area.yw;
+
+            for (int z = 0; z < lotSize.y; z++)
+            {
+                float2 position = rowStart;
+                for (int x = 0; x < lotSize.x; x++)
+                {
+                    int2 cellIndex = ZoneUtils.GetCellIndex(block, position);
+                    if (math.all((cellIndex >= min) & (cellIndex < max)))
+                    {
+                        int index = cellIndex.y * block.m_Size.x + cellIndex.x;
+                        if ((uint) index < (uint) cells.Length)
+                        {
+                            Cell cell = cells[index];
+                            if ((cell.m_State & CellFlags.Visible) != CellFlags.None &&
+                                cell.m_Zone.Equals(zoneData.m_ZoneType))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+
+                    position -= right;
+                }
+
+                rowStart -= forward;
             }
 
             return false;
@@ -739,7 +899,7 @@ namespace EasyZoning.Tools
                         continue;
 
                     Cell cell = cells[idx];
-                    if (protectOccupiedCells && (cell.m_State & CellFlags.Occupied) != 0)
+                    if (protectOccupiedCells && IsBuildingOccupiedCell(cell))
                         return true;
 
                     if (protectZonedCells && cell.m_Zone.m_Index != ZoneType.None.m_Index)
@@ -748,6 +908,14 @@ namespace EasyZoning.Tools
             }
 
             return false;
+        }
+
+        private static bool IsBuildingOccupiedCell(Cell cell)
+        {
+            // CS2 also marks cells as Occupied when height/overlap rules make a painted
+            // zone square unusable. Those are not buildings, so do not let the building
+            // protection toggle block players from clearing those painted cells.
+            return (cell.m_State & CellFlags.Occupied) != 0 && cell.m_Height == short.MaxValue;
         }
 
         public override PrefabBase GetPrefab( ) => m_ToolPrefab;
@@ -815,6 +983,7 @@ namespace EasyZoning.Tools
 
             public NativeArray<Entity>.ReadOnly SelectedEntities;
             public int2 ToolDepths;
+            public NativeArray<int2>.ReadOnly DesiredDepths;
             public bool ProtectOccupiedCells;
             public bool ProtectZonedCells;
 
@@ -822,7 +991,8 @@ namespace EasyZoning.Tools
             {
                 Entity e = SelectedEntities[index];
                 int2 current = GetCommittedRoadDepths(e);
-                int2 preview = ConstrainDepthsForProtectedCells(e, current, ToolDepths);
+                int2 requested = index < DesiredDepths.Length ? DesiredDepths[index] : ToolDepths;
+                int2 preview = ConstrainDepthsForProtectedCells(e, current, requested);
                 bool changed = false;
 
                 if (ZoningPreviewLookup.TryGetComponent(e, out ZoningPreviewComponent data))
@@ -1151,19 +1321,22 @@ namespace EasyZoning.Tools
             [ReadOnly] public ComponentLookup<Updated> UpdatedLookup;
 
             public int2 ToolDepths;
+            public NativeArray<int2>.ReadOnly DesiredDepths;
             public bool ProtectOccupiedCells;
             public bool ProtectZonedCells;
             public EntityCommandBuffer ECB;
 
             public void Execute( )
             {
-                foreach (Entity e in Entities)
+                for (int i = 0; i < Entities.Length; i++)
                 {
+                    Entity e = Entities[i];
                     bool hasPreview = ZoningPreviewLookup.TryGetComponent(e, out ZoningPreviewComponent preview);
                     int2 current = hasPreview
                         ? preview.CommittedDepths
                         : GetCommittedRoadDepths(e);
-                    int2 desired = ConstrainDepthsForProtectedCells(e, current, ToolDepths);
+                    int2 requested = i < DesiredDepths.Length ? DesiredDepths[i] : ToolDepths;
+                    int2 desired = ConstrainDepthsForProtectedCells(e, current, requested);
 
                     if (hasPreview)
                         ECB.RemoveComponent<ZoningPreviewComponent>(e);
@@ -1217,9 +1390,9 @@ namespace EasyZoning.Tools
 
                     if (SubBlockLookup.TryGetBuffer(e, out DynamicBuffer<SubBlock> subBlocks))
                     {
-                        for (int i = 0; i < subBlocks.Length; i++)
+                        for (int j = 0; j < subBlocks.Length; j++)
                         {
-                            Entity subBlock = subBlocks[i].m_SubBlock;
+                            Entity subBlock = subBlocks[j].m_SubBlock;
                             if (subBlock != Entity.Null && !UpdatedLookup.HasComponent(subBlock))
                             {
                                 ECB.AddComponent<Updated>(subBlock);
