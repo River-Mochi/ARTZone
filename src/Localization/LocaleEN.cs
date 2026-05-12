@@ -81,17 +81,17 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseOrangeRemovePreviewEdge)), "◉ Orange preview borders" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseOrangeRemovePreviewEdge)),
-                    "**[ ✓ ] enabled**, use a brighter orange border for the <Remove Cells Preview>.\n" +
+                    "**[ ✓ ] enabled**, use a brighter orange border for <Remove Cells Preview>.\n" +
                     "**[   ] disabled**, keep the vanilla red border.\n\n" +
-                    "Only changes the border." },
+                    "Only changes the border; easier to see." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Border opacity" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
                     "Adjusts only the <orange border opacity> for cells to remove." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "Remove fill" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "Remove cells fill" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
-                    "Choose the fill style for cells to be removed.\n\n" +
+                    "Fill style for cells to be removed preview overlay.\n\n" +
                     "<Vanilla red> = current game look.\n" +
                     "<White> = cleaner contrast.\n" +
                     "<Orange> = matches the orange border.\n" +
@@ -99,7 +99,7 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Fill opacity" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)),
-                    "Adjusts the remove-preview fill opacity.\n\n" +
+                    "Adjusts the fill opacity for preview of removeable cells.\n\n" +
                     "Ignored if <Remove fill> is set to <None>." },
 
                 // Usage toggle + multiline block
