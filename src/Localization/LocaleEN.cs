@@ -50,14 +50,14 @@ namespace EasyZoning
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
                 // Zone options
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● Do not reset existing zoned squares" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
-                    "Do not reset already zoned cells during preview/apply.\n\n" +
-                    "**[ ✓ ] Enabled recommended.**" },
-
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "● Prevent buildings from being removed" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
                     "**Buildings = occupied cells**. Prevents preview/apply of new zones from turning existing buildings into condemned.\n\n" +
+                    "**[ ✓ ] Enabled recommended.**" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● Do not reset existing zoned squares" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
+                    "Do not reset already zoned cells during preview/apply.\n\n" +
                     "**[ ✓ ] Enabled recommended.**" },
 
                 // Keybind
@@ -98,10 +98,11 @@ namespace EasyZoning
                     "2. Use the 3 EZ buttons for Both / Left / Right.\n" +
                     "   Click the selected button again for None.\n" +
                     "3. Hover + preview a road.\n" +
-                    "4. <RMB cycles>: Both → Left → Right → None → ...\n" +
-                    "5. <LMB one time>: applies (locks it in).\n" +
-                    "6. <LMB hold + drag> along many road sections, release to apply.\n" +
-                    "7. <Cancel:> move mouse away and release **LMB**.\n\n" +
+                    "4. Red preview = cells that will be removed.\n" +
+                    "5. <RMB cycles>: Both → Left → Right → None → ...\n" +
+                    "6. <LMB one time>: applies (locks it in).\n" +
+                    "7. <LMB hold + drag> along many road sections, release to apply.\n" +
+                    "8. <Cancel:> move mouse away and release **LMB**.\n\n" +
                     "-------------------------------------------\n" +
                     "<OPTIONAL BUTTON>\n" +
                     "• <Contour> shows terrain elevation lines." },

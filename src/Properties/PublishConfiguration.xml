@@ -100,7 +100,8 @@ No outline means it's already changed to the current selected option.
 
 <!-- Changelog for new version. Single or multi line. Supports minimal markdown subset-->
 <ChangeLog>
-- Fix: now works for NEW roads again. works for both new roads and existing roads.
+- Fix: toggles for Protect buildings and Protect Zoned but empty cells.
+- Preview why cycling right click now shows vanilla colors; RED for the side that will be deleted, and white for the side to be added or remains.
 </ChangeLog>
 
 <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
