@@ -2,7 +2,7 @@
 // Purpose: Options UI + one rebindable hotkey (default Ctrl+V).
 // Notes:
 //   - No UI strings live here. All text is in LocaleEN.cs for translation.
-//   - Usage instructions are a multiline row whose text is localized.
+//   - Usage instructions are multiline row and text is localized.
 //   - Usage row is hidden when ShowUsage is OFF.
 
 namespace EasyZoning
@@ -11,7 +11,7 @@ namespace EasyZoning
     using Game.Input;                // ProxyBinding, BindingKeyboard, ActionType
     using Game.Modding;              // IMod, ModSetting base
     using Game.Settings;             // Settings UI attributes
-    using Game.UI.Localization;      // LocalizedString.Value for dropdown labels
+    using Game.UI.Localization;      // LocalizedString.Id for dropdown labels
     using Game.UI.Widgets;           // DropdownItem<T>
     using System;                    // Exception in URL open handlers
     using UnityEngine;               // Application.OpenURL
@@ -23,7 +23,7 @@ namespace EasyZoning
         kLegacyGroup,
         kAboutInfoGroup, kAboutLinksGroup)]
     [SettingsUIShowGroupName(
-        kProtectGroup, kUiGroup, kUsageGroup)] // kLegacyGroup and other names omitted on purpose so they don't show in UI.
+        kProtectGroup, kUiGroup, kUsageGroup)] // kLegacyGroup and other names omitted on purpose so omitted groups stay hidden in UI.
     [SettingsUIKeyboardAction(Mod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
     public sealed class Setting : ModSetting
     {
@@ -122,7 +122,6 @@ namespace EasyZoning
 
         private bool HideUsageText( ) => !ShowUsage;
         private bool IsRemovePreviewFillOpacityDisabled( ) => RemovePreviewFillStyle == kRemovePreviewFillNone;
-
 
         public static DropdownItem<string>[] GetRemovePreviewBorderStyleValues( ) => new[]
         {
