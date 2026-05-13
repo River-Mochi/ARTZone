@@ -32,15 +32,15 @@ namespace EasyZoning
 
                 // Tabs
                 { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "Actions" },
-                { m_Settings.GetOptionTabLocaleID(Setting.kLegacyTab), "Classique" },
-                { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab), "À propos" },
+                { m_Settings.GetOptionTabLocaleID(Setting.kLegacyTab),  "Classique" },
+                { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "À propos" },
 
                 // Groups
-                { m_Settings.GetOptionGroupLocaleID(Setting.kProtectGroup), "Protections" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "Raccourcis clavier" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup), "Compatibilité" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup), "Visuels" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup), "UTILISATION" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kProtectGroup),         "Protections" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup),     "Raccourcis clavier" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup),  "Compatibilité" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "Visuels" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup),          "UTILISATION" },
 
                 // Legacy group header hidden
                 { m_Settings.GetOptionGroupLocaleID(Setting.kLegacyGroup), "" },
@@ -52,7 +52,7 @@ namespace EasyZoning
                 // Protections
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "● Empêcher la suppression des bâtiments" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
-                    "**Bâtiments = cellules occupées**. Empêche l’aperçu/application de nouvelles zones de condamner des bâtiments existants.\n\n" +
+                    "**Bâtiments = cellules occupées**. Empêche l’aperçu/application de condamner des bâtiments.\n\n" +
                     "**[ ✓ ] Activation recommandée.**" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● Empêcher la réinitialisation des carrés déjà peints/zonés" },
@@ -79,46 +79,48 @@ namespace EasyZoning
                     "**[   ] désactivé**, utilise un panneau gris.\n\n" +
                     "Style visuel uniquement." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Bordure des cellules supprimées" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Couleur de bordure : suppressions en aperçu" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
                     "Couleur de bordure pour l’aperçu des cellules à supprimer.\n\n" +
                     "<Orange> = plus vif et plus facile à voir.\n" +
+                    "<Rouge> = contraste rouge plus fort.\n" +
                     "<Rouge vanilla> = correspond à l’apparence par défaut du jeu." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Opacité de la bordure" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
                     "Ajuste l’opacité de la bordure de l’aperçu de suppression.\n\n" +
-                    "<100%> garde la transparence normale de l’aperçu." },
+                    "<100%> garde la transparence normale de l’aperçu.\n" +
+                    "<0%> masque la bordure." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "Remplissage des cellules supprimées" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "Couleur de remplissage : suppressions en aperçu" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
-                    "Style de remplissage de l’overlay d’aperçu pour les cellules à supprimer.\n\n" +
+                    "Style de couleur de remplissage pour l’aperçu des cellules pouvant être supprimées.\n\n" +
                     "<Rouge vanilla> = apparence actuelle du jeu.\n" +
                     "<Blanc> = contraste plus net.\n" +
                     "<Orange> = correspond à la bordure orange.\n" +
-                    "<Aucun> = bordure seulement." },
+                    "<Aucun> = bordure seule, minimaliste" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Opacité du remplissage" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)),
                     "Ajuste l’opacité du remplissage pour l’aperçu des cellules supprimables.\n\n" +
                     "<100%> garde la transparence normale de l’aperçu.\n" +
-                    "Ignoré si <Remplissage de suppression> est réglé sur <Aucun>." },
+                    "<0%> masque le remplissage.\n" +
+                    "Ignoré si <Remplissage suppression> est réglé sur <Aucun>." },
 
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Afficher les instructions" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)), "Afficher ou masquer les **instructions d’utilisation** ci-dessous." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),
+                    "Afficher ou masquer les **instructions d’utilisation** ci-dessous." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<Nouvelle route>\n" +
                     "1. Ouvrez le panneau Routes (choisissez une route).\n" +
                     "2. En bas du panneau d’outil de route : utilisez les 3 icônes EZ pour Deux côtés / Gauche / Droite.\n" +
                     "   Cliquez à nouveau sur le bouton sélectionné pour Aucun.\n" +
-                    "3. Dessinez normalement.\n" +
-                    "\n" +
+                    "3. Dessinez normalement.\n\n" +
                     "-----------------------------------------\n" +
                     "  <RMB> = clic droit, <LMB> = clic gauche\n" +
-                    "-----------------------------------------\n" +
-                    "\n" +
+                    "-----------------------------------------\n\n" +
                     "<Route existante>\n" +
                     "1. Ouvrez le panneau EZ Update : cliquez sur <Ctrl+V> pour activer/désactiver le panneau\n" +
                     "   (<icône en haut à gauche> fait la même chose).\n" +
@@ -129,8 +131,7 @@ namespace EasyZoning
                     "5. <RMB fait défiler> : Deux côtés → Gauche → Droite → Aucun → ...\n" +
                     "6. <LMB une fois> : applique (verrouille le choix).\n" +
                     "7. <Maintenir LMB + glisser> le long de plusieurs sections de route, relâcher pour appliquer.\n" +
-                    "8. <Annuler :> éloignez la souris et relâchez **LMB**.\n" +
-                    "\n" +
+                    "8. <Annuler :> éloignez la souris et relâchez **LMB**.\n\n" +
                     "-------------------------------------------\n" +
                     "<BOUTON OPTIONNEL>\n" +
                     "• <Courbes de niveau> affiche les lignes d’élévation du terrain." },
@@ -141,26 +142,26 @@ namespace EasyZoning
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
                     "**OFF est recommandé**\n" +
                     "OFF signifie que RMB fait défiler les 4 modes : **Deux côtés → Gauche → Droite → Aucun → ...**\n\n" +
-                    "Avantage désactivé : moins besoin de ramener la souris vers le panneau d’outil.\n" +
-                    "\n" +
+                    "Avantage désactivé : moins besoin de ramener la souris vers le panneau d’outil.\n\n" +
                     "--------------------------------------\n" +
                     "Si Classique est ON : RMB bascule dans deux groupes séparés :\n" +
                     "Gauche ↔ Droite seulement\n" +
-                    "Deux côtés ↔ Aucun seulement" },
+                    "Deux côtés ↔ Aucun seulement"
+                },
 
                 // Keybinding dialog title
                 { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Basculer le panneau de mise à jour Easy Zoning" },
 
                 // About tab
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)), "Nom du mod" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)), "Nom affiché de ce mod." },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Nom du mod" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "Nom affiché de ce mod." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "Version" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)), "Version actuelle du mod." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "Version actuelle du mod." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadox)), "Paradox Mods" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)), "Ouvrir la page Paradox Mods de l’auteur." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),  "Ouvrir la page Paradox Mods de l’auteur." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)), "Rejoindre le Discord du mod." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Rejoindre le Discord du mod." },
             };
 
             return d;

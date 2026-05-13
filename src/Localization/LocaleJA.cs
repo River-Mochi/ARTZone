@@ -32,15 +32,15 @@ namespace EasyZoning
 
                 // Tabs
                 { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "アクション" },
-                { m_Settings.GetOptionTabLocaleID(Setting.kLegacyTab), "レガシー" },
-                { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab), "情報" },
+                { m_Settings.GetOptionTabLocaleID(Setting.kLegacyTab),  "レガシー" },
+                { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "このModについて" },
 
                 // Groups
-                { m_Settings.GetOptionGroupLocaleID(Setting.kProtectGroup), "保護" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup), "キー割り当て" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup), "互換性" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup), "表示" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup), "使い方" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kProtectGroup),         "保護" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup),     "キー割り当て" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup),  "互換性" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "表示" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup),          "使い方" },
 
                 // Legacy group header hidden
                 { m_Settings.GetOptionGroupLocaleID(Setting.kLegacyGroup), "" },
@@ -52,124 +52,116 @@ namespace EasyZoning
                 // Protections
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "● 建物の削除を防止" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
-                    "**建物 = 使用中セル**。新しいゾーンのプレビュー/適用で、既存の建物が取り壊し扱いになるのを防ぎます。\n" +
-                    "\n" +
+                    "**建物 = 占有セル**。プレビュー/適用で建物が取り壊し対象になるのを防ぎます。\n\n" +
                     "**[ ✓ ] 有効推奨。**" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● すでに塗った/ゾーン設定済みのマスをリセットしない" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● すでに塗った/ゾーン済みのマスのリセットを防止" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
-                    "プレビュー/適用中に、すでにゾーン設定済みのセルをリセットしません。\n" +
-                    "\n" +
+                    "プレビュー/適用中に、すでにゾーン設定済みのセルをリセットしません。\n\n" +
                     "**[ ✓ ] 有効推奨。**" },
 
                 // Keybind
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "更新パネル On/Off" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "Easy Zoning パネルをすばやく表示するための**キー割り当て**\n" +
-                    "**初期設定 Ctrl+V**" },
+                    "Easy Zoning パネルを素早く表示するための**キー割り当て**\n" +
+                    "**デフォルト Ctrl+V**" },
 
                 // Compatibility
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ 等高線ボタン" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
-                    "**[ ✓ ] 有効**、既存道路更新パネルに地形の Contour ボタンを表示します。\n" +
-                    "\n" +
-                    "● 小さいパネルにしたい場合や、別のMODが地形ラインを扱う場合は無効にしてください。" },
+                    "**[ ✓ ] 有効**、Modの既存道路更新パネルに Contour 地形ボタンを表示します。\n\n" +
+                    "● 小さめのパネルが好みの場合、または別Modが地形ラインを扱う場合は無効にしてください。" },
 
                 // UI
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ ガラスパネル" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
-                    "**[ ✓ ] 有効**、パネルに明るい半透明スタイルを使います。\n" +
-                    "**[   ] 無効**、グレーのパネルを使います。\n" +
-                    "\n" +
-                    "見た目だけの変更です。" },
+                    "**[ ✓ ] 有効**、パネルに透明感のあるスタイルを使います。\n" +
+                    "**[   ] 無効**、グレーのパネルを使います。\n\n" +
+                    "見た目だけの設定です。" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "削除セルの枠線" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "境界線の色：削除プレビュー" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
-                    "削除予定セルのプレビュー枠線の色です。\n" +
-                    "\n" +
-                    "<オレンジ> = 明るく見やすい色。\n" +
-                    "<バニラ赤> = ゲーム標準の見た目に合わせます。" },
+                    "削除されるセルのプレビュー境界線の色。\n\n" +
+                    "<オレンジ> = 明るく見やすい。\n" +
+                    "<赤> = 赤い境界線のコントラストを強める。\n" +
+                    "<バニラ赤> = ゲーム標準の見た目に合わせる。" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "枠線の不透明度" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "境界線の不透明度" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
-                    "削除プレビューの枠線の不透明度を調整します。\n" +
-                    "\n" +
-                    "<100%> はプレビュー通常の半透明を維持します。" },
+                    "削除プレビューの境界線の不透明度を調整します。\n\n" +
+                    "<100%> はプレビュー通常の半透明を保ちます。\n" +
+                    "<0%> は境界線を非表示にします。" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "削除セルの塗りつぶし" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "塗りつぶし色：削除プレビュー" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
-                    "削除予定セルのプレビューオーバーレイの塗りつぶしスタイルです。\n" +
-                    "\n" +
-                    "<バニラ赤> = 現在のゲームの見た目。\n" +
+                    "削除可能なセルのプレビュー塗りつぶし色スタイル。\n\n" +
+                    "<バニラ赤> = 現在のゲーム表示。\n" +
                     "<白> = すっきりしたコントラスト。\n" +
-                    "<オレンジ> = オレンジの枠線に合わせます。\n" +
-                    "<なし> = 枠線のみ。" },
+                    "<オレンジ> = オレンジの境界線に合わせる。\n" +
+                    "<なし> = 境界線のみ、ミニマル" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "塗りつぶしの不透明度" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)),
-                    "削除可能セルのプレビュー塗りつぶし不透明度を調整します。\n" +
-                    "\n" +
-                    "<100%> はプレビュー通常の半透明を維持します。\n" +
+                    "削除可能セルのプレビュー塗りつぶし不透明度を調整します。\n\n" +
+                    "<100%> はプレビュー通常の半透明を保ちます。\n" +
+                    "<0%> は塗りつぶしを非表示にします。\n" +
                     "<削除塗りつぶし> が <なし> の場合は無視されます。" },
 
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "説明を表示" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)), "下の**使い方説明**を表示または非表示にします。" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),
+                    "下の**使い方説明**を表示/非表示にします。" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<新しい道路>\n" +
-                    "1. 道路パネルを開く（道路を選ぶ）。\n" +
-                    "2. 道路ツールパネル下部の3つのEZアイコンで 両側 / 左 / 右 を選ぶ。\n" +
-                    "   選択中のボタンをもう一度クリックすると なし。\n" +
-                    "3. いつも通り道路を引く。\n" +
-                    "\n" +
+                    "1. 道路パネルを開きます（道路を選択）。\n" +
+                    "2. 道路ツールパネル下部で、3つのEZアイコンを使い 両側 / 左 / 右 を選びます。\n" +
+                    "   選択中のボタンをもう一度クリックすると なし になります。\n" +
+                    "3. いつも通り描画します。\n\n" +
                     "-----------------------------------------\n" +
                     "  <RMB> = 右クリック、<LMB> = 左クリック\n" +
-                    "-----------------------------------------\n" +
-                    "\n" +
+                    "-----------------------------------------\n\n" +
                     "<既存道路>\n" +
-                    "1. EZ Update パネルを開く：<Ctrl+V> でパネルを On/Off\n" +
-                    "   （<左上アイコン>でも同じ）。\n" +
-                    "2. 3つのEZアイコンで 両側 / 左 / 右 を選ぶ。\n" +
-                    "   ボタンをもう一度クリックすると なし。\n" +
-                    "3. 道路にマウスを合わせてプレビュー。\n" +
+                    "1. EZ Update パネルを開く：<Ctrl+V> をクリックしてパネルを On/Off\n" +
+                    "   （<左上アイコン> でも同じです）。\n" +
+                    "2. 3つのEZアイコンで 両側 / 左 / 右 を選びます。\n" +
+                    "   ボタンをもう一度クリックすると なし になります。\n" +
+                    "3. 道路にカーソルを合わせてプレビューします。\n" +
                     "4. 赤いプレビュー = 削除されるセル。\n" +
                     "5. <RMBで切替>：両側 → 左 → 右 → なし → ...\n" +
-                    "6. <LMB 1回>：適用（固定）。\n" +
-                    "7. <LMB長押し + ドラッグ> 複数の道路区間に沿って動かし、離すと適用。\n" +
-                    "8. <キャンセル:> マウスを離れた場所へ動かして **LMB** を離す。\n" +
-                    "\n" +
+                    "6. <LMB 1回>：適用します（確定）。\n" +
+                    "7. <LMB長押し + ドラッグ> で複数の道路区間をなぞり、離すと適用。\n" +
+                    "8. <キャンセル:> マウスを離れた場所へ動かして **LMB** を離します。\n\n" +
                     "-------------------------------------------\n" +
                     "<任意ボタン>\n" +
-                    "• <等高線> は地形の高度線を表示します。" },
+                    "• <等高線> は地形の高さラインを表示します。" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "レガシー右クリック切替" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
                     "**OFF 推奨**\n" +
-                    "Off の場合、RMB は4モードを切り替えます：**両側 → 左 → 右 → なし → ...**\n" +
-                    "\n" +
-                    "無効時の利点：マウスをツールパネルへ戻す回数が減ります。\n" +
-                    "\n" +
+                    "OFFではRMBが4つのモードを順番に切り替えます：**両側 → 左 → 右 → なし → ...**\n\n" +
+                    "無効時の利点：マウスをツールパネルに戻す手間が減ります。\n\n" +
                     "--------------------------------------\n" +
-                    "レガシーが ON の場合：RMB は2つの別グループで切り替えます：\n" +
+                    "レガシーがONの場合：RMBは2つの別グループ内で切り替えます：\n" +
                     "左 ↔ 右 のみ\n" +
-                    "両側 ↔ なし のみ" },
+                    "両側 ↔ なし のみ"
+                },
 
                 // Keybinding dialog title
                 { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Easy Zoning 更新パネルを切り替え" },
 
                 // About tab
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)), "MOD名" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)), "このMODの表示名。" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Mod名" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "このModの表示名。" },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "バージョン" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)), "現在のMODバージョン。" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "現在のModバージョン。" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadox)), "Paradox Mods" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)), "作者の Paradox Mods ページを開きます。" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),  "作者の Paradox Mods ページを開きます。" },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)), "MODのDiscordに参加します。" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Modの Discord に参加します。" },
             };
 
             return d;
