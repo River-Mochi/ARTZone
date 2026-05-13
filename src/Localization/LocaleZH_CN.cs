@@ -36,10 +36,10 @@ namespace EasyZoning
                 { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "关于" },
 
                 // Groups
-                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),         "分区选项" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kProtectGroup),         "保护" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup),     "按键绑定" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup),  "兼容性" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "界面" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "视觉" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup),          "使用说明" },
 
                 // Legacy group header hidden
@@ -49,34 +49,70 @@ namespace EasyZoning
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
-                // Zone options
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "不要重置已有分区格" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
-                    "在预览/应用时，不会重置已经划分分区的单元格。\n\n" +
-                    "**[ ✓ ] 建议开启。**" },
-
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "防止建筑被移除" },
+                // Protections
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "● 防止移除建筑" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
-                    "**建筑 = 已占用单元格**。防止预览/应用新区划时让现有建筑变成待拆除状态。\n\n" +
-                    "**[ ✓ ] 建议开启。**" },
+                    "**建筑 = 已占用单元格**。防止预览/应用时把建筑变成待拆除状态。\n\n" +
+                    "**[ ✓ ] 建议启用。**" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● 防止重置已绘制/已划分的方格" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
+                    "预览/应用时不会重置已经划分区域的单元格。\n\n" +
+                    "**[ ✓ ] 建议启用。**" },
 
                 // Keybind
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "切换更新面板" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "更新面板 On/Off" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "显示 Easy Zoning 面板（**默认 Ctrl+V**）。" },
+                    "**按键绑定**，快速显示 Easy Zoning 面板\n" +
+                    "**默认 Ctrl+V**" },
 
                 // Compatibility
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ 等高线按钮" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
-                    "**[ ✓ ] 已启用**，在 Easy Zoning 的现有道路面板中显示等高线按钮。\n\n" +
-                    "如果其他模组已经处理地形等高线，可关闭此选项。" },
+                    "**[ ✓ ] 启用**，在模组的现有道路更新面板中显示 Contour 地形按钮。\n\n" +
+                    "● 如果想要更小的面板，或其他模组已处理地形线，请关闭此项。" },
 
                 // UI
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ 玻璃面板样式" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ 玻璃面板" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
-                    "**[ ✓ ] 已启用**，使用更清晰的半透明面板样式。\n" +
-                    "**[   ] 已禁用**，使用更深色的原版风格面板。\n\n" +
-                    "仅影响视觉样式。不使用模糊效果。" },
+                    "**[ ✓ ] 启用**，为面板使用清晰的半透明样式。\n" +
+                    "**[   ] 禁用**，使用灰色面板。\n\n" +
+                    "仅影响视觉样式。" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "边框颜色：移除预览" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
+                    "将被移除单元格预览的边框颜色。\n\n" +
+                    "<橙色> = 更亮，更容易看清。\n" +
+                    "<红色> = 更强的红色边框对比。\n" +
+                    "<原版红色> = 匹配游戏默认外观。" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "边框不透明度" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
+                    "调整移除预览边框的不透明度。\n\n" +
+                    "<100%> 保持预览的正常半透明效果。\n" +
+                    "<0%> 隐藏边框。" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "填充颜色：移除预览" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
+                    "可移除单元格预览的填充颜色样式。\n\n" +
+                    "<原版红色> = 当前游戏外观。\n" +
+                    "<白色> = 对比更清爽。\n" +
+                    "<橙色> = 匹配橙色边框。\n" +
+                    "<无> = 仅边框，极简" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "填充不透明度" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)),
+                    "调整可移除单元格预览的填充不透明度。\n\n" +
+                    "<100%> 保持预览的正常半透明效果。\n" +
+                    "<0%> 隐藏填充。\n" +
+                    "如果 <移除填充> 设置为 <无>，则会被忽略。" },
+
+                // Dropdown values
+                { "EasyZoning.Dropdown.Color.Orange", "橙色" },
+                { "EasyZoning.Dropdown.Color.Red", "红色" },
+                { "EasyZoning.Dropdown.Color.VanillaRed", "原版红色" },
+                { "EasyZoning.Dropdown.Color.White", "白色" },
+                { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "无（仅边框）" },
 
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "显示说明" },
@@ -86,38 +122,39 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<新建道路>\n" +
                     "1. 打开道路面板（选择一条道路）。\n" +
-                    "2. 在道路工具面板底部，使用 3 个 EZ 图标选择双侧 / 左侧 / 右侧。\n" +
-                    "   再次点击当前选中的按钮即可切换为无。\n" +
-                    "3. 像平常一样绘制道路。\n\n" +
+                    "2. 在道路工具面板底部：使用 3 个 EZ 图标选择 两侧 / 左侧 / 右侧。\n" +
+                    "   再次点击已选按钮可切换为无。\n" +
+                    "3. 像平常一样绘制。\n\n" +
                     "-----------------------------------------\n" +
-                    "  RMB = 右键，LMB = 左键\n" +
+                    "  <RMB> = 右键，<LMB> = 左键\n" +
                     "-----------------------------------------\n\n" +
                     "<现有道路>\n" +
                     "1. 打开 EZ Update 面板：点击 <Ctrl+V> 开启/关闭面板\n" +
-                    "   （或使用<左上角图标>也可以）。\n" +
-                    "2. 使用 3 个 EZ 图标选择双侧 / 左侧 / 右侧。\n" +
-                    "   再次点击当前选中的按钮即可切换为无。\n" +
-                    "3. 悬停到道路上进行预览。\n" +
-                    "4. 红色预览 = 将被移除的格子。\n" +
-                    "5. <RMB 循环切换>：双侧 → 左侧 → 右侧 → 无 → ...\n" +
-                    "6. <单击 LMB>：应用（锁定设置）。\n" +
-                    "7. <按住 LMB 并拖动>经过多个道路段，松开后应用。\n" +
+                    "   （<左上角图标> 也是同样功能）。\n" +
+                    "2. 使用 3 个 EZ 图标选择 两侧 / 左侧 / 右侧。\n" +
+                    "   再次点击按钮可切换为无。\n" +
+                    "3. 悬停并预览一条道路。\n" +
+                    "4. 红色预览 = 将被移除的单元格。\n" +
+                    "5. <RMB 循环>：两侧 → 左侧 → 右侧 → 无 → ...\n" +
+                    "6. <LMB 一次>：应用（锁定设置）。\n" +
+                    "7. <按住 LMB + 拖动> 沿多个道路区段移动，松开后应用。\n" +
                     "8. <取消：> 将鼠标移开并松开 **LMB**。\n\n" +
                     "-------------------------------------------\n" +
                     "<可选按钮>\n" +
-                    "• <Contour> 显示地形等高线。" },
+                    "• <等高线> 显示地形高程线。" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "旧版右键循环" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
-                    "**建议关闭**，这样 RMB 会循环全部 4 种模式：\n" +
-                    "**双侧 → 左侧 → 右侧 → 无 → ...**\n\n" +
-                    "优点：不需要频繁把鼠标移回工具面板。\n\n" +
+                    "**建议 OFF**\n" +
+                    "OFF 表示 RMB 会循环全部 4 种模式：**两侧 → 左侧 → 右侧 → 无 → ...**\n\n" +
+                    "禁用优势：较少需要把鼠标移回工具面板。\n\n" +
                     "--------------------------------------\n" +
-                    "如果旧版模式为 ON：RMB 只会在两组之间切换：\n" +
-                    "左侧 ↔ 右侧\n" +
-                    "双侧 ↔ 无" },
+                    "如果旧版为 ON：RMB 会在两个独立组中切换：\n" +
+                    "仅左侧 ↔ 右侧\n" +
+                    "仅两侧 ↔ 无"
+                },
 
                 // Keybinding dialog title
                 { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "切换 Easy Zoning 更新面板" },

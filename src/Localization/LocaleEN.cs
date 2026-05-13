@@ -36,10 +36,10 @@ namespace EasyZoning
                 { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "About" },
 
                 // Groups
-                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),         "Zone Options" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kProtectGroup),         "Protections" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup),     "Key bindings" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup),  "Compatibility" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "UI" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "Visuals" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup),          "USAGE" },
 
                 // Legacy group header hidden
@@ -49,34 +49,70 @@ namespace EasyZoning
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
-                // Zone options
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "● Prevent buildings from being removed" },
+                // Protections
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "● Prevent removal of buildings" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
-                    "**Buildings = occupied cells**. Prevents preview/apply of new zones from turning existing buildings into condemned.\n\n" +
+                    "**Buildings = occupied cells**. Prevents preview/apply from turning buildings into condemned.\n\n" +
                     "**[ ✓ ] Enabled recommended.**" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● Do not reset existing zoned squares" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● Prevent reset of already painted/zoned squares" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
                     "Do not reset already zoned cells during preview/apply.\n\n" +
                     "**[ ✓ ] Enabled recommended.**" },
 
                 // Keybind
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Toggle Update Panel" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Update Panel On/Off" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "Show the Easy Zoning panel (**default Ctrl+V**)." },
+                    "**Keybind** to show the Easy Zoning panel quickly\n" +
+                    "**default Ctrl+V**" },
 
                 // Compatibility
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ Contour button" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
-                    "**[ ✓ ] enabled**, show the Contour button in the Easy Zoning existing-roads panel.\n\n" +
-                    "● Disable this if a smaller panel is preferred or another mod handles terrain contour lines." },
+                    "**[ ✓ ] enabled**, show the Contour terrain button in the mod's existing roads update panel.\n\n" +
+                    "● Disable this if a smaller panel is preferred or another mod handles terrain lines." },
 
                 // UI
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Glass panel style" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Glass panel" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
-                    "**[ ✓ ] enabled**, use the clearer translucent panel style.\n" +
+                    "**[ ✓ ] enabled**, use a clear translucent style for the panel.\n" +
                     "**[   ] disabled**, use a gray panel.\n\n" +
                     "Visual style only." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Border color: preview removals" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
+                    "Border color for cells to be removed preview.\n\n" +
+                    "<Orange> = brighter and easier to see.\n" +
+                    "<Red> = stronger red border contrast.\n" +
+                    "<Vanilla red> = match default game look." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Border opacity" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
+                    "Adjusts the remove-preview border opacity.\n\n" +
+                    "<100%> keeps the preview's normal translucency.\n" +
+                    "<0%> hides the border." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "Fill color: preview removals" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
+                    "Fill color style for preview of cells that can be removed.\n\n" +
+                    "<Vanilla red> = current game look.\n" +
+                    "<White> = cleaner contrast.\n" +
+                    "<Orange> = matches the orange border.\n" +
+                    "<None> = border only, minimalist" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Fill opacity" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)),
+                    "Adjusts the fill opacity for preview of removeable cells.\n\n" +
+                    "<100%> keeps the preview's normal translucency.\n" +
+                    "<0%> hides the fill.\n" +
+                    "Ignored if <Remove fill> is set to <None>." },
+  
+                // Dropdown values
+                { "EasyZoning.Dropdown.Color.Orange", "Orange" },
+                { "EasyZoning.Dropdown.Color.Red", "Red" },
+                { "EasyZoning.Dropdown.Color.VanillaRed", "Vanilla red" },
+                { "EasyZoning.Dropdown.Color.White", "White" },
+                { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "None (border only)" },
 
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Show Instructions" },

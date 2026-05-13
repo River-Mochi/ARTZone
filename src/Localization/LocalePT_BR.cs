@@ -32,14 +32,14 @@ namespace EasyZoning
 
                 // Tabs
                 { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "Ações" },
-                { m_Settings.GetOptionTabLocaleID(Setting.kLegacyTab),  "Legacy" },
+                { m_Settings.GetOptionTabLocaleID(Setting.kLegacyTab),  "Clássico" },
                 { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "Sobre" },
 
                 // Groups
-                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),         "Opções de zoneamento" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kProtectGroup),         "Proteções" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup),     "Atalhos de teclado" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup),  "Compatibilidade" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "Interface" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "Visuais" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup),          "USO" },
 
                 // Legacy group header hidden
@@ -49,35 +49,71 @@ namespace EasyZoning
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
-                // Zone options
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Não redefinir quadrados já zoneados" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
-                    "Não redefine células já zoneadas durante prévia/aplicação.\n\n" +
+                // Protections
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "● Impedir remoção de edifícios" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
+                    "**Edifícios = células ocupadas**. Impede que prévia/aplicação transforme edifícios em condenados.\n\n" +
                     "**[ ✓ ] Recomendado ativado.**" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Evitar que edifícios sejam removidos" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
-                    "**Edifícios = células ocupadas**. Impede que a prévia/aplicação de novas zonas transforme edifícios existentes em condenados.\n\n" +
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● Impedir reset de quadrados já pintados/zoneados" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
+                    "Não reseta células já zoneadas durante prévia/aplicação.\n\n" +
                     "**[ ✓ ] Recomendado ativado.**" },
 
                 // Keybind
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Alternar painel de atualização" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Painel de atualização On/Off" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "Mostra o painel Easy Zoning (**padrão Ctrl+V**)." },
+                    "**Atalho de teclado** para mostrar rapidamente o painel Easy Zoning\n" +
+                    "**padrão Ctrl+V**" },
 
                 // Compatibility
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ Botão de contorno" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
-                    "**[ ✓ ] ativado**, mostra o botão de Contorno no painel Easy Zoning para estradas existentes.\n\n" +
-                    "Desative isto se outro mod já controlar as linhas de contorno do terreno." },
+                    "**[ ✓ ] ativado**, mostra o botão de terreno Contour no painel de atualização de estradas existentes do mod.\n\n" +
+                    "● Desative isto se preferir um painel menor ou se outro mod já controlar as linhas do terreno." },
 
                 // UI
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Estilo de painel translúcido" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Painel de vidro" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
-                    "**[ ✓ ] ativado**, usa um estilo de painel translúcido mais claro.\n" +
-                    "**[   ] desativado**, usa um painel mais escuro no estilo vanilla.\n\n" +
-                    "Apenas estilo visual. Nenhum blur é usado." },
+                    "**[ ✓ ] ativado**, usa um estilo translúcido claro para o painel.\n" +
+                    "**[   ] desativado**, usa um painel cinza.\n\n" +
+                    "Apenas estilo visual." },
 
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Cor da borda: remoções na prévia" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
+                    "Cor da borda para a prévia das células que serão removidas.\n\n" +
+                    "<Laranja> = mais brilhante e fácil de ver.\n" +
+                    "<Vermelho> = contraste de borda vermelha mais forte.\n" +
+                    "<Vermelho vanilla> = combina com o visual padrão do jogo." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Opacidade da borda" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
+                    "Ajusta a opacidade da borda da prévia de remoção.\n\n" +
+                    "<100%> mantém a translucidez normal da prévia.\n" +
+                    "<0%> oculta a borda." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "Cor do preenchimento: remoções na prévia" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
+                    "Estilo de cor do preenchimento para a prévia das células que podem ser removidas.\n\n" +
+                    "<Vermelho vanilla> = visual atual do jogo.\n" +
+                    "<Branco> = contraste mais limpo.\n" +
+                    "<Laranja> = combina com a borda laranja.\n" +
+                    "<Nenhum> = só borda, minimalista" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Opacidade do preenchimento" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)),
+                    "Ajusta a opacidade do preenchimento para a prévia das células removíveis.\n\n" +
+                    "<100%> mantém a translucidez normal da prévia.\n" +
+                    "<0%> oculta o preenchimento.\n" +
+                    "Ignorado se <Preenchimento de remoção> estiver definido como <Nenhum>." },
+
+                // Dropdown values
+                { "EasyZoning.Dropdown.Color.Orange", "Laranja" },
+                { "EasyZoning.Dropdown.Color.Red", "Vermelho" },
+                { "EasyZoning.Dropdown.Color.VanillaRed", "Vermelho vanilla" },
+                { "EasyZoning.Dropdown.Color.White", "Branco" },
+                { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "Nenhum (só borda)" },
+             
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Mostrar instruções" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),
@@ -85,39 +121,40 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<Nova estrada>\n" +
-                    "1. Abra o painel de Estradas (escolha uma estrada).\n" +
-                    "2. Na parte inferior do painel da ferramenta de estrada: use os 3 ícones EZ para Ambos os lados / Esquerda / Direita.\n" +
+                    "1. Abra o painel Estradas (escolha uma estrada).\n" +
+                    "2. Na parte inferior do painel da ferramenta de estrada: use os 3 ícones EZ para Ambos / Esquerda / Direita.\n" +
                     "   Clique novamente no botão selecionado para Nenhum.\n" +
-                    "3. Desenhe normalmente.\n\n" +
+                    "3. Desenhe como sempre.\n\n" +
                     "-----------------------------------------\n" +
-                    "  RMB = clique direito, LMB = clique esquerdo\n" +
+                    "  <RMB> = clique direito, <LMB> = clique esquerdo\n" +
                     "-----------------------------------------\n\n" +
                     "<Estrada existente>\n" +
-                    "1. Abra o painel EZ Update: clique <Ctrl+V> para ligar/desligar o painel\n" +
-                    "   (ou o <ícone no canto superior esquerdo> faz o mesmo).\n" +
-                    "2. Use os 3 ícones EZ para Ambos os lados / Esquerda / Direita.\n" +
-                    "   Clique novamente no botão selecionado para Nenhum.\n" +
-                    "3. Passe o mouse sobre uma estrada + veja a prévia.\n" +
+                    "1. Abra o painel EZ Update: clique em <Ctrl+V> para ligar/desligar o painel\n" +
+                    "   (<ícone no canto superior esquerdo> faz a mesma coisa).\n" +
+                    "2. Use os 3 ícones EZ para Ambos / Esquerda / Direita.\n" +
+                    "   Clique no botão novamente para Nenhum.\n" +
+                    "3. Passe o mouse + veja a prévia de uma estrada.\n" +
                     "4. Prévia vermelha = células que serão removidas.\n" +
-                    "5. <RMB alterna>: Ambos os lados → Esquerda → Direita → Nenhum → ...\n" +
-                    "6. <LMB uma vez>: aplica (confirma).\n" +
-                    "7. <Segure LMB + arraste> por vários trechos de estrada, solte para aplicar.\n" +
-                    "8. <Cancelar:> mova o mouse para fora e solte **LMB**.\n\n" +
+                    "5. <RMB alterna>: Ambos → Esquerda → Direita → Nenhum → ...\n" +
+                    "6. <LMB uma vez>: aplica (fixa a escolha).\n" +
+                    "7. <Segure LMB + arraste> por várias seções de estrada, solte para aplicar.\n" +
+                    "8. <Cancelar:> mova o mouse para longe e solte **LMB**.\n\n" +
                     "-------------------------------------------\n" +
                     "<BOTÃO OPCIONAL>\n" +
-                    "• <Contour> mostra linhas de elevação do terreno." },
+                    "• <Contorno> mostra linhas de elevação do terreno." },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Ciclo legado com clique direito" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Ciclo clássico com clique direito" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
-                    "**Recomendado OFF** para que RMB percorra os 4 modos:\n" +
-                    "**Ambos os lados → Esquerda → Direita → Nenhum → ...**\n\n" +
-                    "Vantagem: menos necessidade de mover o mouse de volta ao painel da ferramenta.\n\n" +
+                    "**OFF é recomendado**\n" +
+                    "OFF significa que RMB alterna todos os 4 modos: **Ambos → Esquerda → Direita → Nenhum → ...**\n\n" +
+                    "Vantagem desativada: menos necessidade de mover o mouse de volta ao painel da ferramenta.\n\n" +
                     "--------------------------------------\n" +
-                    "Se Legacy estiver ON: RMB alterna entre dois conjuntos separados:\n" +
-                    "Esquerda ↔ Direita\n" +
-                    "Ambos os lados ↔ Nenhum" },
+                    "Se Clássico estiver ON: RMB alterna em dois grupos separados:\n" +
+                    "Somente Esquerda ↔ Direita\n" +
+                    "Somente Ambos ↔ Nenhum"
+                },
 
                 // Keybinding dialog title
                 { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Alternar painel de atualização Easy Zoning" },

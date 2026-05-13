@@ -36,10 +36,10 @@ namespace EasyZoning
                 { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "À propos" },
 
                 // Groups
-                { m_Settings.GetOptionGroupLocaleID(Setting.kToggleGroup),         "Options de zonage" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kProtectGroup),         "Protections" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup),     "Raccourcis clavier" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup),  "Compatibilité" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "Interface" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "Visuels" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup),          "UTILISATION" },
 
                 // Legacy group header hidden
@@ -49,78 +49,115 @@ namespace EasyZoning
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutInfoGroup),  "" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kAboutLinksGroup), "" },
 
-                // Zone options
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "Ne pas réinitialiser les cases déjà zonées" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
-                    "Ne réinitialise pas les cellules déjà zonées pendant l'aperçu/l'application.\n\n" +
-                    "**[ ✓ ] Activé recommandé.**" },
-
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "Empêcher la suppression des bâtiments" },
+                // Protections
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "● Empêcher la suppression des bâtiments" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
-                    "**Les bâtiments = cellules occupées**. Empêche l'aperçu/l'application de nouveaux zonages de transformer des bâtiments existants en bâtiments condamnés.\n\n" +
-                    "**[ ✓ ] Activé recommandé.**" },
+                    "**Bâtiments = cellules occupées**. Empêche l’aperçu/application de condamner des bâtiments.\n\n" +
+                    "**[ ✓ ] Activation recommandée.**" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● Empêcher la réinitialisation des carrés déjà peints/zonés" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
+                    "Ne réinitialise pas les cellules déjà zonées pendant l’aperçu/application.\n\n" +
+                    "**[ ✓ ] Activation recommandée.**" },
 
                 // Keybind
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Afficher/Masquer le panneau de mise à jour" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Panneau de mise à jour On/Off" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "Afficher le panneau Easy Zoning (**Ctrl+V par défaut**)." },
+                    "**Raccourci clavier** pour afficher rapidement le panneau Easy Zoning\n" +
+                    "**par défaut Ctrl+V**" },
 
                 // Compatibility
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ Bouton Contour" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ Bouton de courbes de niveau" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
-                    "**[ ✓ ] activé**, affiche le bouton Contour dans le panneau Easy Zoning pour les routes existantes.\n\n" +
-                    "Désactiver si un autre mod gère déjà les courbes de niveau du terrain." },
+                    "**[ ✓ ] activé**, affiche le bouton de terrain Contour dans le panneau de mise à jour des routes existantes du mod.\n\n" +
+                    "● Désactivez ceci si vous préférez un panneau plus petit ou si un autre mod gère les lignes de terrain." },
 
                 // UI
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Style de panneau transparent" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Panneau verre" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
-                    "**[ ✓ ] activé**, utilise un panneau translucide plus clair.\n" +
-                    "**[   ] désactivé**, utilise un panneau plus sombre de style vanilla.\n\n" +
-                    "Style visuel uniquement. Aucun flou n'est utilisé." },
+                    "**[ ✓ ] activé**, utilise un style transparent et translucide pour le panneau.\n" +
+                    "**[   ] désactivé**, utilise un panneau gris.\n\n" +
+                    "Style visuel uniquement." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Couleur de bordure : suppressions en aperçu" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
+                    "Couleur de bordure pour l’aperçu des cellules à supprimer.\n\n" +
+                    "<Orange> = plus vif et plus facile à voir.\n" +
+                    "<Rouge> = contraste rouge plus fort.\n" +
+                    "<Rouge vanilla> = correspond à l’apparence par défaut du jeu." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Opacité de la bordure" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
+                    "Ajuste l’opacité de la bordure de l’aperçu de suppression.\n\n" +
+                    "<100%> garde la transparence normale de l’aperçu.\n" +
+                    "<0%> masque la bordure." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "Couleur de remplissage : suppressions en aperçu" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
+                    "Style de couleur de remplissage pour l’aperçu des cellules pouvant être supprimées.\n\n" +
+                    "<Rouge vanilla> = apparence actuelle du jeu.\n" +
+                    "<Blanc> = contraste plus net.\n" +
+                    "<Orange> = correspond à la bordure orange.\n" +
+                    "<Aucun> = bordure seule, minimaliste" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Opacité du remplissage" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)),
+                    "Ajuste l’opacité du remplissage pour l’aperçu des cellules supprimables.\n\n" +
+                    "<100%> garde la transparence normale de l’aperçu.\n" +
+                    "<0%> masque le remplissage.\n" +
+                    "Ignoré si <Remplissage suppression> est réglé sur <Aucun>." },
+
+                // Dropdown values
+                { "EasyZoning.Dropdown.Color.Orange", "Orange" },
+                { "EasyZoning.Dropdown.Color.Red", "Rouge" },
+                { "EasyZoning.Dropdown.Color.VanillaRed", "Rouge vanilla" },
+                { "EasyZoning.Dropdown.Color.White", "Blanc" },
+                { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "Aucun (bordure seule)" },
 
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Afficher les instructions" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),
-                    "Afficher ou masquer les **instructions d'utilisation** ci-dessous." },
+                    "Afficher ou masquer les **instructions d’utilisation** ci-dessous." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
                     "<Nouvelle route>\n" +
-                    "1. Ouvrir le panneau Routes (choisir une route).\n" +
-                    "2. En bas du panneau d'outil route : utilisez les 3 icônes EZ pour Deux côtés / Gauche / Droite.\n" +
+                    "1. Ouvrez le panneau Routes (choisissez une route).\n" +
+                    "2. En bas du panneau d’outil de route : utilisez les 3 icônes EZ pour Deux côtés / Gauche / Droite.\n" +
                     "   Cliquez à nouveau sur le bouton sélectionné pour Aucun.\n" +
-                    "3. Tracer la route normalement.\n\n" +
+                    "3. Dessinez normalement.\n\n" +
                     "-----------------------------------------\n" +
-                    "  RMB = clic droit, LMB = clic gauche\n" +
+                    "  <RMB> = clic droit, <LMB> = clic gauche\n" +
                     "-----------------------------------------\n\n" +
                     "<Route existante>\n" +
-                    "1. Ouvrir le panneau EZ de mise à jour : cliquer sur <Ctrl+V> pour afficher/masquer le panneau\n" +
-                    "   (ou <l'icône en haut à gauche> fait la même chose).\n" +
+                    "1. Ouvrez le panneau EZ Update : cliquez sur <Ctrl+V> pour activer/désactiver le panneau\n" +
+                    "   (<icône en haut à gauche> fait la même chose).\n" +
                     "2. Utilisez les 3 icônes EZ pour Deux côtés / Gauche / Droite.\n" +
-                    "   Cliquez à nouveau sur le bouton sélectionné pour Aucun.\n" +
-                    "3. Survoler + prévisualiser une route.\n" +
-                    "4. L'aperçu rouge = cellules qui seront supprimées.\n" +
+                    "   Cliquez à nouveau sur le bouton pour Aucun.\n" +
+                    "3. Survolez une route pour prévisualiser.\n" +
+                    "4. Aperçu rouge = cellules à supprimer.\n" +
                     "5. <RMB fait défiler> : Deux côtés → Gauche → Droite → Aucun → ...\n" +
-                    "6. <LMB une fois> : applique (valide).\n" +
-                    "7. <Maintenir LMB + glisser> sur plusieurs segments de route, puis relâcher pour appliquer.\n" +
-                    "8. <Annuler :> éloigner la souris et relâcher **LMB**.\n\n" +
+                    "6. <LMB une fois> : applique (verrouille le choix).\n" +
+                    "7. <Maintenir LMB + glisser> le long de plusieurs sections de route, relâcher pour appliquer.\n" +
+                    "8. <Annuler :> éloignez la souris et relâchez **LMB**.\n\n" +
                     "-------------------------------------------\n" +
                     "<BOUTON OPTIONNEL>\n" +
-                    "• <Contour> affiche les lignes d'altitude du terrain." },
+                    "• <Courbes de niveau> affiche les lignes d’élévation du terrain." },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Cycle classique par clic droit" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Cycle classique au clic droit" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
-                    "**OFF recommandé** pour que RMB fasse défiler les 4 modes :\n" +
-                    "**Deux côtés → Gauche → Droite → Aucun → ...**\n\n" +
-                    "Avantage : moins besoin de ramener la souris vers le panneau d'outil.\n\n" +
+                    "**OFF est recommandé**\n" +
+                    "OFF signifie que RMB fait défiler les 4 modes : **Deux côtés → Gauche → Droite → Aucun → ...**\n\n" +
+                    "Avantage désactivé : moins besoin de ramener la souris vers le panneau d’outil.\n\n" +
                     "--------------------------------------\n" +
-                    "Si le mode classique est ON : RMB alterne entre deux ensembles séparés :\n" +
-                    "Gauche ↔ Droite\n" +
-                    "Deux côtés ↔ Aucun" },
+                    "Si Classique est ON : RMB bascule dans deux groupes séparés :\n" +
+                    "Gauche ↔ Droite seulement\n" +
+                    "Deux côtés ↔ Aucun seulement"
+                },
 
                 // Keybinding dialog title
-                { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Afficher/Masquer le panneau Easy Zoning de mise à jour" },
+                { m_Settings.GetBindingKeyLocaleID(Mod.kToggleToolActionName), "Basculer le panneau de mise à jour Easy Zoning" },
 
                 // About tab
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "Nom du mod" },
@@ -129,7 +166,7 @@ namespace EasyZoning
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "Version actuelle du mod." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadox)), "Paradox Mods" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),  "Ouvrir la page Paradox Mods de l'auteur." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),  "Ouvrir la page Paradox Mods de l’auteur." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "Rejoindre le Discord du mod." },
             };

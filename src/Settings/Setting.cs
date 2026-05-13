@@ -2,7 +2,7 @@
 // Purpose: Options UI + one rebindable hotkey (default Ctrl+V).
 // Notes:
 //   - No UI strings live here. All text is in LocaleEN.cs for translation.
-//   - Usage instructions are a multiline row whose text is localized.
+//   - Usage instructions are multiline row and text is localized.
 //   - Usage row is hidden when ShowUsage is OFF.
 
 namespace EasyZoning
@@ -11,17 +11,19 @@ namespace EasyZoning
     using Game.Input;                // ProxyBinding, BindingKeyboard, ActionType
     using Game.Modding;              // IMod, ModSetting base
     using Game.Settings;             // Settings UI attributes
+    using Game.UI.Localization;      // LocalizedString.Id for dropdown labels
+    using Game.UI.Widgets;           // DropdownItem<T>
     using System;                    // Exception in URL open handlers
     using UnityEngine;               // Application.OpenURL
 
     [FileLocation("ModsSettings/EasyZoning/EasyZoning")]
     [SettingsUITabOrder(kActionsTab, kLegacyTab, kAboutTab)]
     [SettingsUIGroupOrder(
-        kToggleGroup, kKeybindingGroup, kCompatibilityGroup, kUiGroup, kUsageGroup,
+        kProtectGroup, kKeybindingGroup, kCompatibilityGroup, kUiGroup, kUsageGroup,
         kLegacyGroup,
         kAboutInfoGroup, kAboutLinksGroup)]
     [SettingsUIShowGroupName(
-        kToggleGroup, kUsageGroup)] // kLegacyGroup and other names omitted on purpose.
+        kProtectGroup, kUiGroup, kUsageGroup)] // kLegacyGroup and other names omitted on purpose so omitted groups stay hidden in UI.
     [SettingsUIKeyboardAction(Mod.kToggleToolActionName, ActionType.Button, usages: new[] { "Game" })]
     public sealed class Setting : ModSetting
     {
@@ -31,14 +33,22 @@ namespace EasyZoning
         public const string kAboutTab = "About";
 
         // Groups
-        public const string kToggleGroup = "Zoning Tools";
+        public const string kProtectGroup = "Protections";
         public const string kKeybindingGroup = "Key bindings";
         public const string kCompatibilityGroup = "Compatibility";
-        public const string kUiGroup = "UI";
+        public const string kUiGroup = "Visuals";
         public const string kUsageGroup = "Usage";
         public const string kLegacyGroup = "Legacy Tool";
         public const string kAboutInfoGroup = "Info";
         public const string kAboutLinksGroup = "Links";
+
+        public const string kRemovePreviewFillVanillaRed = "vanilla-red";
+        public const string kRemovePreviewFillWhite = "white";
+        public const string kRemovePreviewFillOrange = "orange";
+        public const string kRemovePreviewFillNone = "none";
+        public const string kRemovePreviewBorderOrange = "orange";
+        public const string kRemovePreviewBorderRed = "red";
+        public const string kRemovePreviewBorderVanillaRed = "vanilla-red";
 
         public Setting(IMod mod) : base(mod)
         {
@@ -46,10 +56,10 @@ namespace EasyZoning
 
         // --- Zone Options ---
 
-        [SettingsUISection(kActionsTab, kToggleGroup)]
+        [SettingsUISection(kActionsTab, kProtectGroup)]
         public bool RemoveOccupiedCells { get; set; } = true;
 
-        [SettingsUISection(kActionsTab, kToggleGroup)]
+        [SettingsUISection(kActionsTab, kProtectGroup)]
         public bool RemoveZonedCells { get; set; } = true;
 
         // --- Key bindings ---
@@ -73,6 +83,32 @@ namespace EasyZoning
         [SettingsUISection(kActionsTab, kUiGroup)]
         public bool UseGlassPanel { get; set; } = true;
 
+        [SettingsUISection(kActionsTab, kUiGroup)]
+        [SettingsUIDropdown(typeof(Setting), nameof(GetRemovePreviewBorderStyleValues))]
+        public string RemovePreviewBorderStyle { get; set; } = kRemovePreviewBorderOrange;
+
+        // Compatibility shim for older locale keys / saved settings.
+        // Intentionally ignored so updated installs default to the new orange-border mode.
+        [SettingsUIHidden]
+        public bool UseOrangeRemovePreviewEdge
+        {
+            get => RemovePreviewBorderStyle == kRemovePreviewBorderOrange;
+            set { }
+        }
+
+        [SettingsUISlider(min = 0, max = 100, step = 5, scalarMultiplier = 1, unit = "percentage")]
+        [SettingsUISection(kActionsTab, kUiGroup)]
+        public int RemovePreviewEdgeOpacityPercent { get; set; } = 100;
+
+        [SettingsUISection(kActionsTab, kUiGroup)]
+        [SettingsUIDropdown(typeof(Setting), nameof(GetRemovePreviewFillStyleValues))]
+        public string RemovePreviewFillStyle { get; set; } = kRemovePreviewFillVanillaRed;
+
+        [SettingsUISlider(min = 0, max = 100, step = 5, scalarMultiplier = 1, unit = "percentage")]
+        [SettingsUIDisableByCondition(typeof(Setting), nameof(IsRemovePreviewFillOpacityDisabled))]
+        [SettingsUISection(kActionsTab, kUiGroup)]
+        public int RemovePreviewFillOpacityPercent { get; set; } = 100;
+
         // --- Usage (Actions tab) ---
 
         // Default OFF.
@@ -85,6 +121,50 @@ namespace EasyZoning
         public string UsageText => string.Empty;
 
         private bool HideUsageText( ) => !ShowUsage;
+        private bool IsRemovePreviewFillOpacityDisabled( ) => RemovePreviewFillStyle == kRemovePreviewFillNone;
+
+        public static DropdownItem<string>[] GetRemovePreviewBorderStyleValues( ) => new[]
+        {
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewBorderOrange,
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.Orange"),
+            },
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewBorderRed,
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.Red"),
+            },
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewBorderVanillaRed,
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.VanillaRed"),
+            },
+        };
+
+        public static DropdownItem<string>[] GetRemovePreviewFillStyleValues( ) => new[]
+        {
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewFillVanillaRed,
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.VanillaRed"),
+            },
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewFillWhite,
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.White"),
+            },
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewFillOrange,
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.Orange"),
+            },
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewFillNone,
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Fill.NoneBorderOnly"),
+            },
+        };
 
         // --- Legacy (Legacy tab) ---
 
@@ -149,6 +229,10 @@ namespace EasyZoning
             RemoveZonedCells = true;
             ShowContourButton = true;
             UseGlassPanel = true;
+            RemovePreviewBorderStyle = kRemovePreviewBorderOrange;
+            RemovePreviewEdgeOpacityPercent = 100;
+            RemovePreviewFillStyle = kRemovePreviewFillVanillaRed;
+            RemovePreviewFillOpacityPercent = 100;
             ShowUsage = false;
             LegacyRightClickCycle = false;
         }
