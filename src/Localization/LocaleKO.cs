@@ -107,6 +107,13 @@ namespace EasyZoning
                     "<0%>는 채우기를 숨깁니다.\n" +
                     "<제거 채우기>가 <없음>이면 무시됩니다." },
 
+                // Dropdown values
+                { "EasyZoning.Dropdown.Color.Orange", "주황색" },
+                { "EasyZoning.Dropdown.Color.Red", "빨간색" },
+                { "EasyZoning.Dropdown.Color.VanillaRed", "바닐라 빨간색" },
+                { "EasyZoning.Dropdown.Color.White", "흰색" },
+                { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "없음 (테두리만)" },
+
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "설명 표시" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),

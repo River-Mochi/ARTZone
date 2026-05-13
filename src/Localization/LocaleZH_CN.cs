@@ -107,6 +107,13 @@ namespace EasyZoning
                     "<0%> 隐藏填充。\n" +
                     "如果 <移除填充> 设置为 <无>，则会被忽略。" },
 
+                // Dropdown values
+                { "EasyZoning.Dropdown.Color.Orange", "橙色" },
+                { "EasyZoning.Dropdown.Color.Red", "红色" },
+                { "EasyZoning.Dropdown.Color.VanillaRed", "原版红色" },
+                { "EasyZoning.Dropdown.Color.White", "白色" },
+                { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "无（仅边框）" },
+
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "显示说明" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),

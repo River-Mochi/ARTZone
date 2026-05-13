@@ -107,6 +107,13 @@ namespace EasyZoning
                     "<0%> blendet die Füllung aus.\n" +
                     "Wird ignoriert, wenn <Entfernen-Füllung> auf <Keine> steht." },
 
+                // Dropdown values
+                { "EasyZoning.Dropdown.Color.Orange", "Orange" },
+                { "EasyZoning.Dropdown.Color.Red", "Rot" },
+                { "EasyZoning.Dropdown.Color.VanillaRed", "Vanilla-Rot" },
+                { "EasyZoning.Dropdown.Color.White", "Weiß" },
+                { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "Keine (nur Rand)" },            
+
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Anleitung anzeigen" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),

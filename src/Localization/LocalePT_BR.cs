@@ -107,6 +107,13 @@ namespace EasyZoning
                     "<0%> oculta o preenchimento.\n" +
                     "Ignorado se <Preenchimento de remoção> estiver definido como <Nenhum>." },
 
+                // Dropdown values
+                { "EasyZoning.Dropdown.Color.Orange", "Laranja" },
+                { "EasyZoning.Dropdown.Color.Red", "Vermelho" },
+                { "EasyZoning.Dropdown.Color.VanillaRed", "Vermelho vanilla" },
+                { "EasyZoning.Dropdown.Color.White", "Branco" },
+                { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "Nenhum (só borda)" },
+             
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Mostrar instruções" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),

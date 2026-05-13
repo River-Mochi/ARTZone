@@ -107,6 +107,13 @@ namespace EasyZoning
                     "<0%> は塗りつぶしを非表示にします。\n" +
                     "<削除塗りつぶし> が <なし> の場合は無視されます。" },
 
+                // Dropdown values
+                { "EasyZoning.Dropdown.Color.Orange", "オレンジ" },
+                { "EasyZoning.Dropdown.Color.Red", "赤" },
+                { "EasyZoning.Dropdown.Color.VanillaRed", "バニラ赤" },
+                { "EasyZoning.Dropdown.Color.White", "白" },
+                { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "なし（枠線のみ）" },
+                
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "説明を表示" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),

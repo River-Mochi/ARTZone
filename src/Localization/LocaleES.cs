@@ -107,6 +107,13 @@ namespace EasyZoning
                     "<0%> oculta el relleno.\n" +
                     "Se ignora si <Relleno de eliminación> está en <Ninguno>." },
 
+                // Dropdown values
+                { "EasyZoning.Dropdown.Color.Orange", "Naranja" },
+                { "EasyZoning.Dropdown.Color.Red", "Rojo" },
+                { "EasyZoning.Dropdown.Color.VanillaRed", "Rojo vanilla" },
+                { "EasyZoning.Dropdown.Color.White", "Blanco" },
+                { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "Ninguno (solo borde)" },
+
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Mostrar instrucciones" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),

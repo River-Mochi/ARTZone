@@ -107,6 +107,13 @@ namespace EasyZoning
                     "<0%> ukrywa wypełnienie.\n" +
                     "Ignorowane, jeśli <Wypełnienie usuwania> ustawiono na <Brak>." },
 
+                // Dropdown values
+                { "EasyZoning.Dropdown.Color.Orange", "Pomarańczowy" },
+                { "EasyZoning.Dropdown.Color.Red", "Czerwony" },
+                { "EasyZoning.Dropdown.Color.VanillaRed", "Vanilla red" },
+                { "EasyZoning.Dropdown.Color.White", "Biały" },
+                { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "Brak (tylko obramowanie)" },
+
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Pokaż instrukcje" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),

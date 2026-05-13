@@ -107,6 +107,13 @@ namespace EasyZoning
                     "<0%> masque le remplissage.\n" +
                     "Ignoré si <Remplissage suppression> est réglé sur <Aucun>." },
 
+                // Dropdown values
+                { "EasyZoning.Dropdown.Color.Orange", "Orange" },
+                { "EasyZoning.Dropdown.Color.Red", "Rouge" },
+                { "EasyZoning.Dropdown.Color.VanillaRed", "Rouge vanilla" },
+                { "EasyZoning.Dropdown.Color.White", "Blanc" },
+                { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "Aucun (bordure seule)" },
+
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Afficher les instructions" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),

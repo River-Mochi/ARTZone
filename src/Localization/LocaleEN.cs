@@ -106,6 +106,13 @@ namespace EasyZoning
                     "<100%> keeps the preview's normal translucency.\n" +
                     "<0%> hides the fill.\n" +
                     "Ignored if <Remove fill> is set to <None>." },
+  
+                // Dropdown values
+                { "EasyZoning.Dropdown.Color.Orange", "Orange" },
+                { "EasyZoning.Dropdown.Color.Red", "Red" },
+                { "EasyZoning.Dropdown.Color.VanillaRed", "Vanilla red" },
+                { "EasyZoning.Dropdown.Color.White", "White" },
+                { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "None (border only)" },
 
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Show Instructions" },

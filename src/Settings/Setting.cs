@@ -123,22 +123,23 @@ namespace EasyZoning
         private bool HideUsageText( ) => !ShowUsage;
         private bool IsRemovePreviewFillOpacityDisabled( ) => RemovePreviewFillStyle == kRemovePreviewFillNone;
 
+
         public static DropdownItem<string>[] GetRemovePreviewBorderStyleValues( ) => new[]
         {
             new DropdownItem<string>
             {
                 value = kRemovePreviewBorderOrange,
-                displayName = LocalizedString.Value("Orange"),
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.Orange"),
             },
             new DropdownItem<string>
             {
                 value = kRemovePreviewBorderRed,
-                displayName = LocalizedString.Value("Red"),
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.Red"),
             },
             new DropdownItem<string>
             {
                 value = kRemovePreviewBorderVanillaRed,
-                displayName = LocalizedString.Value("Vanilla red"),
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.VanillaRed"),
             },
         };
 
@@ -147,22 +148,22 @@ namespace EasyZoning
             new DropdownItem<string>
             {
                 value = kRemovePreviewFillVanillaRed,
-                displayName = LocalizedString.Value("Vanilla red"),
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.VanillaRed"),
             },
             new DropdownItem<string>
             {
                 value = kRemovePreviewFillWhite,
-                displayName = LocalizedString.Value("White"),
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.White"),
             },
             new DropdownItem<string>
             {
                 value = kRemovePreviewFillOrange,
-                displayName = LocalizedString.Value("Orange"),
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.Orange"),
             },
             new DropdownItem<string>
             {
                 value = kRemovePreviewFillNone,
-                displayName = LocalizedString.Value("None (border only)"),
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Fill.NoneBorderOnly"),
             },
         };
 

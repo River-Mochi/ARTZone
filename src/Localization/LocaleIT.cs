@@ -107,6 +107,13 @@ namespace EasyZoning
                     "<0%> nasconde il riempimento.\n" +
                     "Ignorato se <Riempimento rimozione> è impostato su <Nessuno>." },
 
+                // Dropdown values
+                { "EasyZoning.Dropdown.Color.Orange", "Arancione" },
+                { "EasyZoning.Dropdown.Color.Red", "Rosso" },
+                { "EasyZoning.Dropdown.Color.VanillaRed", "Rosso vanilla" },
+                { "EasyZoning.Dropdown.Color.White", "Bianco" },
+                { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "Nessuno (solo bordo)" },
+
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Mostra istruzioni" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),
