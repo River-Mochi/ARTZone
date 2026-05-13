@@ -52,7 +52,7 @@ namespace EasyZoning
                 // Protections
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "● Prevent removal of buildings" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
-                    "**Buildings = occupied cells**. Prevents preview/apply of new zones from turning existing buildings into condemned.\n\n" +
+                    "**Buildings = occupied cells**. Prevents preview/apply from turning buildings into condemned.\n\n" +
                     "**[ ✓ ] Enabled recommended.**" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● Prevent reset of already painted/zoned squares" },
@@ -79,12 +79,12 @@ namespace EasyZoning
                     "**[   ] disabled**, use a gray panel.\n\n" +
                     "Visual style only." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Remove cells border" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Border color: preview removals" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
                     "Border color for cells to be removed preview.\n\n" +
                     "<Orange> = brighter and easier to see.\n" +
-                    "<Red> = stronger red border for grass/trees.\n" +
-                    "<Vanilla red> = match the game's default look." },
+                    "<Red> = stronger red border contrast.\n" +
+                    "<Vanilla red> = match default game look." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Border opacity" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
@@ -92,7 +92,7 @@ namespace EasyZoning
                     "<100%> keeps the preview's normal translucency.\n" +
                     "<0%> hides the border." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "Remove cells fill" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "Fill color: preview removals" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
                     "Fill color style for preview of cells that can be removed.\n\n" +
                     "<Vanilla red> = current game look.\n" +
