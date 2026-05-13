@@ -169,7 +169,7 @@ namespace EasyZoning
                 // Existing-block sync: apply tool depths to zone blocks on existing roads.
                 updateSystem.UpdateAt<SyncBlockSystem>(SystemUpdatePhase.Modification4B);
 
-                // Visual override for the orange remove-preview border.
+                // Visual override for preview border and fill colors (remove cells only)
                 updateSystem.UpdateAt<PreviewColorOverrideSystem>(SystemUpdatePhase.UIUpdate);
 
                 // UI bridge: binds C# values to the React UI (runs every frame in UIUpdate).
