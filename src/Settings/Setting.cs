@@ -96,7 +96,7 @@ namespace EasyZoning
             set { }
         }
 
-        [SettingsUISlider(min = 20, max = 100, step = 5, scalarMultiplier = 1, unit = "percentage")]
+        [SettingsUISlider(min = 0, max = 100, step = 5, scalarMultiplier = 1, unit = "percentage")]
         [SettingsUISection(kActionsTab, kUiGroup)]
         public int RemovePreviewEdgeOpacityPercent { get; set; } = 100;
 

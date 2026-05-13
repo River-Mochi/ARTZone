@@ -89,20 +89,22 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Border opacity" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
                     "Adjusts the remove-preview border opacity.\n\n" +
-                    "<100%> keeps the preview's normal translucency." },
+                    "<100%> keeps the preview's normal translucency.\n" +
+                    "<0%> hides the border." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "Remove cells fill" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
-                    "Fill style for cells to be removed preview overlay.\n\n" +
+                    "Fill color style for preview of cells that can be removed.\n\n" +
                     "<Vanilla red> = current game look.\n" +
                     "<White> = cleaner contrast.\n" +
                     "<Orange> = matches the orange border.\n" +
-                    "<None> = border only." },
+                    "<None> = border only, minimalist" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Fill opacity" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)),
                     "Adjusts the fill opacity for preview of removeable cells.\n\n" +
                     "<100%> keeps the preview's normal translucency.\n" +
+                    "<0%> hides the fill.\n" +
                     "Ignored if <Remove fill> is set to <None>." },
 
                 // Usage toggle + multiline block
