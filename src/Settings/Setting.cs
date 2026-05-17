@@ -109,6 +109,40 @@ namespace EasyZoning
         [SettingsUISection(kActionsTab, kUiGroup)]
         public int RemovePreviewFillOpacityPercent { get; set; } = 100;
 
+        [SettingsUIButtonGroup(kUiGroup)]
+        [SettingsUIButton]
+        [SettingsUISection(kActionsTab, kUiGroup)]
+        public bool ApplyHighContrastPreset
+        {
+            set
+            {
+                if (!value)
+                {
+                    return;
+                }
+
+                SetHighContrastPreset();
+                ApplyAndSave();
+            }
+        }
+
+        [SettingsUIButtonGroup(kUiGroup)]
+        [SettingsUIButton]
+        [SettingsUISection(kActionsTab, kUiGroup)]
+        public bool ApplyGameColorPreset
+        {
+            set
+            {
+                if (!value)
+                {
+                    return;
+                }
+
+                SetGameColorPreset();
+                ApplyAndSave();
+            }
+        }
+
         // --- Usage (Actions tab) ---
 
         // Default OFF.
@@ -122,6 +156,23 @@ namespace EasyZoning
 
         private bool HideUsageText( ) => !ShowUsage;
         private bool IsRemovePreviewFillOpacityDisabled( ) => RemovePreviewFillStyle == kRemovePreviewFillNone;
+
+        private void SetHighContrastPreset()
+        {
+            UseGlassPanel = true;
+            RemovePreviewBorderStyle = kRemovePreviewBorderOrange;
+            RemovePreviewEdgeOpacityPercent = 100;
+            RemovePreviewFillStyle = kRemovePreviewFillNone;
+            RemovePreviewFillOpacityPercent = 100;
+        }
+
+        private void SetGameColorPreset()
+        {
+            RemovePreviewBorderStyle = kRemovePreviewBorderVanillaRed;
+            RemovePreviewEdgeOpacityPercent = 0;
+            RemovePreviewFillStyle = kRemovePreviewFillVanillaRed;
+            RemovePreviewFillOpacityPercent = 100;
+        }
 
         public static DropdownItem<string>[] GetRemovePreviewBorderStyleValues( ) => new[]
         {
@@ -228,11 +279,7 @@ namespace EasyZoning
             RemoveOccupiedCells = true;
             RemoveZonedCells = true;
             ShowContourButton = true;
-            UseGlassPanel = true;
-            RemovePreviewBorderStyle = kRemovePreviewBorderOrange;
-            RemovePreviewEdgeOpacityPercent = 100;
-            RemovePreviewFillStyle = kRemovePreviewFillVanillaRed;
-            RemovePreviewFillOpacityPercent = 100;
+            SetHighContrastPreset();
             ShowUsage = false;
             LegacyRightClickCycle = false;
         }

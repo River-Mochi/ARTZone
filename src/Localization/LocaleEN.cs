@@ -67,7 +67,7 @@ namespace EasyZoning
                     "**default Ctrl+V**" },
 
                 // Compatibility
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ Contour button" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ Contour Terrain" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
                     "**[ ✓ ] enabled**, show the Contour terrain button in the mod's existing roads update panel.\n\n" +
                     "● Disable this if a smaller panel is preferred or another mod handles terrain lines." },
@@ -106,6 +106,14 @@ namespace EasyZoning
                     "<100%> keeps the preview's normal translucency.\n" +
                     "<0%> hides the fill.\n" +
                     "Ignored if <Remove fill> is set to <None>." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "High Contrast Preset" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
+                    "Sets glass panel ON, orange border, 100% border opacity, and no fill." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Game Color" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
+                    "Uses vanilla red fill and hides the custom border. Panel style is unchanged." },
   
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Orange" },
