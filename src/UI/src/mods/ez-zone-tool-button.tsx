@@ -5,12 +5,11 @@
 // Notes:
 //   - Uses cs2/ui Button "floating" variant, with icon via the `src` prop.
 //   - Keep the colored SVG on Button.src. Do NOT use Icon tinted={true} here;
-//     tinting recolors the SVG and removes EZ's own icon colors for white icon.
-//   - Uses onSelect (CS2 UI toolchain) and not not onClick.
+//     tinting recolors the SVG and hides EZ's own icon colors.
+//   - Uses onSelect (CS2 UI toolchain), not onClick.
 
 import React from "react";
-import { useValue } from "cs2/api";
-import { trigger } from "cs2/api";
+import { trigger, useValue } from "cs2/api";
 import { tool } from "cs2/bindings";
 import { Button } from "cs2/ui";
 import { useLocalization } from "cs2/l10n";
@@ -28,7 +27,7 @@ export default function EZZoneToolButton() {
     const { translate } = useLocalization();
 
     // Vanilla active-tool binding: this drives the GTL selected visual only.
-    // does not toggle the tool; handleSelect below still sends that command to C#.
+    // It does not toggle the tool; handleSelect below sends that command to C#.
     const activeToolId = useValue(tool.activeTool$)?.id;
     const selected = activeToolId === ZONING_TOOL_ID;
 
@@ -55,9 +54,9 @@ export default function EZZoneToolButton() {
     const DescriptionTooltip = resolver.DescriptionTooltip;
 
 
-    // - onSelect is the CS2 UI handler
-    // - Keeps the GTL button independent from keybind conflicts (if Ctrl+V fails, button still works).
-    // - Uses vanilla Button `selected` prop for the light-blue GTL active state.
+    // Button.src preserves EZ's colored SVG; for a white icon, use Icon tinted={true}.
+    // selected gives the vanilla light-blue GTL active state when clicked on.
+    // onSelect is CS2 UI handler; keeps GTL button independent and works if Ctrl+V fails.
     return (
         <DescriptionTooltip title={title} description={description} direction="right">
             <Button
