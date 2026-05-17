@@ -72,6 +72,7 @@ No outline means it's already changed to the current selected option.
 - River-mochi - author
 - thanks to Kemorno (ART mod, retired) and zeeshanabid 94 (zoning toolkit, retired)
 - yenyang - technical support and encouragement
+- Lucas - patch for compatibility with other mods
 - Rouchesta - testing
 - CS2 modding community for testing, feedback
 
@@ -100,10 +101,7 @@ No outline means it's already changed to the current selected option.
 <!-- Changelog for new version. Single or multi line. Supports minimal markdown subset-->
 
 <ChangeLog>
-- Fix: toggles for Protect buildings and Protect zoned-but-empty cells.
-- Right-click cycling now shows vanilla preview colors: red for cells to remove and white for cells to add/keep.
-- New: choose border color, fill color, and opacity for Preview showing of cells to remove.
-- Update all locale files and instructions.
+- Fix: compatibility issue with other mods, per Luca's patch.
 </ChangeLog>
 
 <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
