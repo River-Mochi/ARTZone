@@ -1,18 +1,16 @@
 // File: src/UI/src/index.tsx
-// Purpose: Hook the UI into vanilla, register top-left button + Tool Options
-// section. Keep the options panel visible when the zone tool is active.
+// Purpose: Hook the UI into vanilla, register top-left button, inject new-road
+// controls into vanilla Tool Options, and render the existing-road panel as
+// EZ-owned UI.
 // UI dev mode: launch with --uiDeveloperMode and open localhost:9444.
 
 import type { ModRegistrar, ModuleRegistry } from "cs2/modding";
 import { VanillaComponentResolver } from "./components/VanillaComponentResolver";
 import mod from "mod.json";
 
-// Global (non-module) styling for EZ-only glass Tool Options panel.
-import "./mods/toolOptionsGlass.scss";
-
 import EasyZoningToolButton from "./mods/ez-zone-tool-button";
+import ExistingRoadsPanel from "./mods/ez-existingRoadsPanel";
 import { ZoningToolController } from "./mods/ez-zoneToolSections";
-import { ToolOptionsVisibility } from "./mods/ToolOptionsVisible/toolOptionsVisible";
 
 // Ensure assets are emitted to coui://ui-mods/images/
 import "../images/ico-zones-color02.svg"; // Top-left FAB icon
@@ -29,10 +27,6 @@ const VANILLA = {
     MouseToolOptions: {
         path: "game-ui/game/components/tool-options/mouse-tool-options/mouse-tool-options.tsx",
         exportId: "MouseToolOptions",
-    },
-    ToolOptionsPanelVisible: {
-        path: "game-ui/game/components/tool-options/tool-options-panel.tsx",
-        exportId: "useToolOptionsVisible",
     },
 };
 
@@ -59,20 +53,15 @@ const register: ModRegistrar = (moduleRegistry) => {
     // Add floating button to GameTopLeft region.
     moduleRegistry.append("GameTopLeft", EasyZoningToolButton);
 
-    // Extend Tool Options section to include EZ UI controls.
+    // Existing-road controls are EZ-owned UI, not restyled vanilla Tool Options.
+    moduleRegistry.append("Game", ExistingRoadsPanel);
+
+    // New-road controls still live inside the vanilla road Tool Options panel.
     extendSafe(
         moduleRegistry,
         VANILLA.MouseToolOptions.path,
         VANILLA.MouseToolOptions.exportId,
         ZoningToolController
-    );
-
-    // Keep Tool panel visible when EZ tool is active.
-    extendSafe(
-        moduleRegistry,
-        VANILLA.ToolOptionsPanelVisible.path,
-        VANILLA.ToolOptionsPanelVisible.exportId,
-        ToolOptionsVisibility
     );
 
     console.log(mod.id + " UI module registration completed.");

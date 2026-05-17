@@ -1,9 +1,8 @@
 // File: src/UI/src/mods/ez-zoneToolSections.module.scss
 // Purpose:
-//   Local layout classes for EZ rows inside the vanilla Tool Options panel.
+//   Local layout class for EZ new-road controls inside vanilla Tool Options.
 // Notes:
-//   - .rowNewRoads is only for vanilla new roads.
-//   - .rowExisting is only for EZ existing-roads compact panel.
+//   - Existing-road controls live in ez-existingRoadsPanel.module.scss.
 
 .rowNewRoads {
     display: flex;
@@ -11,15 +10,4 @@
     align-items: center;
     justify-content: flex-start;
     gap: 2rem;
-}
-
-.rowExisting {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 2rem;
-    width: 100%;
-    /* More negative = shift both rows farther left */
-    transform: translateX(-1.5rem);
 }
