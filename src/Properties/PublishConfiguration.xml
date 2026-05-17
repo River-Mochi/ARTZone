@@ -101,7 +101,11 @@ No outline means it's already changed to the current selected option.
 <!-- Changelog for new version. Single or multi line. Supports minimal markdown subset-->
 
 <ChangeLog>
-- Fix: compatibility issue with other mods, per Luca's patch.
+- Improved compatibility with other UI mods.
+- Added buttons: High Contrast Preset and Game Color.
+- New installs default to high-contrast preset for previews of zones to remove.
+- Polished gray/glass panel styling and rounded corners.
+
 </ChangeLog>
 
 <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
