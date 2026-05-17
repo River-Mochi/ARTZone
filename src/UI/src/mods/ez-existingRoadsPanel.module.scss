@@ -32,9 +32,9 @@
 }
 
 .panelVanilla {
-    // Matches CityWatchdog's top toolbar/info button gray.
-    background-color: rgba(36, 54, 66, 0.58);
-    background-image: none;
+    // Matches CityWatchdog's panel body behind the top toolbar buttons.
+    background-color: transparent;
+    background-image: linear-gradient(to bottom, rgba(55, 82, 96, 0.72), rgba(31, 45, 60, 0.66));
 }
 
 .row {
