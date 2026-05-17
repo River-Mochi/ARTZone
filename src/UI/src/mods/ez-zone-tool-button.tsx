@@ -54,9 +54,9 @@ export default function EZZoneToolButton() {
     const DescriptionTooltip = resolver.DescriptionTooltip;
 
 
-    // Button.src preserves EZ's colored SVG; for a white icon, use Icon tinted={true}.
-    // selected gives the vanilla light-blue GTL active state when clicked on.
-    // onSelect is CS2 UI handler; keeps GTL button independent and works if Ctrl+V fails.
+    // Button.src preserves EZ's colored SVG; for a future white icon, use Icon tinted={true}.
+    // selected gives the vanilla light-blue GTL active state while EZ tool is active.
+    // onSelect is CS2 UI handler; button still works if Ctrl+V keybind fails.
     return (
         <DescriptionTooltip title={title} description={description} direction="right">
             <Button
