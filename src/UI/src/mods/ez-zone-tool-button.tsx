@@ -7,18 +7,23 @@
 //   - Uses onSelect (CS2 UI toolchain) and not not onClick.
 
 import React from "react";
+import { useValue } from "cs2/api";
+import { tool } from "cs2/bindings";
 import { Button } from "cs2/ui";
 import { useLocalization } from "cs2/l10n";
 import { trigger } from "cs2/api";
 import mod from "mod.json";
 
 import { VanillaComponentResolver } from "../components/VanillaComponentResolver";
+import { ZONING_TOOL_ID } from "../shared/tool-ids";
 
 // Icon emitted by webpack to coui://ui-mods/images/
 import MainIconPath from "../../images/ico-zones-color02.svg";
 
 export default function EZZoneToolButton() {
     const { translate } = useLocalization();
+    const activeToolId = useValue(tool.activeTool$)?.id;
+    const selected = activeToolId === ZONING_TOOL_ID;
 
     // Tooltip strings live in locale files; fallback text lives here.
     const title = translate("EasyZoning.Zone_Controller.ToolName", "Easy Zoning");
@@ -50,6 +55,8 @@ export default function EZZoneToolButton() {
             <Button
                 variant="floating"
                 src={MainIconPath}
+                tinted={true}
+                selected={selected}
                 onSelect={handleSelect}
             />
         </DescriptionTooltip>
