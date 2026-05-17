@@ -12,70 +12,71 @@
 
 	<!-- Long description (minimal markdown supported) -->
 	<LongDescription>
-### Easy Zoning
+        ### Easy Zoning
 
-Custom zoning for new and existing roads. Newer alternative to Zone Tools.
+        Custom zoning for new and existing roads. Newer alternative to Zone Tools.
 
-### How to use
+        ### How to use
 
-**New Road**
-1. Open Roads panel (i.e., pick small roads)
-2. Near the bottom of tool icons, pick one of 3 EZ icons (see image).
-3. Draw as usual (road appears with cells on one side or no-sides if the 3 icons are flipped off).
+        **New Road**
+        1. Open Roads panel (i.e., pick small roads)
+        2. Near the bottom of tool icons, pick one of 3 EZ icons (see image).
+        3. Draw as usual (road appears with cells on one side or no-sides if the 3 icons are flipped off).
 
-**Existing Road**
-1. Open EZ Update panel: Ctrl+V toggles panel On/Off (top-left icon does the same).
-2. Select an icon to pick a preferred side (see image).
-3. Hover and preview a road.
-4. Right-Click to switch sides (infinitely); **RMB cycles** Both → Left → Right → None →...
-5. Left-Click (LMB) to apply (lock it in).
-6. Or LMB hold+drag along many road sections, release and update is applied.
-7. To Cancel, just move mouse away and release.
-8. Optional: **Contour Lines** terrain toggle
+        **Existing Road**
+        1. Open EZ Update panel: Ctrl+V toggles panel On/Off (top-left icon does the same).
+        2. Select an icon to pick a preferred side (see image).
+        3. Hover and preview a road.
+        4. Right-Click to switch sides (infinitely); **RMB cycles** Both → Left → Right → None →...
+        5. Left-Click (LMB) to apply (lock it in).
+        6. Or LMB hold+drag along many road sections, release and update is applied.
+        7. To Cancel, just move mouse away and release.
+        8. Optional: **Contour Lines** terrain toggle
 
-**Options Menu**
-- ✅ Protect occupied cells (buildings).
-- ✅ Protect zoned-but-empty cells.
-- ✅ Default **Ctrl +V** short-cut can be changed (it opens/closes EZ panel fast)
-- ✅ Choose transparent Glass panel or gray panel
-- ✅ Contour: choice to disable if a smaller panel is preferred or if another mod handles terrain lines.
-- ✅ **Legacy RMB mode** (optional): RMB toggles only **Left↔Right** Or **Both↔None** instead of all 4-cycles.
+        **Options Menu**
+        - ✅ Protect occupied cells (buildings).
+        - ✅ Protect zoned-but-empty cells.
+        - ✅ Default **Ctrl +V** short-cut can be changed (it opens/closes EZ panel fast)
+        - ✅ Choose transparent Glass panel or gray panel
+        - ✅ Contour: choice to disable if a smaller panel is preferred or if another mod handles terrain lines.
+        - ✅ **Legacy RMB mode** (optional): RMB toggles only **Left↔Right** Or **Both↔None** instead of all 4-cycles.
 
-## Support and feedback
+        ## Support and feedback
 
-- If the mod helps you, give it a Like, it's free + easy :)
-- Feedback to GitHub or Discord links on this page.
+        - If the mod helps you, give it a Like, it's free + easy :)
+        - Feedback to GitHub or Discord links on this page.
 
-Power Trick: if you have existing roads and do not want a new road intersecting it to alter zoning,
-pick **none**, then draw the new road. Your existing road should keep zoning facing the same original direction you set.
+        Power Trick: if you have existing roads and do not want a new road intersecting it to alter zoning,
+        pick **none**, then draw the new road. Your existing road should keep zoning facing the same original direction you set.
 
-### Compatibility
-- Does not use Harmony patch; extends vanilla tools (means more stable on patch days, and compatibility).
-- Safe to remove any time. Road you zoned will keep their zoning.
-- Should work with Platter mod.
-- Lightweight, optimized, runs only when needed.
-- This mod has a different UX than Zone Tools. I had both EZ + ZT installed to switch back/forth for testing purposes and it was fine.
-- Recommend: pick one you like more to avoid any unknown future issues. Both use the same game systems, can accomplish the same goal.
-ZT is older, has a moveable panel; EZ is the newest mod + uses vanilla tool panel + sounds, smaller and tidy as it's in the same place as vanilla tool panel.
-
-
-### Tech notes
-- For newly drawn roads, “Left/Right” is relative to the segment’s orientation.
-At some diagonal angles  ↖||↗ it may apply flipped from what you want — use RMB to swap.
-- Highlight outline color on the road indicates the section could be changed.
-No outline means it's already changed to the current selected option.
-- Transparent panel does not use blur filter for better performance.
+        ### Compatibility
+        - Does not use Harmony patch; extends vanilla tools (means more stable on patch days, and compatibility).
+        - Safe to remove any time. Road you zoned will keep their zoning.
+        - Should work with Platter mod.
+        - Lightweight, optimized, runs only when needed.
+        - This mod has a different UX than Zone Tools. I had both EZ + ZT installed to switch back/forth for testing purposes and it was fine.
+        - Recommend: pick one you like more to avoid any unknown future issues. Both use the same game systems, can accomplish the same goal.
+        ZT is older, has a moveable panel; EZ is the newest mod + uses vanilla tool panel + sounds, smaller and tidy as it's in the same place as vanilla tool panel.
 
 
-### Credits
+        ### Tech notes
+        - For newly drawn roads, “Left/Right” is relative to the segment’s orientation.
+        At some diagonal angles  ↖||↗ it may apply flipped from what you want — use RMB to swap.
+        - Highlight outline color on the road indicates the section could be changed.
+        No outline means it's already changed to the current selected option.
+        - Transparent panel does not use blur filter for better performance.
 
-- River-mochi - author
-- thanks to Kemorno (ART mod, retired) and zeeshanabid 94 (zoning toolkit, retired)
-- yenyang - technical support and encouragement
-- Rouchesta - testing
-- CS2 modding community for testing, feedback
 
-</LongDescription>
+        ### Credits
+
+        - River-mochi - author
+        - thanks to Kemorno (ART mod, retired) and zeeshanabid 94 (zoning toolkit, retired)
+        - yenyang - technical support and encouragement
+        - Lucas - patch for compatibility with other mods
+        - Rouchesta - testing
+        - CS2 modding community for testing, feedback
+
+    </LongDescription>
     <!--Thumbnail-->
 <Thumbnail Value="Properties/EZthumbnail01.jpg" />
     <!--Screenshot, can be set multiple times-->
@@ -100,10 +101,7 @@ No outline means it's already changed to the current selected option.
 <!-- Changelog for new version. Single or multi line. Supports minimal markdown subset-->
 
 <ChangeLog>
-- Fix: toggles for Protect buildings and Protect zoned-but-empty cells.
-- Right-click cycling now shows vanilla preview colors: red for cells to remove and white for cells to add/keep.
-- New: choose border color, fill color, and opacity for Preview showing of cells to remove.
-- Update all locale files and instructions.
+- Fix: compatibility issue with other mods, per Luca's patch.
 </ChangeLog>
 
 <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->

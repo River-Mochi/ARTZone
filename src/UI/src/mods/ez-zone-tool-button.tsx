@@ -4,6 +4,9 @@
 //   Clicking triggers ToggleZoneControllerTool on the C# side.
 // Notes:
 //   - Uses cs2/ui Button "floating" variant, with icon via the `src` prop.
+//   - Keep the colored SVG on Button.src. Do NOT use Icon tinted={true} here;
+//     tinting intentionally recolors the SVG and removes EZ's own icon colors.
+//   - Uses the vanilla Button `selected` prop for the light-blue GameTopLeft active state.
 //   - Uses onSelect (CS2 UI toolchain) and not not onClick.
 
 import React from "react";
@@ -17,11 +20,16 @@ import mod from "mod.json";
 import { VanillaComponentResolver } from "../components/VanillaComponentResolver";
 import { ZONING_TOOL_ID } from "../shared/tool-ids";
 
-// Icon emitted by webpack to coui://ui-mods/images/
+// Color SVG path:
+//   Button src={MainIconPath} lets the SVG keep its own colors.
+//   Use Icon tinted={true} only for icons that are meant to become monochrome/white.
 import MainIconPath from "../../images/ico-zones-color02.svg";
 
 export default function EZZoneToolButton() {
     const { translate } = useLocalization();
+
+    // Vanilla active-tool binding: this drives the GTL selected visual only.
+    // It does not toggle the tool; handleSelect below still sends that command to C#.
     const activeToolId = useValue(tool.activeTool$)?.id;
     const selected = activeToolId === ZONING_TOOL_ID;
 
@@ -55,7 +63,6 @@ export default function EZZoneToolButton() {
             <Button
                 variant="floating"
                 src={MainIconPath}
-                tinted={true}
                 selected={selected}
                 onSelect={handleSelect}
             />
