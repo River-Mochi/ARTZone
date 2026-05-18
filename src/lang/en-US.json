@@ -1,6 +1,6 @@
 {
   "EasyZoning.Zone_Controller.ToolName": "Easy Zoning",
-  "EasyZoning.Zone_Controller.ToolDescription": "This opens the EZ update roads panel.\nShortcut: Ctrl+V default (see Options menu).",
+  "EasyZoning.Zone_Controller.ToolDescription": "Opens the EZ panel to update roads.\nShortcut: Ctrl+V default (see Options menu).",
 
   "EasyZoning.NewRoads.SectionTitle": "Zone Change",
 
