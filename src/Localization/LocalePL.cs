@@ -67,7 +67,10 @@ namespace EasyZoning
                     "**domyślnie Ctrl+V**" },
 
                 // Compatibility
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ Przycisk poziomic" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ContourIconText)), "Poziomice" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ContourIconText)), "" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "Pokaż przycisk" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
                     "**[ ✓ ] włączone**, pokazuje przycisk terenu Contour w panelu aktualizacji istniejących dróg moda.\n\n" +
                     "● Wyłącz to, jeśli wolisz mniejszy panel albo inny mod obsługuje linie terenu." },
@@ -149,7 +152,7 @@ namespace EasyZoning
                     "8. <Anuluj:> odsuń mysz i puść **LMB**.\n\n" +
                     "-------------------------------------------\n" +
                     "<PRZYCISK OPCJONALNY>\n" +
-                    "• <Poziomice> pokazuje linie wysokości terenu." },
+                    "<◎ Poziomice> pokazuje linie wysokości terenu." },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy

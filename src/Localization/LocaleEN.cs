@@ -67,10 +67,10 @@ namespace EasyZoning
                     "**default Ctrl+V**" },
 
                 // Compatibility
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ContourIconText)), "Contour" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ContourIconText)), "Contour Lines" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ContourIconText)), "" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "Show Contour button" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "Show button" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
                     "**[ ✓ ] enabled**, show the Contour lines button in the existing roads update panel.\n\n" +
                     "● Disable this if a smaller panel is preferred or another mod handles contour lines." },
@@ -157,7 +157,8 @@ namespace EasyZoning
                     "8. <Cancel:> move mouse away and release **LMB**.\n\n" +
                     "-------------------------------------------\n" +
                     "<OPTIONAL BUTTON>\n" +
-                    "• <Contour> shows terrain elevation lines." },
+                    "<◎ Contour Lines> shows terrain elevation lines."
+                },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy

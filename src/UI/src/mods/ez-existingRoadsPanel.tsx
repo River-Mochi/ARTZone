@@ -16,7 +16,7 @@ import mod from "mod.json";
 import { ZONING_TOOL_ID } from "../shared/tool-ids";
 import { VanillaComponentResolver } from "../components/VanillaComponentResolver";
 
-import { panel, panelGlass, panelVanilla, row } from "./ez-existingRoadsPanel.module.scss";
+import { contourRow, panel, panelGlass, panelVanilla, row } from "./ez-existingRoadsPanel.module.scss";
 
 // Icon assets (webpack emits to coui://ui-mods/images/)
 import IconBoth from "../../images/icons/mode-icon-both.svg";
@@ -128,7 +128,7 @@ export default function ExistingRoadsPanel() {
             </div>
 
             {showContourButton && (
-                <div className={row}>
+                <div className={`${row} ${contourRow}`}>
                     <ToolButton
                         selected={contourEnabled}
                         tooltip={tipContour}

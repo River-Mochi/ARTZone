@@ -67,7 +67,10 @@ namespace EasyZoning
                     "**デフォルト Ctrl+V**" },
 
                 // Compatibility
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ 等高線ボタン" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ContourIconText)), "等高線" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ContourIconText)), "" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "ボタンを表示" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
                     "**[ ✓ ] 有効**、Modの既存道路更新パネルに Contour 地形ボタンを表示します。\n\n" +
                     "● 小さめのパネルが好みの場合、または別Modが地形ラインを扱う場合は無効にしてください。" },
@@ -149,7 +152,7 @@ namespace EasyZoning
                     "8. <キャンセル:> マウスを離れた場所へ動かして **LMB** を離します。\n\n" +
                     "-------------------------------------------\n" +
                     "<任意ボタン>\n" +
-                    "• <等高線> は地形の高さラインを表示します。" },
+                    "<◎ 等高線> は地形の高さラインを表示します。" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy

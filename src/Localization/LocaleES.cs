@@ -67,7 +67,10 @@ namespace EasyZoning
                     "**predeterminado Ctrl+V**" },
 
                 // Compatibility
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ Botón de contorno" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ContourIconText)), "Líneas de contorno" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ContourIconText)), "" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "Mostrar botón" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
                     "**[ ✓ ] activado**, muestra el botón de terreno Contour en el panel de actualización de carreteras existentes del mod.\n\n" +
                     "● Desactiva esto si prefieres un panel más pequeño o si otro mod gestiona las líneas del terreno." },
@@ -149,7 +152,7 @@ namespace EasyZoning
                     "8. <Cancelar:> aleja el mouse y suelta **LMB**.\n\n" +
                     "-------------------------------------------\n" +
                     "<BOTÓN OPCIONAL>\n" +
-                    "• <Contorno> muestra líneas de elevación del terreno." },
+                    "<◎ Contorno> muestra líneas de elevación del terreno." },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy

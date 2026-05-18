@@ -67,7 +67,10 @@ namespace EasyZoning
                     "**기본값 Ctrl+V**" },
 
                 // Compatibility
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ 등고선 버튼" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ContourIconText)), "등고선" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ContourIconText)), "" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "버튼 표시" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
                     "**[ ✓ ] 켜짐**, 모드의 기존 도로 업데이트 패널에 Contour 지형 버튼을 표시합니다.\n\n" +
                     "● 더 작은 패널을 원하거나 다른 모드가 지형선을 처리한다면 끄세요." },
@@ -149,7 +152,7 @@ namespace EasyZoning
                     "8. <취소:> 마우스를 멀리 이동하고 **LMB**를 놓습니다.\n\n" +
                     "-------------------------------------------\n" +
                     "<선택 버튼>\n" +
-                    "• <등고선>은 지형 높이선을 표시합니다." },
+                    "<◎ 등고선>은 지형 높이선을 표시합니다." },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy

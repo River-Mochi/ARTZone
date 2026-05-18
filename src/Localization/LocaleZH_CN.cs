@@ -67,7 +67,10 @@ namespace EasyZoning
                     "**默认 Ctrl+V**" },
 
                 // Compatibility
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ 等高线按钮" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ContourIconText)), "等高线" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ContourIconText)), "" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "显示按钮" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
                     "**[ ✓ ] 启用**，在模组的现有道路更新面板中显示 Contour 地形按钮。\n\n" +
                     "● 如果想要更小的面板，或其他模组已处理地形线，请关闭此项。" },
@@ -149,7 +152,7 @@ namespace EasyZoning
                     "8. <取消：> 将鼠标移开并松开 **LMB**。\n\n" +
                     "-------------------------------------------\n" +
                     "<可选按钮>\n" +
-                    "• <等高线> 显示地形高程线。" },
+                    "<◎ 等高线> 显示地形高程线。" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy
