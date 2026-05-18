@@ -102,9 +102,9 @@ No outline means it's already changed to the current selected option.
 
 <ChangeLog>
 - Added buttons: High Contrast Preset and Game Color.
-- Improved compatibility with other UI mods.
-- New installs default to high-contrast preset for previews of zones to remove.
-- Polished gray/glass panel styling and rounded corners.
+- Refactor: Improved compatibility with other UI mods.
+- New default to high-contrast preset for previews of zones to remove (orange borders, no fil
+- Polished gray/glass panel styling and added rounded corners.
 </ChangeLog>
 
 <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->

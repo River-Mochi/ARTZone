@@ -109,7 +109,9 @@ The mod includes these settings:
 ## Credits
 
 - RiverMochi — author
-- Thanks to LuxStice (original ART, now obsolete), yenyang, StarQ
+- Thanks to LuxStice (original ART, now obsolete)
+- yenyang - technical feedback
+- StarQ - technical feedback
 - Thanks to the CS2 modding community for testing and feedback
 
 ---
