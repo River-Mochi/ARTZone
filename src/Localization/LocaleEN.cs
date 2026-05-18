@@ -61,7 +61,7 @@ namespace EasyZoning
                     "**[ ✓ ] Enabled recommended.**" },
 
                 // Keybind
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Update Panel On/Off" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "EZ update panel On/Off" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
                     "**Keybind** to show the Easy Zoning panel quickly\n" +
                     "**default Ctrl+V**" },
@@ -75,9 +75,9 @@ namespace EasyZoning
                 // UI
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Glass panel" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
-                    "**[ ✓ ] enabled**, use a clear translucent style for the panel.\n" +
-                    "**[   ] disabled**, use a gray panel.\n\n" +
-                    "Visual style only." },
+                    "**[ ✓ ] enabled**, use a clearer translucent style for the panel.\n" +
+                    "**[   ] disabled** = gray panel.\n\n" +
+                    "<Visual style only.>" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Border color: preview removals" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
@@ -109,11 +109,16 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "High Contrast Preset" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "Sets glass panel ON, orange border, 100% border opacity, and no fill." },
+                    "Sets\n" +
+                    "<Glass panel On>\n" +
+                    "<Orange border>\n" +
+                    "<100% border opacity>\n" +
+                    "<No fill.>" },
+
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Game Color" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
-                    "Uses vanilla red border and fill to match the game's zoning tool preview." },
+                    "Uses game's vanilla red fill+border to match the game's zoning tool preview." },
   
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Orange" },
@@ -155,11 +160,11 @@ namespace EasyZoning
                 // Legacy
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Legacy right-click cycle" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
-                    "**OFF is recommended**\n" +
-                    "Off means RMB cycles all 4 modes: **Both → Left → Right → None → ...**\n\n" +
-                    "Disabled Advantage: less need to move the mouse back to the tool panel.\n\n" +
-                    "--------------------------------------\n" +
-                    "If Legacy is ON: RMB toggles in two separate sets:\n" +
+                    "**Not recommended**\n" +
+                    "Off means use the modern method: RMB cycles all 4 modes: **Both → Left → Right → None → ...**\n\n" +
+                    "Advantage: less need to move the mouse back to the tool panel.\n\n" +
+                    "<-------------------------------------->\n" +
+                    "If Legacy is ON: RMB toggles in two separate sets and more mouse moves needed:\n" +
                     "Left ↔ Right only\n" +
                     "Both ↔ None only"
                 },
