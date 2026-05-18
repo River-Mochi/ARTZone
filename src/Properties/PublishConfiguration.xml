@@ -72,7 +72,7 @@ No outline means it's already changed to the current selected option.
 - River-mochi - author
 - thanks to Kemorno (ART mod, retired) and zeeshanabid 94 (zoning toolkit, retired)
 - yenyang - technical support and encouragement
-- Lucas - patch for compatibility with other mods
+- Lucas - compatibility fix
 - Rouchesta - testing
 - CS2 modding community for testing, feedback
 
@@ -103,7 +103,7 @@ No outline means it's already changed to the current selected option.
 
 <ChangeLog>
 - Added buttons: High Contrast Preset and Game Color.
-- Refactor: Improved compatibility with other UI mods.
+- Refactor: Improved compatibility with other mods.
 - New default to high-contrast preset for previews of zones to remove (orange borders, no fil
 - Polished gray/glass panel styling and added rounded corners.
 </ChangeLog>
