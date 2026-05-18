@@ -107,6 +107,14 @@ namespace EasyZoning
                     "<0%> oculta o preenchimento.\n" +
                     "Ignorado se <Preenchimento de remoção> estiver definido como <Nenhum>." },
 
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "Alto contraste" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
+                    "Ativa painel de vidro, borda laranja, 100% de opacidade da borda e sem preenchimento." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Cor do jogo" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
+                    "Usa borda e preenchimento vermelhos como a prévia da ferramenta de zoneamento do jogo." },
+
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Laranja" },
                 { "EasyZoning.Dropdown.Color.Red", "Vermelho" },

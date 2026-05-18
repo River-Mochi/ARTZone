@@ -107,6 +107,14 @@ namespace EasyZoning
                     "<0%> は塗りつぶしを非表示にします。\n" +
                     "<削除塗りつぶし> が <なし> の場合は無視されます。" },
 
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "高コントラスト" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
+                    "ガラスパネルをオンにし、オレンジ枠、枠の不透明度100%、塗りつぶしなしにします。" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "ゲーム色" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
+                    "ゲームのゾーニングツールのプレビューに合わせて、赤い枠と赤い塗りつぶしを使います。" },
+
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "オレンジ" },
                 { "EasyZoning.Dropdown.Color.Red", "赤" },

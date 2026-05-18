@@ -107,6 +107,14 @@ namespace EasyZoning
                     "<0%> blendet die Füllung aus.\n" +
                     "Wird ignoriert, wenn <Entfernen-Füllung> auf <Keine> steht." },
 
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "Hoher Kontrast" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
+                    "Schaltet Glaspanel EIN, orangefarbenen Rand, 100% Randdeckkraft und keine Füllung ein." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Spielfarbe" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
+                    "Verwendet roten Rand und rote Füllung wie die Vorschau des Zoning-Tools im Spiel." },
+
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Orange" },
                 { "EasyZoning.Dropdown.Color.Red", "Rot" },

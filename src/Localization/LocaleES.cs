@@ -107,6 +107,14 @@ namespace EasyZoning
                     "<0%> oculta el relleno.\n" +
                     "Se ignora si <Relleno de eliminación> está en <Ninguno>." },
 
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "Alto contraste" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
+                    "Activa panel de vidrio, borde naranja, 100% de opacidad del borde y sin relleno." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Color del juego" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
+                    "Usa borde y relleno rojos para coincidir con la vista previa de zonificación del juego." },
+
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Naranja" },
                 { "EasyZoning.Dropdown.Color.Red", "Rojo" },

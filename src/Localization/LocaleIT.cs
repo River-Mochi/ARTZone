@@ -107,6 +107,14 @@ namespace EasyZoning
                     "<0%> nasconde il riempimento.\n" +
                     "Ignorato se <Riempimento rimozione> è impostato su <Nessuno>." },
 
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "Alto contrasto" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
+                    "Attiva pannello vetro, bordo arancione, opacità bordo 100% e nessun riempimento." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Colore gioco" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
+                    "Usa bordo e riempimento rossi come l’anteprima dello strumento zone del gioco." },
+
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Arancione" },
                 { "EasyZoning.Dropdown.Color.Red", "Rosso" },

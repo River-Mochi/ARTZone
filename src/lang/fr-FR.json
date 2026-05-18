@@ -8,7 +8,7 @@
   "EasyZoning.NewRoads.Tooltip.Left": "Côté gauche uniquement. Cliquer à nouveau pour Aucun.",
   "EasyZoning.NewRoads.Tooltip.Right": "Côté droit uniquement. Cliquer à nouveau pour Aucun.",
 
-  "EasyZoning.ExistingRoads.Tooltip.Both": "Deux côtés. Cliquer à nouveau pour Aucun.",
+  "EasyZoning.ExistingRoads.Tooltip.Both": "Deux côtés. Cliquer à nouveau pour Aucun. Aperçu rouge = supprimer.",
   "EasyZoning.ExistingRoads.Tooltip.Left": "Côté gauche uniquement. Cliquer à nouveau pour Aucun. Le clic droit fait défiler les zones.",
   "EasyZoning.ExistingRoads.Tooltip.Right": "Côté droit uniquement. Cliquer à nouveau pour Aucun. Le clic droit fait défiler les zones.",
   "EasyZoning.ExistingRoads.Tooltip.Contour": "Afficher les courbes de niveau du terrain."

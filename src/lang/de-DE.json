@@ -8,7 +8,7 @@
   "EasyZoning.NewRoads.Tooltip.Left": "Nur linke Seite. Erneut klicken für Keine.",
   "EasyZoning.NewRoads.Tooltip.Right": "Nur rechte Seite. Erneut klicken für Keine.",
 
-  "EasyZoning.ExistingRoads.Tooltip.Both": "Beide Seiten. Erneut klicken für Keine.",
+  "EasyZoning.ExistingRoads.Tooltip.Both": "Beide Seiten. Erneut klicken für Keine. Rote Vorschau = entfernen.",
   "EasyZoning.ExistingRoads.Tooltip.Left": "Nur linke Seite. Erneut klicken für Keine. Rechtsklick wechselt die Zonen.",
   "EasyZoning.ExistingRoads.Tooltip.Right": "Nur rechte Seite. Erneut klicken für Keine. Rechtsklick wechselt die Zonen.",
   "EasyZoning.ExistingRoads.Tooltip.Contour": "Geländehöhenlinien anzeigen."

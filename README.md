@@ -25,6 +25,7 @@ Edit road zoning in Cities: Skylines II
 - Open with the **top-left Easy Zoning button** or **Ctrl + V**
 - Use the same 3 zoning buttons for **Both**, **Left**, **Right**, or **None**
 - Hover a zonable road segment to preview the result
+- Red preview cells are cells that will be removed
 - **Right-Click** cycles zoning choices before applying
 - **Left-Click** applies the change.
 - **Hold LMB and drag** to select multiple segments to change.
@@ -47,6 +48,10 @@ Edit road zoning in Cities: Skylines II
   - **Glass panel** style
   - **Gray panel** style
 - This is visual only, does not use blur filter for better performance.
+
+### Preview colors
+- **High Contrast Preset** uses an orange border and no fill for removal preview
+- **Game Color** uses the game's red removal preview style
 
 ---
 
@@ -77,6 +82,7 @@ The mod includes these settings:
 - **Rebindable hotkey** for the EZ panel/tool
 - **Contour button** on/off
 - **Glass panel style** on/off
+- **Preview color presets** for removal previews
 - **Legacy right-click cycle**
 - Optional built-in **usage instructions**
 
@@ -103,7 +109,9 @@ The mod includes these settings:
 ## Credits
 
 - RiverMochi — author
-- Thanks to LuxStice (original ART, now obsolete), yenyang, StarQ
+- Thanks to LuxStice (original ART, now obsolete)
+- yenyang - technical feedback
+- StarQ - technical feedback
 - Thanks to the CS2 modding community for testing and feedback
 
 ---

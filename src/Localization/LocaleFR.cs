@@ -107,6 +107,14 @@ namespace EasyZoning
                     "<0%> masque le remplissage.\n" +
                     "Ignoré si <Remplissage suppression> est réglé sur <Aucun>." },
 
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "Contraste élevé" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
+                    "Active le panneau vitré, la bordure orange, 100% d’opacité de bordure et aucun remplissage." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Couleur du jeu" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
+                    "Utilise la bordure et le remplissage rouges comme l’aperçu de zonage du jeu." },
+
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Orange" },
                 { "EasyZoning.Dropdown.Color.Red", "Rouge" },

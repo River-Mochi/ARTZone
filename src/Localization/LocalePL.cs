@@ -107,6 +107,14 @@ namespace EasyZoning
                     "<0%> ukrywa wypełnienie.\n" +
                     "Ignorowane, jeśli <Wypełnienie usuwania> ustawiono na <Brak>." },
 
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "Wysoki kontrast" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
+                    "Włącza panel szklany, pomarańczowe obramowanie, 100% przezroczystości obramowania i brak wypełnienia." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Kolor gry" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
+                    "Używa czerwonego obramowania i wypełnienia jak podgląd narzędzia stref w grze." },
+
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Pomarańczowy" },
                 { "EasyZoning.Dropdown.Color.Red", "Czerwony" },
