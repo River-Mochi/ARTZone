@@ -85,6 +85,7 @@ No outline means it's already changed to the current selected option.
 <Screenshot Value="Properties/30-image-EZ-ExistingRoads.jpg" />
 <Screenshot Value="Properties/50-image-EZ-Instructions.jpg" />
 <Screenshot Value="Properties/60-image-EZ-CN.jpg" />
+    <Screenshot Value="Properties/70-image-CombinedPreviews.jpg" />
 <!--Tag, can be set multiple times-->
 <Tag Value="Code Mod" />
 
