@@ -8,7 +8,7 @@
   "EasyZoning.NewRoads.Tooltip.Left": "왼쪽만. 다시 클릭하면 없음.",
   "EasyZoning.NewRoads.Tooltip.Right": "오른쪽만. 다시 클릭하면 없음.",
 
-  "EasyZoning.ExistingRoads.Tooltip.Both": "양쪽. 다시 클릭하면 없음.",
+  "EasyZoning.ExistingRoads.Tooltip.Both": "양쪽. 다시 클릭하면 없음. 빨간 미리보기 = 제거.",
   "EasyZoning.ExistingRoads.Tooltip.Left": "왼쪽만. 다시 클릭하면 없음. 우클릭으로 구역을 순환합니다.",
   "EasyZoning.ExistingRoads.Tooltip.Right": "오른쪽만. 다시 클릭하면 없음. 우클릭으로 구역을 순환합니다.",
   "EasyZoning.ExistingRoads.Tooltip.Contour": "지형 등고선을 표시합니다."

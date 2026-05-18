@@ -113,7 +113,7 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Game Color" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
-                    "Uses vanilla red fill and hides the custom border. Panel style is unchanged." },
+                    "Uses vanilla red border and fill to match the game's zoning tool preview." },
   
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Orange" },

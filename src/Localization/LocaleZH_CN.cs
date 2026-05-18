@@ -107,6 +107,14 @@ namespace EasyZoning
                     "<0%> 隐藏填充。\n" +
                     "如果 <移除填充> 设置为 <无>，则会被忽略。" },
 
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "高对比度" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
+                    "开启玻璃面板、橙色边框、100% 边框不透明度，并且无填充。" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "游戏颜色" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
+                    "使用红色边框和红色填充，以匹配游戏分区工具的预览。" },
+
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "橙色" },
                 { "EasyZoning.Dropdown.Color.Red", "红色" },

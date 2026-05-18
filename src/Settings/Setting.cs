@@ -102,7 +102,7 @@ namespace EasyZoning
 
         [SettingsUISection(kActionsTab, kUiGroup)]
         [SettingsUIDropdown(typeof(Setting), nameof(GetRemovePreviewFillStyleValues))]
-        public string RemovePreviewFillStyle { get; set; } = kRemovePreviewFillVanillaRed;
+        public string RemovePreviewFillStyle { get; set; } = kRemovePreviewFillNone;
 
         [SettingsUISlider(min = 0, max = 100, step = 5, scalarMultiplier = 1, unit = "percentage")]
         [SettingsUIDisableByCondition(typeof(Setting), nameof(IsRemovePreviewFillOpacityDisabled))]
@@ -169,7 +169,7 @@ namespace EasyZoning
         private void SetGameColorPreset()
         {
             RemovePreviewBorderStyle = kRemovePreviewBorderVanillaRed;
-            RemovePreviewEdgeOpacityPercent = 0;
+            RemovePreviewEdgeOpacityPercent = 100;
             RemovePreviewFillStyle = kRemovePreviewFillVanillaRed;
             RemovePreviewFillOpacityPercent = 100;
         }

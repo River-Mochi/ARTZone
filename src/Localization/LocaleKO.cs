@@ -107,6 +107,14 @@ namespace EasyZoning
                     "<0%>는 채우기를 숨깁니다.\n" +
                     "<제거 채우기>가 <없음>이면 무시됩니다." },
 
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "고대비" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
+                    "유리 패널 켜기, 주황색 테두리, 테두리 불투명도 100%, 채우기 없음으로 설정합니다." },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "게임 색상" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
+                    "게임의 구역 도구 미리보기와 맞게 빨간 테두리와 빨간 채우기를 사용합니다." },
+
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "주황색" },
                 { "EasyZoning.Dropdown.Color.Red", "빨간색" },

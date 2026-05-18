@@ -94,7 +94,7 @@ namespace EasyZoning.Tools
 
             string borderStyle = Mod.Settings?.RemovePreviewBorderStyle ?? Setting.kRemovePreviewBorderOrange;
             float edgeAlpha = math.saturate((Mod.Settings?.RemovePreviewEdgeOpacityPercent ?? 100) / 100f);
-            string fillStyle = Mod.Settings?.RemovePreviewFillStyle ?? Setting.kRemovePreviewFillVanillaRed;
+            string fillStyle = Mod.Settings?.RemovePreviewFillStyle ?? Setting.kRemovePreviewFillNone;
             float fillAlpha = math.saturate((Mod.Settings?.RemovePreviewFillOpacityPercent ?? 100) / 100f);
             bool edgeChanged = false;
             bool fillChanged = false;

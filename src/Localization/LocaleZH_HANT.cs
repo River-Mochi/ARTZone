@@ -107,6 +107,14 @@ namespace EasyZoning
                     "<0%> 隱藏填滿。\n" +
                     "如果 <移除填滿> 設為 <無>，則會被忽略。" },
 
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "高對比度" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
+                    "開啟玻璃面板、橙色邊框、100% 邊框不透明度，並且無填滿。" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "遊戲顏色" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
+                    "使用紅色邊框和紅色填滿，以符合遊戲分區工具的預覽。" },
+
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "橙色" },
                 { "EasyZoning.Dropdown.Color.Red", "紅色" },

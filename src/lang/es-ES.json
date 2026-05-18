@@ -8,7 +8,7 @@
   "EasyZoning.NewRoads.Tooltip.Left": "Solo lado izquierdo. Haz clic otra vez para Ninguno.",
   "EasyZoning.NewRoads.Tooltip.Right": "Solo lado derecho. Haz clic otra vez para Ninguno.",
 
-  "EasyZoning.ExistingRoads.Tooltip.Both": "Ambos lados. Haz clic otra vez para Ninguno.",
+  "EasyZoning.ExistingRoads.Tooltip.Both": "Ambos lados. Haz clic otra vez para Ninguno. Vista previa roja = eliminar.",
   "EasyZoning.ExistingRoads.Tooltip.Left": "Solo lado izquierdo. Haz clic otra vez para Ninguno. El clic derecho recorre las zonas.",
   "EasyZoning.ExistingRoads.Tooltip.Right": "Solo lado derecho. Haz clic otra vez para Ninguno. El clic derecho recorre las zonas.",
   "EasyZoning.ExistingRoads.Tooltip.Contour": "Mostrar líneas de contorno del terreno."

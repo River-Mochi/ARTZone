@@ -8,7 +8,7 @@
   "EasyZoning.NewRoads.Tooltip.Left": "Tylko lewa strona. Kliknij ponownie, aby ustawić Brak.",
   "EasyZoning.NewRoads.Tooltip.Right": "Tylko prawa strona. Kliknij ponownie, aby ustawić Brak.",
 
-  "EasyZoning.ExistingRoads.Tooltip.Both": "Obie strony. Kliknij ponownie, aby ustawić Brak.",
+  "EasyZoning.ExistingRoads.Tooltip.Both": "Obie strony. Kliknij ponownie, aby ustawić Brak. Czerwony podgląd = usuwanie.",
   "EasyZoning.ExistingRoads.Tooltip.Left": "Tylko lewa strona. Kliknij ponownie, aby ustawić Brak. Prawy przycisk myszy przełącza strefy.",
   "EasyZoning.ExistingRoads.Tooltip.Right": "Tylko prawa strona. Kliknij ponownie, aby ustawić Brak. Prawy przycisk myszy przełącza strefy.",
   "EasyZoning.ExistingRoads.Tooltip.Contour": "Pokaż linie poziomic terenu."
