@@ -5,7 +5,7 @@
 //   - buttons: Both, Left, Right, Contour
 //   - Appended to Game, not injected into vanilla Tool Options.
 //   - Keep styling in ez-existingRoadsPanel.module.scss only.
-//   - Do not use wildcard selectors against vanilla / mod - owned wrapper classes.
+//   - Do not use wildcard selectors against vanilla / mod-owned wrapper classes.
 
 import React from "react";
 import { bindValue, trigger, useValue } from "cs2/api";
