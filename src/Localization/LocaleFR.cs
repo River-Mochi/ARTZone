@@ -67,7 +67,10 @@ namespace EasyZoning
                     "**par défaut Ctrl+V**" },
 
                 // Compatibility
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ Bouton de courbes de niveau" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ContourIconText)), "Courbes de niveau" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ContourIconText)), "" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "Afficher le bouton" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
                     "**[ ✓ ] activé**, affiche le bouton de terrain Contour dans le panneau de mise à jour des routes existantes du mod.\n\n" +
                     "● Désactivez ceci si vous préférez un panneau plus petit ou si un autre mod gère les lignes de terrain." },
@@ -149,7 +152,7 @@ namespace EasyZoning
                     "8. <Annuler :> éloignez la souris et relâchez **LMB**.\n\n" +
                     "-------------------------------------------\n" +
                     "<BOUTON OPTIONNEL>\n" +
-                    "• <Courbes de niveau> affiche les lignes d’élévation du terrain." },
+                    "<◎ Courbes de niveau> affiche les lignes d’élévation du terrain." },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy

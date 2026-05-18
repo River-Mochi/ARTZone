@@ -67,7 +67,10 @@ namespace EasyZoning
                     "**Standard Ctrl+V**" },
 
                 // Compatibility
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "◉ Höhenlinien-Schaltfläche" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ContourIconText)), "Konturlinien" },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.ContourIconText)), "" },
+
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "Schaltfläche anzeigen" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
                     "**[ ✓ ] aktiviert**, zeigt die Contour-Gelände-Schaltfläche im Update-Panel für bestehende Straßen des Mods.\n\n" +
                     "● Deaktivieren, wenn ein kleineres Panel gewünscht ist oder ein anderer Mod Geländelinien übernimmt." },
@@ -149,7 +152,7 @@ namespace EasyZoning
                     "8. <Abbrechen:> Maus wegbewegen und **LMB** loslassen.\n\n" +
                     "-------------------------------------------\n" +
                     "<OPTIONALER BUTTON>\n" +
-                    "• <Höhenlinien> zeigt Geländehöhenlinien." },
+                    "<◎ Höhenlinien> zeigt Geländehöhenlinien." },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy
