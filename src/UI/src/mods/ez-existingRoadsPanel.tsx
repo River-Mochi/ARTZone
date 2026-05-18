@@ -1,11 +1,11 @@
 // File: src/UI/src/mods/ez-existingRoadsPanel.tsx
 // Purpose:
-//   Builds the EZ SIP and buttons for updating existing roads.
+//   Builds the EZ-owned compact panel and buttons for updating existing roads.
 // Notes:
-//   - compact panel and buttons: Both, Left, Right, Contour
+//   - buttons: Both, Left, Right, Contour
 //   - Appended to Game, not injected into vanilla Tool Options.
-//   - Keep styling in ez-existingRoadsPanel.module.scss only; no wildcard
-//     selectors against vanilla / mod - owned wrapper classes.
+//   - Keep styling in ez-existingRoadsPanel.module.scss only.
+//   - Do not use wildcard selectors against vanilla / mod - owned wrapper classes.
 
 import React from "react";
 import { bindValue, trigger, useValue } from "cs2/api";
