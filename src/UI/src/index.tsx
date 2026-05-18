@@ -1,6 +1,6 @@
 // File: src/UI/src/index.tsx
 // Purpose: Hook the UI into vanilla, register top-left button, inject new-road
-// controls into vanilla Tool Options, and render the existing-road panel as
+// controls into vanilla Tool Options render the existing-road panel as
 // EZ-owned UI.
 // UI dev mode: launch with --uiDeveloperMode and open localhost:9444.
 
