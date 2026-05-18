@@ -73,9 +73,14 @@ namespace EasyZoning
 
         // --- Compatibility ---
 
+        [SettingsUIMultilineText("Media/Tools/Snap Options/ContourLines.svg")]
+        [SettingsUISection(kActionsTab, kCompatibilityGroup)]
+        public string ContourIconText => string.Empty;
+
         // Default ON.
         [SettingsUISection(kActionsTab, kCompatibilityGroup)]
         public bool ShowContourButton { get; set; } = true;
+
 
         // --- UI ---
 
