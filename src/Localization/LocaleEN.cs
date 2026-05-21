@@ -136,14 +136,6 @@ namespace EasyZoning
                     "Show or hide the **usage instructions** below." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
-                    "<New Road>\n" +
-                    "1. Open Roads panel (pick a road).\n" +
-                    "2. Bottom of road tool panel: use the 3 EZ icons for Both / Left / Right.\n" +
-                    "   Click the selected button again for None.\n" +
-                    "3. Draw as usual.\n\n" +
-                    "-----------------------------------------\n" +
-                    "  <RMB> = right-click, <LMB> = left-click\n" +
-                    "-----------------------------------------\n\n" +
                     "<Existing Road>\n" +
                     "1. Open EZ Update panel: click <Ctrl+V> to turn the panel On/Off\n" +
                     "   (<top-left icon> does the same).\n" +
@@ -155,8 +147,16 @@ namespace EasyZoning
                     "6. <LMB one time>: applies (locks it in).\n" +
                     "7. <LMB hold + drag> along many road sections, release to apply.\n" +
                     "8. <Cancel:> move mouse away and release **LMB**.\n\n" +
+                    "-----------------------------------------\n" +
+                    "  <RMB> = right-click, <LMB> = left-click\n" +
+                    "-----------------------------------------\n\n" +
+                    "<New Road>\n" +
+                    "1. Open Roads panel (pick a road).\n" +
+                    "2. Bottom of road tool panel: use the 3 EZ icons for Both / Left / Right.\n" +
+                    "   Click the selected button again for None.\n" +
+                    "3. Draw as usual.\n\n" +
                     "-------------------------------------------\n" +
-                    "<OPTIONAL BUTTON>\n" +
+                    "<Terrain button>\n" +
                     "<◎ Contour Lines> shows terrain elevation lines."
                 },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },

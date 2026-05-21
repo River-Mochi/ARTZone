@@ -1,5 +1,5 @@
 // File: src/Mod.cs
-// Purpose: Mod entrypoint; registers settings, localization, ECS systems, keybindings, and locale-change hooks.
+// Purpose: Mod entrypoint; registers settings, localization, ECS systems, and keybindings.
 // Notes:
 //   • Locales install before Options UI so labels render correctly.
 //   • Existing-roads tool uses the game tool actions:
@@ -12,15 +12,14 @@ namespace EasyZoning
 {
     using Colossal;                  // IDictionarySource (locale sources)
     using Colossal.IO.AssetDatabase; // AssetDatabase.LoadSettings
-    using Colossal.Localization;     // LocalizationManager (locale sources + change hook)
+    using Colossal.Localization;     // LocalizationManager (locale sources)
     using Colossal.Logging;          // ILog, LogManager (mod log)
     using CS2HonuShared;             // LogUtils (safe logging + WarnOnce)
     using EasyZoning.Tools;          // ECS systems scheduled by UpdateSystem
     using Game;                      // UpdateSystem, SystemUpdatePhase
-    using Game.Input;                // ProxyAction (Ctrl+V action)
     using Game.Modding;              // IMod
     using Game.SceneFlow;            // GameManager (localization manager access)
-    using System;                    // Exception, Func<T>, StringComparison
+    using System;                    // Exception, Func<T>
     using System.Reflection;         // Assembly (version number from csproj)
 
     public sealed class Mod : IMod
@@ -64,7 +63,7 @@ namespace EasyZoning
 #endif
             );
 
-        // ---- GLOBAL SETTINGS / KEYBIND ----
+        // ---- GLOBAL SETTINGS ----
 
         /// <summary>
         /// Global settings instance (Options UI).
@@ -74,22 +73,9 @@ namespace EasyZoning
             get; private set;
         }
 
-        /// <summary>
-        /// ProxyAction for the Easy Zoning tool toggle (default Ctrl+V).
-        /// </summary>
-        public static ProxyAction? ToggleToolAction
-        {
-            get; private set;
-        }
-
         // ---- PRIVATE STATE ----
 
         private static bool s_BannerLogged;
-        private static bool s_ReapplyingLocale;
-
-#if DEBUG
-        private static string? s_LastLocaleId;
-#endif
 
         // ---- IMod IMPLEMENTATION ----
 
@@ -138,16 +124,6 @@ namespace EasyZoning
             try
             {
                 setting.RegisterKeyBindings();
-
-                ToggleToolAction = setting.GetAction(kToggleToolActionName);
-                if (ToggleToolAction != null)
-                {
-                    ToggleToolAction.shouldBeEnabled = true;
-                }
-                else
-                {
-                    WarnSafe(( ) => $"Keybinding action '{kToggleToolActionName}' not found.");
-                }
             }
             catch (Exception ex)
             {
@@ -183,74 +159,23 @@ namespace EasyZoning
                 WarnSafe(( ) => $"System scheduling/init failed: {ex.GetType().Name}: {ex.Message}");
             }
 
-            // Locale-change hook: re-register Options UI when active dictionary changes.
-            LocalizationManager? lm = GameManager.instance.localizationManager;
-            if (lm != null)
-            {
-                lm.onActiveDictionaryChanged -= OnLocaleChanged;
-                lm.onActiveDictionaryChanged += OnLocaleChanged;
-            }
+            // No active-dictionary event hook is needed here. All Easy Zoning locale
+            // sources are registered once above, and the game rebuilds the active
+            // dictionary from registered sources when the player changes language.
         }
 
         public void OnDispose( )
         {
             LogSafe(( ) => "OnDispose");
 
-            LocalizationManager? lm = GameManager.instance?.localizationManager;
-            if (lm != null)
-            {
-                lm.onActiveDictionaryChanged -= OnLocaleChanged;
-            }
-
-            if (ToggleToolAction != null)
-            {
-                ToggleToolAction.shouldBeEnabled = false;
-                ToggleToolAction = null;
-            }
-
             if (Settings != null)
             {
-                try
-                {
-                    Settings.UnregisterInOptionsUI();
-                }
-                catch (Exception ex)
-                {
-                    WarnSafe(( ) => $"UnregisterInOptionsUI failed: {ex.GetType().Name}: {ex.Message}");
-                }
-
+                Settings.UnregisterInOptionsUI();
                 Settings = null;
             }
         }
 
         // ---- LOCALE HANDLING ----
-
-        private static void OnLocaleChanged( )
-        {
-            if (s_ReapplyingLocale)
-                return;
-
-            s_ReapplyingLocale = true;
-            try
-            {
-                LocalizationManager? lm = GameManager.instance?.localizationManager;
-                string id = lm?.activeLocaleId ?? "(unknown)";
-
-#if DEBUG
-                if (!string.Equals(id, s_LastLocaleId, StringComparison.Ordinal))
-                {
-                    LogSafe(( ) => "[EZ] Active locale = " + id);
-                    s_LastLocaleId = id;
-                }
-#endif
-                // Re-register Options UI so labels pull from the current dictionary.
-                Settings?.RegisterInOptionsUI();
-            }
-            finally
-            {
-                s_ReapplyingLocale = false;
-            }
-        }
 
         private static void AddLocaleSource(string localeId, IDictionarySource source)
         {
