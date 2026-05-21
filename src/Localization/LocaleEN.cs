@@ -136,7 +136,7 @@ namespace EasyZoning
                     "Show or hide the **usage instructions** below." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
-                    "<Existing Road>\n" +
+                    "<Existing Roads>\n" +
                     "1. Open EZ Update panel: click <Ctrl+V> to turn the panel On/Off\n" +
                     "   (<top-left icon> does the same).\n" +
                     "2. Use the 3 EZ icons for Both / Left / Right.\n" +

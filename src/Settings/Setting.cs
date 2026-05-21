@@ -42,6 +42,8 @@ namespace EasyZoning
         public const string kAboutInfoGroup = "Info";
         public const string kAboutLinksGroup = "Links";
 
+        private const string UsageIconPath = Mod.MainIconPath;
+
         public const string kRemovePreviewFillVanillaRed = "vanilla-red";
         public const string kRemovePreviewFillWhite = "white";
         public const string kRemovePreviewFillOrange = "orange";
@@ -154,7 +156,7 @@ namespace EasyZoning
         [SettingsUISection(kActionsTab, kUsageGroup)]
         public bool ShowUsage { get; set; } = false;
 
-        [SettingsUIMultilineText]
+        [SettingsUIMultilineText(UsageIconPath)]
         [SettingsUIHideByCondition(typeof(Setting), nameof(HideUsageText))]
         [SettingsUISection(kActionsTab, kUsageGroup)]
         public string UsageText => string.Empty;
