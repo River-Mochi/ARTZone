@@ -116,7 +116,7 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "High Contrast Preset" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "Sets\n" +
+                    "Preset for:\n" +
                     "<Glass panel On>\n" +
                     "<Orange border>\n" +
                     "<100% border opacity>\n" +

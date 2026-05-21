@@ -82,7 +82,7 @@ namespace EasyZoning
                     "**[   ] desactivado** = panel gris.\n\n" +
                     "<Solo estilo visual.>" },
 
-                                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Color de borde: eliminaciones en vista previa" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Color de borde: eliminaciones en vista previa" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
                     "Color del borde para la vista previa de celdas que se eliminarán.\n\n" +
                     "<Naranja> = más brillante y fácil de ver.\n" +
