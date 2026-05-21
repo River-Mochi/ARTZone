@@ -61,7 +61,7 @@ namespace EasyZoning
                     "**[ ✓ ] 建議啟用。**" },
 
                 // Keybind
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "更新面板 On/Off" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "EZ 更新面板 On/Off" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
                     "**按鍵綁定**，快速顯示 Easy Zoning 面板\n" +
                     "**預設 Ctrl+V**" },
@@ -72,21 +72,21 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "顯示按鈕" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
-                    "**[ ✓ ] 啟用**，在模組的既有道路更新面板中顯示 Contour 地形按鈕。\n\n" +
-                    "● 如果想要較小的面板，或其他模組已處理地形線，請關閉此項。" },
+                    "**[ ✓ ] 啟用**，在既有道路更新面板中顯示等高線按鈕。\n\n" +
+                    "● 如果想要較小面板，或其他模組已處理等高線，請關閉此項。" },
 
                 // UI
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ 玻璃面板" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
                     "**[ ✓ ] 啟用**，為面板使用清楚的半透明樣式。\n" +
-                    "**[   ] 停用**，使用灰色面板。\n\n" +
-                    "僅影響視覺樣式。" },
+                    "**[   ] 停用** = 灰色面板。\n\n" +
+                    "<僅影響視覺樣式。>" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "邊框顏色：移除預覽" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
                     "將被移除格子的預覽邊框顏色。\n\n" +
                     "<橘色> = 更亮，也更容易看清。\n" +
-                    "<紅色> = 更強的紅色邊框對比。\n" +
+                    "<紅色> = 紅色邊框對比更強。\n" +
                     "<原版紅色> = 符合遊戲預設外觀。" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "邊框不透明度" },
@@ -110,16 +110,21 @@ namespace EasyZoning
                     "<0%> 隱藏填滿。\n" +
                     "如果 <移除填滿> 設為 <無>，則會被忽略。" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "高對比度" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "高對比度預設" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "開啟玻璃面板、橙色邊框、100% 邊框不透明度，並且無填滿。" },
+                    "設定為\n" +
+                    "<玻璃面板 On>\n" +
+                    "<橘色邊框>\n" +
+                    "<100% 邊框不透明度>\n" +
+                    "<無填滿。>" },
+
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "遊戲顏色" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
-                    "使用紅色邊框和紅色填滿，以符合遊戲分區工具的預覽。" },
+                    "使用遊戲原版紅色填滿+邊框，以符合遊戲分區工具預覽。" },
 
                 // Dropdown values
-                { "EasyZoning.Dropdown.Color.Orange", "橙色" },
+                { "EasyZoning.Dropdown.Color.Orange", "橘色" },
                 { "EasyZoning.Dropdown.Color.Red", "紅色" },
                 { "EasyZoning.Dropdown.Color.VanillaRed", "原版紅色" },
                 { "EasyZoning.Dropdown.Color.White", "白色" },
@@ -131,14 +136,6 @@ namespace EasyZoning
                     "顯示或隱藏下方的**使用說明**。" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
-                    "<新道路>\n" +
-                    "1. 開啟道路面板（選擇一條道路）。\n" +
-                    "2. 在道路工具面板底部：使用 3 個 EZ 圖示選擇 兩側 / 左側 / 右側。\n" +
-                    "   再次點擊已選按鈕可切換為無。\n" +
-                    "3. 像平常一樣繪製。\n\n" +
-                    "-----------------------------------------\n" +
-                    "  <RMB> = 右鍵，<LMB> = 左鍵\n" +
-                    "-----------------------------------------\n\n" +
                     "<既有道路>\n" +
                     "1. 開啟 EZ Update 面板：點擊 <Ctrl+V> 開啟/關閉面板\n" +
                     "   （<左上角圖示> 也是相同功能）。\n" +
@@ -150,19 +147,28 @@ namespace EasyZoning
                     "6. <LMB 一次>：套用（鎖定設定）。\n" +
                     "7. <按住 LMB + 拖曳> 沿多個道路區段移動，放開後套用。\n" +
                     "8. <取消：> 將滑鼠移開並放開 **LMB**。\n\n" +
+                    "-----------------------------------------\n" +
+                    "  <RMB> = 右鍵，<LMB> = 左鍵\n" +
+                    "-----------------------------------------\n\n" +
+                    "<新道路>\n" +
+                    "1. 開啟道路面板（選擇一條道路）。\n" +
+                    "2. 在道路工具面板底部：使用 3 個 EZ 圖示選擇 兩側 / 左側 / 右側。\n" +
+                    "   再次點擊已選按鈕可切換為無。\n" +
+                    "3. 像平常一樣繪製。\n\n" +
                     "-------------------------------------------\n" +
-                    "<選用按鈕>\n" +
-                    "<◎ 等高線> 顯示地形高程線。" },
+                    "<地形按鈕>\n" +
+                    "<◎ 等高線> 顯示地形高程線。"
+                },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "舊版右鍵循環" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
-                    "**建議 OFF**\n" +
-                    "OFF 表示 RMB 會循環全部 4 種模式：**兩側 → 左側 → 右側 → 無 → ...**\n\n" +
-                    "停用優點：較少需要把滑鼠移回工具面板。\n\n" +
-                    "--------------------------------------\n" +
-                    "如果舊版為 ON：RMB 會在兩個獨立群組中切換：\n" +
+                    "**不建議使用**\n" +
+                    "OFF 表示使用新版方式：RMB 會循環全部 4 種模式：**兩側 → 左側 → 右側 → 無 → ...**\n\n" +
+                    "優點：比較不需要把滑鼠移回工具面板。\n\n" +
+                    "<-------------------------------------->\n" +
+                    "如果舊版為 ON：RMB 會在兩個獨立群組中切換，且需要更多滑鼠移動：\n" +
                     "僅左側 ↔ 右側\n" +
                     "僅兩側 ↔ 無"
                 },

@@ -1,4 +1,4 @@
-// File: src/Localization/LocaleFR.cs
+// File: src/Localization/LocaleFR.cs.cs
 // Purpose: French (fr-FR) strings for Options UI + Panel text.
 
 namespace EasyZoning
@@ -61,7 +61,7 @@ namespace EasyZoning
                     "**[ ✓ ] Activation recommandée.**" },
 
                 // Keybind
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Panneau de mise à jour On/Off" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Panneau EZ On/Off" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
                     "**Raccourci clavier** pour afficher rapidement le panneau Easy Zoning\n" +
                     "**par défaut Ctrl+V**" },
@@ -72,15 +72,15 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "Afficher le bouton" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
-                    "**[ ✓ ] activé**, affiche le bouton de terrain Contour dans le panneau de mise à jour des routes existantes du mod.\n\n" +
-                    "● Désactivez ceci si vous préférez un panneau plus petit ou si un autre mod gère les lignes de terrain." },
+                    "**[ ✓ ] activé**, affiche le bouton Courbes de niveau dans le panneau de mise à jour des routes existantes.\n\n" +
+                    "● Désactivez ceci si vous préférez un panneau plus petit ou si un autre mod gère les courbes de niveau." },
 
                 // UI
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Panneau verre" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
-                    "**[ ✓ ] activé**, utilise un style transparent et translucide pour le panneau.\n" +
-                    "**[   ] désactivé**, utilise un panneau gris.\n\n" +
-                    "Style visuel uniquement." },
+                    "**[ ✓ ] activé**, utilise un style translucide plus lisible pour le panneau.\n" +
+                    "**[   ] désactivé** = panneau gris.\n\n" +
+                    "<Style visuel uniquement.>" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Couleur de bordure : suppressions en aperçu" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
@@ -112,11 +112,16 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "Contraste élevé" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "Active le panneau vitré, la bordure orange, 100% d’opacité de bordure et aucun remplissage." },
+                    "Définit\n" +
+                    "<Panneau verre ON>\n" +
+                    "<Bordure orange>\n" +
+                    "<Opacité bordure 100%>\n" +
+                    "<Sans remplissage.>" },
+
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Couleur du jeu" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
-                    "Utilise la bordure et le remplissage rouges comme l’aperçu de zonage du jeu." },
+                    "Utilise le remplissage+bordure rouges vanilla du jeu pour correspondre à l’aperçu de zonage du jeu." },
 
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Orange" },
@@ -131,15 +136,7 @@ namespace EasyZoning
                     "Afficher ou masquer les **instructions d’utilisation** ci-dessous." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
-                    "<Nouvelle route>\n" +
-                    "1. Ouvrez le panneau Routes (choisissez une route).\n" +
-                    "2. En bas du panneau d’outil de route : utilisez les 3 icônes EZ pour Deux côtés / Gauche / Droite.\n" +
-                    "   Cliquez à nouveau sur le bouton sélectionné pour Aucun.\n" +
-                    "3. Dessinez normalement.\n\n" +
-                    "-----------------------------------------\n" +
-                    "  <RMB> = clic droit, <LMB> = clic gauche\n" +
-                    "-----------------------------------------\n\n" +
-                    "<Route existante>\n" +
+                    "<Routes existantes>\n" +
                     "1. Ouvrez le panneau EZ Update : cliquez sur <Ctrl+V> pour activer/désactiver le panneau\n" +
                     "   (<icône en haut à gauche> fait la même chose).\n" +
                     "2. Utilisez les 3 icônes EZ pour Deux côtés / Gauche / Droite.\n" +
@@ -148,21 +145,30 @@ namespace EasyZoning
                     "4. Aperçu rouge = cellules à supprimer.\n" +
                     "5. <RMB fait défiler> : Deux côtés → Gauche → Droite → Aucun → ...\n" +
                     "6. <LMB une fois> : applique (verrouille le choix).\n" +
-                    "7. <Maintenir LMB + glisser> le long de plusieurs sections de route, relâcher pour appliquer.\n" +
+                    "7. <Maintenir LMB + glisser> sur plusieurs sections de route, relâcher pour appliquer.\n" +
                     "8. <Annuler :> éloignez la souris et relâchez **LMB**.\n\n" +
+                    "-----------------------------------------\n" +
+                    "  <RMB> = clic droit, <LMB> = clic gauche\n" +
+                    "-----------------------------------------\n\n" +
+                    "<Nouvelle route>\n" +
+                    "1. Ouvrez le panneau Routes (choisissez une route).\n" +
+                    "2. En bas du panneau d’outil de route : utilisez les 3 icônes EZ pour Deux côtés / Gauche / Droite.\n" +
+                    "   Cliquez à nouveau sur le bouton sélectionné pour Aucun.\n" +
+                    "3. Dessinez normalement.\n\n" +
                     "-------------------------------------------\n" +
-                    "<BOUTON OPTIONNEL>\n" +
-                    "<◎ Courbes de niveau> affiche les lignes d’élévation du terrain." },
+                    "<Bouton terrain>\n" +
+                    "<◎ Courbes de niveau> affiche les lignes d’élévation du terrain."
+                },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Cycle classique au clic droit" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
-                    "**OFF est recommandé**\n" +
-                    "OFF signifie que RMB fait défiler les 4 modes : **Deux côtés → Gauche → Droite → Aucun → ...**\n\n" +
-                    "Avantage désactivé : moins besoin de ramener la souris vers le panneau d’outil.\n\n" +
-                    "--------------------------------------\n" +
-                    "Si Classique est ON : RMB bascule dans deux groupes séparés :\n" +
+                    "**Non recommandé**\n" +
+                    "OFF signifie : RMB fait défiler les 4 modes : **Deux côtés → Gauche → Droite → Aucun → ...**\n\n" +
+                    "Avantage : moins besoin de ramener la souris vers le panneau d’outil.\n\n" +
+                    "<-------------------------------------->\n" +
+                    "Si Classique est ON : RMB bascule dans deux groupes séparés et demande plus de mouvements de souris :\n" +
                     "Gauche ↔ Droite seulement\n" +
                     "Deux côtés ↔ Aucun seulement"
                 },

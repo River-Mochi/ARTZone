@@ -1,5 +1,5 @@
 // File: src/Localization/LocalePT_BR.cs
-// Purpose: Portuguese (pt-BR) strings for Options UI + Panel text.
+// Purpose: Brazilian Portuguese (pt-BR) strings for Options UI + Panel text.
 
 namespace EasyZoning
 {
@@ -52,7 +52,7 @@ namespace EasyZoning
                 // Protections
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "● Impedir remoção de edifícios" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
-                    "**Edifícios = células ocupadas**. Impede que prévia/aplicação transforme edifícios em condenados.\n\n" +
+                    "**Edifícios = células ocupadas**. Impede que prévia/aplicação condene edifícios.\n\n" +
                     "**[ ✓ ] Recomendado ativado.**" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● Impedir reset de quadrados já pintados/zoneados" },
@@ -61,7 +61,7 @@ namespace EasyZoning
                     "**[ ✓ ] Recomendado ativado.**" },
 
                 // Keybind
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Painel de atualização On/Off" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Painel de atualização EZ On/Off" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
                     "**Atalho de teclado** para mostrar rapidamente o painel Easy Zoning\n" +
                     "**padrão Ctrl+V**" },
@@ -72,15 +72,15 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "Mostrar botão" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
-                    "**[ ✓ ] ativado**, mostra o botão de terreno Contour no painel de atualização de estradas existentes do mod.\n\n" +
-                    "● Desative isto se preferir um painel menor ou se outro mod já controlar as linhas do terreno." },
+                    "**[ ✓ ] ativado**, mostra o botão de linhas de contorno no painel de estradas existentes.\n\n" +
+                    "● Desative isto se preferir um painel menor ou se outro mod já controlar as linhas de contorno." },
 
                 // UI
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Painel de vidro" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
-                    "**[ ✓ ] ativado**, usa um estilo translúcido claro para o painel.\n" +
-                    "**[   ] desativado**, usa um painel cinza.\n\n" +
-                    "Apenas estilo visual." },
+                    "**[ ✓ ] ativado**, usa um estilo translúcido mais claro para o painel.\n" +
+                    "**[   ] desativado** = painel cinza.\n\n" +
+                    "<Apenas estilo visual.>" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Cor da borda: remoções na prévia" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
@@ -112,11 +112,16 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "Alto contraste" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "Ativa painel de vidro, borda laranja, 100% de opacidade da borda e sem preenchimento." },
+                    "Define\n" +
+                    "<Painel de vidro ON>\n" +
+                    "<Borda laranja>\n" +
+                    "<100% de opacidade da borda>\n" +
+                    "<Sem preenchimento.>" },
+
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Cor do jogo" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
-                    "Usa borda e preenchimento vermelhos como a prévia da ferramenta de zoneamento do jogo." },
+                    "Usa preenchimento+borda vermelhos vanilla para combinar com a prévia de zoneamento do jogo." },
 
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Laranja" },
@@ -124,22 +129,14 @@ namespace EasyZoning
                 { "EasyZoning.Dropdown.Color.VanillaRed", "Vermelho vanilla" },
                 { "EasyZoning.Dropdown.Color.White", "Branco" },
                 { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "Nenhum (só borda)" },
-             
+
                 // Usage toggle + multiline block
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "Mostrar instruções" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),
                     "Mostra ou oculta as **instruções de uso** abaixo." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
-                    "<Nova estrada>\n" +
-                    "1. Abra o painel Estradas (escolha uma estrada).\n" +
-                    "2. Na parte inferior do painel da ferramenta de estrada: use os 3 ícones EZ para Ambos / Esquerda / Direita.\n" +
-                    "   Clique novamente no botão selecionado para Nenhum.\n" +
-                    "3. Desenhe como sempre.\n\n" +
-                    "-----------------------------------------\n" +
-                    "  <RMB> = clique direito, <LMB> = clique esquerdo\n" +
-                    "-----------------------------------------\n\n" +
-                    "<Estrada existente>\n" +
+                    "<Estradas existentes>\n" +
                     "1. Abra o painel EZ Update: clique em <Ctrl+V> para ligar/desligar o painel\n" +
                     "   (<ícone no canto superior esquerdo> faz a mesma coisa).\n" +
                     "2. Use os 3 ícones EZ para Ambos / Esquerda / Direita.\n" +
@@ -150,19 +147,28 @@ namespace EasyZoning
                     "6. <LMB uma vez>: aplica (fixa a escolha).\n" +
                     "7. <Segure LMB + arraste> por várias seções de estrada, solte para aplicar.\n" +
                     "8. <Cancelar:> mova o mouse para longe e solte **LMB**.\n\n" +
+                    "-----------------------------------------\n" +
+                    "  <RMB> = clique direito, <LMB> = clique esquerdo\n" +
+                    "-----------------------------------------\n\n" +
+                    "<Nova estrada>\n" +
+                    "1. Abra o painel Estradas (escolha uma estrada).\n" +
+                    "2. Na parte inferior do painel da ferramenta de estrada: use os 3 ícones EZ para Ambos / Esquerda / Direita.\n" +
+                    "   Clique novamente no botão selecionado para Nenhum.\n" +
+                    "3. Desenhe como sempre.\n\n" +
                     "-------------------------------------------\n" +
-                    "<BOTÃO OPCIONAL>\n" +
-                    "<◎ Contorno> mostra linhas de elevação do terreno." },
+                    "<Botão de terreno>\n" +
+                    "<◎ Linhas de contorno> mostra linhas de elevação do terreno."
+                },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Ciclo clássico com clique direito" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
-                    "**OFF é recomendado**\n" +
-                    "OFF significa que RMB alterna todos os 4 modos: **Ambos → Esquerda → Direita → Nenhum → ...**\n\n" +
-                    "Vantagem desativada: menos necessidade de mover o mouse de volta ao painel da ferramenta.\n\n" +
-                    "--------------------------------------\n" +
-                    "Se Clássico estiver ON: RMB alterna em dois grupos separados:\n" +
+                    "**Não recomendado**\n" +
+                    "OFF usa o método moderno: RMB alterna todos os 4 modos: **Ambos → Esquerda → Direita → Nenhum → ...**\n\n" +
+                    "Vantagem: menos necessidade de mover o mouse de volta ao painel da ferramenta.\n\n" +
+                    "<-------------------------------------->\n" +
+                    "Se Clássico estiver ON: RMB alterna em dois grupos separados e exige mais movimentos do mouse:\n" +
                     "Somente Esquerda ↔ Direita\n" +
                     "Somente Ambos ↔ Nenhum"
                 },

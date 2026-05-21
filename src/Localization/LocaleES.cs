@@ -1,4 +1,4 @@
-// File: src/Localization/LocaleES.cs
+// File: src/Localization/LocaleES.cs.cs
 // Purpose: Spanish (es-ES) strings for Options UI + Panel text.
 
 namespace EasyZoning
@@ -61,7 +61,7 @@ namespace EasyZoning
                     "**[ ✓ ] Recomendado activado.**" },
 
                 // Keybind
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Panel de actualización On/Off" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "Panel EZ On/Off" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
                     "**Atajo de teclado** para mostrar rápido el panel Easy Zoning\n" +
                     "**predeterminado Ctrl+V**" },
@@ -72,15 +72,15 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "Mostrar botón" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
-                    "**[ ✓ ] activado**, muestra el botón de terreno Contour en el panel de actualización de carreteras existentes del mod.\n\n" +
-                    "● Desactiva esto si prefieres un panel más pequeño o si otro mod gestiona las líneas del terreno." },
+                    "**[ ✓ ] activado**, muestra el botón de líneas de contorno en el panel de actualización de carreteras existentes.\n\n" +
+                    "● Desactívalo si prefieres un panel más pequeño o si otro mod gestiona las líneas de contorno." },
 
                 // UI
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ Panel de cristal" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
-                    "**[ ✓ ] activado**, usa un estilo translúcido claro para el panel.\n" +
-                    "**[   ] desactivado**, usa un panel gris.\n\n" +
-                    "Solo estilo visual." },
+                    "**[ ✓ ] activado**, usa un estilo translúcido más claro para el panel.\n" +
+                    "**[   ] desactivado** = panel gris.\n\n" +
+                    "<Solo estilo visual.>" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Color de borde: eliminaciones en vista previa" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
@@ -112,11 +112,16 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "Alto contraste" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "Activa panel de vidrio, borde naranja, 100% de opacidad del borde y sin relleno." },
+                    "Establece\n" +
+                    "<Panel de cristal ON>\n" +
+                    "<Borde naranja>\n" +
+                    "<100% opacidad del borde>\n" +
+                    "<Sin relleno.>" },
+
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Color del juego" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
-                    "Usa borde y relleno rojos para coincidir con la vista previa de zonificación del juego." },
+                    "Usa el relleno+borde rojos vanilla del juego para coincidir con la vista previa de zonificación." },
 
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Naranja" },
@@ -131,15 +136,7 @@ namespace EasyZoning
                     "Muestra u oculta las **instrucciones de uso** de abajo." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
-                    "<Carretera nueva>\n" +
-                    "1. Abre el panel Carreteras (elige una carretera).\n" +
-                    "2. Abajo del panel de herramienta de carretera: usa los 3 iconos EZ para Ambos / Izquierda / Derecha.\n" +
-                    "   Haz clic de nuevo en el botón seleccionado para Ninguno.\n" +
-                    "3. Dibuja como siempre.\n\n" +
-                    "-----------------------------------------\n" +
-                    "  <RMB> = clic derecho, <LMB> = clic izquierdo\n" +
-                    "-----------------------------------------\n\n" +
-                    "<Carretera existente>\n" +
+                    "<Carreteras existentes>\n" +
                     "1. Abre el panel EZ Update: haz clic en <Ctrl+V> para activar/desactivar el panel\n" +
                     "   (<icono superior izquierdo> hace lo mismo).\n" +
                     "2. Usa los 3 iconos EZ para Ambos / Izquierda / Derecha.\n" +
@@ -150,19 +147,28 @@ namespace EasyZoning
                     "6. <LMB una vez>: aplica (lo fija).\n" +
                     "7. <Mantener LMB + arrastrar> por varias secciones de carretera, soltar para aplicar.\n" +
                     "8. <Cancelar:> aleja el mouse y suelta **LMB**.\n\n" +
+                    "-----------------------------------------\n" +
+                    "  <RMB> = clic derecho, <LMB> = clic izquierdo\n" +
+                    "-----------------------------------------\n\n" +
+                    "<Carretera nueva>\n" +
+                    "1. Abre el panel Carreteras (elige una carretera).\n" +
+                    "2. Abajo del panel de herramienta de carretera: usa los 3 iconos EZ para Ambos / Izquierda / Derecha.\n" +
+                    "   Haz clic de nuevo en el botón seleccionado para Ninguno.\n" +
+                    "3. Dibuja como siempre.\n\n" +
                     "-------------------------------------------\n" +
-                    "<BOTÓN OPCIONAL>\n" +
-                    "<◎ Contorno> muestra líneas de elevación del terreno." },
+                    "<Botón de terreno>\n" +
+                    "<◎ Líneas de contorno> muestra líneas de elevación del terreno."
+                },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "Ciclo clásico con clic derecho" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
-                    "**Se recomienda OFF**\n" +
-                    "OFF significa que RMB recorre los 4 modos: **Ambos → Izquierda → Derecha → Ninguno → ...**\n\n" +
-                    "Ventaja desactivada: menos necesidad de mover el mouse de vuelta al panel de herramienta.\n\n" +
-                    "--------------------------------------\n" +
-                    "Si Clásico está ON: RMB alterna en dos grupos separados:\n" +
+                    "**No recomendado**\n" +
+                    "OFF significa usar el método moderno: RMB recorre los 4 modos: **Ambos → Izquierda → Derecha → Ninguno → ...**\n\n" +
+                    "Ventaja: menos necesidad de mover el mouse de vuelta al panel de herramienta.\n\n" +
+                    "<-------------------------------------->\n" +
+                    "Si Clásico está ON: RMB alterna en dos grupos separados y requiere más movimientos del mouse:\n" +
                     "Izquierda ↔ Derecha solamente\n" +
                     "Ambos ↔ Ninguno solamente"
                 },

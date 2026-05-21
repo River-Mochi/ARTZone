@@ -31,15 +31,15 @@ namespace EasyZoning
                 { m_Settings.GetSettingsLocaleID(), title },
 
                 // Tabs
-                { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "작업" },
-                { m_Settings.GetOptionTabLocaleID(Setting.kLegacyTab),  "기존 방식" },
+                { m_Settings.GetOptionTabLocaleID(Setting.kActionsTab), "동작" },
+                { m_Settings.GetOptionTabLocaleID(Setting.kLegacyTab),  "레거시" },
                 { m_Settings.GetOptionTabLocaleID(Setting.kAboutTab),   "정보" },
 
                 // Groups
                 { m_Settings.GetOptionGroupLocaleID(Setting.kProtectGroup),         "보호" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup),     "키 바인딩" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kKeybindingGroup),     "키 설정" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kCompatibilityGroup),  "호환성" },
-                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "시각 효과" },
+                { m_Settings.GetOptionGroupLocaleID(Setting.kUiGroup),             "화면 표시" },
                 { m_Settings.GetOptionGroupLocaleID(Setting.kUsageGroup),          "사용법" },
 
                 // Legacy group header hidden
@@ -52,19 +52,19 @@ namespace EasyZoning
                 // Protections
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveOccupiedCells)), "● 건물 제거 방지" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveOccupiedCells)),
-                    "**건물 = 점유된 셀**. 미리보기/적용 중 건물이 철거 대상으로 바뀌는 것을 방지합니다.\n\n" +
-                    "**[ ✓ ] 켜기 권장.**" },
+                    "**건물 = 점유된 셀**. 미리보기/적용으로 건물이 폐건물 처리되는 것을 막습니다.\n\n" +
+                    "**[ ✓ ] ON 권장.**" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● 이미 칠했거나 구역 지정된 칸 초기화 방지" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemoveZonedCells)), "● 이미 칠한/구역 지정된 칸 초기화 방지" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemoveZonedCells)),
                     "미리보기/적용 중 이미 구역 지정된 셀을 초기화하지 않습니다.\n\n" +
-                    "**[ ✓ ] 켜기 권장.**" },
+                    "**[ ✓ ] ON 권장.**" },
 
                 // Keybind
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "업데이트 패널 On/Off" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ToggleZoneTool)), "EZ 업데이트 패널 ON/OFF" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ToggleZoneTool)),
-                    "Easy Zoning 패널을 빠르게 표시하는 **키 바인딩**\n" +
-                    "**기본값 Ctrl+V**" },
+                    "Easy Zoning 패널을 빠르게 표시하는 **키 설정**\n" +
+                    "**기본 Ctrl+V**" },
 
                 // Compatibility
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ContourIconText)), "등고선" },
@@ -72,52 +72,57 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowContourButton)), "버튼 표시" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowContourButton)),
-                    "**[ ✓ ] 켜짐**, 모드의 기존 도로 업데이트 패널에 Contour 지형 버튼을 표시합니다.\n\n" +
-                    "● 더 작은 패널을 원하거나 다른 모드가 지형선을 처리한다면 끄세요." },
+                    "**[ ✓ ] ON**, 기존 도로 업데이트 패널에 등고선 버튼을 표시합니다.\n\n" +
+                    "● 더 작은 패널을 원하거나 다른 모드가 등고선을 처리하면 OFF로 두세요." },
 
                 // UI
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UseGlassPanel)), "◉ 유리 패널" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UseGlassPanel)),
-                    "**[ ✓ ] 켜짐**, 패널에 선명한 반투명 스타일을 사용합니다.\n" +
-                    "**[   ] 꺼짐**, 회색 패널을 사용합니다.\n\n" +
-                    "시각 스타일만 변경합니다." },
+                    "**[ ✓ ] ON**, 더 선명한 반투명 패널 스타일을 사용합니다.\n" +
+                    "**[   ] OFF** = 회색 패널.\n\n" +
+                    "<시각 효과 전용.>" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "테두리 색상: 제거 미리보기" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "제거 미리보기 테두리 색" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
-                    "제거될 셀 미리보기의 테두리 색상입니다.\n\n" +
-                    "<주황색> = 더 밝고 보기 쉽습니다.\n" +
-                    "<빨간색> = 빨간 테두리 대비가 더 강합니다.\n" +
-                    "<바닐라 빨강> = 게임 기본 모습과 맞춥니다." },
+                    "제거될 셀 미리보기의 테두리 색입니다.\n\n" +
+                    "<주황색> = 더 밝고 보기 쉬움.\n" +
+                    "<빨간색> = 더 강한 빨간 테두리 대비.\n" +
+                    "<바닐라 빨간색> = 게임 기본 모습과 일치." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "테두리 불투명도" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
-                    "제거 미리보기 테두리의 불투명도를 조정합니다.\n\n" +
-                    "<100%>는 미리보기의 기본 반투명 상태를 유지합니다.\n" +
+                    "제거 미리보기 테두리 불투명도를 조절합니다.\n\n" +
+                    "<100%>는 미리보기의 기본 반투명 느낌을 유지합니다.\n" +
                     "<0%>는 테두리를 숨깁니다." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "채우기 색상: 제거 미리보기" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "제거 미리보기 채우기 색" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
-                    "제거 가능한 셀 미리보기의 채우기 색상 스타일입니다.\n\n" +
-                    "<바닐라 빨강> = 현재 게임 모습.\n" +
+                    "제거 가능한 셀 미리보기의 채우기 색 스타일입니다.\n\n" +
+                    "<바닐라 빨간색> = 현재 게임 모습.\n" +
                     "<흰색> = 더 깔끔한 대비.\n" +
                     "<주황색> = 주황색 테두리와 맞춤.\n" +
                     "<없음> = 테두리만, 미니멀" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "채우기 불투명도" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)),
-                    "제거 가능한 셀 미리보기의 채우기 불투명도를 조정합니다.\n\n" +
-                    "<100%>는 미리보기의 기본 반투명 상태를 유지합니다.\n" +
+                    "제거 가능한 셀 미리보기의 채우기 불투명도를 조절합니다.\n\n" +
+                    "<100%>는 미리보기의 기본 반투명 느낌을 유지합니다.\n" +
                     "<0%>는 채우기를 숨깁니다.\n" +
                     "<제거 채우기>가 <없음>이면 무시됩니다." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "고대비" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "고대비 프리셋" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "유리 패널 켜기, 주황색 테두리, 테두리 불투명도 100%, 채우기 없음으로 설정합니다." },
+                    "설정\n" +
+                    "<유리 패널 ON>\n" +
+                    "<주황색 테두리>\n" +
+                    "<테두리 불투명도 100%>\n" +
+                    "<채우기 없음.>" },
+
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "게임 색상" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
-                    "게임의 구역 도구 미리보기와 맞게 빨간 테두리와 빨간 채우기를 사용합니다." },
-
+                    "게임 구역 도구 미리보기와 맞게 바닐라 빨간색 채우기+테두리를 사용합니다." },
+  
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "주황색" },
                 { "EasyZoning.Dropdown.Color.Red", "빨간색" },
@@ -126,43 +131,44 @@ namespace EasyZoning
                 { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "없음 (테두리만)" },
 
                 // Usage toggle + multiline block
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "설명 표시" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ShowUsage)), "사용법 표시" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ShowUsage)),
-                    "아래 **사용법 설명**을 표시하거나 숨깁니다." },
+                    "아래 **사용법 안내**를 표시하거나 숨깁니다." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.UsageText)),
-                    "<새 도로>\n" +
-                    "1. 도로 패널을 엽니다(도로 선택).\n" +
-                    "2. 도로 도구 패널 아래에서 EZ 아이콘 3개로 양쪽 / 왼쪽 / 오른쪽을 선택합니다.\n" +
-                    "   선택한 버튼을 다시 클릭하면 없음이 됩니다.\n" +
-                    "3. 평소처럼 그립니다.\n\n" +
+                    "<기존 도로>\n" +
+                    "1. EZ 업데이트 패널 열기: <Ctrl+V>를 눌러 패널 ON/OFF\n" +
+                    "   (<왼쪽 위 아이콘>도 같은 기능).\n" +
+                    "2. 3개의 EZ 아이콘으로 양쪽 / 왼쪽 / 오른쪽을 선택.\n" +
+                    "   같은 버튼을 다시 누르면 없음.\n" +
+                    "3. 도로에 마우스를 올려 미리보기.\n" +
+                    "4. 빨간 미리보기 = 제거될 셀.\n" +
+                    "5. <RMB 순환>: 양쪽 → 왼쪽 → 오른쪽 → 없음 → ...\n" +
+                    "6. <LMB 한 번>: 적용(고정).\n" +
+                    "7. <LMB 누른 채 드래그>로 여러 도로 구간을 지나간 뒤 놓으면 적용.\n" +
+                    "8. <취소:> 마우스를 밖으로 옮기고 **LMB** 놓기.\n\n" +
                     "-----------------------------------------\n" +
                     "  <RMB> = 오른쪽 클릭, <LMB> = 왼쪽 클릭\n" +
                     "-----------------------------------------\n\n" +
-                    "<기존 도로>\n" +
-                    "1. EZ Update 패널 열기: <Ctrl+V>를 눌러 패널을 On/Off\n" +
-                    "   (<왼쪽 위 아이콘>도 같은 기능입니다).\n" +
-                    "2. EZ 아이콘 3개로 양쪽 / 왼쪽 / 오른쪽을 선택합니다.\n" +
-                    "   버튼을 다시 클릭하면 없음이 됩니다.\n" +
-                    "3. 도로에 마우스를 올려 미리봅니다.\n" +
-                    "4. 빨간 미리보기 = 제거될 셀.\n" +
-                    "5. <RMB 순환>: 양쪽 → 왼쪽 → 오른쪽 → 없음 → ...\n" +
-                    "6. <LMB 한 번>: 적용합니다(고정).\n" +
-                    "7. <LMB 길게 + 드래그> 여러 도로 구간을 따라 이동한 뒤 놓으면 적용됩니다.\n" +
-                    "8. <취소:> 마우스를 멀리 이동하고 **LMB**를 놓습니다.\n\n" +
+                    "<새 도로>\n" +
+                    "1. 도로 패널 열기(도로 선택).\n" +
+                    "2. 도로 도구 패널 아래쪽에서 3개 EZ 아이콘으로 양쪽 / 왼쪽 / 오른쪽 선택.\n" +
+                    "   같은 버튼을 다시 누르면 없음.\n" +
+                    "3. 평소처럼 그리기.\n\n" +
                     "-------------------------------------------\n" +
-                    "<선택 버튼>\n" +
-                    "<◎ 등고선>은 지형 높이선을 표시합니다." },
+                    "<지형 버튼>\n" +
+                    "<◎ 등고선>은 지형 높이 선을 표시합니다."
+                },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.UsageText)), "" },
 
                 // Legacy
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "기존 방식 오른쪽 클릭 순환" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.LegacyRightClickCycle)), "레거시 오른쪽 클릭 순환" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.LegacyRightClickCycle)),
-                    "**OFF 권장**\n" +
-                    "OFF이면 RMB가 4개 모드를 모두 순환합니다: **양쪽 → 왼쪽 → 오른쪽 → 없음 → ...**\n\n" +
-                    "비활성 장점: 마우스를 도구 패널로 다시 옮길 필요가 줄어듭니다.\n\n" +
-                    "--------------------------------------\n" +
-                    "기존 방식이 ON이면: RMB는 두 개의 별도 묶음 안에서 전환됩니다:\n" +
+                    "**권장하지 않음**\n" +
+                    "OFF는 최신 방식: RMB가 4개 모드를 순환: **양쪽 → 왼쪽 → 오른쪽 → 없음 → ...**\n\n" +
+                    "장점: 마우스를 도구 패널로 다시 옮길 일이 줄어듭니다.\n\n" +
+                    "<-------------------------------------->\n" +
+                    "레거시가 ON이면 RMB가 두 묶음으로만 전환되어 마우스 이동이 더 필요합니다:\n" +
                     "왼쪽 ↔ 오른쪽만\n" +
                     "양쪽 ↔ 없음만"
                 },
@@ -172,14 +178,14 @@ namespace EasyZoning
 
                 // About tab
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.NameText)),    "모드 이름" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "이 모드의 표시 이름입니다." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.NameText)),     "이 모드의 표시 이름." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.VersionText)), "버전" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "현재 모드 버전입니다." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.VersionText)),  "현재 모드 버전." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenParadox)), "Paradox Mods" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenParadox)),  "제작자의 Paradox Mods 페이지를 엽니다." },
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.OpenDiscord)), "Discord" },
-                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "모드 Discord에 참가합니다." },
+                { m_Settings.GetOptionDescLocaleID(nameof(Setting.OpenDiscord)),  "모드 Discord에 참여합니다." },
             };
 
             return d;
