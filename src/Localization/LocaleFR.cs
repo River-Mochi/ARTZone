@@ -1,4 +1,4 @@
-// File: src/Localization/LocaleFR.cs.cs
+// File: src/Localization/LocaleFR.cs
 // Purpose: French (fr-FR) strings for Options UI + Panel text.
 
 namespace EasyZoning

@@ -1,4 +1,4 @@
-// File: src/Localization/LocaleES.cs.cs
+// File: src/Localization/LocaleES.cs
 // Purpose: Spanish (es-ES) strings for Options UI + Panel text.
 
 namespace EasyZoning
