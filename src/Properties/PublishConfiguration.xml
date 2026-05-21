@@ -103,9 +103,8 @@ No outline means it's already changed to the current selected option.
 <!-- Changelog for new version. Single or multi line. Supports minimal markdown subset-->
 
 <ChangeLog>
+- add Pink and Purple Color options for the preview "zone to remove" Border and Fill.
 - update/fix all locale translation files.
-- Improved hotkey handling, on key release.
-- menu buttons: High Contrast Preset and Game Color.
 </ChangeLog>
 
 <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
