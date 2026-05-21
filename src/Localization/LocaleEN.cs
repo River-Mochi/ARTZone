@@ -109,7 +109,7 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Fill opacity" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)),
-                    "Adjusts the fill opacity for preview of removeable cells.\n\n" +
+                    "Adjusts the fill opacity for preview of removable cells.\n\n" +
                     "<100%> keeps the preview's normal translucency.\n" +
                     "<0%> hides the fill.\n" +
                     "Ignored if <Remove fill> is set to <None>." },
