@@ -87,6 +87,8 @@ namespace EasyZoning
                     "Couleur de bordure pour l’aperçu des cellules à supprimer.\n\n" +
                     "<Orange> = plus vif et plus facile à voir.\n" +
                     "<Rouge> = contraste rouge plus fort.\n" +
+                    "<Rose> = couleur vive et fun.\n" +
+                    "<Violet> = contraste doux mais visible.\n" +
                     "<Rouge vanilla> = correspond à l’apparence par défaut du jeu." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Opacité de la bordure" },
@@ -101,6 +103,8 @@ namespace EasyZoning
                     "<Rouge vanilla> = apparence actuelle du jeu.\n" +
                     "<Blanc> = contraste plus net.\n" +
                     "<Orange> = correspond à la bordure orange.\n" +
+                    "<Rose> = couleur vive et fun.\n" +
+                    "<Violet> = contraste doux mais visible.\n" +
                     "<Aucun> = bordure seule, minimaliste" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Opacité du remplissage" },
@@ -112,20 +116,22 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "Contraste élevé" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "Définit\n" +
-                    "<Panneau verre ON>\n" +
+                    "Sets\n" +
+                    "<Panneau verre On>\n" +
                     "<Bordure orange>\n" +
-                    "<Opacité bordure 100%>\n" +
-                    "<Sans remplissage.>" },
+                    "<Opacité de bordure 100%>\n" +
+                    "<Aucun remplissage.>" },
 
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Couleur du jeu" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
-                    "Utilise le remplissage+bordure rouges vanilla du jeu pour correspondre à l’aperçu de zonage du jeu." },
-
+                    "Utilise la bordure et le remplissage rouges comme l’aperçu de zonage du jeu." },
+  
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Orange" },
                 { "EasyZoning.Dropdown.Color.Red", "Rouge" },
+                { "EasyZoning.Dropdown.Color.Pink", "Rose" },
+                { "EasyZoning.Dropdown.Color.Purple", "Violet" },
                 { "EasyZoning.Dropdown.Color.VanillaRed", "Rouge vanilla" },
                 { "EasyZoning.Dropdown.Color.White", "Blanc" },
                 { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "Aucun (bordure seule)" },

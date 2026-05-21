@@ -82,11 +82,13 @@ namespace EasyZoning
                     "**[   ] desactivado** = panel gris.\n\n" +
                     "<Solo estilo visual.>" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Color de borde: eliminaciones en vista previa" },
+                                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "Color de borde: eliminaciones en vista previa" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
                     "Color del borde para la vista previa de celdas que se eliminarán.\n\n" +
                     "<Naranja> = más brillante y fácil de ver.\n" +
                     "<Rojo> = contraste de borde rojo más fuerte.\n" +
+                    "<Rosa> = color vivo y divertido.\n" +
+                    "<Morado> = contraste suave pero visible.\n" +
                     "<Rojo vanilla> = coincide con el aspecto predeterminado del juego." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Opacidad del borde" },
@@ -101,6 +103,8 @@ namespace EasyZoning
                     "<Rojo vanilla> = aspecto actual del juego.\n" +
                     "<Blanco> = contraste más limpio.\n" +
                     "<Naranja> = combina con el borde naranja.\n" +
+                    "<Rosa> = color vivo y divertido.\n" +
+                    "<Morado> = contraste suave pero visible.\n" +
                     "<Ninguno> = solo borde, minimalista" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Opacidad del relleno" },
@@ -112,8 +116,8 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "Alto contraste" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "Establece\n" +
-                    "<Panel de cristal ON>\n" +
+                    "Sets\n" +
+                    "<Panel de cristal On>\n" +
                     "<Borde naranja>\n" +
                     "<100% opacidad del borde>\n" +
                     "<Sin relleno.>" },
@@ -121,11 +125,13 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Color del juego" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
-                    "Usa el relleno+borde rojos vanilla del juego para coincidir con la vista previa de zonificación." },
-
+                    "Usa borde y relleno rojos para coincidir con la vista previa de zonificación del juego." },
+  
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Naranja" },
                 { "EasyZoning.Dropdown.Color.Red", "Rojo" },
+                { "EasyZoning.Dropdown.Color.Pink", "Rosa" },
+                { "EasyZoning.Dropdown.Color.Purple", "Morado" },
                 { "EasyZoning.Dropdown.Color.VanillaRed", "Rojo vanilla" },
                 { "EasyZoning.Dropdown.Color.White", "Blanco" },
                 { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "Ninguno (solo borde)" },

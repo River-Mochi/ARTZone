@@ -87,6 +87,8 @@ namespace EasyZoning
                     "Cor da borda para a prévia das células que serão removidas.\n\n" +
                     "<Laranja> = mais brilhante e fácil de ver.\n" +
                     "<Vermelho> = contraste de borda vermelha mais forte.\n" +
+                    "<Rosa> = cor viva e divertida.\n" +
+                    "<Roxo> = contraste suave, mas visível.\n" +
                     "<Vermelho vanilla> = combina com o visual padrão do jogo." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Opacidade da borda" },
@@ -101,6 +103,8 @@ namespace EasyZoning
                     "<Vermelho vanilla> = visual atual do jogo.\n" +
                     "<Branco> = contraste mais limpo.\n" +
                     "<Laranja> = combina com a borda laranja.\n" +
+                    "<Rosa> = cor viva e divertida.\n" +
+                    "<Roxo> = contraste suave, mas visível.\n" +
                     "<Nenhum> = só borda, minimalista" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Opacidade do preenchimento" },
@@ -112,20 +116,21 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "Alto contraste" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "Define\n" +
-                    "<Painel de vidro ON>\n" +
+                    "Sets\n" +
+                    "<Painel de vidro On>\n" +
                     "<Borda laranja>\n" +
-                    "<100% de opacidade da borda>\n" +
+                    "<100% opacidade da borda>\n" +
                     "<Sem preenchimento.>" },
-
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Cor do jogo" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
-                    "Usa preenchimento+borda vermelhos vanilla para combinar com a prévia de zoneamento do jogo." },
-
+                    "Usa borda e preenchimento vermelhos como a prévia da ferramenta de zoneamento do jogo." },
+  
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Laranja" },
                 { "EasyZoning.Dropdown.Color.Red", "Vermelho" },
+                { "EasyZoning.Dropdown.Color.Pink", "Rosa" },
+                { "EasyZoning.Dropdown.Color.Purple", "Roxo" },
                 { "EasyZoning.Dropdown.Color.VanillaRed", "Vermelho vanilla" },
                 { "EasyZoning.Dropdown.Color.White", "Branco" },
                 { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "Nenhum (só borda)" },

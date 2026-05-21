@@ -87,6 +87,8 @@ namespace EasyZoning
                     "Randfarbe für die Vorschau der zu entfernenden Zellen.\n\n" +
                     "<Orange> = heller und leichter zu erkennen.\n" +
                     "<Rot> = stärkerer roter Randkontrast.\n" +
+                    "<Pink> = kräftig und spielerisch.\n" +
+                    "<Lila> = weicher, aber gut sichtbarer Kontrast.\n" +
                     "<Vanilla-Rot> = entspricht der Standardoptik des Spiels." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Randdeckkraft" },
@@ -101,6 +103,8 @@ namespace EasyZoning
                     "<Vanilla-Rot> = aktuelle Spieloptik.\n" +
                     "<Weiß> = klarerer Kontrast.\n" +
                     "<Orange> = passt zum orangefarbenen Rand.\n" +
+                    "<Pink> = kräftig und spielerisch.\n" +
+                    "<Lila> = weicher, aber gut sichtbarer Kontrast.\n" +
                     "<Keine> = nur Rand, minimalistisch" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Fülldeckkraft" },
@@ -112,20 +116,22 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "Hoher Kontrast" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "Setzt\n" +
-                    "<Glas-Panel ON>\n" +
-                    "<Oranger Rand>\n" +
+                    "Sets\n" +
+                    "<Glas-Panel On>\n" +
+                    "<Orangefarbener Rand>\n" +
                     "<100% Randdeckkraft>\n" +
                     "<Keine Füllung.>" },
 
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Spielfarbe" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
-                    "Verwendet die vanilla rote Füllung+Randfarbe des Spiels passend zur Zoning-Vorschau." },
-
+                    "Verwendet roten Rand und rote Füllung wie die Vorschau des Zoning-Tools im Spiel." },
+  
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Orange" },
                 { "EasyZoning.Dropdown.Color.Red", "Rot" },
+                { "EasyZoning.Dropdown.Color.Pink", "Pink" },
+                { "EasyZoning.Dropdown.Color.Purple", "Lila" },
                 { "EasyZoning.Dropdown.Color.VanillaRed", "Vanilla-Rot" },
                 { "EasyZoning.Dropdown.Color.White", "Weiß" },
                 { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "Keine (nur Rand)" },

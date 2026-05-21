@@ -87,6 +87,8 @@ namespace EasyZoning
                     "Border color for cells to be removed preview.\n\n" +
                     "<Orange> = brighter and easier to see.\n" +
                     "<Red> = stronger red border contrast.\n" +
+                    "<Pink> = bright pink, easy to spot.\n" +
+                    "<Purple> = strong purple contrast.\n" +
                     "<Vanilla red> = match default game look." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Border opacity" },
@@ -101,6 +103,8 @@ namespace EasyZoning
                     "<Vanilla red> = current game look.\n" +
                     "<White> = cleaner contrast.\n" +
                     "<Orange> = matches the orange border.\n" +
+                    "<Pink> = bright pink fill.\n" +
+                    "<Purple> = purple fill.\n" +
                     "<None> = border only, minimalist" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Fill opacity" },
@@ -126,6 +130,8 @@ namespace EasyZoning
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Orange" },
                 { "EasyZoning.Dropdown.Color.Red", "Red" },
+                { "EasyZoning.Dropdown.Color.Pink", "Pink" },
+                { "EasyZoning.Dropdown.Color.Purple", "Purple" },
                 { "EasyZoning.Dropdown.Color.VanillaRed", "Vanilla red" },
                 { "EasyZoning.Dropdown.Color.White", "White" },
                 { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "None (border only)" },

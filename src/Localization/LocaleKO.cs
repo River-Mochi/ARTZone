@@ -82,51 +82,57 @@ namespace EasyZoning
                     "**[   ] OFF** = 회색 패널.\n\n" +
                     "<시각 효과 전용.>" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "제거 미리보기 테두리 색" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "테두리 색상: 제거 미리보기" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
-                    "제거될 셀 미리보기의 테두리 색입니다.\n\n" +
-                    "<주황색> = 더 밝고 보기 쉬움.\n" +
-                    "<빨간색> = 더 강한 빨간 테두리 대비.\n" +
-                    "<바닐라 빨간색> = 게임 기본 모습과 일치." },
+                    "제거될 셀 미리보기의 테두리 색상입니다.\n\n" +
+                    "<주황> = 더 밝고 보기 쉬움.\n" +
+                    "<빨강> = 더 강한 빨간 테두리 대비.\n" +
+                    "<핑크> = 밝고 재미있는 색상.\n" +
+                    "<보라> = 부드럽지만 잘 보이는 대비.\n" +
+                    "<바닐라 빨강> = 게임 기본 모양과 맞춤." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "테두리 불투명도" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
-                    "제거 미리보기 테두리 불투명도를 조절합니다.\n\n" +
-                    "<100%>는 미리보기의 기본 반투명 느낌을 유지합니다.\n" +
-                    "<0%>는 테두리를 숨깁니다." },
+                    "제거 미리보기 테두리의 불투명도를 조절합니다.\n\n" +
+                    "<100%> 미리보기의 기본 반투명 효과 유지.\n" +
+                    "<0%> 테두리 숨김." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "제거 미리보기 채우기 색" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "채우기 색상: 제거 미리보기" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
-                    "제거 가능한 셀 미리보기의 채우기 색 스타일입니다.\n\n" +
-                    "<바닐라 빨간색> = 현재 게임 모습.\n" +
+                    "제거 가능한 셀 미리보기의 채우기 색상입니다.\n\n" +
+                    "<바닐라 빨강> = 현재 게임 기본 모양.\n" +
                     "<흰색> = 더 깔끔한 대비.\n" +
-                    "<주황색> = 주황색 테두리와 맞춤.\n" +
+                    "<주황> = 주황 테두리와 맞춤.\n" +
+                    "<핑크> = 밝고 재미있는 색상.\n" +
+                    "<보라> = 부드럽지만 잘 보이는 대비.\n" +
                     "<없음> = 테두리만, 미니멀" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "채우기 불투명도" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)),
-                    "제거 가능한 셀 미리보기의 채우기 불투명도를 조절합니다.\n\n" +
-                    "<100%>는 미리보기의 기본 반투명 느낌을 유지합니다.\n" +
-                    "<0%>는 채우기를 숨깁니다.\n" +
+                    "제거 가능한 셀 미리보기 채우기의 불투명도를 조절합니다.\n\n" +
+                    "<100%> 미리보기의 기본 반투명 효과 유지.\n" +
+                    "<0%> 채우기 숨김.\n" +
                     "<제거 채우기>가 <없음>이면 무시됩니다." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "고대비 프리셋" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "고대비" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "설정\n" +
+                    "Sets\n" +
                     "<유리 패널 ON>\n" +
-                    "<주황색 테두리>\n" +
+                    "<주황 테두리>\n" +
                     "<테두리 불투명도 100%>\n" +
                     "<채우기 없음.>" },
 
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "게임 색상" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
-                    "게임 구역 도구 미리보기와 맞게 바닐라 빨간색 채우기+테두리를 사용합니다." },
+                    "게임의 구역 도구 미리보기와 맞도록 빨간 테두리+채우기를 사용합니다." },
   
                 // Dropdown values
-                { "EasyZoning.Dropdown.Color.Orange", "주황색" },
-                { "EasyZoning.Dropdown.Color.Red", "빨간색" },
-                { "EasyZoning.Dropdown.Color.VanillaRed", "바닐라 빨간색" },
+                { "EasyZoning.Dropdown.Color.Orange", "주황" },
+                { "EasyZoning.Dropdown.Color.Red", "빨강" },
+                { "EasyZoning.Dropdown.Color.Pink", "핑크" },
+                { "EasyZoning.Dropdown.Color.Purple", "보라" },
+                { "EasyZoning.Dropdown.Color.VanillaRed", "바닐라 빨강" },
                 { "EasyZoning.Dropdown.Color.White", "흰색" },
                 { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "없음 (테두리만)" },
 

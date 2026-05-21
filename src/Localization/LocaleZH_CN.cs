@@ -87,6 +87,8 @@ namespace EasyZoning
                     "将被移除单元格预览的边框颜色。\n\n" +
                     "<橙色> = 更亮，更容易看清。\n" +
                     "<红色> = 更强的红色边框对比。\n" +
+                    "<粉色> = 鲜亮又有趣。\n" +
+                    "<紫色> = 柔和但清楚可见。\n" +
                     "<原版红色> = 匹配游戏默认外观。" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "边框不透明度" },
@@ -101,6 +103,8 @@ namespace EasyZoning
                     "<原版红色> = 当前游戏外观。\n" +
                     "<白色> = 对比更清爽。\n" +
                     "<橙色> = 匹配橙色边框。\n" +
+                    "<粉色> = 鲜亮又有趣。\n" +
+                    "<紫色> = 柔和但清楚可见。\n" +
                     "<无> = 仅边框，极简" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "填充不透明度" },
@@ -110,10 +114,10 @@ namespace EasyZoning
                     "<0%> 隐藏填充。\n" +
                     "如果 <移除填充> 设置为 <无>，则会被忽略。" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "高对比度预设" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "高对比度" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "设置\n" +
-                    "<玻璃面板 ON>\n" +
+                    "Sets\n" +
+                    "<玻璃面板 On>\n" +
                     "<橙色边框>\n" +
                     "<100% 边框不透明度>\n" +
                     "<无填充。>" },
@@ -121,11 +125,13 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "游戏颜色" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
-                    "使用游戏原版红色填充+边框，以匹配游戏分区工具预览。" },
-
+                    "使用红色边框和红色填充，以匹配游戏分区工具的预览。" },
+  
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "橙色" },
                 { "EasyZoning.Dropdown.Color.Red", "红色" },
+                { "EasyZoning.Dropdown.Color.Pink", "粉色" },
+                { "EasyZoning.Dropdown.Color.Purple", "紫色" },
                 { "EasyZoning.Dropdown.Color.VanillaRed", "原版红色" },
                 { "EasyZoning.Dropdown.Color.White", "白色" },
                 { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "无（仅边框）" },

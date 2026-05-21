@@ -86,34 +86,38 @@ namespace EasyZoning
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
                     "Colore del bordo per l’anteprima delle celle da rimuovere.\n\n" +
                     "<Arancione> = più luminoso e facile da vedere.\n" +
-                    "<Rosso> = bordo rosso più contrastato.\n" +
-                    "<Rosso vanilla> = aspetto predefinito del gioco." },
+                    "<Rosso> = contrasto rosso più forte.\n" +
+                    "<Rosa> = colore vivace e divertente.\n" +
+                    "<Viola> = contrasto morbido ma visibile.\n" +
+                    "<Rosso vanilla> = come l’aspetto predefinito del gioco." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Opacità bordo" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
-                    "Regola l’opacità del bordo dell’anteprima rimozione.\n\n" +
+                    "Regola l’opacità del bordo dell’anteprima di rimozione.\n\n" +
                     "<100%> mantiene la normale trasparenza dell’anteprima.\n" +
                     "<0%> nasconde il bordo." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "Colore riempimento: anteprima rimozioni" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
-                    "Stile di riempimento per l’anteprima delle celle rimovibili.\n\n" +
+                    "Stile del colore di riempimento per l’anteprima delle celle rimovibili.\n\n" +
                     "<Rosso vanilla> = aspetto attuale del gioco.\n" +
                     "<Bianco> = contrasto più pulito.\n" +
                     "<Arancione> = abbina il bordo arancione.\n" +
-                    "<Nessuno> = solo bordo, minimal" },
+                    "<Rosa> = colore vivace e divertente.\n" +
+                    "<Viola> = contrasto morbido ma visibile.\n" +
+                    "<Nessuno> = solo bordo, minimalista" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Opacità riempimento" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)),
                     "Regola l’opacità del riempimento per l’anteprima delle celle rimovibili.\n\n" +
                     "<100%> mantiene la normale trasparenza dell’anteprima.\n" +
                     "<0%> nasconde il riempimento.\n" +
-                    "Ignorato se <Riempimento rimozione> è su <Nessuno>." },
+                    "Ignorato se <Riempimento rimozione> è impostato su <Nessuno>." },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "Preset alto contrasto" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "Alto contrasto" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "Imposta\n" +
-                    "<Pannello vetro ON>\n" +
+                    "Sets\n" +
+                    "<Pannello vetro On>\n" +
                     "<Bordo arancione>\n" +
                     "<100% opacità bordo>\n" +
                     "<Nessun riempimento.>" },
@@ -121,11 +125,13 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Colore gioco" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
-                    "Usa riempimento+bordo rosso vanilla per abbinare l’anteprima zone del gioco." },
+                    "Usa bordo e riempimento rossi come l’anteprima dello strumento zone del gioco." },
   
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Arancione" },
                 { "EasyZoning.Dropdown.Color.Red", "Rosso" },
+                { "EasyZoning.Dropdown.Color.Pink", "Rosa" },
+                { "EasyZoning.Dropdown.Color.Purple", "Viola" },
                 { "EasyZoning.Dropdown.Color.VanillaRed", "Rosso vanilla" },
                 { "EasyZoning.Dropdown.Color.White", "Bianco" },
                 { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "Nessuno (solo bordo)" },

@@ -1,6 +1,6 @@
 // File: src/Tools/PreviewColorOverrideSystem.cs
-// Purpose: Improves remove-preview visibility by overriding the vanilla
-// highlight edge color after ZoneSystem builds its shader color arrays.
+// Purpose: Improves remove-preview visibility by overriding vanilla
+// highlight edge/fill colors after ZoneSystem builds its shader color arrays.
 
 namespace EasyZoning.Tools
 {
@@ -23,6 +23,14 @@ namespace EasyZoning.Tools
         private const float kRedHue = 0.00f;
         private const float kRedSaturation = 0.95f;
         private const float kRedValue = 1.00f;
+        private const float kPinkHue = 0.92f;
+        private const float kPinkSaturation = 0.90f;
+        private const float kPinkValue = 1.00f;
+        private const float kPinkFillSaturation = 0.62f;
+        private const float kPurpleHue = 0.76f;
+        private const float kPurpleSaturation = 0.85f;
+        private const float kPurpleValue = 1.00f;
+        private const float kPurpleFillSaturation = 0.58f;
         private const string kZoneEdgeShaderProperty = "colossal_ZoneEdgeColors";
         private const string kZoneFillShaderProperty = "colossal_ZoneFillColors";
 
@@ -161,12 +169,32 @@ namespace EasyZoning.Tools
             return color;
         }
 
+        private static Color BuildPinkHighlightEdge(float alpha)
+        {
+            Color color = Color.HSVToRGB(kPinkHue, kPinkSaturation, kPinkValue);
+            color.a = alpha;
+            return color;
+        }
+
+        private static Color BuildPurpleHighlightEdge(float alpha)
+        {
+            Color color = Color.HSVToRGB(kPurpleHue, kPurpleSaturation, kPurpleValue);
+            color.a = alpha;
+            return color;
+        }
+
         private static Color BuildHighlightEdge(string borderStyle, Color edgeColor, float opacityPercent)
         {
             switch (borderStyle)
             {
                 case Setting.kRemovePreviewBorderRed:
                     return BuildRedHighlightEdge(opacityPercent);
+
+                case Setting.kRemovePreviewBorderPink:
+                    return BuildPinkHighlightEdge(opacityPercent);
+
+                case Setting.kRemovePreviewBorderPurple:
+                    return BuildPurpleHighlightEdge(opacityPercent);
 
                 case Setting.kRemovePreviewBorderVanillaRed:
                 {
@@ -206,6 +234,20 @@ namespace EasyZoning.Tools
                     Color orange = Color.HSVToRGB(kOrangeHue, kOrangeFillSaturation, kOrangeValue);
                     orange.a = vanillaFill.a * opacityPercent;
                     return orange;
+                }
+
+                case Setting.kRemovePreviewFillPink:
+                {
+                    Color pink = Color.HSVToRGB(kPinkHue, kPinkFillSaturation, kPinkValue);
+                    pink.a = vanillaFill.a * opacityPercent;
+                    return pink;
+                }
+
+                case Setting.kRemovePreviewFillPurple:
+                {
+                    Color purple = Color.HSVToRGB(kPurpleHue, kPurpleFillSaturation, kPurpleValue);
+                    purple.a = vanillaFill.a * opacityPercent;
+                    return purple;
                 }
 
                 case Setting.kRemovePreviewFillNone:

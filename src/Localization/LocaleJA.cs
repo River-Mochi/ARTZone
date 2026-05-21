@@ -82,50 +82,56 @@ namespace EasyZoning
                     "**[   ] OFF** = グレーパネル。\n\n" +
                     "<見た目だけの設定です。>" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "削除プレビューの枠線色" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewBorderStyle)), "枠線の色：削除プレビュー" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
-                    "削除されるセルのプレビュー枠線色です。\n\n" +
-                    "<オレンジ> = 明るく見やすい。\n" +
-                    "<赤> = 赤い枠線を強めに表示。\n" +
-                    "<バニラ赤> = ゲーム標準の見た目。" },
+                    "削除されるセルのプレビュー枠線の色です。\n\n" +
+                    "<オレンジ> = 明るくて見やすい。\n" +
+                    "<赤> = 赤い枠線のコントラストを強める。\n" +
+                    "<ピンク> = 明るくて楽しい色。\n" +
+                    "<紫> = やわらかいけど見やすい色。\n" +
+                    "<バニラ赤> = ゲーム標準の見た目に合わせる。" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "枠線の不透明度" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
                     "削除プレビュー枠線の不透明度を調整します。\n\n" +
-                    "<100%> は通常のプレビュー透明感を維持。\n" +
-                    "<0%> は枠線を非表示。" },
+                    "<100%> プレビュー本来の半透明を維持。\n" +
+                    "<0%> 枠線を非表示。" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "削除プレビューの塗り色" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "塗りつぶし色：削除プレビュー" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
-                    "削除可能セルのプレビュー塗り色です。\n\n" +
-                    "<バニラ赤> = 現在のゲーム風。\n" +
-                    "<白> = すっきり見やすい。\n" +
+                    "削除可能セルのプレビュー塗りつぶし色です。\n\n" +
+                    "<バニラ赤> = 現在のゲーム標準の見た目。\n" +
+                    "<白> = すっきりしたコントラスト。\n" +
                     "<オレンジ> = オレンジ枠線に合わせる。\n" +
+                    "<ピンク> = 明るくて楽しい色。\n" +
+                    "<紫> = やわらかいけど見やすい色。\n" +
                     "<なし> = 枠線のみ、ミニマル" },
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "塗りの不透明度" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "塗りつぶしの不透明度" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)),
-                    "削除可能セルのプレビュー塗り不透明度を調整します。\n\n" +
-                    "<100%> は通常のプレビュー透明感を維持。\n" +
-                    "<0%> は塗りを非表示。\n" +
-                    "<削除塗り> が <なし> の場合は無視されます。" },
+                    "削除可能セルのプレビュー塗りつぶし不透明度を調整します。\n\n" +
+                    "<100%> プレビュー本来の半透明を維持。\n" +
+                    "<0%> 塗りつぶしを非表示。\n" +
+                    "<削除塗りつぶし> が <なし> の場合は無視されます。" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "高コントラスト" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "設定内容\n" +
-                    "<ガラス風パネル ON>\n" +
+                    "Sets\n" +
+                    "<ガラスパネル On>\n" +
                     "<オレンジ枠線>\n" +
                     "<枠線不透明度 100%>\n" +
-                    "<塗りなし。>" },
+                    "<塗りつぶしなし。>" },
 
 
-                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "ゲーム標準色" },
+                { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "ゲームカラー" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
-                    "ゲームのゾーンツールプレビューに合わせて、バニラ赤の塗り+枠線を使います。" },
+                    "ゲームのゾーニングツールのプレビューに合わせて、赤い枠線と塗りつぶしを使います。" },
   
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "オレンジ" },
                 { "EasyZoning.Dropdown.Color.Red", "赤" },
+                { "EasyZoning.Dropdown.Color.Pink", "ピンク" },
+                { "EasyZoning.Dropdown.Color.Purple", "紫" },
                 { "EasyZoning.Dropdown.Color.VanillaRed", "バニラ赤" },
                 { "EasyZoning.Dropdown.Color.White", "白" },
                 { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "なし（枠線のみ）" },

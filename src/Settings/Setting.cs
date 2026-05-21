@@ -47,9 +47,13 @@ namespace EasyZoning
         public const string kRemovePreviewFillVanillaRed = "vanilla-red";
         public const string kRemovePreviewFillWhite = "white";
         public const string kRemovePreviewFillOrange = "orange";
+        public const string kRemovePreviewFillPink = "pink";
+        public const string kRemovePreviewFillPurple = "purple";
         public const string kRemovePreviewFillNone = "none";
         public const string kRemovePreviewBorderOrange = "orange";
         public const string kRemovePreviewBorderRed = "red";
+        public const string kRemovePreviewBorderPink = "pink";
+        public const string kRemovePreviewBorderPurple = "purple";
         public const string kRemovePreviewBorderVanillaRed = "vanilla-red";
 
         public Setting(IMod mod) : base(mod)
@@ -195,6 +199,16 @@ namespace EasyZoning
             },
             new DropdownItem<string>
             {
+                value = kRemovePreviewBorderPink,
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.Pink"),
+            },
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewBorderPurple,
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.Purple"),
+            },
+            new DropdownItem<string>
+            {
                 value = kRemovePreviewBorderVanillaRed,
                 displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.VanillaRed"),
             },
@@ -216,6 +230,16 @@ namespace EasyZoning
             {
                 value = kRemovePreviewFillOrange,
                 displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.Orange"),
+            },
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewFillPink,
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.Pink"),
+            },
+            new DropdownItem<string>
+            {
+                value = kRemovePreviewFillPurple,
+                displayName = LocalizedString.Id("EasyZoning.Dropdown.Color.Purple"),
             },
             new DropdownItem<string>
             {

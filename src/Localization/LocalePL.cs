@@ -86,8 +86,10 @@ namespace EasyZoning
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewBorderStyle)),
                     "Kolor obramowania dla podglądu komórek do usunięcia.\n\n" +
                     "<Pomarańczowy> = jaśniejszy i łatwiejszy do zobaczenia.\n" +
-                    "<Czerwony> = mocniejszy czerwony kontrast.\n" +
-                    "<Vanilla red> = jak domyślny wygląd gry." },
+                    "<Czerwony> = mocniejszy kontrast czerwonego obramowania.\n" +
+                    "<Różowy> = jasny i zabawny kolor.\n" +
+                    "<Fioletowy> = łagodny, ale widoczny kontrast.\n" +
+                    "<Czerwony vanilla> = zgodny z domyślnym wyglądem gry." },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)), "Przezroczystość obramowania" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewEdgeOpacityPercent)),
@@ -98,9 +100,11 @@ namespace EasyZoning
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillStyle)), "Kolor wypełnienia: podgląd usuwania" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.RemovePreviewFillStyle)),
                     "Styl koloru wypełnienia dla podglądu komórek, które można usunąć.\n\n" +
-                    "<Vanilla red> = obecny wygląd gry.\n" +
+                    "<Czerwony vanilla> = obecny wygląd gry.\n" +
                     "<Biały> = czystszy kontrast.\n" +
                     "<Pomarańczowy> = pasuje do pomarańczowego obramowania.\n" +
+                    "<Różowy> = jasny i zabawny kolor.\n" +
+                    "<Fioletowy> = łagodny, ale widoczny kontrast.\n" +
                     "<Brak> = tylko obramowanie, minimalistycznie" },
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.RemovePreviewFillOpacityPercent)), "Przezroczystość wypełnienia" },
@@ -112,20 +116,22 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "Wysoki kontrast" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "Ustawia\n" +
-                    "<Szklany panel ON>\n" +
+                    "Sets\n" +
+                    "<Szklany panel On>\n" +
                     "<Pomarańczowe obramowanie>\n" +
                     "<100% przezroczystości obramowania>\n" +
-                    "<Bez wypełnienia.>" },
+                    "<Brak wypełnienia.>" },
 
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyGameColorPreset)), "Kolor gry" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyGameColorPreset)),
-                    "Używa czerwonego wypełnienia i obramowania z gry, jak w podglądzie narzędzia stref." },
-
+                    "Używa czerwonego obramowania i wypełnienia jak podgląd narzędzia stref w grze." },
+  
                 // Dropdown values
                 { "EasyZoning.Dropdown.Color.Orange", "Pomarańczowy" },
                 { "EasyZoning.Dropdown.Color.Red", "Czerwony" },
+                { "EasyZoning.Dropdown.Color.Pink", "Różowy" },
+                { "EasyZoning.Dropdown.Color.Purple", "Fioletowy" },
                 { "EasyZoning.Dropdown.Color.VanillaRed", "Vanilla red" },
                 { "EasyZoning.Dropdown.Color.White", "Biały" },
                 { "EasyZoning.Dropdown.Fill.NoneBorderOnly", "Brak (tylko obramowanie)" },
