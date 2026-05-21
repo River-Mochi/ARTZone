@@ -116,7 +116,7 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "高コントラスト" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "Sets\n" +
+                    "プリセット内容:\n" +
                     "<ガラスパネル On>\n" +
                     "<オレンジ枠線>\n" +
                     "<枠線不透明度 100%>\n" +

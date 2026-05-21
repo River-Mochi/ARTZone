@@ -116,7 +116,7 @@ namespace EasyZoning
 
                 { m_Settings.GetOptionLabelLocaleID(nameof(Setting.ApplyHighContrastPreset)), "고대비" },
                 { m_Settings.GetOptionDescLocaleID(nameof(Setting.ApplyHighContrastPreset)),
-                    "Sets\n" +
+                    "프리셋 내용:\n" +
                     "<유리 패널 ON>\n" +
                     "<주황 테두리>\n" +
                     "<테두리 불투명도 100%>\n" +
