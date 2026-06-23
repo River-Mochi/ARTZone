@@ -1,4 +1,13 @@
+# <copyright file="check_locales.py" company="River-Mochi">
+# Copyright (c) 2026 River-Mochi. All rights reserved.
+# Licensed under the MIT License. You may not use this file except in compliance with this License.
+# See LICENSE file in the project root for full license information.
+# This notice and the MIT License notice must be kept with
+# all copies or substantial portions of this code.
+# ================= </copyright> ======================
+
 # File: src/Scripts/check_locales.py
+# Version: 0.2.0
 # Purpose:
 #   Generic checker for C# Locale*.cs dictionary files.
 #
@@ -473,7 +482,7 @@ def _next_nonspace_same_line(s: str, i: int) -> str:
 
 def count_markup_angle_brackets(s: str) -> Tuple[int, int]:
     """
-    Count '<' and '>' intended as CS2 markup markers.
+    Count '<' and '>' intended as CS2 markup to highlight words.
 
     Important:
     - <some words> are valid markup CS2 shows as green highlighted text.
@@ -492,15 +501,31 @@ def count_markup_angle_brackets(s: str) -> Tuple[int, int]:
         if ch not in "<>":
             continue
 
+        # Ignore readable comparator text such as:
+        #   balance < threshold
+        #   balance > threshold
+        #
+        # CS2 green markup normally looks like <Highlight me>, without spaces
+        # directly inside the brackets. This rule intentionally ignores only
+        # angle brackets with spaces on both immediate sides.
+        if (
+            i > 0
+            and i + 1 < len(s)
+            and s[i - 1] in " \t"
+            and s[i + 1] in " \t"
+        ):
+            continue
+
         left = _prev_nonspace_same_line(s, i)
         right = _next_nonspace_same_line(s, i)
 
         left_digit = left.isdigit() if left else False
         right_digit = right.isdigit() if right else False
 
-        # Ignore only true numeric comparators.
+        # Ignore true numeric comparators.
         if left_digit and right_digit:
             continue
+
 
         if ch == "<":
             lt += 1

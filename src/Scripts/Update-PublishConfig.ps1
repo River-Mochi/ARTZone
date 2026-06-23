@@ -1,7 +1,16 @@
+# <copyright file="Update-PublishConfig.ps1" company="River-Mochi">
+# Copyright (c) 2026 River-Mochi. All rights reserved.
+# Licensed under the MIT License. You may not use this file except in compliance with this License.
+# See LICENSE file in the project root for full license information.
+# This notice and the MIT License notice must be kept with
+# all copies or substantial portions of this code.
+# ================= </copyright> ======================
+
 # File: Update-PublishConfig.ps1
-# Version: 0.5.0
+# Version: 0.6.0
 # Purpose:
 #   - Sync <ModVersion Value="..."/> in PublishConfiguration.xml to csproj <Version>.
+#   - Optionally sync <GameVersion Value="..."/> to csproj <GameVersion>.
 #   - Enforce consistent line endings (CRLF or LF) to prevent VS "MIXED" + popup.
 #   - Optional: left-align inner text of <LongDescription> and <ChangeLog> only.
 #   - Also update any mod.json found recursively under detected repo root:
@@ -20,8 +29,11 @@ param(
   # Version string from csproj <Version>
   [Parameter(Mandatory = $true)][string]$Version,
 
+  # Optional game version string from csproj <GameVersion>
+  [string]$GameVersion,
+
   # Enforced line ending style for PublishConfiguration.xml
-  [ValidateSet('crlf','lf')][string]$Eol = 'crlf',
+  [ValidateSet('crlf','lf')][string]$Eol = 'lf',
 
   # Enforced line ending style for mod.json files
   [ValidateSet('crlf','lf')][string]$ModJsonEol = 'lf',
@@ -66,6 +78,20 @@ function Normalize-Eol([string]$s, [string]$eolKind) {
   return $s
 }
 
+function Ensure-FinalNewline([string]$s, [string]$eolKind) {
+  $eolText = "`n"
+
+  if ($eolKind -eq 'crlf') {
+    $eolText = "`r`n"
+  }
+
+  if ($s.EndsWith($eolText, [System.StringComparison]::Ordinal)) {
+    return $s
+  }
+
+  return $s + $eolText
+}
+
 function LeftAlignInnerBlock([string]$s, [string]$tagName) {
   # Only touches text inside <tagName>...</tagName>, not the tags themselves.
   $opts = [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
@@ -88,6 +114,22 @@ function LeftAlignInnerBlock([string]$s, [string]$tagName) {
 
     $openTag + $inner2 + $closeTag
   }, 1)
+}
+
+function Set-PublishTagValue([string]$s, [string]$tagName, [string]$value, [string]$pathForError) {
+  $escapedTag = [System.Text.RegularExpressions.Regex]::Escape($tagName)
+  $rx = [System.Text.RegularExpressions.Regex]::new(
+    '(?m)^(?<prefix>[\t ]*<' + $escapedTag + '\b[^>]*\bValue=")[^"]*(?<suffix>")',
+    [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+  )
+
+  if ($rx.IsMatch($s)) {
+    return $rx.Replace($s, { param($m)
+      $m.Groups['prefix'].Value + $value + $m.Groups['suffix'].Value
+    }, 1)
+  }
+
+  throw "Could not find <$tagName ... Value=""..."" ...> in: $pathForError"
 }
 
 function Strip-LeadingBomChar([string]$text) {
@@ -210,6 +252,7 @@ function Update-ModJsonVersions(
 
     # Keep JSON line endings consistent.
     $jsonUpdated = Normalize-Eol $jsonUpdated $jsonEol
+    $jsonUpdated = Ensure-FinalNewline $jsonUpdated $jsonEol
 
     if ($jsonUpdated -eq $jsonOriginal) {
       $relNoChange = Get-DisplayRelativePath $searchRoot $f.FullName
@@ -257,22 +300,18 @@ if ($LeftAlignBlocks) {
   $text = LeftAlignInnerBlock $text 'ChangeLog'
 }
 
-# Replace only the Value="..." part of <ModVersion ...>.
-$rxMod = [System.Text.RegularExpressions.Regex]::new(
-  '(?m)^(?<prefix>[\t ]*<ModVersion\b[^>]*\bValue=")[^"]*(?<suffix>")',
-  [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
-)
+# Replace only the Value="..." part of publish version tags.
+$text = Set-PublishTagValue $text 'ModVersion' $Version $Path
 
-if ($rxMod.IsMatch($text)) {
-  $text = $rxMod.Replace($text, { param($m)
-    $m.Groups['prefix'].Value + $Version + $m.Groups['suffix'].Value
-  }, 1)
-} else {
-  throw "Could not find <ModVersion ... Value=""..."" ...> in: $Path"
+$gameVersionLog = 'unchanged'
+if (-not [string]::IsNullOrWhiteSpace($GameVersion)) {
+  $text = Set-PublishTagValue $text 'GameVersion' $GameVersion $Path
+  $gameVersionLog = $GameVersion
 }
 
-# Final normalize so output is guaranteed clean.
+# Final normalize so output is guaranteed clean and editorconfig-compliant.
 $text = Normalize-Eol $text $Eol
+$text = Ensure-FinalNewline $text $Eol
 
 # Safety check: if CRLF requested, refuse to write a mixed file.
 if ($Eol -eq 'crlf') {
@@ -294,10 +333,10 @@ if ($publishChanged) {
   [System.IO.File]::WriteAllText($tmp, $text, $utf8NoBom)
   Move-Item -Force -LiteralPath $tmp -Destination $Path
 
-  Write-Host ("PublishConfiguration.xml updated: ModVersion=[{0}] EOL=[{1}] LeftAlignBlocks=[{2}] BACKUP=[{3}]" -f `
-    $Version, $Eol, $LeftAlignBlocks.IsPresent, (Split-Path -Leaf $bak))
+  Write-Host ("PublishConfiguration.xml updated: ModVersion=[{0}] GameVersion=[{1}] EOL=[{2}] LeftAlignBlocks=[{3}] BACKUP=[{4}]" -f `
+    $Version, $gameVersionLog, $Eol, $LeftAlignBlocks.IsPresent, (Split-Path -Leaf $bak))
 } else {
-  Write-Host ("No PublishConfiguration.xml change needed (ModVersion already [{0}] and formatting already clean)." -f $Version)
+  Write-Host ("No PublishConfiguration.xml change needed (ModVersion=[{0}], GameVersion=[{1}], formatting already clean)." -f $Version, $gameVersionLog)
 }
 
 # ---------------------------------------------------------

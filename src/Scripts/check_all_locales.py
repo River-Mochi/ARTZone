@@ -1,4 +1,13 @@
+# <copyright file="check_all_locales.py" company="River-Mochi">
+# Copyright (c) 2026 River-Mochi. All rights reserved.
+# Licensed under the MIT License. You may not use this file except in compliance with this License.
+# See LICENSE file in the project root for full license information.
+# This notice and the MIT License notice must be kept with
+# all copies or substantial portions of this code.
+# ================= </copyright> ======================
+
 # File: src/Scripts/check_all_locales.py
+# Version: 0.2.0
 # Purpose:
 #   Run both localization checkers:
 #   - check_locales.py   for C# Locale*.cs files

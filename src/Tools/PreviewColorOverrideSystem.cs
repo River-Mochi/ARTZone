@@ -1,3 +1,11 @@
+// <copyright file="PreviewColorOverrideSystem.cs" company="River-Mochi">
+// Copyright (c) 2026 River-Mochi. All rights reserved.
+// Licensed under the MIT License. You may not use this file except in compliance with this License.
+// See LICENSE file in the project root for full license information.
+// This notice and the MIT License notice must be kept with
+// all copies or substantial portions of this code.
+// ================= </copyright> ======================
+
 // File: src/Tools/PreviewColorOverrideSystem.cs
 // Purpose: Improves remove-preview visibility by overriding vanilla
 // highlight edge/fill colors after ZoneSystem builds its shader color arrays.

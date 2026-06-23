@@ -1,30 +1,77 @@
-* text=auto
+# File: .gitattributes version 0.6.2
+# Controls line endings and binary handling
+#
+# Policy:
+# - Use LF for normal text files.
+# - Keep classic Visual Studio .sln files as CRLF.
+# - Keep XML .slnx files as LF.
+# - Keep Windows batch scripts as CRLF.
+# - Never modify binary files.
 
-# Windows-style line endings for VS project files and C#
+# Default for text files
+* text=auto eol=lf
+
+# Visual Studio solution files
 *.sln      text eol=crlf
-*.csproj   text eol=crlf
-*.props    text eol=crlf
-*.targets  text eol=crlf
-*.cs       text eol=crlf
-*.xml     text eol=crlf
+*.slnx     text eol=lf
 
-# optional: LF renders nicer on GitHub
-*.md       text eol=lf
-*.json text eol=lf
+# Visual Studio / C# project files
+*.csproj   text eol=lf
+*.props    text eol=lf
+*.targets  text eol=lf
+*.cs       text eol=lf
+*.xml      text eol=lf
+*.resx     text eol=lf
+*.ruleset  text eol=lf
+*.config   text eol=lf
 
-*.css   text eol=lf
-*.scss  text eol=lf
-*.js    text eol=lf
-*.ts    text eol=lf
-*.tsx   text eol=lf
+# Repo meta files
+.gitattributes text eol=lf
+.editorconfig  text eol=lf
+.gitignore     text eol=lf
+
+# Markdown / config / data files
+*.md      text eol=lf
+*.txt     text eol=lf
+*.json    text eol=lf
+*.jsonc   text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
+*.toml    text eol=lf
+
+# Images / icons that are text
+*.svg     text eol=lf
+
+# COHTML / web UI files
+*.html    text eol=lf
+*.css     text eol=lf
+*.scss    text eol=lf
+*.js      text eol=lf
+*.jsx     text eol=lf
+*.ts      text eol=lf
+*.tsx     text eol=lf
 
 # Scripts
-*.sh       text eol=lf
-*.bash     text eol=lf
-*.ps1      text eol=crlf
+*.sh      text eol=lf
+*.bash    text eol=lf
+*.ps1     text eol=lf
+*.py      text eol=lf
 
-# Binaries
-*.png binary
-*.jpg binary
-*.svg binary
-*.ico binary
+# Windows batch scripts: safest as CRLF
+*.bat     text eol=crlf
+*.cmd     text eol=crlf
+
+# Binaries: never modify line endings
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.webp    binary
+*.ico     binary
+*.pdn     binary
+
+*.zip     binary
+*.7z      binary
+*.dll     binary
+*.exe     binary
+*.pdb     binary

@@ -1,3 +1,11 @@
+// <copyright file="Setting.cs" company="River-Mochi">
+// Copyright (c) 2026 River-Mochi. All rights reserved.
+// Licensed under the MIT License. You may not use this file except in compliance with this License.
+// See LICENSE file in the project root for full license information.
+// This notice and the MIT License notice must be kept with
+// all copies or substantial portions of this code.
+// ================= </copyright> ======================
+
 // File: src/Settings/Setting.cs
 // Purpose: Options UI + one rebindable hotkey (default Ctrl+V).
 // Notes:
@@ -7,13 +15,13 @@
 
 namespace EasyZoning
 {
+    using System;                    // Exception in URL open handlers
     using Colossal.IO.AssetDatabase; // FileLocation attribute (settings storage path)
     using Game.Input;                // ProxyBinding, BindingKeyboard, ActionType
     using Game.Modding;              // IMod, ModSetting base
     using Game.Settings;             // Settings UI attributes
     using Game.UI.Localization;      // LocalizedString.Id for dropdown labels
     using Game.UI.Widgets;           // DropdownItem<T>
-    using System;                    // Exception in URL open handlers
     using UnityEngine;               // Application.OpenURL
 
     [FileLocation("ModsSettings/EasyZoning/EasyZoning")]
@@ -269,7 +277,7 @@ namespace EasyZoning
 
         private const string UrlParadox =
             "https://mods.paradoxplaza.com/authors/River-mochi/cities_skylines_2?games=cities_skylines_2&orderBy=desc&sortBy=best&time=alltime";
-        private const string UrlDiscord = "https://discord.gg/HTav7ARPs2";
+        private const string UrlDiscord = "https://discord.gg/gwXgvtyhjc";
 
         [SettingsUIButtonGroup(kAboutLinksGroup)]
         [SettingsUIButton]
