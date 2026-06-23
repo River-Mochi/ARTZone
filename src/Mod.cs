@@ -18,17 +18,17 @@
 
 namespace EasyZoning
 {
+    using System;                    // Exception, Func<T>
+    using System.Reflection;         // Assembly (version number from csproj)
     using Colossal;                  // IDictionarySource (locale sources)
     using Colossal.IO.AssetDatabase; // AssetDatabase.LoadSettings
     using Colossal.Localization;     // LocalizationManager (locale sources)
     using Colossal.Logging;          // ILog, LogManager (mod log)
-    using CS2HonuShared;             // LogUtils (safe logging + WarnOnce)
+    using CS2Shared.RiverMochi;      // LogUtils (safe logging + WarnOnce)
     using EasyZoning.Tools;          // ECS systems scheduled by UpdateSystem
     using Game;                      // UpdateSystem, SystemUpdatePhase
     using Game.Modding;              // IMod
     using Game.SceneFlow;            // GameManager (localization manager access)
-    using System;                    // Exception, Func<T>
-    using System.Reflection;         // Assembly (version number from csproj)
 
     public sealed class Mod : IMod
     {
@@ -89,6 +89,7 @@ namespace EasyZoning
 
         public void OnLoad(UpdateSystem updateSystem)
         {
+            LogUtils.Configure(ModID, s_Log);
             if (!s_BannerLogged)
             {
                 s_BannerLogged = true;
